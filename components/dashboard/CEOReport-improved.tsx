@@ -71,7 +71,7 @@ const CEOReport = () => {
   // ============================================================
   // STATE 관리 - 뷰 옵션 및 선택 상태
   // ============================================================
-  const [expandedItems, setExpandedItems] = useState({});                     // 확장된 아이템 (액션아이템 토글용)
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({}); // 확장된 아이템 (액션아이템 토글용)
   const [muType, setMuType] = useState('발주');                                // MU 타입: '발주' | '매출'
   const [costType, setCostType] = useState('발주');                            // 원가 타입: '발주' | '매출' (25FW 원가현황)
   const [expenseType, setExpenseType] = useState('당월');                      // 비용 타입: '당월' | '누적'
@@ -148,11 +148,12 @@ const CEOReport = () => {
   // ============================================================
   // 헬퍼 함수 - 액션 아이템 토글
   // CEO 인사이트의 액션 아이템 확장/축소
+  // 인덱스는 'green-0', 'blue-2' 같은 문자열 키를 사용
   // ============================================================
-  const toggleActionItem = (index: number) => {
+  const toggleActionItem = (index: string) => {
     setExpandedItems(prev => ({
       ...prev,
-      [index]: !prev[index]
+      [index]: !prev[index],
     }));
   };
 
