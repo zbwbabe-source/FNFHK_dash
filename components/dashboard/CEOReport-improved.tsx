@@ -1758,7 +1758,7 @@ const CEOReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      yoy: channelYOY[selectedChannel]?.[idx]
+                      yoy: selectedChannel ? channelYOY[selectedChannel as keyof typeof channelYOY]?.[idx] : undefined
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2393,7 +2393,7 @@ const CEOReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      yoy: salesItemYOY[selectedSalesItem]?.[idx]
+                      yoy: selectedSalesItem ? salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY]?.[idx] : undefined
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2444,7 +2444,7 @@ const CEOReport = () => {
                         <>
                           <tr>
                             <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">YOY</td>
-                            {salesItemYOY[selectedSalesItem].map((yoy, idx) => (
+                            {selectedSalesItem && salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY] ? salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY].map((yoy, idx) => (
                               <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                 {yoy === null ? '-' : `${yoy}%`}
                               </td>
@@ -2598,7 +2598,7 @@ const CEOReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      yoy: inventoryItemYOY[selectedInventoryItem]?.[idx]
+                      yoy: selectedInventoryItem ? inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY]?.[idx] : undefined
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2640,7 +2640,7 @@ const CEOReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">YOY</td>
-                          {inventoryItemYOY[selectedInventoryItem].map((yoy, idx) => (
+                          {selectedInventoryItem && inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY] ? inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY].map((yoy, idx) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                               {yoy === null ? '-' : `${yoy}%`}
                             </td>
