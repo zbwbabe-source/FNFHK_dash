@@ -1673,13 +1673,13 @@ const TaiwanReport = () => {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
-                    <th rowSpan="2" className="text-left py-2 px-2 text-gray-700 font-semibold border-r border-gray-300 min-w-[100px]">항목<br/>(1K TWD)</th>
-                    <th colSpan="3" className="text-center py-1 px-1 text-gray-700 font-semibold bg-green-50 border-r border-gray-300">당월</th>
-                    <th colSpan="3" className="text-center py-1 px-1 text-gray-700 font-semibold bg-orange-50 border-r border-gray-300">당월 전년비</th>
-                    <th rowSpan="2" className="text-center py-2 px-2 text-gray-700 font-semibold bg-purple-50 border-r border-gray-300">YOY</th>
-                    <th colSpan="3" className="text-center py-1 px-1 text-gray-700 font-semibold bg-cyan-50 border-r border-gray-300">누적</th>
-                    <th colSpan="3" className="text-center py-1 px-1 text-gray-700 font-semibold bg-amber-50 border-r border-gray-300">누적 전년비</th>
-                    <th rowSpan="2" className="text-center py-2 px-2 text-gray-700 font-semibold bg-indigo-50">누적<br/>YOY</th>
+                    <th rowSpan={2} className="text-left py-2 px-2 text-gray-700 font-semibold border-r border-gray-300 min-w-[100px]">항목<br/>(1K TWD)</th>
+                    <th colSpan={3} className="text-center py-1 px-1 text-gray-700 font-semibold bg-green-50 border-r border-gray-300">당월</th>
+                    <th colSpan={3} className="text-center py-1 px-1 text-gray-700 font-semibold bg-orange-50 border-r border-gray-300">당월 전년비</th>
+                    <th rowSpan={2} className="text-center py-2 px-2 text-gray-700 font-semibold bg-purple-50 border-r border-gray-300">YOY</th>
+                    <th colSpan={3} className="text-center py-1 px-1 text-gray-700 font-semibold bg-cyan-50 border-r border-gray-300">누적</th>
+                    <th colSpan={3} className="text-center py-1 px-1 text-gray-700 font-semibold bg-amber-50 border-r border-gray-300">누적 전년비</th>
+                    <th rowSpan={2} className="text-center py-2 px-2 text-gray-700 font-semibold bg-indigo-50">누적<br/>YOY</th>
                   </tr>
                   <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
                     <th className="text-center py-1 px-1 text-gray-700 font-semibold bg-green-50 border-r">오프라인</th>
