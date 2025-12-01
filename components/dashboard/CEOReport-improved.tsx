@@ -149,7 +149,7 @@ const CEOReport = () => {
   // 헬퍼 함수 - 액션 아이템 토글
   // CEO 인사이트의 액션 아이템 확장/축소
   // ============================================================
-  const toggleActionItem = (index) => {
+  const toggleActionItem = (index: number) => {
     setExpandedItems(prev => ({
       ...prev,
       [index]: !prev[index]
