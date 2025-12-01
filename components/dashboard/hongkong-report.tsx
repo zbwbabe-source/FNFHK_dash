@@ -101,9 +101,9 @@ const HongKongReport = () => {
   const [costType, setCostType] = useState('발주'); // '발주' 또는 '매출' (25FW 원가현황)
   const [expenseType, setExpenseType] = useState('당월'); // '당월' 또는 '누적' (비용요약)
   const [opexType, setOpexType] = useState('당월'); // '당월' 또는 '누적' (영업비 카드)
-  const [selectedChannel, setSelectedChannel] = useState(null); // 채널별 매출 선택
-  const [selectedSalesItem, setSelectedSalesItem] = useState(null); // 아이템별 매출 선택
-  const [selectedInventoryItem, setSelectedInventoryItem] = useState(null); // 아이템별 재고 선택
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null); // 채널별 매출 선택
+  const [selectedSalesItem, setSelectedSalesItem] = useState<string | null>(null); // 아이템별 매출 선택
+  const [selectedInventoryItem, setSelectedInventoryItem] = useState<string | null>(null); // 아이템별 재고 선택
   const [salesPriceType, setSalesPriceType] = useState('실판'); // '실판', '택가', '할인율'
   const [selectedChannelTrend, setSelectedChannelTrend] = useState<string | null>(null); // 채널별 추세 선택 (단일 선택)
   

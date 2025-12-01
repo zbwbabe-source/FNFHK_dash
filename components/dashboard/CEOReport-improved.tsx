@@ -77,9 +77,9 @@ const CEOReport = () => {
   const [expenseType, setExpenseType] = useState('당월');                      // 비용 타입: '당월' | '누적'
   const [opexType, setOpexType] = useState('당월');                            // 영업비 타입: '당월' | '누적'
   const [calcYearView, setCalcYearView] = useState('2025');                   // 계산 연도: '2025' | '2024'
-  const [selectedChannel, setSelectedChannel] = useState(null);               // 선택된 채널 (차트 클릭 시)
-  const [selectedSalesItem, setSelectedSalesItem] = useState(null);           // 선택된 매출 아이템 (차트 클릭 시)
-  const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);   // 선택된 재고 아이템 (차트 클릭 시)
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);               // 선택된 채널 (차트 클릭 시)
+  const [selectedSalesItem, setSelectedSalesItem] = useState<string | null>(null);           // 선택된 매출 아이템 (차트 클릭 시)
+  const [selectedInventoryItem, setSelectedInventoryItem] = useState<string | null>(null);   // 선택된 재고 아이템 (차트 클릭 시)
   const [salesPriceType, setSalesPriceType] = useState('실판');                // 가격 타입: '실판' | '택가' | '할인율'
 
   // ============================================================
