@@ -1,0 +1,13 @@
+pandas>=2.2.0
+snowflake-connector-python>=3.9.0
+snowflake-sqlalchemy>=1.6.0
+openapi-generator-cli>=2.15.0
+fastapi>=0.110.0
+uvicorn>=0.30.0
+pydantic>=2.7.0
+python-multipart>=0.0.9
+requests>=2.31.0
+openpyxl>=3.1.0
+mcp>=0.1.0
+
+

@@ -1,0 +1,165 @@
+{
+  "_comment": "이 파일은 수동으로 관리합니다. 매월 손익 데이터를 직접 입력하세요.",
+  "meta": {
+    "period": 2510,
+    "period_name": "2025년 10월",
+    "last_updated": "2025-11-20",
+    "updated_by": "수동 입력"
+  },
+  "opex": {
+    "monthly": {
+      "total": 1451,
+      "total_prev": 1117,
+      "yoy": 130,
+      "breakdown": {
+        "marketing": {
+          "amount": 657,
+          "yoy": 215,
+          "description": "마케팅비"
+        },
+        "salary": {
+          "amount": 605,
+          "yoy": 137,
+          "description": "급여"
+        },
+        "commission": {
+          "amount": 131,
+          "yoy": 243,
+          "description": "지급수수료"
+        },
+        "other": {
+          "amount": 116,
+          "yoy": 92,
+          "description": "기타"
+        },
+        "rent": {
+          "amount": 85,
+          "yoy": 70,
+          "description": "임차료"
+        },
+        "depreciation": {
+          "amount": 59,
+          "yoy": 152,
+          "description": "감가상각비"
+        },
+        "travel": {
+          "amount": 47,
+          "yoy": 408,
+          "description": "여비교통비"
+        },
+        "insurance": {
+          "amount": 17,
+          "yoy": 92,
+          "description": "보험료"
+        }
+      }
+    },
+    "ytd": {
+      "total": 13385,
+      "total_prev": 12982,
+      "yoy": 103,
+      "breakdown": {
+        "salary": {
+          "amount": 5232,
+          "yoy": 114,
+          "description": "급여"
+        },
+        "marketing": {
+          "amount": 3137,
+          "yoy": 76,
+          "description": "마케팅비"
+        },
+        "commission": {
+          "amount": 1964,
+          "yoy": 194,
+          "description": "지급수수료"
+        },
+        "other": {
+          "amount": 1210,
+          "yoy": 92,
+          "description": "기타"
+        },
+        "rent": {
+          "amount": 1015,
+          "yoy": 85,
+          "description": "임차료"
+        },
+        "depreciation": {
+          "amount": 426,
+          "yoy": 115,
+          "description": "감가상각비"
+        },
+        "travel": {
+          "amount": 223,
+          "yoy": 150,
+          "description": "여비교통비"
+        },
+        "insurance": {
+          "amount": 179,
+          "yoy": 88,
+          "description": "보험료"
+        }
+      }
+    }
+  },
+  "profit": {
+    "monthly": {
+      "operating_profit": -925,
+      "operating_profit_prev": -196,
+      "operating_margin": -4.6,
+      "direct_profit": 526,
+      "direct_profit_prev": 922,
+      "direct_margin": 2.6
+    },
+    "ytd": {
+      "operating_profit": -9232,
+      "operating_profit_prev": -5640,
+      "operating_margin": -4.55,
+      "direct_profit": 4153,
+      "direct_profit_prev": 18622,
+      "direct_margin": 2.05
+    }
+  },
+  "cost": {
+    "_comment": "매출원가 관련 데이터",
+    "monthly": {
+      "cogs": 7865,
+      "cogs_prev": 7426,
+      "cogs_rate": 31.9
+    },
+    "ytd": {
+      "cogs": 79867,
+      "cogs_prev": 83456,
+      "cogs_rate": 32.1
+    }
+  },
+  "direct_cost": {
+    "_comment": "직접비 (임차료, 인건비 등)",
+    "monthly": {
+      "total": 11686,
+      "total_prev": 13009,
+      "yoy": 90
+    },
+    "ytd": {
+      "total": 119296,
+      "total_prev": 131133,
+      "yoy": 91
+    }
+  },
+  "store_performance": {
+    "_comment": "매장별 손익 데이터 - 필요시 추가",
+    "profit_stores": [],
+    "loss_stores": []
+  },
+  "_update_guide": {
+    "step1": "매월 회계 데이터 확인",
+    "step2": "opex.monthly 및 opex.ytd 업데이트",
+    "step3": "profit.monthly 및 profit.ytd 업데이트",
+    "step4": "cost 및 direct_cost 업데이트",
+    "step5": "파일 저장 후 대시보드 새로고침"
+  }
+}
+
+
+
+

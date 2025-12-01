@@ -1,0 +1,89 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pydeps
+__pycache__/
+*.py[cod]
+*$py.class
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# python
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Snowflake credentials
+snowflake_credentials.json
+config.json
+
+# 데이터 파일 (GitHub 제외)
+*.xlsx
+*.xls
+*.csv
+!components/dashboard/*.csv  # 대시보드용 CSV는 예외 (필요시)
+
+# 분석 결과물
+hongkong_analysis_*.json
+dashboard_update_data.json
+
+# 데이터베이스
+*.db
+users.db
+
+# 백업/임시 파일
+*.backup
+*.bak
+*.tmp
+
+# HTML 리포트 (생성된 파일)
+*_report_*.html
+weather_*.html
+
+# 테스트 파일
+test*.py
+test*.txt
+input.txt
+
+

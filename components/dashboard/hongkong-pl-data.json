@@ -1,0 +1,357 @@
+{
+  "metadata": {
+    "last_period": "2510",
+    "previous_period": "2410",
+    "generated_at": "2025-11-25T23:39:41.441955"
+  },
+  "current_month": {
+    "hk": {
+      "tag_sales": 18384.5,
+      "net_sales": 14703.292500000001,
+      "discount_rate": 20.02343006336859,
+      "cogs_rate": 30.353237781827087,
+      "gross_profit": 8877.377319668965,
+      "gross_profit_rate": 60.376798731773604,
+      "direct_cost": 8904.147589999999,
+      "direct_profit": -26.770270331033316,
+      "direct_profit_rate": -0.1820699025815702,
+      "sg_a": 1062.7708238962396,
+      "operating_profit": -1089.5410942272729,
+      "operating_profit_rate": -7.41018444832865
+    },
+    "mc": {
+      "tag_sales": 6294.273,
+      "net_sales": 5374.113590000001,
+      "discount_rate": 14.618994282580362,
+      "cogs_rate": 31.038800509606112,
+      "gross_profit": 3334.453418072521,
+      "gross_profit_rate": 62.04657497893565,
+      "direct_cost": 2781.54863,
+      "direct_profit": 552.9047880725211,
+      "direct_profit_rate": 10.288297387337527,
+      "sg_a": 388.4470861037606,
+      "operating_profit": 164.4577019687605,
+      "operating_profit_rate": 3.0601828415904486
+    },
+    "total": {
+      "tag_sales": 24678.773,
+      "discount": 4601.366909999997,
+      "discount_rate": 18.645039240808273,
+      "net_sales": 20077.406090000004,
+      "cogs": 7533.957840000001,
+      "cogs_rate": 30.528089220643185,
+      "gross_profit": 12211.830737741486,
+      "gross_profit_rate": 60.82374726595712,
+      "direct_cost": 11685.696219999998,
+      "direct_profit": 526.1345177414878,
+      "direct_profit_rate": 2.620530338346549,
+      "sg_a": 1451.2179100000003,
+      "operating_profit": -925.0833922585125,
+      "operating_profit_rate": -4.60758420740053,
+      "expense_detail": {
+        "salary": 584.36277,
+        "marketing": 416.96352,
+        "fee": 5.09049,
+        "rent": 79.42,
+        "insurance": 17.4444,
+        "travel": 20.890099999999993,
+        "other": 327.04663,
+        "other_detail": {
+          "depreciation": 58.95232000000001,
+          "duty_free": 0.0,
+          "govt_license": 5.33,
+          "logistics": 101.81139,
+          "maintenance": 3.95215,
+          "other_fee": 125.43270999999999,
+          "rent_free": 0.0,
+          "retirement": 20.86679,
+          "supplies": 5.7246,
+          "transport": 0.0,
+          "uniform": 0.0,
+          "utilities": 0.806,
+          "var_rent": 0.0,
+          "communication": 4.17067,
+          "bonus": 0.0
+        }
+      }
+    },
+    "prev_month": {
+      "hk": {
+        "tag_sales": 18325.150999999998,
+        "net_sales": 14763.610420000003,
+        "discount_rate": 19.4352591146452,
+        "cogs_rate": 31.11034288339562,
+        "gross_profit": 8874.132907342735,
+        "gross_profit_rate": 60.108148717613844,
+        "direct_cost": 9372.773390000002,
+        "direct_profit": -498.64048265726706,
+        "direct_profit_rate": -3.377496889119802,
+        "sg_a": 762.9419331539509,
+        "operating_profit": -1261.582415811218,
+        "operating_profit_rate": -8.545216108535175
+      },
+      "mc": {
+        "tag_sales": 8265.845631067961,
+        "net_sales": 6865.63495,
+        "discount_rate": 16.939714864806298,
+        "cogs_rate": 32.10142565482643,
+        "gross_profit": 4124.464642657265,
+        "gross_profit_rate": 60.07404519311452,
+        "direct_cost": 2704.05588,
+        "direct_profit": 1420.4087626572655,
+        "direct_profit_rate": 20.68867297783238,
+        "sg_a": 354.796736846049,
+        "operating_profit": 1065.6120258112164,
+        "operating_profit_rate": 15.520953758417006
+      },
+      "total": {
+        "tag_sales": 26590.99663106796,
+        "net_sales": 21629.245370000004,
+        "cogs": 8354.4716,
+        "gross_profit": 12998.59755,
+        "direct_cost": 12076.829270000002,
+        "direct_profit": 921.7682799999984,
+        "sg_a": 1117.73867,
+        "operating_profit": -195.97039000000154,
+        "expense_detail": {
+          "salary": 425.79677,
+          "marketing": 306.05233999999996,
+          "fee": 5.702,
+          "rent": 115.43613,
+          "insurance": 18.99547,
+          "travel": 11.4255,
+          "other": 234.33046,
+          "other_detail": {
+            "depreciation": 38.88245,
+            "duty_free": 0.0,
+            "govt_license": 5.48,
+            "logistics": 108.08009,
+            "maintenance": 8.38851,
+            "other_fee": 48.00858,
+            "rent_free": 0.0,
+            "retirement": 15.55143,
+            "supplies": 5.5714,
+            "transport": 0.0,
+            "uniform": 0.0,
+            "utilities": 0.84,
+            "var_rent": 0.0,
+            "communication": 3.528,
+            "bonus": 0.0
+          }
+        }
+      }
+    },
+    "yoy": {
+      "tag_sales": 92.80875531820502,
+      "discount": 92.7367509553393,
+      "net_sales": 92.82527312694683,
+      "cogs": 90.17874739079849,
+      "gross_profit": 93.94729462749991,
+      "direct_cost": 96.76129353776976,
+      "direct_profit": 57.07882655079959,
+      "sg_a": 129.83517068439622,
+      "operating_profit": 472.05263624698875
+    },
+    "change": {
+      "tag_sales": -1912.2236310679582,
+      "discount": -360.38435106795805,
+      "net_sales": -1551.8392800000001,
+      "cogs": -820.5137599999998,
+      "gross_profit": -786.7668122585146,
+      "direct_cost": -391.133050000004,
+      "direct_profit": -395.6337622585106,
+      "sg_a": 333.47924000000035,
+      "operating_profit": -729.113002258511
+    }
+  },
+  "cumulative": {
+    "hk": {
+      "tag_sales": 191556.21545,
+      "net_sales": 147932.95223,
+      "discount_rate": 22.773086802493516,
+      "cogs_rate": 30.81319057245971,
+      "gross_profit": 86627.67197422666,
+      "gross_profit_rate": 58.55873939400706,
+      "direct_cost": 90108.05084999997,
+      "direct_profit": -3480.3788757733128,
+      "direct_profit_rate": -2.352673169370787,
+      "sg_a": 9886.20556910878,
+      "operating_profit": -13366.584444882094,
+      "operating_profit_rate": -9.035569319336158
+    },
+    "mc": {
+      "tag_sales": 66049.75649514563,
+      "net_sales": 54836.672210000004,
+      "discount_rate": 16.976723125345266,
+      "cogs_rate": 31.51786088950986,
+      "gross_profit": 33204.72926351483,
+      "gross_profit_rate": 60.55205016153338,
+      "direct_cost": 25571.604750000002,
+      "direct_profit": 7633.124513514831,
+      "direct_profit_rate": 13.91974422569511,
+      "sg_a": 3664.6778558912206,
+      "operating_profit": 3968.4466576236105,
+      "operating_profit_rate": 7.236848075729741
+    },
+    "total": {
+      "tag_sales": 257605.97194514563,
+      "net_sales": 202769.62443999999,
+      "discount_rate": 21.28690848705264,
+      "cogs_rate": 30.99386690732523,
+      "gross_profit": 119832.40123774149,
+      "gross_profit_rate": 59.09780696625011,
+      "direct_cost": 115679.65559999997,
+      "direct_profit": 4152.745637741522,
+      "direct_profit_rate": 2.0480117025468623,
+      "sg_a": 13550.883425,
+      "operating_profit": -9398.137787258478,
+      "operating_profit_rate": -4.634884447418509,
+      "expense_detail": {
+        "salary": 5038.83023,
+        "marketing": 3137.17065,
+        "fee": 844.5783799999999,
+        "rent": 1398.0038699999998,
+        "insurance": 178.57014,
+        "travel": 279.89840000000004,
+        "other": 2673.8317549999997,
+        "other_detail": {
+          "depreciation": 425.52034,
+          "duty_free": 0.0,
+          "govt_license": 85.72483,
+          "logistics": 1014.71652,
+          "maintenance": 56.125,
+          "other_fee": 1118.95978,
+          "rent_free": -468.32,
+          "retirement": 192.93467,
+          "supplies": 36.9542,
+          "transport": 0.0,
+          "uniform": 0.0,
+          "utilities": 8.938035,
+          "var_rent": 0.0,
+          "communication": 36.10638,
+          "bonus": 166.172
+        }
+      }
+    },
+    "prev_cumulative": {
+      "hk": {
+        "tag_sales": 205944.45800000004,
+        "net_sales": 167784.57905,
+        "discount_rate": 18.52920895302754,
+        "cogs_rate": 31.448292374053587,
+        "gross_profit": 100525.13884889933,
+        "gross_profit_rate": 59.91321694644102,
+        "direct_cost": 96492.98396999999,
+        "direct_profit": 4032.1548788993387,
+        "direct_profit_rate": 2.403173701498367,
+        "sg_a": 9224.999030267669,
+        "operating_profit": -5192.84415136833,
+        "operating_profit_rate": -3.0949472119370736
+      },
+      "mc": {
+        "tag_sales": 80660.03330097088,
+        "net_sales": 67968.76694,
+        "discount_rate": 15.734268684982208,
+        "cogs_rate": 32.619952560979044,
+        "gross_profit": 40645.92027706625,
+        "gross_profit_rate": 59.8008792964374,
+        "direct_cost": 25880.05668,
+        "direct_profit": 14765.86359706625,
+        "direct_profit_rate": 21.724483555955842,
+        "sg_a": 3737.0049897323333,
+        "operating_profit": 11028.858607333917,
+        "operating_profit_rate": 16.2263626425204
+      },
+      "total": {
+        "tag_sales": 286604.4913009709,
+        "net_sales": 235753.34599,
+        "gross_profit": 141171.05912596558,
+        "direct_cost": 122373.04064999998,
+        "direct_profit": 18798.018475965597,
+        "sg_a": 12962.004020000002,
+        "operating_profit": 5836.014455965595,
+        "expense_detail": {
+          "salary": 4409.08472,
+          "marketing": 3872.0143500000004,
+          "fee": 59.69530999999999,
+          "rent": 1144.2001300000002,
+          "insurance": 203.75179000000003,
+          "travel": 149.22188999999997,
+          "other": 3124.03583,
+          "other_detail": {
+            "depreciation": 371.04643000000004,
+            "duty_free": 0.0,
+            "govt_license": 46.836500000000015,
+            "logistics": 1118.22315,
+            "maintenance": 84.37364,
+            "other_fee": 950.4879200000001,
+            "rent_free": 0.0,
+            "retirement": 197.15051,
+            "supplies": 26.51014,
+            "transport": 0.0,
+            "uniform": 0.0,
+            "utilities": 9.58271,
+            "var_rent": 5.48,
+            "communication": 35.32783,
+            "bonus": 279.017
+          }
+        }
+      }
+    },
+    "yoy": {
+      "tag_sales": 89.88204294210688,
+      "net_sales": 86.00922442415767,
+      "gross_profit": 84.88453793551,
+      "direct_cost": 94.5303434363915,
+      "direct_profit": 22.091400979582282,
+      "sg_a": 104.54312006146098,
+      "operating_profit": -161.03691754313027
+    },
+    "change": {
+      "tag_sales": -28998.519355825265,
+      "net_sales": -32983.72155000002,
+      "gross_profit": -21338.657888224086,
+      "direct_cost": -6693.385050000012,
+      "direct_profit": -14645.272838224075,
+      "sg_a": 588.8794049999979,
+      "operating_profit": -15234.152243224073
+    }
+  },
+  "channel_direct_profit": {
+    "hk_offline": {
+      "direct_profit": -325.3993943441528,
+      "direct_profit_rate": -2.3635482819674243,
+      "yoy": 55.86125664612444,
+      "status": "적자개선"
+    },
+    "mc_offline": {
+      "direct_profit": 552.9047880725211,
+      "direct_profit_rate": 10.288297387337527,
+      "yoy": 38.92575169968401
+    },
+    "hk_online": {
+      "direct_profit": 298.62912401311917,
+      "direct_profit_rate": 31.908843637672184,
+      "yoy": 356.0488491200792
+    },
+    "total": {
+      "direct_profit": 526.1345177414875,
+      "direct_profit_rate": 2.6205303383465477,
+      "yoy": 57.07882655079955
+    }
+  },
+  "discovery": {
+    "net_sales": 408.25809000000004,
+    "discount_rate": 9.735326892038291,
+    "direct_cost": 1385.3208200000004,
+    "direct_profit": -1122.1580377414866,
+    "marketing": 240.0,
+    "travel": 25.74,
+    "sg_a": 424.02,
+    "operating_profit": -1546.1780377414866,
+    "store_count": {
+      "online": 1,
+      "offline": 1
+    }
+  }
+}
