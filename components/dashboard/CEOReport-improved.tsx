@@ -1789,7 +1789,7 @@ const CEOReport = () => {
                           {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map(channel => (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {channelYOY[channel].map((yoy, idx) => (
+                              {channelYOY[channel as keyof typeof channelYOY].map((yoy, idx) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy}%
                                 </td>
@@ -2424,7 +2424,7 @@ const CEOReport = () => {
                           {['당시즌의류', '과시즌의류', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">{item}</td>
-                              {salesItemYOY[item].map((yoy, idx) => (
+                              {salesItemYOY[item as keyof typeof salesItemYOY].map((yoy, idx) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy === null ? '-' : `${yoy}%`}
                                 </td>
@@ -2629,7 +2629,7 @@ const CEOReport = () => {
                           {['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">{item}</td>
-                              {inventoryItemYOY[item].map((yoy, idx) => (
+                              {inventoryItemYOY[item as keyof typeof inventoryItemYOY].map((yoy, idx) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                                   {yoy === null ? '-' : `${yoy}%`}
                                 </td>
