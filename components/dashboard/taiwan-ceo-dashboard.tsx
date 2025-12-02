@@ -3736,8 +3736,8 @@ const TaiwanCEODashboard = () => {
                     const prevMonthData = plData?.current_month?.prev_month?.total;
                     
                     // 직접비 급여는 매장별 데이터에서 계산되어야 하지만, 일단 구조만 만들기
-                    const current = 2275;
-                    const prev = 2141;
+                    const current: number = 2275;
+                    const prev: number = 2141;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
@@ -3802,8 +3802,8 @@ const TaiwanCEODashboard = () => {
                     const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
                     
                     // 직접비는 매장별 데이터에서 계산되어야 하지만, 일단 구조만 만들기
-                    const current = 21390;
-                    const prev = 21354;
+                    const current: number = 21390;
+                    const prev: number = 21354;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = cumulativeData?.net_sales || 0;
@@ -3873,8 +3873,8 @@ const TaiwanCEODashboard = () => {
                   {showDirectCostItemAnalysis.rent && (() => {
                     const currentMonthData = plData?.current_month?.total;
                     const prevMonthData = plData?.current_month?.prev_month?.total;
-                    const current = 5844;
-                    const prev = 6101;
+                    const current: number = 5844;
+                    const prev: number = 6101;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
@@ -3935,8 +3935,8 @@ const TaiwanCEODashboard = () => {
                     )}
                   </button>
                   {showDirectCostItemAnalysis.rent && (() => {
-                    const current = 59221;
-                    const prev = 61960;
+                    const current: number = 59221;
+                    const prev: number = 61960;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const cumulativeData = plData?.cumulative?.total;
@@ -4009,8 +4009,8 @@ const TaiwanCEODashboard = () => {
                   {showDirectCostItemAnalysis.logistics && (() => {
                     const currentMonthData = plData?.current_month?.total;
                     const prevMonthData = plData?.current_month?.prev_month?.total;
-                    const current = 1105;
-                    const prev = 1410;
+                    const current: number = 1105;
+                    const prev: number = 1410;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
@@ -4108,8 +4108,8 @@ const TaiwanCEODashboard = () => {
                   {showDirectCostItemAnalysis.other && (() => {
                     const currentMonthData = plData?.current_month?.total;
                     const prevMonthData = plData?.current_month?.prev_month?.total;
-                    const current = 2462;
-                    const prev = 2425;
+                    const current: number = 2462;
+                    const prev: number = 2425;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
@@ -4173,8 +4173,8 @@ const TaiwanCEODashboard = () => {
                     )}
                   </button>
                   {showDirectCostItemAnalysis.other && (() => {
-                    const current = 23034;
-                    const prev = 24197;
+                    const current: number = 23034;
+                    const prev: number = 24197;
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const cumulativeData = plData?.cumulative?.total;
