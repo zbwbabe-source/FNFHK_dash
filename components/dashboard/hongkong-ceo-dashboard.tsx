@@ -3312,7 +3312,7 @@ const HongKongCEODashboard = () => {
                   <LineChart 
                     data={(dashboardData?.monthly_item_data || []).map((item: any, idx: number) => ({
                       month: `${item.period.slice(2, 4)}월`,
-                      yoy: dashboardData?.monthly_item_yoy?.[selectedItem]?.[idx] || 0
+                      yoy: dashboardData?.monthly_item_yoy ? ((dashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] || 0) : 0
                     }))} 
                     margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
                   >
