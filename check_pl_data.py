@@ -2,7 +2,7 @@
 """손익 데이터 확인"""
 import csv
 
-csv_file = 'components/dashboard/hmd_pl_database.csv'
+csv_file = '../Dashboard_Raw_Data/hmd_pl_database (1).csv'
 
 # 202510 Period의 HK 데이터 확인
 with open(csv_file, 'r', encoding='utf-8-sig') as f:

@@ -101,7 +101,7 @@ def categorize_store(direct_profit, yoy):
             return 'loss_deteriorating'  # 적자 & 매출악화
 
 def main():
-    csv_file = 'components/dashboard/hmd_pl_database (1).csv'
+    csv_file = '../Dashboard_Raw_Data/hmd_pl_database (1).csv'
     
     # 최신 기간 확인 (hongkong-dashboard-data.json에서)
     try:

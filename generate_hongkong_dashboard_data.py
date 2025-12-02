@@ -91,8 +91,14 @@ def read_csv_data(file_path):
     
     return data, sorted(periods)
 
-def generate_dashboard_data(csv_file_path, output_file_path):
-    """대시보드용 데이터 생성"""
+def generate_dashboard_data(csv_file_path, output_file_path, target_period=None):
+    """대시보드용 데이터 생성
+    
+    Args:
+        csv_file_path: CSV 파일 경로
+        output_file_path: 출력 JSON 파일 경로
+        target_period: 처리할 Period (예: '2410'). None이면 마지막 Period 사용
+    """
     print("CSV 파일 읽는 중...")
     data, periods = read_csv_data(csv_file_path)
     
@@ -100,15 +106,23 @@ def generate_dashboard_data(csv_file_path, output_file_path):
         print("데이터가 없습니다.")
         return
     
-    # 마지막 Period 찾기
-    last_period = periods[-1]
-    last_year, last_month = parse_period(last_period)
+    # target_period가 지정되면 해당 Period 사용, 아니면 마지막 Period 사용
+    if target_period:
+        if target_period not in periods:
+            print(f"경고: {target_period} Period가 CSV에 없습니다. 사용 가능한 Period: {periods}")
+            return
+        last_period = target_period
+        last_year, last_month = parse_period(last_period)
+    else:
+        # 마지막 Period 찾기
+        last_period = periods[-1]
+        last_year, last_month = parse_period(last_period)
     
     # 전년 동월 Period 찾기
     prev_year = last_year - 1
     prev_period = f"{prev_year % 100:02d}{last_month:02d}"
     
-    print(f"마지막 Period: {last_period} ({last_year}년 {last_month}월)")
+    print(f"처리 Period: {last_period} ({last_year}년 {last_month}월)")
     print(f"전년 동월 Period: {prev_period} ({prev_year}년 {last_month}월)")
     
     # 데이터 필터링 (MLB Brand만)
@@ -434,7 +448,7 @@ def generate_dashboard_data(csv_file_path, output_file_path):
     print(f"  - 추세 데이터 포인트: {len(trend_data)}")
 
 if __name__ == '__main__':
-    csv_file = 'components/dashboard/24012510 홍콩재고수불.csv'
+    csv_file = '../Dashboard_Raw_Data/24012510 홍콩재고수불.csv'
     output_file = 'components/dashboard/hongkong-dashboard-data.json'
     generate_dashboard_data(csv_file, output_file)
 

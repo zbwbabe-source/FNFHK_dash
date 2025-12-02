@@ -5,7 +5,7 @@
 import csv
 from collections import defaultdict
 
-csv_file = 'components/dashboard/hmd_pl_database.csv'
+csv_file = '../Dashboard_Raw_Data/hmd_pl_database (1).csv'
 
 print("=" * 100)
 print("매장별 손익 데이터베이스 분석")

@@ -1,24 +1,91 @@
-# 경영실적 대시보드
+# 홍콩 마카오 대만 실적 대시보드
 
-경영실적 분석을 위한 대시보드 프로젝트입니다.
+홍콩, 마카오, 대만법인의 실적 대시보드를 웹앱 기반으로 제공하는 프로젝트입니다.
+
+## 프로젝트 개요
+
+본 프로젝트는 홍콩마카오와 대만법인의 경영실적을 분석하고 시각화하는 대시보드 웹 애플리케이션입니다.
+
+### 주요 기능
+
+- **4가지 실적 보고서**
+  1. 홍콩마카오 실적보고
+  2. 대만 실적보고
+  3. 홍마대 BS (Balance Sheet)
+  4. 현금흐름
+
+- **월별 데이터 조회**: 월별 전환 버튼을 통해 각 월의 실적을 확인할 수 있습니다.
+- **전년 동월 비교**: 선택한 월의 데이터를 전년 동월과 자동으로 비교하여 표시합니다.
+- **브랜드별 분석**: 
+  - **MLB**: 상세 분석 및 시각화 제공
+  - **Discovery**: 요약 정보만 표시 (현재)
 
 ## 기술 스택
 
-- **Next.js**: 웹사이트 + API
+- **Next.js 15**: 웹 애플리케이션 프레임워크
 - **Tailwind CSS**: UI 스타일링
-- **shadcn/ui**: UI 컴포넌트
-- **Pandas**: 데이터 분석
-- **Snowflake**: 데이터베이스 연결
-- **OpenAPI**: API 스펙 정의 및 자동 코드 생성
+- **Shadcn/ui**: UI 컴포넌트 라이브러리
+- **Recharts**: 데이터 시각화 (차트 라이브러리)
+- **TypeScript**: 타입 안정성
+- **WFLAKE**: 데이터 소스 (Snowflake 기반)
+
+## 데이터 구조 설명
+
+### 데이터 소스
+
+#### 1. 홍콩마카오 실적
+
+**표시 통화**: 1K HKD
+
+- **재고 및 매출 데이터**: `components/dashboard/홍콩재고수불.csv`
+  - 재고 관련 항목
+  - 매출 관련 항목
+  
+- **손익 데이터**: `components/dashboard/hmd_pl_database (1).csv`
+  - 매장별 계정별 손익 항목
+
+**특징**:
+- 부가세 없음
+- 통화 변환 불필요 (HKD 기준)
+
+#### 2. 대만 실적
+
+**표시 통화**: 1K HKD
+
+- **재고 및 매출 데이터**: `components/dashboard/대만재고수불.csv`
+  - 부가세 포함, TWD로 표시
+  - **실판매출 계산 시 주의사항**:
+    - 부가세 제외: 금액을 1.05로 나눔
+    - 환율 적용: TWD → HKD 변환 필요
+    - 환율 데이터: `components/dashboard/환율.csv` 파일에서 제공
+
+- **환율 데이터**: `components/dashboard/환율.csv`
+  - 월별 TWD → HKD 환율 정보
+  - **환율 적용 규칙**:
+    - 해당 월 대시보드를 생성할 때, **해당 월의 환율**을 사용
+    - 이 환율을 **전년 및 추세에 나오는 모든 월**에 동일하게 적용
+    - 예: 2025년 10월 대시보드를 만들 때, 2025년 10월 환율을 2024년 10월, 2025년 1월~10월 등 모든 월 데이터에 적용
+
+- **손익 데이터**: `components/dashboard/hmd_pl_database (1).csv`
+  - 매장별 계정별 손익 항목
+  - 1K HKD 기준
+  - 부가세 제외된 실판매출로 계산됨 (숫자 그대로 사용 가능)
+
+**특징**:
+- 부가세 포함 데이터 (재고/매출 CSV)
+- TWD → HKD 환율 변환 필요
+- 월별 환율 적용
+
+### 분석 방법
+
+- **기본 분석 방식**: 선택한 월의 데이터를 **전년 동월**과 비교
+- **YOY (Year-over-Year) 계산**: 현재 월 / 전년 동월 × 100
 
 ## 사전 요구사항
 
 - Node.js 18.x 이상
-- Python 3.8 이상 (일반 Python 설치 권장, Anaconda/Miniconda 제거 후 설치)
 - npm 또는 yarn
-
-> **참고**: Anaconda/Miniconda를 사용 중이라면 일반 Python으로 전환하는 것을 권장합니다. 
-> 자세한 내용은 `PYTHON_SETUP_GUIDE.md`를 참고하세요.
+- WFLAKE 접근 권한 (데이터 소스)
 
 ## 설치 방법
 
@@ -29,55 +96,24 @@ npm install
 ```
 
 설치되는 주요 패키지:
-- Next.js 14
+- Next.js 15
 - Tailwind CSS
-- shadcn/ui 관련 패키지
+- Shadcn/ui 관련 패키지
 - Recharts (차트 라이브러리)
+- TypeScript
 
-### 2. Python 가상환경 설정 및 패키지 설치
+### 2. 환경 변수 설정
 
-#### 가상환경 생성 및 활성화
-```bash
-# 가상환경 생성
-python -m venv venv
-
-# 가상환경 활성화 (PowerShell)
-.\venv\Scripts\Activate.ps1
-
-# 가상환경 활성화 (CMD)
-venv\Scripts\activate.bat
-```
-
-#### 패키지 설치
-```bash
-pip install -r requirements.txt
-```
-
-> **팁**: 자동 설정 스크립트를 사용하려면 `.\setup_python.ps1` 실행
-
-설치되는 주요 패키지:
-- pandas: 데이터 분석
-- snowflake-connector-python: Snowflake 연결
-- fastapi: Python API 서버
-- openapi-generator-cli: OpenAPI 코드 생성
-
-### 3. shadcn/ui 컴포넌트 추가 (선택사항)
-
-필요한 UI 컴포넌트를 추가하려면:
+WFLAKE 연결을 위한 환경 변수 설정이 필요합니다:
 
 ```bash
-npx shadcn-ui@latest add button
-npx shadcn-ui@latest add card
-npx shadcn-ui@latest add table
-npx shadcn-ui@latest add chart
-```
-
-### 4. OpenAPI 코드 생성
-
-API 스펙이 변경되면 자동으로 코드를 생성:
-
-```bash
-npx @openapitools/openapi-generator-cli generate -i api/openapi.yaml -g typescript-fetch -o lib/generated
+# .env.local 파일 생성
+WFLAKE_ACCOUNT=your_account
+WFLAKE_USERNAME=your_username
+WFLAKE_PASSWORD=your_password
+WFLAKE_WAREHOUSE=your_warehouse
+WFLAKE_DATABASE=your_database
+WFLAKE_SCHEMA=your_schema
 ```
 
 ## 개발 서버 실행
@@ -90,51 +126,253 @@ npm run dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-### Python API 서버 (선택사항)
-
-별도의 Python API 서버를 실행하려면:
-
-```bash
-cd api
-python server.py
-```
-
-API 서버는 [http://localhost:8000](http://localhost:8000)에서 실행됩니다.
-
 ## 프로젝트 구조
 
 ```
 .
-├── app/                      # Next.js App Router
-│   ├── layout.tsx           # 루트 레이아웃
-│   ├── page.tsx             # 메인 페이지
-│   └── globals.css          # 전역 스타일
-├── components/               # React 컴포넌트
-│   └── ui/                  # shadcn/ui 컴포넌트
-├── lib/                     # 유틸리티 함수
-│   ├── utils.ts             # 공통 유틸리티
-│   ├── snowflake.ts         # Snowflake 연결
-│   └── generated/           # OpenAPI로 생성된 코드
-├── api/                     # API 관련
-│   ├── server.py            # FastAPI 서버
-│   └── openapi.yaml         # OpenAPI 스펙
-├── package.json             # Node.js 의존성
-├── requirements.txt         # Python 패키지 목록
-├── tailwind.config.ts       # Tailwind 설정
-├── components.json          # shadcn/ui 설정
-└── tsconfig.json            # TypeScript 설정
+├── app/                          # Next.js App Router
+│   ├── hongkong/                 # 홍콩마카오 실적 페이지
+│   ├── taiwan/                   # 대만 실적 페이지
+│   ├── layout.tsx                # 루트 레이아웃
+│   └── globals.css               # 전역 스타일
+├── components/                    # React 컴포넌트
+│   ├── dashboard/                # 대시보드 컴포넌트
+│   │   ├── hongkong-ceo-dashboard.tsx
+│   │   ├── taiwan-ceo-dashboard.tsx
+│   │   ├── hongkong-report.tsx
+│   │   ├── taiwan-report.tsx
+│   │   ├── hongkong-*.json       # 홍콩 데이터 파일
+│   │   ├── taiwan-*.json         # 대만 데이터 파일
+│   │   ├── 홍콩재고수불.csv
+│   │   ├── 대만재고수불.csv
+│   │   ├── 환율.csv              # 대만 데이터 환율 정보
+│   │   └── hmd_pl_database (1).csv
+│   └── ui/                       # Shadcn/ui 컴포넌트
+├── lib/                          # 유틸리티 함수
+│   ├── utils.ts                  # 공통 유틸리티
+│   └── wflake.ts                 # WFLAKE 연결 (예정)
+├── package.json                  # Node.js 의존성
+├── tailwind.config.ts            # Tailwind 설정
+├── components.json               # Shadcn/ui 설정
+└── tsconfig.json                 # TypeScript 설정
 ```
+
+## 배포 방법
+
+### GitHub 연동 및 Vercel 배포
+
+1. **GitHub 저장소 생성 및 푸시**
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/your-username/your-repo.git
+git push -u origin main
+```
+
+2. **Vercel 배포**
+
+- [Vercel](https://vercel.com)에 로그인
+- "New Project" 클릭
+- GitHub 저장소 선택
+- 환경 변수 설정 (WFLAKE 관련)
+- "Deploy" 클릭
+
+3. **자동 배포 설정**
+
+- GitHub에 푸시하면 자동으로 Vercel에서 빌드 및 배포됩니다.
+- `main` 브랜치에 푸시 시 프로덕션 배포
+- Pull Request 생성 시 프리뷰 배포
+
+### 빌드 명령어
+
+```bash
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm start
+```
+
+## 데이터 처리 주의사항
+
+### 대만 데이터 환율 처리
+
+대만 재고수불 CSV 파일의 데이터를 처리할 때:
+
+1. **부가세 제외**: 금액 ÷ 1.05
+2. **환율 적용**: TWD → HKD 변환
+3. **환율 파일**: `components/dashboard/환율.csv`에서 월별 환율 조회
+4. **환율 적용 규칙**:
+   - 해당 월 대시보드 생성 시, **해당 월의 환율**을 사용
+   - 이 환율을 **전년 동월 및 추세 그래프의 모든 월**에 동일하게 적용
+   - 예시: 2025년 10월 대시보드 생성 시
+     - 2025년 10월 환율을 조회
+     - 2024년 10월, 2025년 1월~10월 등 모든 월 데이터에 동일 환율 적용
+
+### YOY 계산 규칙
+
+- **전년 동월 기준**: 현재 보고 있는 기간의 전년 동월과 비교
+- 예: 2025년 10월 대시보드의 YOY는 2024년 10월 데이터를 기준으로 계산
+
+### 데이터 표시 포맷 규칙
+
+- **YOY (Year-over-Year)**: 소수점 없이 정수로 표시
+  - 예: 113%, 102%, 95%
+  
+- **할인율, 증감 %p, 매출대비율 등**: 소수 첫째자리까지 표시
+  - 예: 13.2%, 0.4%p, 15.8%
+
+- **적자매장 손실**: 음수로 표시
+  - 예: -8K, -20K, -50K (직접이익이 음수인 경우 자동으로 음수 표시)
+
+### 직접비 및 영업비 증감 분석 규칙 (홍콩마카오/대만 공통)
+
+- **모든 증감 분석은 실제 데이터를 기반으로 계산**
+  - 직접비 상세: 전체 직접비용, 급여, 임차료, 물류비, 기타 직접비 등 모든 항목의 당월/누적 증감 분석은 실제 데이터에서 계산
+  - 영업비 상세: 전체 영업비, 급여, 마케팅비 등 모든 항목의 당월/누적 증감 분석은 실제 데이터에서 계산
+  - 하드코딩된 값 사용 금지
+  - YOY, 전년비, 매출대비율 등 모든 지표는 실제 데이터를 기반으로 동적 계산
+
+### 매장효율성 카드 계산 규칙 (홍콩마카오/대만 공통)
+
+매장효율성 카드(점당매출 등) 계산 시 다음 규칙을 준수해야 합니다:
+
+0. **온라인은 제외**
+   - 온라인 채널 매장은 매장효율성 계산에서 제외
+
+1. **기준 월에 매출이 0인 매장 제외**
+   - 기준 월(당월)에 매출이 0인 매장은 매장수에서 제외
+   - 기준 월에 매출이 0인 매장의 매출은 매출 합계에서도 제외
+
+2. **당월기준 폐점매장 포함**
+   - 당월기준 폐점매장은 전년도 계산에 포함시켜야 함
+   - 폐점 전까지의 데이터를 전년도 비교에 사용
+
+3. **당월기준 신규매장 포함**
+   - 당월기준 신규매장은 당월 계산에 포함시켜야 함
+   - 신규매장의 당월 데이터를 포함하여 계산
+
+4. **추가 조정**
+   - 추가적인 조정이 필요할 경우 별도 지시에 따라 수정
+
+## 월별 데이터 업데이트 프로세스
+
+### 실적보고 대시보드 업데이트 순서
+
+대시보드를 업데이트할 때는 다음 순서를 따라야 합니다:
+
+1. **경영실적 카드 10개**
+   - 실판매출, 직접이익, 영업이익 등 핵심 지표 카드
+   - YOY 및 전년비 증감 계산
+   - 채널별(Retail, Outlet, Online) 세부 데이터
+
+2. **손익요약 (단위: 1K HKD)**
+   - 매출, 원가, 매출총이익, 직접비, 직접이익, 영업비, 영업이익
+   - 당월 및 누적 데이터
+   - YOY 및 전년비 증감 표시
+
+3. **그래프 세개**
+   - 채널별 실판매출 추세
+   - 아이템별 실판매출 추세
+   - 월별 아이템별 재고 추세
+   - 각 그래프 하단에 인사이트 섹션 포함
+
+4. **오프라인 매장별 현황 (실판V-, 해당월 기준)**
+   - 홍콩마카오: 홍콩마카오 특성에 맞는 매장 분류 및 분석
+   - 대만: 대만 특성에 맞는 매장 분류 및 분석
+   - 매장별 직접이익, YOY, 효율성 지표
+
+5. **직접비 상세 (1K HKD)**
+   - 당월 직접비 항목별 상세
+   - 누적 직접비 항목별 상세
+   - 직접비 분석 (항목별 비중, YOY 등)
+
+6. **영업비 상세 (1K HKD)**
+   - 당월 영업비 항목별 상세
+   - 누적 영업비 항목별 상세
+   - 영업비 분석 (항목별 비중, YOY 등)
+
+7. **실적 요약 및 CEO 인사이트 업데이트**
+   - 1~6항목의 데이터를 종합하여 자동 생성
+   - 핵심 성과: 매출 성장, 매장 효율성, 온라인 성장, 재고 안정화 등
+   - 주요 리스크: 영업손익, 과시즌 재고, 적자매장, 영업비 증가 등
+   - CEO 전략 방향: 수익성 회복, 재고 소진, 적자매장 개선, 온라인 확대 등
+   - 모든 인사이트는 실제 데이터를 기반으로 동적으로 생성됨
+
+### 데이터 업데이트 절차
+
+월별로 새로운 데이터가 추가될 때 다음 절차를 따릅니다:
+
+1. **CSV 파일 업데이트**
+   - `Dashboard_Raw_Data/홍콩재고수불.csv` (홍콩마카오)
+   - `Dashboard_Raw_Data/대만재고수불.csv` (대만)
+   - `Dashboard_Raw_Data/환율.csv` (대만 환율 - 해당 월 환율 업데이트)
+   - `Dashboard_Raw_Data/hmd_pl_database (1).csv` (손익 데이터)
+
+2. **Python 스크립트 실행**
+   - `generate_hongkong_dashboard_data.py` (홍콩마카오 데이터 생성)
+   - `generate_taiwan_dashboard_data.py` (대만 데이터 생성)
+   - `generate_pl_summary.py` 또는 `generate_taiwan_pl_summary.py` (손익 데이터 생성)
+   - 스크립트 실행 시 자동으로 JSON 파일이 생성/업데이트됩니다.
+
+3. **대시보드 확인**
+   - 생성된 JSON 파일이 올바르게 업데이트되었는지 확인
+   - 브라우저에서 대시보드 새로고침하여 데이터 반영 확인
+
+### 과거 데이터 업데이트 방법
+
+**과거 데이터를 쉽고 빠르고 정확하게 업데이트하기 위한 방법:**
+
+**중요: 대시보드 업데이트 범위**
+- 대시보드는 기본적으로 4가지 항목이 있습니다:
+  1. 홍콩마카오 실적보고
+  2. 대만 실적보고
+  3. 홍마대 BS (Balance Sheet)
+  4. 현금흐름
+- **과거분 업데이트 시**: 홍콩마카오 대시보드, 대만 대시보드 2가지만 업데이트
+- **BS와 현금흐름표**: 각각 당월에만 업데이트 예정 (과거분 업데이트 제외)
+
+1. **CSV 파일 준비**
+   - 해당 월의 CSV 파일을 `Dashboard_Raw_Data` 폴더에 준비
+   - 파일명은 기존 규칙을 따름 (예: `24012510 홍콩재고수불.csv`)
+
+2. **Python 스크립트 수정**
+   - 각 생성 스크립트에서 `TARGET_PERIOD`와 `PREV_PERIOD` 변수만 수정
+   - CSV 파일 경로만 해당 월 파일로 변경
+   - **과거분 업데이트 시**: 홍콩마카오 및 대만 관련 스크립트만 실행
+     - `generate_hongkong_dashboard_data.py`
+     - `generate_taiwan_dashboard_data.py`
+     - `generate_pl_summary.py` 또는 `generate_taiwan_pl_summary.py`
+
+3. **스크립트 실행**
+   - Python 스크립트 실행으로 자동 생성
+   - 수동 입력 최소화로 오류 방지
+
+4. **일관성 유지**
+   - 모든 과거 데이터도 동일한 양식과 구조로 생성
+   - 데이터 포맷 규칙(YOY 정수, 할인율 소수 첫째자리 등) 일관 적용
+
+### 업데이트 내용
+
+- 새로운 월 데이터 추가
+- 전년 동월 비교 데이터 자동 계산
+- YOY 추이 그래프 업데이트
+- 모든 차트 및 테이블 데이터 갱신
+- 인사이트 섹션 자동 업데이트 (데이터 기반)
 
 ## 다음 단계
 
-1. **Snowflake 연결 설정**: `lib/snowflake.ts`와 `api/server.py`에서 실제 연결 정보 입력
-2. **shadcn/ui 컴포넌트 추가**: 필요한 UI 컴포넌트 설치
-   ```bash
-   npx shadcn-ui@latest add button
-   npx shadcn-ui@latest add card
-   npx shadcn-ui@latest add table
-   npx shadcn-ui@latest add chart
-   ```
-3. **데이터 시각화**: Recharts를 사용하여 차트 컴포넌트 생성
-4. **API 엔드포인트 구현**: Next.js API Routes에서 Snowflake 데이터 조회
+1. **WFLAKE 연결 설정**: `lib/wflake.ts`에서 실제 연결 정보 입력
+2. **환율 데이터 연동**: 대만 데이터 처리 시 월별 환율 적용
+3. **Discovery 브랜드 상세 분석**: 현재 요약만 제공되는 Discovery 브랜드의 상세 분석 추가
+4. **데이터 자동 갱신**: WFLAKE에서 데이터를 자동으로 가져와 갱신하는 스케줄 설정
 
+## 참고 자료
+
+- [Next.js 문서](https://nextjs.org/docs)
+- [Tailwind CSS 문서](https://tailwindcss.com/docs)
+- [Shadcn/ui 문서](https://ui.shadcn.com)
+- [Recharts 문서](https://recharts.org)
+- [Vercel 배포 가이드](https://vercel.com/docs)

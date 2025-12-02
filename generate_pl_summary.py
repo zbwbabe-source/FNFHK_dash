@@ -448,39 +448,56 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         },
     }
 
-def main():
-    # 기존 대시보드 데이터에서 최신 Period 가져오기
-    with open('components/dashboard/hongkong-dashboard-data.json', 'r', encoding='utf-8') as f:
-        dashboard_data = json.load(f)
+def main(target_period_short=None):
+    """PL Summary 생성
     
-    # metadata에서 Period 찾기
-    metadata = dashboard_data.get('metadata', {})
-    latest_period_short = metadata.get('last_period', '2510')  # 예: "2510"
-    prev_period_short = metadata.get('previous_period', '2410')  # 예: "2410"
+    Args:
+        target_period_short: 처리할 Period (예: '2410'). None이면 dashboard-data.json에서 읽음
+    """
+    if target_period_short:
+        # target_period가 지정되면 직접 사용
+        latest_period_short = target_period_short
+        latest_year = 2000 + int(latest_period_short[:2])
+        latest_month = int(latest_period_short[2:4])
+        prev_year = latest_year - 1
+        prev_period_short = f"{prev_year % 100:02d}{latest_month:02d}"
+    else:
+        # 기존 대시보드 데이터에서 최신 Period 가져오기
+        with open('components/dashboard/hongkong-dashboard-data.json', 'r', encoding='utf-8') as f:
+            dashboard_data = json.load(f)
+        
+        # metadata에서 Period 찾기
+        metadata = dashboard_data.get('metadata', {})
+        latest_period_short = metadata.get('last_period', '2510')  # 예: "2510"
+        prev_period_short = metadata.get('previous_period', '2410')  # 예: "2410"
+        
+        # Period 형식 변환 (2510 -> 202510)
+        latest_year = 2000 + int(latest_period_short[:2])
+        latest_month = int(latest_period_short[2:4])
+        prev_year = 2000 + int(prev_period_short[:2])
+        prev_month = int(prev_period_short[2:4])
+        prev_period_full = f"{prev_year}{prev_month:02d}"
     
-    # Period 형식 변환 (2510 -> 202510)
-    latest_year = 2000 + int(latest_period_short[:2])
-    latest_month = int(latest_period_short[2:4])
     latest_period_full = f"{latest_year}{latest_month:02d}"
+    if not target_period_short:
+        prev_period_full = f"{prev_year}{prev_month:02d}"
+    else:
+        prev_period_full = f"{prev_year}{latest_month:02d}"
     
-    prev_year = 2000 + int(prev_period_short[:2])
-    prev_month = int(prev_period_short[2:4])
-    prev_period_full = f"{prev_year}{prev_month:02d}"
-    
-    print(f"최신 Period: {latest_period_full} ({latest_year}년 {latest_month}월)")
-    print(f"전년 동월 Period: {prev_period_full} ({prev_year}년 {prev_month}월)")
+    print(f"처리 Period: {latest_period_full} ({latest_year}년 {latest_month}월)")
+    print(f"전년 동월 Period: {prev_period_full} ({prev_year}년 {latest_month}월)")
     
     # 손익 데이터 읽기 (MLB만, 오피스 제외)
     print("\n손익 데이터 읽는 중...")
-    pl_data = read_pl_database('components/dashboard/hmd_pl_database (1).csv', brand_filter='M', include_office=False)
+    pl_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")
     
     # 영업이익 계산용 데이터 (MLB + M99 오피스)
-    pl_data_with_office = read_pl_database('components/dashboard/hmd_pl_database (1).csv', brand_filter='M', include_office=True)
+    pl_data_with_office = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='M', include_office=True)
     print(f"오피스 포함 MLB 데이터: {len(pl_data_with_office):,}건")
     
     # 디스커버리 데이터 읽기 (참고용)
-    discovery_data = read_pl_database('components/dashboard/hmd_pl_database (1).csv', brand_filter='X', include_office=False)
+    discovery_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='X', include_office=False)
     print(f"디스커버리 데이터: {len(discovery_data):,}건")
     
     # MLB 영업비 계산 (M99 오피스의 판매관리비)

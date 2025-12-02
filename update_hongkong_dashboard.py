@@ -1869,7 +1869,7 @@ def generate_dashboard_data(csv_dir, output_file_path):
 
 if __name__ == '__main__':
     # CSV 파일이 있는 디렉토리
-    csv_dir = 'components/dashboard'
+    csv_dir = '../Dashboard_Raw_Data'
     output_file = 'components/dashboard/hongkong-dashboard-data.json'
     
     generate_dashboard_data(csv_dir, output_file)

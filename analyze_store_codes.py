@@ -3,7 +3,7 @@ from collections import defaultdict
 
 store_info = defaultdict(lambda: {'Store_Name': set(), 'Brand': set(), 'Channel': set()})
 
-with open('components/dashboard/24012510 홍콩재고수불.csv', 'r', encoding='utf-8') as f:
+with open('../Dashboard_Raw_Data/24012510 홍콩재고수불.csv', 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
         store_code = row['Store_Code']

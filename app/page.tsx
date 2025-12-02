@@ -363,7 +363,7 @@ export default function Home() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   대시보드 바로가기
-                </Link>
+          </Link>
               </div>
             </div>
           </div>
@@ -379,15 +379,15 @@ export default function Home() {
               </h3>
               <p className="text-sm text-gray-600 mb-3">
                 Business Plan 2026
-              </p>
+                </p>
               <div className="pt-3 border-t border-gray-100">
                 <p className="text-xs text-orange-600 font-semibold mb-1">
                   연간 예상 PL / 예상 물량표
                 </p>
                 <p className="text-xs text-gray-500 italic">
                   작업중 (매출계획 수신완료)
-                </p>
-              </div>
+                  </p>
+                </div>
               
               {/* 대시보드 바로가기 버튼 */}
               <div className="mt-4 pt-3 border-t border-orange-200">
@@ -409,7 +409,7 @@ export default function Home() {
         <div className="text-center pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             💡 각 항목을 클릭하여 상세 정보를 확인할 수 있습니다
-          </p>
+            </p>
         </div>
       </main>
     </div>
