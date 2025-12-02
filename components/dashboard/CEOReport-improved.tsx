@@ -2444,7 +2444,7 @@ const CEOReport = () => {
                         <>
                           <tr>
                             <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">YOY</td>
-                            {selectedSalesItem && salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY] ? salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY].map((yoy, idx) => (
+                            {selectedSalesItem && salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY] && salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY].map((yoy, idx) => (
                               <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                 {yoy === null ? '-' : `${yoy}%`}
                               </td>
@@ -2640,7 +2640,7 @@ const CEOReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">YOY</td>
-                          {selectedInventoryItem && inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY] ? inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY].map((yoy, idx) => (
+                          {selectedInventoryItem && inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY] && inventoryItemYOY[selectedInventoryItem as keyof typeof inventoryItemYOY].map((yoy, idx) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy === null ? 'text-gray-400' : yoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                               {yoy === null ? '-' : `${yoy}%`}
                             </td>
