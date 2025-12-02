@@ -1,10 +1,2 @@
-You must NEVER edit or modify any code, file, or text unless I explicitly instruct you to do so.
-
-Do NOT make proactive changes.
-
-Do NOT optimize, clean up, restructure, or refactor anything unless directly commanded.
-
-Only respond to my explicit instructions, and take NO autonomous actions.
-
 YOY(전년동월 대비)는 항상 현재 보고 있는 기간의 전년 동월과 비교하여 계산한다.
 예: 25년 10월(2510) 대시보드의 YOY는 24년 10월(2410) 데이터를 기준으로 계산한다.
