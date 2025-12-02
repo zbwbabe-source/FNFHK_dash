@@ -960,7 +960,7 @@ const TaiwanCEODashboard = () => {
                         ];
                         
                         // 데이터가 있는지 확인
-                        const hasData = expenseItems.some(item => expenseDetail[item.key] !== undefined);
+                        const hasData = expenseItems.some(item => (expenseDetail as any)[item.key] !== undefined);
                         
                         if (!hasData) {
                           // 데이터가 없으면 기본 구조만 표시
@@ -986,8 +986,8 @@ const TaiwanCEODashboard = () => {
                             <div className="space-y-1">
                               {expenseItems.map((item) => {
                                 console.log('expenseItems.map - item:', item.key, item);
-                                const current = expenseDetail[item.key] || 0;
-                                const previous = expenseDetailPrev[item.key] || 0;
+                                const current = (expenseDetail as any)[item.key] || 0;
+                                const previous = (expenseDetailPrev as any)[item.key] || 0;
                                 // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
                                 let yoy = 0;
                                 let showYoy = false;
