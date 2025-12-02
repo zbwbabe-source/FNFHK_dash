@@ -2531,7 +2531,7 @@ const HongKongCEODashboard = () => {
                       const channelKey = selectedChannel.replace(' ', '_');
                       return {
                         month: `${item.period.slice(2, 4)}월`,
-                        yoy: dashboardData?.monthly_channel_yoy?.[channelKey]?.[idx] || 0
+                        yoy: dashboardData?.monthly_channel_yoy ? ((dashboardData.monthly_channel_yoy as any)[channelKey]?.[idx] || 0) : 0
                       };
                     })} 
                     margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
