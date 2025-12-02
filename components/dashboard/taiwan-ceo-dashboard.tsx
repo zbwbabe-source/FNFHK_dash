@@ -1115,8 +1115,8 @@ const TaiwanCEODashboard = () => {
                           <div className="space-y-1">
                             {expenseItems.map((item) => {
                               console.log('expenseItems.map (hasData=true) - item:', item.key, item);
-                              const current = expenseDetail[item.key] || 0;
-                              const previous = expenseDetailPrev[item.key] || 0;
+                              const current = (expenseDetail as any)[item.key] || 0;
+                              const previous = (expenseDetailPrev as any)[item.key] || 0;
                               const yoy = previous > 0 ? ((current / previous) * 100) : 0;
                               const colorClass = yoy >= 100 ? 'text-red-600' : 'text-green-600';
                               
@@ -1302,8 +1302,8 @@ const TaiwanCEODashboard = () => {
                         return (
                           <div className="space-y-1">
                             {expenseItems.map((item) => {
-                              const current = expenseDetail[item.key] || 0;
-                              const previous = expenseDetailPrev[item.key] || 0;
+                              const current = (expenseDetail as any)[item.key] || 0;
+                              const previous = (expenseDetailPrev as any)[item.key] || 0;
                               // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
                               let yoy = 0;
                               let showYoy = false;
