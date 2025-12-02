@@ -545,8 +545,8 @@ const TaiwanCEODashboard = () => {
                   <span>
                     <span className="font-semibold">과시즌 FW 소진:</span> 
                     <span className="bg-purple-100 px-1 rounded font-bold">
-                      MT({formatPercent(pastSeasonFW?.['1year_subcategory']?.MT?.yoy || 0)}%), 
-                      JP({formatPercent(pastSeasonFW?.['1year_subcategory']?.JP?.yoy || 0)}%)
+                      MT({formatPercent((pastSeasonFW as any)?.['1year_subcategory']?.MT?.yoy || 0)}%), 
+                      JP({formatPercent((pastSeasonFW as any)?.['1year_subcategory']?.JP?.yoy || 0)}%)
                     </span> 집중 프로모션
                   </span>
                 </div>
