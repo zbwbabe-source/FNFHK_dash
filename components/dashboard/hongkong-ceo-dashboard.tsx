@@ -967,7 +967,7 @@ const HongKongCEODashboard = () => {
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
                                         {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
                                           if (value === 0) return null;
-                                          const prevValue = otherDetailPrev[key] || 0;
+                                          const prevValue = (otherDetailPrev as any)[key] || 0;
                                           const detailYoy = prevValue > 0 ? ((value / prevValue) * 100) : 0;
                                           const detailColorClass = detailYoy >= 100 ? 'text-red-600' : 'text-green-600';
                                           
@@ -1137,7 +1137,7 @@ const HongKongCEODashboard = () => {
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
                                         {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
                                           if (value === 0) return null;
-                                          const prevValue = otherDetailPrev[key] || 0;
+                                          const prevValue = (otherDetailPrev as any)[key] || 0;
                                           let detailYoy = 0;
                                           let showDetailYoy = false;
                                           if (prevValue !== 0) {
