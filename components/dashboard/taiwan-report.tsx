@@ -2045,7 +2045,7 @@ const TaiwanReport = () => {
                           {['Retail', 'Outlet', 'Online'].map(channel => (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {channelYOY[channel].map((yoy: number, idx: number) => (
+                              {(channelYOY as any)[channel].map((yoy: number, idx: number) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy}%
                                 </td>
