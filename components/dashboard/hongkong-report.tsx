@@ -145,13 +145,13 @@ const HongKongReport = () => {
     return {
       month,
       '당시즌F': idx < 6 
-        ? (monthlyData?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx])
-        : (monthlyData?.['당시즌F'] || monthlyData?.['F당시즌'] || itemSales.net_sales['당시즌F'][idx]), // 1~6월은 당시즌S를 24F로 표시
-      '당시즌S': idx < 6 ? (monthlyData?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx]) : (monthlyData?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx]), // S당시즌(25S)은 항상 원래 값 유지
-      '과시즌의류': monthlyData?.['과시즌의류'] || itemSales.net_sales['과시즌의류'][idx],
-      '모자': monthlyData?.['모자'] || itemSales.net_sales['모자'][idx],
-      '신발': monthlyData?.['신발'] || itemSales.net_sales['신발'][idx],
-      '가방외': monthlyData?.['가방외'] || itemSales.net_sales['가방외'][idx]
+        ? ((monthlyData as any)?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx])
+        : ((monthlyData as any)?.['당시즌F'] || (monthlyData as any)?.['F당시즌'] || itemSales.net_sales['당시즌F'][idx]), // 1~6월은 당시즌S를 24F로 표시
+      '당시즌S': idx < 6 ? ((monthlyData as any)?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx]) : ((monthlyData as any)?.['당시즌S'] || itemSales.net_sales['당시즌S'][idx]), // S당시즌(25S)은 항상 원래 값 유지
+      '과시즌의류': (monthlyData as any)?.['과시즌의류'] || itemSales.net_sales['과시즌의류'][idx],
+      '모자': (monthlyData as any)?.['모자'] || itemSales.net_sales['모자'][idx],
+      '신발': (monthlyData as any)?.['신발'] || itemSales.net_sales['신발'][idx],
+      '가방외': (monthlyData as any)?.['가방외'] || itemSales.net_sales['가방외'][idx]
     };
   });
 
@@ -160,13 +160,13 @@ const HongKongReport = () => {
     return {
       month,
       '당시즌F': idx < 6 
-        ? (monthlyData?.['당시즌S_택가'] || monthlyData?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx])
-        : (monthlyData?.['당시즌F_택가'] || monthlyData?.['F당시즌_택가'] || monthlyData?.['당시즌F'] || monthlyData?.['F당시즌'] || itemSales.gross_sales['당시즌F'][idx]), // 1~6월은 당시즌S를 24F로 표시
-      '당시즌S': idx < 6 ? (monthlyData?.['당시즌S_택가'] || monthlyData?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx]) : (monthlyData?.['당시즌S_택가'] || monthlyData?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx]), // S당시즌(25S)은 항상 원래 값 유지
-      '과시즌의류': monthlyData?.['과시즌의류_택가'] || monthlyData?.['과시즌의류'] || itemSales.gross_sales['과시즌의류'][idx],
-      '모자': monthlyData?.['모자_택가'] || monthlyData?.['모자'] || itemSales.gross_sales['모자'][idx],
-      '신발': monthlyData?.['신발_택가'] || monthlyData?.['신발'] || itemSales.gross_sales['신발'][idx],
-      '가방외': monthlyData?.['가방외_택가'] || monthlyData?.['가방외'] || itemSales.gross_sales['가방외'][idx]
+        ? ((monthlyData as any)?.['당시즌S_택가'] || (monthlyData as any)?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx])
+        : ((monthlyData as any)?.['당시즌F_택가'] || (monthlyData as any)?.['F당시즌_택가'] || (monthlyData as any)?.['당시즌F'] || (monthlyData as any)?.['F당시즌'] || itemSales.gross_sales['당시즌F'][idx]), // 1~6월은 당시즌S를 24F로 표시
+      '당시즌S': idx < 6 ? ((monthlyData as any)?.['당시즌S_택가'] || (monthlyData as any)?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx]) : ((monthlyData as any)?.['당시즌S_택가'] || (monthlyData as any)?.['당시즌S'] || itemSales.gross_sales['당시즌S'][idx]), // S당시즌(25S)은 항상 원래 값 유지
+      '과시즌의류': (monthlyData as any)?.['과시즌의류_택가'] || (monthlyData as any)?.['과시즌의류'] || itemSales.gross_sales['과시즌의류'][idx],
+      '모자': (monthlyData as any)?.['모자_택가'] || (monthlyData as any)?.['모자'] || itemSales.gross_sales['모자'][idx],
+      '신발': (monthlyData as any)?.['신발_택가'] || (monthlyData as any)?.['신발'] || itemSales.gross_sales['신발'][idx],
+      '가방외': (monthlyData as any)?.['가방외_택가'] || (monthlyData as any)?.['가방외'] || itemSales.gross_sales['가방외'][idx]
     };
   });
 
@@ -1113,15 +1113,15 @@ const HongKongReport = () => {
                 <h3 className="text-sm font-semibold text-gray-600">당시즌 판매 (25F 의류)</h3>
               </div>
               <div className="text-3xl font-bold text-green-600 mb-2">
-                {categories?.current_season_f?.total_sales 
-                  ? Math.round(categories.current_season_f.total_sales / 1000).toLocaleString()
+                {(categories as any)?.current_season_f?.total_sales 
+                  ? Math.round((categories as any).current_season_f.total_sales / 1000).toLocaleString()
                   : '17,195'}
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {categories?.current_season_f?.prev_total_sales 
-                  ? Math.round(categories.current_season_f.prev_total_sales / 1000).toLocaleString()
-                  : '16,849'}</span> | <span className="text-green-600">YOY {categories?.current_season_f?.yoy 
-                  ? Math.round(categories.current_season_f.yoy)
+                <span className="text-gray-600">전년 {(categories as any)?.current_season_f?.prev_total_sales 
+                  ? Math.round((categories as any).current_season_f.prev_total_sales / 1000).toLocaleString()
+                  : '16,849'}</span> | <span className="text-green-600">YOY {(categories as any)?.current_season_f?.yoy 
+                  ? Math.round((categories as any).current_season_f.yoy)
                   : '102'}%</span>
               </div>
               

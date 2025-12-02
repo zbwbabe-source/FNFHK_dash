@@ -33,6 +33,7 @@ const TaiwanReport = () => {
   const [showStoreTable, setShowStoreTable] = useState(false);
   const [showStoreCalcModal, setShowStoreCalcModal] = useState(false);
   const [showStoreListInModal, setShowStoreListInModal] = useState(false);
+  const [showStoreListInModal2024, setShowStoreListInModal2024] = useState(false);
   const [showRetailLoss, setShowRetailLoss] = useState(false);
   const [showOutletLoss, setShowOutletLoss] = useState(false);
   const [showGloriaDetail, setShowGloriaDetail] = useState(false);
