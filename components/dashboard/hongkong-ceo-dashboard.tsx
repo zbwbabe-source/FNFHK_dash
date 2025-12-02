@@ -3051,7 +3051,7 @@ const HongKongCEODashboard = () => {
               <LineChart 
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
                   const calculateDiscount = (gross: number, net: number) => {
-                    if (gross === 0) return 0;
+                    if (gross === 0) return '0';
                     return ((gross - net) / gross * 100).toFixed(1);
                   };
                   return {
