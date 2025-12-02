@@ -187,8 +187,8 @@ const TaiwanCEODashboard = () => {
         // 직접이익 계산
         let directProfit = 0;
         let directProfitPrev = 0;
-        if (plData?.channel_direct_profit?.stores?.[store.store_code]) {
-          const storeData = plData.channel_direct_profit.stores[store.store_code];
+        if (plData?.channel_direct_profit?.stores?.[store.store_code as keyof typeof plData.channel_direct_profit.stores]) {
+          const storeData = plData.channel_direct_profit.stores[store.store_code as keyof typeof plData.channel_direct_profit.stores];
           directProfit = storeData.direct_profit || 0;
           directProfitPrev = storeData.direct_profit_prev || 0;
         }
@@ -215,9 +215,9 @@ const TaiwanCEODashboard = () => {
     const avgYoy = stores.reduce((sum, s) => sum + s.yoy, 0) / stores.length;
 
     // 임차료/인건비/감가상각비율 계산
-    const totalRent = stores.reduce((sum, s) => sum + (plData?.channel_direct_profit?.stores?.[s.store_code]?.rent || 0), 0);
-    const totalLabor = stores.reduce((sum, s) => sum + (plData?.channel_direct_profit?.stores?.[s.store_code]?.labor_cost || 0), 0);
-    const totalDepreciation = stores.reduce((sum, s) => sum + (plData?.channel_direct_profit?.stores?.[s.store_code]?.depreciation || 0), 0);
+    const totalRent = stores.reduce((sum, s) => sum + ((plData?.channel_direct_profit?.stores as any)?.[s.store_code]?.rent || 0), 0);
+    const totalLabor = stores.reduce((sum, s) => sum + ((plData?.channel_direct_profit?.stores as any)?.[s.store_code]?.labor_cost || 0), 0);
+    const totalDepreciation = stores.reduce((sum, s) => sum + ((plData?.channel_direct_profit?.stores as any)?.[s.store_code]?.depreciation || 0), 0);
     const totalSales = stores.reduce((sum, s) => sum + ((s.current?.net_sales || 0) / 1000), 0); // 1K HKD 단위로 변환
 
     const rentRate = totalSales > 0 ? (totalRent / totalSales) * 100 : 0;
