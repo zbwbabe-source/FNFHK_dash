@@ -2620,12 +2620,12 @@ const HongKongReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      currSeasonF: idx < 6 ? salesItemYOY['당시즌S'][idx] : salesItemYOY['당시즌F'][idx], // 1~6월은 당시즌S YOY(24F)를 당시즌F로 표시
-                      currSeasonS: salesItemYOY['당시즌S'][idx],
-                      pastSeason: salesItemYOY['과시즌의류'][idx],
-                      cap: salesItemYOY['모자'][idx],
-                      shoes: salesItemYOY['신발'][idx],
-                      bagEtc: salesItemYOY['가방외'][idx]
+                      currSeasonF: idx < 6 ? (salesItemYOY as any)['당시즌S'][idx] : (salesItemYOY as any)['당시즌F'][idx], // 1~6월은 당시즌S YOY(24F)를 당시즌F로 표시
+                      currSeasonS: (salesItemYOY as any)['당시즌S'][idx],
+                      pastSeason: (salesItemYOY as any)['과시즌의류'][idx],
+                      cap: (salesItemYOY as any)['모자'][idx],
+                      shoes: (salesItemYOY as any)['신발'][idx],
+                      bagEtc: (salesItemYOY as any)['가방외'][idx]
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2648,7 +2648,7 @@ const HongKongReport = () => {
                     <LineChart data={months.map((month, idx) => ({
                       month,
                       yoy: selectedSalesItem === '당시즌F' && idx < 6
-                        ? (salesItemYOY['당시즌S']?.[idx] ?? null) // 1~6월 당시즌F는 당시즌S YOY 표시
+                        ? ((salesItemYOY as any)['당시즌S']?.[idx] ?? null) // 1~6월 당시즌F는 당시즌S YOY 표시
                         : ((salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY] as any)?.[idx] ?? null)
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -2680,10 +2680,10 @@ const HongKongReport = () => {
                           {['당시즌F', '당시즌S', '과시즌의류', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">{item}</td>
-                              {salesItemYOY[item].map((yoy: number, idx: number) => {
+                              {(salesItemYOY as any)[item].map((yoy: number, idx: number) => {
                                 // 1~6월 당시즌F는 당시즌S YOY를 표시
                                 const displayYoy = (item === '당시즌F' && idx < 6) 
-                                  ? salesItemYOY['당시즌S'][idx] 
+                                  ? (salesItemYOY as any)['당시즌S'][idx] 
                                   : yoy;
                                 return (
                                   <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -2695,7 +2695,7 @@ const HongKongReport = () => {
                           ))}
                           <tr className="bg-blue-100 font-bold border-t-2 border-blue-300">
                             <td className="border border-gray-300 px-2 py-1 text-blue-900">합계</td>
-                            {salesItemYOY['합계'].map((yoy: number, idx: number) => (
+                            {(salesItemYOY as any)['합계'].map((yoy: number, idx: number) => (
                               <td key={idx} className={`border border-gray-300 px-2 py-1 text-center ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                 {yoy}%
                               </td>
@@ -2706,10 +2706,10 @@ const HongKongReport = () => {
                         <>
                           <tr>
                             <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">YOY</td>
-                            {salesItemYOY[selectedSalesItem]?.map((yoy: number, idx: number) => {
+                            {(salesItemYOY as any)[selectedSalesItem]?.map((yoy: number, idx: number) => {
                               // 당시즌F 선택 시 1~6월은 당시즌S YOY 표시
                               const displayYoy = (selectedSalesItem === '당시즌F' && idx < 6)
-                                ? salesItemYOY['당시즌S'][idx]
+                                ? (salesItemYOY as any)['당시즌S'][idx]
                                 : yoy;
                               return (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -2897,7 +2897,7 @@ const HongKongReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      yoy: inventoryItemYOY[selectedInventoryItem]?.[idx]
+                      yoy: (inventoryItemYOY as any)[selectedInventoryItem]?.[idx]
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2928,10 +2928,10 @@ const HongKongReport = () => {
                           {['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">{item}</td>
-                              {inventoryItemYOY[item].map((yoy: number, idx: number) => {
+                              {(inventoryItemYOY as any)[item].map((yoy: number, idx: number) => {
                                 // 1~6월 F당시즌은 S당시즌 YOY를 표시
                                 const displayYoy = (item === 'F당시즌' && idx < 6) 
-                                  ? inventoryItemYOY['S당시즌'][idx] 
+                                  ? (inventoryItemYOY as any)['S당시즌'][idx] 
                                   : yoy;
                                 return (
                                   <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
@@ -2945,10 +2945,10 @@ const HongKongReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">YOY</td>
-                          {inventoryItemYOY[selectedInventoryItem].map((yoy: number, idx: number) => {
+                          {(inventoryItemYOY as any)[selectedInventoryItem].map((yoy: number, idx: number) => {
                             // F당시즌 선택 시 1~6월은 S당시즌 YOY 표시
                             const displayYoy = (selectedInventoryItem === 'F당시즌' && idx < 6)
-                              ? inventoryItemYOY['S당시즌'][idx]
+                              ? (inventoryItemYOY as any)['S당시즌'][idx]
                               : yoy;
                             return (
                               <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
