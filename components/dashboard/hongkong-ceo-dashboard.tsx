@@ -2584,7 +2584,7 @@ const HongKongCEODashboard = () => {
                     ) : (
                       <tr>
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-blue-50">YOY</td>
-                        {(dashboardData?.monthly_channel_yoy?.[selectedChannel.replace(' ', '_')] || []).map((yoy: number, idx: number) => (
+                        {((dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[selectedChannel.replace(' ', '_')] : undefined) || []).map((yoy: number, idx: number) => (
                           <td 
                             key={idx} 
                             className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
