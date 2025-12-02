@@ -2569,7 +2569,7 @@ const HongKongCEODashboard = () => {
                           return (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-1 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {(dashboardData?.monthly_channel_yoy?.[channelKey] || []).map((yoy: number, idx: number) => (
+                              {((dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[channelKey] : undefined) || []).map((yoy: number, idx: number) => (
                                 <td 
                                   key={idx} 
                                   className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
@@ -3711,7 +3711,7 @@ const HongKongCEODashboard = () => {
                     );
                   } else {
                     const itemKey = selectedInventoryItem;
-                    const yoyData = inventoryYOY[itemKey] || [];
+                    const yoyData = (inventoryYOY as any)[itemKey] || [];
                     const itemColors: { [key: string]: string } = {
                       'F당시즌': '#EF4444',
                       'S당시즌': '#10B981',
@@ -3782,7 +3782,7 @@ const HongKongCEODashboard = () => {
                           <tr key={itemKey} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-1 py-1 font-semibold bg-gray-50">{itemKey}</td>
                             {months.map((month: string, idx: number) => {
-                              const yoyValue = inventoryYOY[itemKey]?.[idx];
+                              const yoyValue = (inventoryYOY as any)[itemKey]?.[idx];
                               const displayValue = yoyValue !== null && yoyValue !== undefined ? `${yoyValue}%` : '-';
                               const isPositive = yoyValue !== null && yoyValue !== undefined && yoyValue < 100;
                               const isNegative = yoyValue !== null && yoyValue !== undefined && yoyValue > 100;
