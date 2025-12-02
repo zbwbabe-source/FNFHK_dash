@@ -2059,7 +2059,7 @@ const HongKongReport = () => {
                           {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map(channel => (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {channelYOY[channel].map((yoy, idx) => (
+                              {channelYOY[channel].map((yoy: number, idx: number) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy}%
                                 </td>
@@ -2070,7 +2070,7 @@ const HongKongReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {channelYOY[selectedChannelTrend].map((yoy, idx) => (
+                          {channelYOY[selectedChannelTrend].map((yoy: number, idx: number) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                               {yoy}%
                             </td>
@@ -2265,7 +2265,7 @@ const HongKongReport = () => {
                           {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map(channel => (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {channelYOY[channel].map((yoy, idx) => (
+                              {channelYOY[channel].map((yoy: number, idx: number) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy}%
                                 </td>
@@ -2276,7 +2276,7 @@ const HongKongReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {channelYOY[selectedChannel].map((yoy, idx) => (
+                          {channelYOY[selectedChannel].map((yoy: number, idx: number) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                               {yoy}%
                             </td>
@@ -2680,7 +2680,7 @@ const HongKongReport = () => {
                           {['당시즌F', '당시즌S', '과시즌의류', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">{item}</td>
-                              {salesItemYOY[item].map((yoy, idx) => {
+                              {salesItemYOY[item].map((yoy: number, idx: number) => {
                                 // 1~6월 당시즌F는 당시즌S YOY를 표시
                                 const displayYoy = (item === '당시즌F' && idx < 6) 
                                   ? salesItemYOY['당시즌S'][idx] 
@@ -2695,7 +2695,7 @@ const HongKongReport = () => {
                           ))}
                           <tr className="bg-blue-100 font-bold border-t-2 border-blue-300">
                             <td className="border border-gray-300 px-2 py-1 text-blue-900">합계</td>
-                            {salesItemYOY['합계'].map((yoy, idx) => (
+                            {salesItemYOY['합계'].map((yoy: number, idx: number) => (
                               <td key={idx} className={`border border-gray-300 px-2 py-1 text-center ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                 {yoy}%
                               </td>
@@ -2706,7 +2706,7 @@ const HongKongReport = () => {
                         <>
                           <tr>
                             <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">YOY</td>
-                            {salesItemYOY[selectedSalesItem]?.map((yoy, idx) => {
+                            {salesItemYOY[selectedSalesItem]?.map((yoy: number, idx: number) => {
                               // 당시즌F 선택 시 1~6월은 당시즌S YOY 표시
                               const displayYoy = (selectedSalesItem === '당시즌F' && idx < 6)
                                 ? salesItemYOY['당시즌S'][idx]
@@ -2928,7 +2928,7 @@ const HongKongReport = () => {
                           {['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'].map(item => (
                             <tr key={item}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">{item}</td>
-                              {inventoryItemYOY[item].map((yoy, idx) => {
+                              {inventoryItemYOY[item].map((yoy: number, idx: number) => {
                                 // 1~6월 F당시즌은 S당시즌 YOY를 표시
                                 const displayYoy = (item === 'F당시즌' && idx < 6) 
                                   ? inventoryItemYOY['S당시즌'][idx] 
@@ -2945,7 +2945,7 @@ const HongKongReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">YOY</td>
-                          {inventoryItemYOY[selectedInventoryItem].map((yoy, idx) => {
+                          {inventoryItemYOY[selectedInventoryItem].map((yoy: number, idx: number) => {
                             // F당시즌 선택 시 1~6월은 S당시즌 YOY 표시
                             const displayYoy = (selectedInventoryItem === 'F당시즌' && idx < 6)
                               ? inventoryItemYOY['S당시즌'][idx]
