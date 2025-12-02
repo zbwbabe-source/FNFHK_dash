@@ -1281,7 +1281,7 @@ const HongKongCEODashboard = () => {
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-600">누적 할인</span>
                       <span className="font-semibold text-purple-600">
-                        {formatNumber(plData?.cumulative?.total?.discount || 0)}K
+                        {formatNumber((plData?.cumulative?.total as any)?.discount || 0)}K
                         <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0))}%p)</span>
                       </span>
                     </div>
