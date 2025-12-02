@@ -1060,7 +1060,7 @@ const TaiwanCEODashboard = () => {
                                         <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
                                           {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
                                             if (value === 0) return null;
-                                            const prevValue = otherDetailPrev[key] || 0;
+                                            const prevValue = (otherDetailPrev as any)[key] || 0;
                                             let detailYoy = 0;
                                             let showDetailYoy = false;
                                             if (prevValue !== 0) {
