@@ -1604,8 +1604,8 @@ const HongKongCEODashboard = () => {
                       {(() => {
                         const categories = ['SHO', 'HEA', 'BAG'];
                         return categories.map((key) => {
-                          const item = accStock?.by_category?.[key];
-                          const sales = accStock?.october_sales?.[key];
+                          const item = accStock?.by_category ? (accStock.by_category as any)[key] : undefined;
+                          const sales = accStock?.october_sales ? (accStock.october_sales as any)[key] : undefined;
                           if (!item || !sales) return null;
                           return (
                             <div key={key} className="flex justify-between text-xs">
@@ -1623,7 +1623,7 @@ const HongKongCEODashboard = () => {
                         <span className="text-indigo-600">
                           {formatNumber((() => {
                             const categories = ['SHO', 'HEA', 'BAG'];
-                            return categories.reduce((sum, key) => sum + ((accStock?.october_sales?.[key]?.net_sales || 0) / 1000), 0);
+                            return categories.reduce((sum, key) => sum + ((accStock?.october_sales ? ((accStock.october_sales as any)[key]?.net_sales || 0) : 0) / 1000), 0);
                           })())} 
                           <span className="text-red-600"> (84%)</span>
                         </span>
