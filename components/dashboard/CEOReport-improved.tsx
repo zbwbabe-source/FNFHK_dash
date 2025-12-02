@@ -2925,7 +2925,7 @@ const CEOReport = () => {
                   {expandedItems[`blue-${idx}`] && (
                     <div className="ml-4 mt-1 text-xs bg-blue-50 rounded p-2 border-l-2 border-blue-400">
                       <div className="text-blue-600">직접이익 {store.profit} | 연간 {store.annual}</div>
-                      {store.note && <div className="text-gray-600 mt-1 italic">{store.note}</div>}
+                      {(store as any).note && <div className="text-gray-600 mt-1 italic">{(store as any).note}</div>}
                     </div>
                   )}
                 </div>
