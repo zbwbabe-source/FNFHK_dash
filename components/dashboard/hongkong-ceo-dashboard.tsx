@@ -117,6 +117,58 @@ const HongKongCEODashboard = () => {
   const plYoy = plData?.current_month?.yoy || {};
   const plChange = plData?.current_month?.change || {};
 
+  // 아이템/재고 전체합계 YOY (백엔드 값이 없을 경우 대비)
+  const overallItemYoy: number[] = useMemo(() => {
+    const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+    const yoy = (dashboardData?.monthly_item_yoy || {}) as any;
+    if (!monthlyData.length) return [];
+    const keys = ['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방외'];
+
+    const result = monthlyData.map((item: any, idx: number) => {
+      let currentTotal = 0;
+      let prevTotal = 0;
+      keys.forEach((k) => {
+        const cur = (item?.[k]?.net_sales as number) || 0;
+        const yoyVal = (yoy?.[k]?.[idx] as number) || 0;
+        currentTotal += cur;
+        if (yoyVal > 0) {
+          prevTotal += (cur * 100) / yoyVal;
+        }
+      });
+      if (prevTotal <= 0) return 0;
+      return Math.round((currentTotal / prevTotal) * 100);
+    });
+
+    // 마지막 월 전체합계는 PL 카드의 실판매 YOY와 동일하게 사용
+    const yoyNetSales = plYoy?.net_sales;
+    if (!isNaN(Number(yoyNetSales)) && result.length > 0) {
+      result[result.length - 1] = Math.round(Number(yoyNetSales));
+    }
+
+    return result;
+  }, [dashboardData, plYoy]);
+
+  const overallInventoryYoy: (number | null)[] = useMemo(() => {
+    const months = (dashboardData?.monthly_inventory_data || []) as any[];
+    const yoy = (dashboardData?.monthly_inventory_yoy || {}) as any;
+    if (!months.length) return [];
+    const keys = ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'];
+    return months.map((item: any, idx: number) => {
+      let currentTotal = 0;
+      let prevTotal = 0;
+      keys.forEach((k) => {
+        const cur = (item?.[k]?.stock_price as number) || 0;
+        const yoyVal = (yoy?.[k]?.[idx] as number) || 0;
+        currentTotal += cur;
+        if (yoyVal && yoyVal > 0) {
+          prevTotal += (cur * 100) / yoyVal;
+        }
+      });
+      if (prevTotal <= 0) return null;
+      return Math.round((currentTotal / prevTotal) * 100);
+    });
+  }, [dashboardData]);
+
   // 채널별 데이터
   const hkRetail = countryChannel?.HK_Retail || {};
   const hkOutlet = countryChannel?.HK_Outlet || {};
@@ -2415,7 +2467,7 @@ const HongKongCEODashboard = () => {
                   );
                 })}
               </Bar>
-              <Bar dataKey="MC Retail" stackId="a" fill="#FCD34D">
+              <Bar dataKey="MC Retail" stackId="a" fill="#A78BFA">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const mcRetail = (item.MC_Retail || 0) / 1000;
@@ -2435,7 +2487,7 @@ const HongKongCEODashboard = () => {
                   );
                 })}
               </Bar>
-              <Bar dataKey="MC Outlet" stackId="a" fill="#FCA5A5">
+              <Bar dataKey="MC Outlet" stackId="a" fill="#F472B6">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const mcOutlet = (item.MC_Outlet || 0) / 1000;
@@ -2465,8 +2517,8 @@ const HongKongCEODashboard = () => {
               { name: 'HK Retail', color: '#93C5FD' },
               { name: 'HK Outlet', color: '#C4B5FD' },
               { name: 'HK Online', color: '#F9A8D4' },
-              { name: 'MC Retail', color: '#FCD34D' },
-              { name: 'MC Outlet', color: '#FCA5A5' },
+              { name: 'MC Retail', color: '#A78BFA' },
+              { name: 'MC Outlet', color: '#F472B6' },
             ].map((channel) => (
               <button
                 key={channel.name}
@@ -2518,8 +2570,8 @@ const HongKongCEODashboard = () => {
                     <Line type="monotone" dataKey="hkRetail" stroke="#93C5FD" strokeWidth={2} name="HK Retail" />
                     <Line type="monotone" dataKey="hkOutlet" stroke="#C4B5FD" strokeWidth={2} name="HK Outlet" />
                     <Line type="monotone" dataKey="hkOnline" stroke="#F9A8D4" strokeWidth={2} name="HK Online" />
-                    <Line type="monotone" dataKey="mcRetail" stroke="#FCD34D" strokeWidth={2} name="MC Retail" />
-                    <Line type="monotone" dataKey="mcOutlet" stroke="#FCA5A5" strokeWidth={2} name="MC Outlet" />
+                    <Line type="monotone" dataKey="mcRetail" stroke="#A78BFA" strokeWidth={2} name="MC Retail" />
+                    <Line type="monotone" dataKey="mcOutlet" stroke="#F472B6" strokeWidth={2} name="MC Outlet" />
                     <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -3051,50 +3103,58 @@ const HongKongCEODashboard = () => {
               <LineChart 
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
                   const calculateDiscount = (gross: number, net: number) => {
-                    if (gross === 0) return '0';
-                    return ((gross - net) / gross * 100).toFixed(1);
+                    if (gross === 0) return 0;
+                    return ((gross - net) / gross * 100);
                   };
                   return {
                     month: `${item.period.slice(2, 4)}월`,
-                    '당시즌의류': parseFloat(calculateDiscount(item.당시즌의류.gross_sales, item.당시즌의류.net_sales)),
-                    '과시즌의류': parseFloat(calculateDiscount(item.과시즌의류.gross_sales, item.과시즌의류.net_sales)),
-                    '모자': parseFloat(calculateDiscount(item.모자.gross_sales, item.모자.net_sales)),
-                    '신발': parseFloat(calculateDiscount(item.신발.gross_sales, item.신발.net_sales)),
-                    '가방외': parseFloat(calculateDiscount(item.가방외.gross_sales, item.가방외.net_sales)),
+                    '당시즌F': calculateDiscount(item.당시즌F.gross_sales, item.당시즌F.net_sales),
+                    '당시즌S': calculateDiscount(item.당시즌S.gross_sales, item.당시즌S.net_sales),
+                    '과시즌F': calculateDiscount(item.과시즌F.gross_sales, item.과시즌F.net_sales),
+                    '과시즌S': calculateDiscount(item.과시즌S.gross_sales, item.과시즌S.net_sales),
+                    '모자': calculateDiscount(item.모자.gross_sales, item.모자.net_sales),
+                    '신발': calculateDiscount(item.신발.gross_sales, item.신발.net_sales),
+                    '가방외': calculateDiscount(item.가방외.gross_sales, item.가방외.net_sales),
                   };
                 })} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} domain={[0, 70]} tickFormatter={(value) => `${value}%`} />
+                <YAxis tick={{ fontSize: 11 }} domain={[0, 70]} tickFormatter={(value) => `${Math.round(value)}%`} />
                 <Tooltip 
-                  formatter={(value: any, name: string) => [`${value}%`, name]}
+                  formatter={(value: any, name: string) => [`${Math.round(value)}%`, name]}
                   contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                 />
-                <Line type="monotone" dataKey="당시즌의류" stroke="#34D399" strokeWidth={3} dot={{ r: 4 }} name="당시즌의류" />
-                <Line type="monotone" dataKey="과시즌의류" stroke="#FCA5A5" strokeWidth={3} dot={{ r: 4 }} name="과시즌의류" />
-                <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={3} dot={{ r: 4 }} name="모자" />
-                <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={3} dot={{ r: 4 }} name="신발" />
-                <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} name="가방외" />
+                <Line type="monotone" dataKey="당시즌F" stroke="#FFD4B3" strokeWidth={3} dot={{ r: 4 }} name="🍂 당시즌F" />
+                <Line type="monotone" dataKey="당시즌S" stroke="#B3E5FC" strokeWidth={3} dot={{ r: 4 }} name="☀️ 당시즌S" />
+                <Line type="monotone" dataKey="과시즌F" stroke="#FFB3C1" strokeWidth={3} dot={{ r: 4 }} name="🍂 과시즌F" />
+                <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={3} dot={{ r: 4 }} name="☀️ 과시즌S" />
+                <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={3} dot={{ r: 4 }} name="🧢 모자" />
+                <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={3} dot={{ r: 4 }} name="👟 신발" />
+                <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} name="👜 가방외" />
               </LineChart>
             ) : (
               <BarChart 
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
-                  const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                  const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
+                  const 당시즌F = Math.round(salesPriceType === '실판' ? item.당시즌F.net_sales : item.당시즌F.gross_sales);
+                  const 당시즌S = Math.round(salesPriceType === '실판' ? item.당시즌S.net_sales : item.당시즌S.gross_sales);
+                  const 과시즌F = Math.round(salesPriceType === '실판' ? item.과시즌F.net_sales : item.과시즌F.gross_sales);
+                  const 과시즌S = Math.round(salesPriceType === '실판' ? item.과시즌S.net_sales : item.과시즌S.gross_sales);
                   const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
                   const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
                   const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                  const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
+                  const total = 당시즌F + 당시즌S + 과시즌F + 과시즌S + 모자 + 신발 + 가방외;
                   return {
                     month: `${item.period.slice(2, 4)}월`,
-                    '당시즌의류': 당시즌의류,
-                    '과시즌의류': 과시즌의류,
+                    '당시즌F': 당시즌F,
+                    '당시즌S': 당시즌S,
+                    '과시즌F': 과시즌F,
+                    '과시즌S': 과시즌S,
                     '모자': 모자,
                     '신발': 신발,
                     '가방외': 가방외,
-                    total: total
+                    total,
                   };
                 })} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -3118,139 +3178,28 @@ const HongKongCEODashboard = () => {
                   formatter={(value: any, name: string) => [`${Math.round(value).toLocaleString()}K HKD`, name]}
                   contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                 />
-                <Bar dataKey="당시즌의류" stackId="a" fill="#34D399">
-                  {(dashboardData?.monthly_item_data || []).map((item: any, index: number) => {
-                    const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                    const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
-                    const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
-                    const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                    const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                    const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
-                    const pct = total > 0 ? ((당시즌의류 / total) * 100).toFixed(1) : '0.0';
-                    return (
-                      <text 
-                        key={`label-당시즌의류-${index}`} 
-                        x={47 + index * 94} 
-                        y={140 + (index % 2) * 15} 
-                        textAnchor="middle" 
-                        fill="#000000" 
-                        fontSize="9" 
-                        fontWeight="700"
-                      >
-                        {pct}%
-                      </text>
-                    );
-                  })}
-                </Bar>
-                <Bar dataKey="과시즌의류" stackId="a" fill="#FCA5A5">
-                  {(dashboardData?.monthly_item_data || []).map((item: any, index: number) => {
-                    const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                    const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
-                    const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
-                    const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                    const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                    const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
-                    const pct = total > 0 ? ((과시즌의류 / total) * 100).toFixed(1) : '0.0';
-                    return (
-                      <text 
-                        key={`label-과시즌의류-${index}`} 
-                        x={47 + index * 94} 
-                        y={215 + (index % 2) * 3} 
-                        textAnchor="middle" 
-                        fill="#000000" 
-                        fontSize="9" 
-                        fontWeight="700"
-                      >
-                        {pct}%
-                      </text>
-                    );
-                  })}
-                </Bar>
-                <Bar dataKey="모자" stackId="a" fill="#93C5FD">
-                  {(dashboardData?.monthly_item_data || []).map((item: any, index: number) => {
-                    const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                    const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
-                    const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
-                    const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                    const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                    const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
-                    const pct = total > 0 ? ((모자 / total) * 100).toFixed(1) : '0.0';
-                    return (
-                      <text 
-                        key={`label-모자-${index}`} 
-                        x={47 + index * 94} 
-                        y={240 + (index % 2) * 3} 
-                        textAnchor="middle" 
-                        fill="#000000" 
-                        fontSize="9" 
-                        fontWeight="700"
-                      >
-                        {pct}%
-                      </text>
-                    );
-                  })}
-                </Bar>
-                <Bar dataKey="신발" stackId="a" fill="#FCD34D">
-                  {(dashboardData?.monthly_item_data || []).map((item: any, index: number) => {
-                    const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                    const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
-                    const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
-                    const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                    const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                    const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
-                    const pct = total > 0 ? ((신발 / total) * 100).toFixed(1) : '0.0';
-                    return (
-                      <text 
-                        key={`label-신발-${index}`} 
-                        x={47 + index * 94} 
-                        y={265 + (index % 2) * 3} 
-                        textAnchor="middle" 
-                        fill="#000000" 
-                        fontSize="9" 
-                        fontWeight="700"
-                      >
-                        {pct}%
-                      </text>
-                    );
-                  })}
-                </Bar>
-                <Bar dataKey="가방외" stackId="a" fill="#C4B5FD">
-                  {(dashboardData?.monthly_item_data || []).map((item: any, index: number) => {
-                    const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                    const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
-                    const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
-                    const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                    const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                    const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
-                    const pct = total > 0 ? ((가방외 / total) * 100).toFixed(1) : '0.0';
-                    return (
-                      <text 
-                        key={`label-가방외-${index}`} 
-                        x={47 + index * 94} 
-                        y={290 + (index % 2) * 3} 
-                        textAnchor="middle" 
-                        fill="#000000" 
-                        fontSize="9" 
-                        fontWeight="700"
-                      >
-                        {pct}%
-                      </text>
-                    );
-                  })}
-                </Bar>
+                <Bar dataKey="당시즌F" stackId="a" fill="#FFD4B3" name="🍂 당시즌F" />
+                <Bar dataKey="당시즌S" stackId="a" fill="#B3E5FC" name="☀️ 당시즌S" />
+                <Bar dataKey="과시즌F" stackId="a" fill="#FFB3C1" name="🍂 과시즌F" />
+                <Bar dataKey="과시즌S" stackId="a" fill="#B2F5EA" name="☀️ 과시즌S" />
+                <Bar dataKey="모자" stackId="a" fill="#93C5FD" name="🧢 모자" />
+                <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
+                <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" name="👜 가방외" />
               </BarChart>
             )}
           </ResponsiveContainer>
           
-          {/* 아이템 선택 버튼 */}
+          {/* 아이템 선택 버튼 (재고 그래프와 동일한 F/S + ACC 구성) */}
           <div className="mt-3 flex flex-wrap gap-2 justify-center">
             {[
-              { name: '전체', color: '#E5E7EB' },
-              { name: '당시즌의류', color: '#34D399' },
-              { name: '과시즌의류', color: '#FCA5A5' },
-              { name: '모자', color: '#93C5FD' },
-              { name: '신발', color: '#FCD34D' },
-              { name: '가방외', color: '#C4B5FD' },
+              { name: '전체', displayName: '전체', color: '#E5E7EB' },
+              { name: '당시즌F', displayName: '🍂 당시즌F', color: '#FFD4B3' },
+              { name: '당시즌S', displayName: '☀️ 당시즌S', color: '#B3E5FC' },
+              { name: '과시즌F', displayName: '🍂 과시즌F', color: '#FFB3C1' },
+              { name: '과시즌S', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
+              { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
+              { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
+              { name: '가방외', displayName: '👜 가방외', color: '#C4B5FD' },
             ].map((item) => (
               <button
                 key={item.name}
@@ -3267,7 +3216,7 @@ const HongKongCEODashboard = () => {
                   color: '#000000'
                 }}
               >
-                {item.name}
+                {item.displayName}
               </button>
             ))}
           </div>
@@ -3281,29 +3230,55 @@ const HongKongCEODashboard = () => {
               {selectedItem === '전체' ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
-                    data={(dashboardData?.monthly_item_data || []).map((item: any, idx: number) => ({
-                      month: `${item.period.slice(2, 4)}월`,
-                      당시즌의류: dashboardData?.monthly_item_yoy?.['당시즌의류']?.[idx] || 0,
-                      과시즌의류: dashboardData?.monthly_item_yoy?.['과시즌의류']?.[idx] || 0,
-                      모자: dashboardData?.monthly_item_yoy?.['모자']?.[idx] || 0,
-                      신발: dashboardData?.monthly_item_yoy?.['신발']?.[idx] || 0,
-                      가방외: dashboardData?.monthly_item_yoy?.['가방외']?.[idx] || 0,
-                    }))} 
+                    data={(dashboardData?.monthly_item_data || []).map((item: any, idx: number, arr: any[]) => {
+                      const yoyData = (dashboardData?.monthly_item_yoy || {}) as Record<string, number[]>;
+                      const seasonSalesData = seasonSales as any;
+                      const isLast = idx === arr.length - 1;
+
+                      // 카드용 당시즌F YOY (10월 기준) - season_sales에서 직접 계산
+                      let cardSeasonFYoy: number | null = null;
+                      const currentF = seasonSalesData?.current_season_f?.october?.total_net_sales;
+                      const prevF = seasonSalesData?.previous_season_f?.october?.total_net_sales;
+                      if (typeof currentF === 'number' && typeof prevF === 'number' && prevF !== 0) {
+                        cardSeasonFYoy = Math.round((currentF / prevF) * 100);
+                      }
+
+                      const baseData: any = {
+                        month: `${item.period.slice(2, 4)}월`,
+                        당시즌F: yoyData['당시즌F']?.[idx] ?? 0,
+                        당시즌S: yoyData['당시즌S']?.[idx] ?? 0,
+                        과시즌F: yoyData['과시즌F']?.[idx] ?? 0,
+                        과시즌S: yoyData['과시즌S']?.[idx] ?? 0,
+                        모자: yoyData['모자']?.[idx] ?? 0,
+                        신발: yoyData['신발']?.[idx] ?? 0,
+                        가방외: yoyData['가방외']?.[idx] ?? 0,
+                        전체합계: (overallItemYoy[idx] ?? 0),
+                      };
+
+                      // 마지막 월(10월)은 카드와 동일한 당시즌F YOY로 덮어씀
+                      if (isLast && cardSeasonFYoy !== null) {
+                        baseData['당시즌F'] = cardSeasonFYoy;
+                      }
+
+                      return baseData;
+                    })} 
                     margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
                     <Tooltip 
-                      formatter={(value: any) => [`${value}%`, 'YOY']}
+                      formatter={(value: any, name: string) => [`${value}%`, name]}
                       contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                     />
-                    <Legend />
-                    <Line type="monotone" dataKey="당시즌의류" stroke="#34D399" strokeWidth={2} name="당시즌의류" />
-                    <Line type="monotone" dataKey="과시즌의류" stroke="#FCA5A5" strokeWidth={2} name="과시즌의류" />
-                    <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={2} name="모자" />
-                    <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={2} name="신발" />
-                    <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={2} name="가방외" />
+                    <Line type="monotone" dataKey="전체합계" stroke="#111827" strokeWidth={2.5} dot={{ r: 4 }} name="전체합계" />
+                    <Line type="monotone" dataKey="당시즌F" stroke="#FFD4B3" strokeWidth={2} name="🍂 당시즌F" />
+                    <Line type="monotone" dataKey="당시즌S" stroke="#B3E5FC" strokeWidth={2} name="☀️ 당시즌S" />
+                    <Line type="monotone" dataKey="과시즌F" stroke="#FFB3C1" strokeWidth={2} name="🍂 과시즌F" />
+                    <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={2} name="☀️ 과시즌S" />
+                    <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={2} name="🧢 모자" />
+                    <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={2} name="👟 신발" />
+                    <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={2} name="👜 가방외" />
                     <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -3323,7 +3298,6 @@ const HongKongCEODashboard = () => {
                       formatter={(value: any) => [`${value}%`, 'YOY']}
                       contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                     />
-                    <Legend />
                     <Line type="monotone" dataKey="yoy" stroke="#F59E0B" strokeWidth={2} name={`${selectedItem} YOY`} />
                     <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
                   </LineChart>
@@ -3335,7 +3309,9 @@ const HongKongCEODashboard = () => {
                 <table className="w-full text-[10px] border-collapse border border-gray-300">
                   <thead>
                     <tr>
-                      <th className="border border-gray-300 px-1 py-1 text-left font-semibold">{selectedItem === '전체' ? '아이템' : selectedItem}</th>
+                      <th className="border border-gray-300 px-1 py-1 text-left font-semibold">
+                        {selectedItem === '전체' ? '아이템' : selectedItem}
+                      </th>
                       {(dashboardData?.monthly_item_data || []).map((item: any) => (
                         <th key={item.period} className="border border-gray-300 px-1 py-1 text-center font-semibold">{`${item.period.slice(2, 4)}월`}</th>
                       ))}
@@ -3344,17 +3320,54 @@ const HongKongCEODashboard = () => {
                   <tbody>
                     {selectedItem === '전체' ? (
                       <>
-                        {['당시즌의류', '과시즌의류', '모자', '신발', '가방외'].map((item) => (
-                          <tr key={item}>
-                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">{item}</td>
-                            {((dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[item] : undefined) || []).map((yoy: number, idx: number) => (
-                              <td 
-                                key={idx} 
-                                className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
-                              >
-                                {yoy}%
-                              </td>
-                            ))}
+                        {[
+                          { key: '전체합계', label: '전체합계' },
+                          { key: '당시즌F', label: '🍂 당시즌F' },
+                          { key: '당시즌S', label: '☀️ 당시즌S' },
+                          { key: '과시즌F', label: '🍂 과시즌F' },
+                          { key: '과시즌S', label: '☀️ 과시즌S' },
+                          { key: '모자', label: '🧢 모자' },
+                          { key: '신발', label: '👟 신발' },
+                          { key: '가방외', label: '👜 가방외' },
+                        ].map((row) => (
+                          <tr key={row.key}>
+                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">
+                              {row.label}
+                            </td>
+                            {(() => {
+                              const yoyArray: number[] =
+                                row.key === '전체합계'
+                                  ? overallItemYoy
+                                  : ((dashboardData?.monthly_item_yoy
+                                      ? ((dashboardData.monthly_item_yoy as any)[row.key] as number[])
+                                      : []) || []);
+
+                              // 당시즌F 10월 값은 카드 기준 95%로 맞추기
+                              let overrideArray = yoyArray;
+                              if (row.key === '당시즌F' && yoyArray.length > 0) {
+                                const seasonSalesData = seasonSales as any;
+                                const currentF =
+                                  seasonSalesData?.current_season_f?.october?.total_net_sales;
+                                const prevF =
+                                  seasonSalesData?.previous_season_f?.october?.total_net_sales;
+                                if (typeof currentF === 'number' && typeof prevF === 'number' && prevF !== 0) {
+                                  const cardYoy = Math.round((currentF / prevF) * 100);
+                                  overrideArray = [...yoyArray];
+                                  overrideArray[overrideArray.length - 1] = cardYoy;
+                                }
+                              }
+
+                              return overrideArray.map((yoy: number, idx: number) => (
+                                <td
+                                  key={idx}
+                                  className={`border border-gray-300 px-1 py-1 text-center font-bold ${
+                                    yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                                  }`}
+                                >
+                                  {yoy}%
+                                </td>
+                              ));
+                            })()}
                           </tr>
                         ))}
                       </>
@@ -3389,12 +3402,15 @@ const HongKongCEODashboard = () => {
                       if (monthlyData.length === 0) return <div>데이터 없음</div>;
                       
                       const totals = monthlyData.map((item: any) => {
-                        const 당시즌의류 = Math.round(salesPriceType === '실판' ? item.당시즌의류.net_sales : item.당시즌의류.gross_sales);
-                        const 과시즌의류 = Math.round(salesPriceType === '실판' ? item.과시즌의류.net_sales : item.과시즌의류.gross_sales);
+                        // 당시즌F/S, 과시즌F/S, ACC 전체 매출 합계 (실판/택가 선택 반영)
+                        const 당F = Math.round(salesPriceType === '실판' ? item.당시즌F.net_sales : item.당시즌F.gross_sales);
+                        const 당S = Math.round(salesPriceType === '실판' ? item.당시즌S.net_sales : item.당시즌S.gross_sales);
+                        const 과F = Math.round(salesPriceType === '실판' ? item.과시즌F.net_sales : item.과시즌F.gross_sales);
+                        const 과S = Math.round(salesPriceType === '실판' ? item.과시즌S.net_sales : item.과시즌S.gross_sales);
                         const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
                         const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
                         const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                        return 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
+                        return 당F + 당S + 과F + 과S + 모자 + 신발 + 가방외;
                       });
                       const maxTotal = Math.max(...totals);
                       const minTotal = Math.min(...totals);
@@ -3425,20 +3441,23 @@ const HongKongCEODashboard = () => {
                       if (monthlyData.length === 0) return <div>데이터 없음</div>;
                       
                       const latest = monthlyData[monthlyData.length - 1] || {};
-                      const 당시즌의류 = Math.round(salesPriceType === '실판' ? latest.당시즌의류?.net_sales : latest.당시즌의류?.gross_sales) || 0;
-                      const 과시즌의류 = Math.round(salesPriceType === '실판' ? latest.과시즌의류?.net_sales : latest.과시즌의류?.gross_sales) || 0;
+                      const 당F = Math.round(salesPriceType === '실판' ? latest.당시즌F?.net_sales : latest.당시즌F?.gross_sales) || 0;
+                      const 당S = Math.round(salesPriceType === '실판' ? latest.당시즌S?.net_sales : latest.당시즌S?.gross_sales) || 0;
+                      const 과F = Math.round(salesPriceType === '실판' ? latest.과시즌F?.net_sales : latest.과시즌F?.gross_sales) || 0;
+                      const 과S = Math.round(salesPriceType === '실판' ? latest.과시즌S?.net_sales : latest.과시즌S?.gross_sales) || 0;
                       const 모자 = Math.round(salesPriceType === '실판' ? latest.모자?.net_sales : latest.모자?.gross_sales) || 0;
                       const 신발 = Math.round(salesPriceType === '실판' ? latest.신발?.net_sales : latest.신발?.gross_sales) || 0;
                       const 가방외 = Math.round(salesPriceType === '실판' ? latest.가방외?.net_sales : latest.가방외?.gross_sales) || 0;
-                      const total = 당시즌의류 + 과시즌의류 + 모자 + 신발 + 가방외;
+                      const total = 당F + 당S + 과F + 과S + 모자 + 신발 + 가방외;
                       
-                      const 당시즌의류Pct = total > 0 ? ((당시즌의류 / total) * 100).toFixed(1) : '0';
+                      const currentSeason = 당F + 당S;
+                      const currentSeasonPct = total > 0 ? ((currentSeason / total) * 100).toFixed(1) : '0';
                       const 모자Pct = total > 0 ? ((모자 / total) * 100).toFixed(1) : '0';
                       const 신발Pct = total > 0 ? ((신발 / total) * 100).toFixed(1) : '0';
                       
                       return (
                         <>
-                          <div>• 당시즌의류: 최대 비중 ({당시즌의류Pct}%)</div>
+                          <div>• 당시즌F/S: 최대 비중 ({currentSeasonPct}%)</div>
                           <div>• 모자: 안정적 기여 ({모자Pct}%)</div>
                           <div>• 신발: 주요 아이템 ({신발Pct}%)</div>
                         </>
@@ -3449,8 +3468,8 @@ const HongKongCEODashboard = () => {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
                   <h4 className="text-xs font-bold text-green-800 mb-1">💡 전략 포인트</h4>
                   <div className="space-y-0.5 text-xs text-green-700">
-                    <div>• 당시즌 의류 집중 육성</div>
-                    <div>• 액세서리 라인 강화</div>
+                    <div>• 당시즌F/S 집중 육성</div>
+                    <div>• 액세서리(모자·신발·가방외) 라인 강화</div>
                     <div>• 아이템별 차별화 전략</div>
                   </div>
                 </div>
@@ -3502,13 +3521,14 @@ const HongKongCEODashboard = () => {
                 }}
                 contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
               />
-              <Bar dataKey="F당시즌" stackId="a" fill="#EF4444" />
-              <Bar dataKey="S당시즌" stackId="a" fill="#34D399" />
-              <Bar dataKey="과시즌FW" stackId="a" fill="#93C5FD" />
-              <Bar dataKey="과시즌SS" stackId="a" fill="#60A5FA" />
-              <Bar dataKey="모자" stackId="a" fill="#60A5FA" />
-              <Bar dataKey="신발" stackId="a" fill="#FCD34D" />
-              <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" />
+              {/* 범례 이름을 아이템 판매 그래프와 통일: 당시즌F/S, 과시즌F/S */}
+              <Bar dataKey="F당시즌" stackId="a" fill="#FFD4B3" name="🍂 당시즌F" />
+              <Bar dataKey="S당시즌" stackId="a" fill="#B3E5FC" name="☀️ 당시즌S" />
+              <Bar dataKey="과시즌FW" stackId="a" fill="#FFB3BA" name="🍂 과시즌F" />
+              <Bar dataKey="과시즌SS" stackId="a" fill="#B2F5EA" name="☀️ 과시즌S" />
+              <Bar dataKey="모자" stackId="a" fill="#93C5FD" name="🧢 모자" />
+              <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
+              <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" name="👜 가방외" />
               {/* 재고주수 레이블 - 맨 마지막에 렌더링하여 막대 위에 표시 */}
               <Layer>
                 {(dashboardData?.monthly_inventory_data || []).map((item: any, index: number) => {
@@ -3643,14 +3663,14 @@ const HongKongCEODashboard = () => {
           <div className="mt-4">
             <div className="flex flex-wrap gap-2 justify-center">
               {[
-                { name: '전체', color: '#E5E7EB' },
-                { name: 'F당시즌', color: '#EF4444' },
-                { name: 'S당시즌', color: '#34D399' },
-                { name: '과시즌FW', color: '#93C5FD' },
-                { name: '과시즌SS', color: '#60A5FA' },
-                { name: '모자', color: '#60A5FA' },
-                { name: '신발', color: '#FCD34D' },
-                { name: '가방외', color: '#C4B5FD' },
+                { name: '전체', displayName: '전체', color: '#E5E7EB' },
+                { name: 'F당시즌', displayName: '🍂 당시즌F', color: '#FFD4B3' },
+                { name: 'S당시즌', displayName: '☀️ 당시즌S', color: '#B3E5FC' },
+                { name: '과시즌FW', displayName: '🍂 과시즌F', color: '#FFB3BA' },
+                { name: '과시즌SS', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
+                { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
+                { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
+                { name: '가방외', displayName: '👜 가방외', color: '#C4B5FD' },
               ].map((item) => (
                 <button
                   key={item.name}
@@ -3667,7 +3687,7 @@ const HongKongCEODashboard = () => {
                     color: '#000000'
                   }}
                 >
-                  {item.name}
+                  {item.displayName}
                 </button>
               ))}
             </div>
@@ -3775,14 +3795,26 @@ const HongKongCEODashboard = () => {
                         const months = (dashboardData?.monthly_inventory_data || []).map((item: any) => `${item.period.slice(2, 4)}월`);
                         const inventoryYOY = dashboardData?.monthly_inventory_yoy || {};
                         const itemKeys = selectedInventoryItem === '전체' 
-                          ? ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']
+                          ? ['전체합계', 'F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']
                           : [selectedInventoryItem];
                         
                         return itemKeys.map((itemKey: string) => (
                           <tr key={itemKey} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-gray-50">{itemKey}</td>
+                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-gray-50">
+                              {itemKey === '전체합계' && '전체합계'}
+                              {itemKey === 'F당시즌' && '🍂 당시즌F'}
+                              {itemKey === 'S당시즌' && '☀️ 당시즌S'}
+                              {itemKey === '과시즌FW' && '🍂 과시즌F'}
+                              {itemKey === '과시즌SS' && '☀️ 과시즌S'}
+                              {itemKey === '모자' && '🧢 모자'}
+                              {itemKey === '신발' && '👟 신발'}
+                              {itemKey === '가방외' && '👜 가방외'}
+                            </td>
                             {months.map((month: string, idx: number) => {
-                              const yoyValue = (inventoryYOY as any)[itemKey]?.[idx];
+                              const yoyValue =
+                                itemKey === '전체합계'
+                                  ? overallInventoryYoy[idx]
+                                  : (inventoryYOY as any)[itemKey]?.[idx];
                               const displayValue = yoyValue !== null && yoyValue !== undefined ? `${yoyValue}%` : '-';
                               const isPositive = yoyValue !== null && yoyValue !== undefined && yoyValue < 100;
                               const isNegative = yoyValue !== null && yoyValue !== undefined && yoyValue > 100;
@@ -3854,8 +3886,11 @@ const HongKongCEODashboard = () => {
             <h3 className="text-lg font-semibold text-gray-900">
               오프라인 매장별 현황 (실판V-, 25년 10월 기준)
             </h3>
-            <button className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors">
-              YOY 추세 분석
+            <button
+              className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
+              onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
+            >
+              매장 상세 대시보드
             </button>
           </div>
           

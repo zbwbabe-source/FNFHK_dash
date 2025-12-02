@@ -135,6 +135,7 @@ def main():
     parser.add_argument('--period', type=str, help='특정 Period만 업데이트 (예: 2410)')
     parser.add_argument('--hk-only', action='store_true', help='홍콩마카오만 업데이트')
     parser.add_argument('--tw-only', action='store_true', help='대만만 업데이트')
+    parser.add_argument('--yes', '-y', action='store_true', help='확인 없이 자동 진행')
     
     args = parser.parse_args()
     
@@ -153,10 +154,13 @@ def main():
     print("="*80)
     
     # 확인
-    response = input("\n계속하시겠습니까? (y/n): ")
-    if response.lower() != 'y':
-        print("취소되었습니다.")
-        return
+    if not args.yes:
+        response = input("\n계속하시겠습니까? (y/n): ")
+        if response.lower() != 'y':
+            print("취소되었습니다.")
+            return
+    else:
+        print("\n자동 진행 모드: 확인 없이 진행합니다.")
     
     # 결과 추적
     hk_success = []

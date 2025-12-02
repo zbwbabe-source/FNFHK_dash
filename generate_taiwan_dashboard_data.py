@@ -9,14 +9,17 @@
 """
 import csv
 import json
+import os
+import shutil
 from collections import defaultdict
 from datetime import datetime
 import re
 
 # TWD to HKD 환산환율
 # 2510 기준: 3.95701015338086
+# 2509 기준: 3.92 (임시)
 # 다음달 업데이트 시 이 값을 변경하세요
-TWD_TO_HKD_RATE = 3.95701015338086
+TWD_TO_HKD_RATE = 3.92  # 2509 테스트용 임시 값
 
 # V- (부가세 제외) 적용 비율
 # 대만재고수불.csv의 실판매출은 V-로 표현해야 하므로 1.05로 나눔
@@ -1553,10 +1556,30 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         'ending_inventory': ending_inventory,
     }
     
-    # JSON 저장
-    print(f"결과 저장 중: {output_file_path}")
-    with open(output_file_path, 'w', encoding='utf-8') as f:
+    # Period별 파일명 생성
+    period = result['metadata']['last_period']
+    base_name = os.path.splitext(os.path.basename(output_file_path))[0]
+    period_file = f"{base_name}-{period}.json"
+    period_output_path = os.path.join(os.path.dirname(output_file_path), period_file)
+    
+    # JSON 저장 (Period별 파일명)
+    print(f"결과 저장 중: {period_output_path}")
+    with open(period_output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+    
+    # 기본 파일명으로도 복사 (최신 Period용)
+    shutil.copy2(period_output_path, output_file_path)
+    print(f"기본 파일로도 복사: {output_file_path}")
+    
+    # public/dashboard 폴더에도 복사 (Next.js에서 동적 로드용)
+    public_dir = 'public/dashboard'
+    if not os.path.exists(public_dir):
+        os.makedirs(public_dir)
+    public_period_file = os.path.join(public_dir, period_file)
+    public_default_file = os.path.join(public_dir, os.path.basename(output_file_path))
+    shutil.copy2(period_output_path, public_period_file)
+    shutil.copy2(period_output_path, public_default_file)
+    print(f"public 폴더로 복사 완료: {public_period_file}, {public_default_file}")
     
     print("완료!")
     print(f"  - Store 수: {len(store_summary)}")

@@ -1,0 +1,1276 @@
+{
+  "metadata": {
+    "last_period": "2509",
+    "previous_period": "2409",
+    "last_year": 2025,
+    "last_month": 9,
+    "generated_at": "2025-12-02T15:39:26.880313"
+  },
+  "sales_summary": {
+    "total_net_sales": 16251.97,
+    "total_yoy": 9.020474850381666,
+    "total_change": 1344.706,
+    "same_store_yoy": 107.30949704114813,
+    "same_store_count": 3
+  },
+  "country_channel_summary": {
+    "HK_Online": {
+      "country": "HK",
+      "channel": "Online",
+      "current": {
+        "net_sales": 589024.0
+      },
+      "previous": {
+        "net_sales": 235420.0
+      },
+      "yoy": 250.2013422818792
+    },
+    "HK_Retail": {
+      "country": "HK",
+      "channel": "Retail",
+      "current": {
+        "net_sales": 9909404.0
+      },
+      "previous": {
+        "net_sales": 8417578.0
+      },
+      "yoy": 117.72274637668936
+    },
+    "HK_Outlet": {
+      "country": "HK",
+      "channel": "Outlet",
+      "current": {
+        "net_sales": 2215295.0
+      },
+      "previous": {
+        "net_sales": 2079282.0
+      },
+      "yoy": 106.54134456028572
+    },
+    "MO_Retail": {
+      "country": "MO",
+      "channel": "Retail",
+      "current": {
+        "net_sales": 3121056.0
+      },
+      "previous": {
+        "net_sales": 3745377.0
+      },
+      "yoy": 83.33089032158846
+    },
+    "MO_Outlet": {
+      "country": "MO",
+      "channel": "Outlet",
+      "current": {
+        "net_sales": 417191.0
+      },
+      "previous": {
+        "net_sales": 429607.0
+      },
+      "yoy": 97.10991673785576
+    }
+  },
+  "store_summary": {
+    "HE1": {
+      "store_code": "HE1",
+      "store_name": "HE1 HK Zalora Online Store",
+      "category": "MLB 온라인",
+      "brand": "MLB",
+      "channel": "Online",
+      "current": {
+        "gross_sales": 105879.0,
+        "net_sales": 62172.0,
+        "sales_qty": 3888915.0,
+        "stock_price": 9358458.0,
+        "stock_cost": 2958668.0,
+        "discount_rate": 41.280140537783694
+      },
+      "previous": {
+        "gross_sales": 179043.0,
+        "net_sales": 113327.0,
+        "sales_qty": 3159408.0,
+        "stock_price": 40506.0,
+        "stock_cost": 11934.0,
+        "discount_rate": 36.7040319923147
+      },
+      "closed": true
+    },
+    "HE2": {
+      "store_code": "HE2",
+      "store_name": "HE2 HK 91APP",
+      "category": "MLB 온라인",
+      "brand": "MLB",
+      "channel": "Online",
+      "current": {
+        "gross_sales": 659745.0,
+        "net_sales": 526852.0,
+        "sales_qty": 6341752.0,
+        "stock_price": 11427352.0,
+        "stock_cost": 3535719.0,
+        "discount_rate": 20.14308558609766
+      },
+      "previous": {
+        "gross_sales": 138563.0,
+        "net_sales": 122093.0,
+        "sales_qty": 5002347.0,
+        "stock_price": 1429.0,
+        "stock_cost": 455.0,
+        "discount_rate": 11.886289990834493
+      },
+      "closed": true
+    },
+    "M01": {
+      "store_code": "M01",
+      "store_name": "M01 MLB MONG KOK",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1009417.0,
+        "net_sales": 906559.0,
+        "sales_qty": 74809420.0,
+        "stock_price": 6141319.0,
+        "stock_cost": 1914712.0,
+        "discount_rate": 10.189842255480142
+      },
+      "previous": {
+        "gross_sales": 1381015.0,
+        "net_sales": 1229729.0,
+        "sales_qty": 68829329.0,
+        "stock_price": 11687441.0,
+        "stock_cost": 3758893.0,
+        "discount_rate": 10.954696364630362
+      },
+      "closed": true
+    },
+    "M02": {
+      "store_code": "M02",
+      "store_name": "M02 MLB Times Square",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 432670.0,
+        "net_sales": 393922.0,
+        "sales_qty": 43525003.0,
+        "stock_price": 3184826.0,
+        "stock_cost": 1020662.0,
+        "discount_rate": 8.955555041948829
+      },
+      "previous": {
+        "gross_sales": 449098.0,
+        "net_sales": 411467.0,
+        "sales_qty": 41418065.0,
+        "stock_price": 4366021.0,
+        "stock_cost": 1426861.0,
+        "discount_rate": 8.379240165843536
+      },
+      "closed": true
+    },
+    "M03": {
+      "store_code": "M03",
+      "store_name": "M03 Temp Store",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 8486239.0,
+        "net_sales": 2590566.0,
+        "sales_qty": 18814153.0,
+        "stock_price": 10301074.0,
+        "stock_cost": 3234979.0,
+        "discount_rate": 69.47333206147034
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 15600454.0,
+        "stock_price": 0.0,
+        "stock_cost": 73870.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M04": {
+      "store_code": "M04",
+      "store_name": "M04 MLB Telford Plaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 7284628.0,
+        "stock_price": 0.0,
+        "stock_cost": -7558.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 7284628.0,
+        "stock_price": 0.0,
+        "stock_cost": -7558.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M05": {
+      "store_code": "M05",
+      "store_name": "M05 MLB LCX",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 494341.0,
+        "net_sales": 447680.0,
+        "sales_qty": 50312764.0,
+        "stock_price": 3695933.0,
+        "stock_cost": 1107130.0,
+        "discount_rate": 9.439030952318339
+      },
+      "previous": {
+        "gross_sales": 604366.0,
+        "net_sales": 544254.0,
+        "sales_qty": 46872440.0,
+        "stock_price": 4760707.0,
+        "stock_cost": 1476798.0,
+        "discount_rate": 9.94629082377235
+      },
+      "closed": true
+    },
+    "M06": {
+      "store_code": "M06",
+      "store_name": "M06 MLB KIDS K11",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 1707000.0,
+        "stock_price": 0.0,
+        "stock_cost": -647.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 1707000.0,
+        "stock_price": 0.0,
+        "stock_cost": -647.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M07": {
+      "store_code": "M07",
+      "store_name": "M07 MLB CITYGATE OUTLET",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 1670127.0,
+        "net_sales": 909576.0,
+        "sales_qty": 59826108.0,
+        "stock_price": 5131338.0,
+        "stock_cost": 1607257.0,
+        "discount_rate": 45.538512939435144
+      },
+      "previous": {
+        "gross_sales": 1632772.0,
+        "net_sales": 1013348.0,
+        "sales_qty": 49528119.0,
+        "stock_price": 6908283.0,
+        "stock_cost": 2092764.0,
+        "discount_rate": 37.936956292734074
+      },
+      "closed": true
+    },
+    "M08": {
+      "store_code": "M08",
+      "store_name": "M08 V City",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 160148.0,
+        "net_sales": 139327.0,
+        "sales_qty": 12241077.0,
+        "stock_price": 0.0,
+        "stock_cost": 8247.0,
+        "discount_rate": 13.001098983440318
+      },
+      "previous": {
+        "gross_sales": 354478.0,
+        "net_sales": 314588.0,
+        "sales_qty": 10451872.0,
+        "stock_price": 3558915.0,
+        "stock_cost": 1127985.0,
+        "discount_rate": 11.253166628112323
+      },
+      "closed": true
+    },
+    "M09": {
+      "store_code": "M09",
+      "store_name": "M09 Sheung Shui",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 424311.0,
+        "net_sales": 360279.0,
+        "sales_qty": 12778564.0,
+        "stock_price": 4019598.0,
+        "stock_cost": 1241160.0,
+        "discount_rate": 15.090817819948105
+      },
+      "previous": {
+        "gross_sales": 468340.0,
+        "net_sales": 415277.0,
+        "sales_qty": 10403473.0,
+        "stock_price": 4144610.0,
+        "stock_cost": 1322527.0,
+        "discount_rate": 11.330016654567194
+      },
+      "closed": true
+    },
+    "M10": {
+      "store_code": "M10",
+      "store_name": "M10 HK-I SQUARE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1300838.0,
+        "net_sales": 1171451.0,
+        "sales_qty": 26449608.0,
+        "stock_price": 4945951.0,
+        "stock_cost": 1510088.0,
+        "discount_rate": 9.94643452912661
+      },
+      "previous": {
+        "gross_sales": 1385931.0,
+        "net_sales": 1232955.0,
+        "sales_qty": 19075012.0,
+        "stock_price": 5874994.0,
+        "stock_cost": 1860963.0,
+        "discount_rate": 11.03777893704665
+      },
+      "closed": true
+    },
+    "M11": {
+      "store_code": "M11",
+      "store_name": "M11-APM",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 764975.0,
+        "net_sales": 703063.0,
+        "sales_qty": 17841876.0,
+        "stock_price": 4353276.0,
+        "stock_cost": 1325148.0,
+        "discount_rate": 8.093336383541946
+      },
+      "previous": {
+        "gross_sales": 895185.0,
+        "net_sales": 811528.0,
+        "sales_qty": 13357193.0,
+        "stock_price": 5036315.0,
+        "stock_cost": 1605139.0,
+        "discount_rate": 9.345219144646078
+      },
+      "closed": true
+    },
+    "M12": {
+      "store_code": "M12",
+      "store_name": "M12 World Trade Centre",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 30646.0,
+        "net_sales": 28522.0,
+        "sales_qty": 1147353.0,
+        "stock_price": 1114987.0,
+        "stock_cost": 346342.0,
+        "discount_rate": 6.930757684526529
+      },
+      "previous": {
+        "gross_sales": 73020.0,
+        "net_sales": 63213.0,
+        "sales_qty": 918364.0,
+        "stock_price": 3330459.0,
+        "stock_cost": 1063015.0,
+        "discount_rate": 13.430566967953986
+      },
+      "closed": true
+    },
+    "M13": {
+      "store_code": "M13",
+      "store_name": "M13 Tai Po Mega Mall",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 340143.0,
+        "net_sales": 255281.0,
+        "sales_qty": 8007181.0,
+        "stock_price": 4679142.0,
+        "stock_cost": 1464793.0,
+        "discount_rate": 24.94891854308335
+      },
+      "previous": {
+        "gross_sales": 291086.0,
+        "net_sales": 256613.0,
+        "sales_qty": 6040727.0,
+        "stock_price": 5222742.0,
+        "stock_cost": 1658473.0,
+        "discount_rate": 11.842891791429338
+      },
+      "closed": true
+    },
+    "M14": {
+      "store_code": "M14",
+      "store_name": "M14 NewTownPlaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 865047.0,
+        "net_sales": 782363.0,
+        "sales_qty": 17244367.0,
+        "stock_price": 3816804.0,
+        "stock_cost": 1163303.0,
+        "discount_rate": 9.5583245765837
+      },
+      "previous": {
+        "gross_sales": 1082369.0,
+        "net_sales": 962299.0,
+        "sales_qty": 12285747.0,
+        "stock_price": 3281001.0,
+        "stock_cost": 1040466.0,
+        "discount_rate": 11.09325932283722
+      },
+      "closed": true
+    },
+    "M15": {
+      "store_code": "M15",
+      "store_name": "M15 YuenLongPlaza",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 914211.0,
+        "net_sales": 449230.0,
+        "sales_qty": 9249442.0,
+        "stock_price": 3855160.0,
+        "stock_cost": 1220666.0,
+        "discount_rate": 50.86145320937946
+      },
+      "previous": {
+        "gross_sales": 455955.0,
+        "net_sales": 290088.0,
+        "sales_qty": 6180548.0,
+        "stock_price": 3893746.0,
+        "stock_cost": 1188554.0,
+        "discount_rate": 36.37793203276639
+      },
+      "closed": true
+    },
+    "M16": {
+      "store_code": "M16",
+      "store_name": "M16 Hysan Place",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 314421.0,
+        "net_sales": 289119.0,
+        "sales_qty": 6322256.0,
+        "stock_price": 3274787.0,
+        "stock_cost": 998307.0,
+        "discount_rate": 8.04717242168939
+      },
+      "previous": {
+        "gross_sales": 395489.0,
+        "net_sales": 356611.0,
+        "sales_qty": 4370790.0,
+        "stock_price": 4121621.0,
+        "stock_cost": 1314888.0,
+        "discount_rate": 9.83036190639942
+      },
+      "closed": true
+    },
+    "M17": {
+      "store_code": "M17",
+      "store_name": "M17 Tuen Mun Town Plaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 521186.0,
+        "net_sales": 456575.0,
+        "sales_qty": 6647826.0,
+        "stock_price": 4035501.0,
+        "stock_cost": 1231422.0,
+        "discount_rate": 12.396917799019928
+      },
+      "previous": {
+        "gross_sales": 459237.0,
+        "net_sales": 407435.0,
+        "sales_qty": 4036739.0,
+        "stock_price": 4081277.0,
+        "stock_cost": 1299749.0,
+        "discount_rate": 11.2800144587653
+      },
+      "closed": true
+    },
+    "M18": {
+      "store_code": "M18",
+      "store_name": "M18 Langham Place",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1316782.0,
+        "net_sales": 1201726.0,
+        "sales_qty": 17554924.0,
+        "stock_price": 4652814.0,
+        "stock_cost": 1416932.0,
+        "discount_rate": 8.737665004533781
+      },
+      "previous": {
+        "gross_sales": 1261015.0,
+        "net_sales": 1145984.0,
+        "sales_qty": 10788418.0,
+        "stock_price": 5203755.0,
+        "stock_cost": 1656651.0,
+        "discount_rate": 9.122096089261428
+      },
+      "closed": false
+    },
+    "M19": {
+      "store_code": "M19",
+      "store_name": "M19 NewTownPlaza KIDS",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 81081.0,
+        "net_sales": 72805.0,
+        "sales_qty": 1321114.0,
+        "stock_price": 1395390.0,
+        "stock_cost": 424541.0,
+        "discount_rate": 10.20707687374354
+      },
+      "previous": {
+        "gross_sales": 79914.0,
+        "net_sales": 72592.0,
+        "sales_qty": 744027.0,
+        "stock_price": 1542603.0,
+        "stock_cost": 499304.0,
+        "discount_rate": 9.16234952574017
+      },
+      "closed": true
+    },
+    "M20": {
+      "store_code": "M20",
+      "store_name": "M20 OceanTerminal KIDS",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 3323446.0,
+        "stock_price": 0.0,
+        "stock_cost": 11.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 167491.0,
+        "net_sales": 149143.0,
+        "sales_qty": 2378123.0,
+        "stock_price": 1555516.0,
+        "stock_cost": 502526.0,
+        "discount_rate": 10.95461845711113
+      },
+      "closed": true
+    },
+    "M21": {
+      "store_code": "M21",
+      "store_name": "M21 MOKO",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 1124579.0,
+        "net_sales": 601208.0,
+        "sales_qty": 10585165.0,
+        "stock_price": 5449567.0,
+        "stock_cost": 1729118.0,
+        "discount_rate": 46.53928270045946
+      },
+      "previous": {
+        "gross_sales": 820423.0,
+        "net_sales": 519233.0,
+        "sales_qty": 5316320.0,
+        "stock_price": 5812204.0,
+        "stock_cost": 1782739.0,
+        "discount_rate": 36.71155001749098
+      },
+      "closed": true
+    },
+    "M22": {
+      "store_code": "M22",
+      "store_name": "M22 YOHO Mall",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 410449.0,
+        "net_sales": 365447.0,
+        "sales_qty": 4352033.0,
+        "stock_price": 4322673.0,
+        "stock_cost": 1327466.0,
+        "discount_rate": 10.964090544744902
+      },
+      "previous": {
+        "gross_sales": 306176.0,
+        "net_sales": 273606.0,
+        "sales_qty": 2172359.0,
+        "stock_price": 5163207.0,
+        "stock_cost": 1657715.0,
+        "discount_rate": 10.637672449832776
+      },
+      "closed": false
+    },
+    "M99": {
+      "store_code": "M99",
+      "store_name": "M99 MLB HK Office",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Office",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 43363.0,
+        "stock_cost": 13022.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 80228.0,
+        "stock_cost": 25759.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "MC1": {
+      "store_code": "MC1",
+      "store_name": "MC1 MLB Venetian",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 2038412.0,
+        "net_sales": 1832718.0,
+        "sales_qty": 94580719.0,
+        "stock_price": 6248581.0,
+        "stock_cost": 1665689.0,
+        "discount_rate": 10.090894284374308
+      },
+      "previous": {
+        "gross_sales": 2430617.0,
+        "net_sales": 2164984.0,
+        "sales_qty": 82329805.0,
+        "stock_price": 9085221.0,
+        "stock_cost": 2681636.0,
+        "discount_rate": 10.928624295806372
+      },
+      "closed": true
+    },
+    "MC2": {
+      "store_code": "MC2",
+      "store_name": "MC2 MLB Londoner",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 517048.0,
+        "net_sales": 465096.0,
+        "sales_qty": 30766796.0,
+        "stock_price": 3649281.0,
+        "stock_cost": 1018442.0,
+        "discount_rate": 10.04780987451842
+      },
+      "previous": {
+        "gross_sales": 749067.0,
+        "net_sales": 660470.0,
+        "sales_qty": 27327833.0,
+        "stock_price": 4772122.0,
+        "stock_cost": 1428641.0,
+        "discount_rate": 11.827646926109413
+      },
+      "closed": true
+    },
+    "MC3": {
+      "store_code": "MC3",
+      "store_name": "MC3 MLB Senado Square",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 901689.0,
+        "net_sales": 823242.0,
+        "sales_qty": 34701549.0,
+        "stock_price": 5717633.0,
+        "stock_cost": 1639740.0,
+        "discount_rate": 8.700006321470042
+      },
+      "previous": {
+        "gross_sales": 1015533.0,
+        "net_sales": 919923.0,
+        "sales_qty": 28850097.0,
+        "stock_price": 7013727.0,
+        "stock_cost": 2137318.0,
+        "discount_rate": 9.414760524768766
+      },
+      "closed": true
+    },
+    "MC4": {
+      "store_code": "MC4",
+      "store_name": "MC4 Senado2",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 817385.0,
+        "net_sales": 417191.0,
+        "sales_qty": 8903295.0,
+        "stock_price": 3850465.0,
+        "stock_cost": 1254862.0,
+        "discount_rate": 48.96028187451446
+      },
+      "previous": {
+        "gross_sales": 721677.0,
+        "net_sales": 429607.0,
+        "sales_qty": 3860830.0,
+        "stock_price": 3691171.0,
+        "stock_cost": 1161057.0,
+        "discount_rate": 40.4710140409075
+      },
+      "closed": false
+    },
+    "WHM": {
+      "store_code": "WHM",
+      "store_name": "WHM HK MAIN WAREHOUSE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Warehouse",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 995735.0,
+        "stock_price": 276699482.0,
+        "stock_cost": 86103598.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 59770.0,
+        "net_sales": 26897.0,
+        "sales_qty": 995735.0,
+        "stock_price": 321706663.0,
+        "stock_cost": 100849700.0,
+        "discount_rate": 54.99916345992973
+      },
+      "closed": true
+    },
+    "WMM": {
+      "store_code": "WMM",
+      "store_name": "WMM MC MAIN WAREHOUSE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Warehouse",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": -1494850.0,
+        "stock_cost": 75576.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": -1442280.0,
+        "stock_cost": 69420.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    }
+  },
+  "season_summary": {
+    "22F_과시즌F": {
+      "season_code": "22F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 1187436.0,
+        "net_sales": 399780.0,
+        "sales_qty": 27769811.0
+      },
+      "previous": {
+        "gross_sales": 104934.0,
+        "net_sales": 59640.0,
+        "sales_qty": 26193458.0
+      }
+    },
+    "22N_N시즌": {
+      "season_code": "22N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1091535.0,
+        "net_sales": 500219.0,
+        "sales_qty": 43792005.0
+      },
+      "previous": {
+        "gross_sales": 844977.0,
+        "net_sales": 656923.0,
+        "sales_qty": 40620084.0
+      }
+    },
+    "23N_N시즌": {
+      "season_code": "23N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 2711373.0,
+        "net_sales": 1215490.0,
+        "sales_qty": 40659005.0
+      },
+      "previous": {
+        "gross_sales": 1704233.0,
+        "net_sales": 1334454.0,
+        "sales_qty": 34410559.0
+      }
+    },
+    "23S_과시즌S": {
+      "season_code": "23S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 2775616.0,
+        "net_sales": 796551.0,
+        "sales_qty": 31122176.0
+      },
+      "previous": {
+        "gross_sales": 1180035.0,
+        "net_sales": 665059.0,
+        "sales_qty": 26450116.0
+      }
+    },
+    "20S_과시즌S": {
+      "season_code": "20S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 29583961.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 29583961.0
+      }
+    },
+    "22S_과시즌S": {
+      "season_code": "22S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 563475.0,
+        "net_sales": 131874.0,
+        "sales_qty": 21641898.0
+      },
+      "previous": {
+        "gross_sales": 100745.0,
+        "net_sales": 49420.0,
+        "sales_qty": 21196598.0
+      }
+    },
+    "19F_과시즌F": {
+      "season_code": "19F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 17534196.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 17534196.0
+      }
+    },
+    "23F_과시즌F": {
+      "season_code": "23F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 627622.0,
+        "net_sales": 257883.0,
+        "sales_qty": 29392172.0
+      },
+      "previous": {
+        "gross_sales": 682194.0,
+        "net_sales": 392843.0,
+        "sales_qty": 23236103.0
+      }
+    },
+    "19S_과시즌S": {
+      "season_code": "19S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 42843625.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 42843625.0
+      }
+    },
+    "24N_N시즌": {
+      "season_code": "24N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1413220.0,
+        "net_sales": 1054022.0,
+        "sales_qty": 31705522.0
+      },
+      "previous": {
+        "gross_sales": 5628289.0,
+        "net_sales": 5041361.0,
+        "sales_qty": 15299640.0
+      }
+    },
+    "24S_과시즌S": {
+      "season_code": "24S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 2759382.0,
+        "net_sales": 1052039.0,
+        "sales_qty": 24857938.0
+      },
+      "previous": {
+        "gross_sales": 2140461.0,
+        "net_sales": 1912259.0,
+        "sales_qty": 19214126.0
+      }
+    },
+    "18F_과시즌F": {
+      "season_code": "18F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 27643958.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 27643958.0
+      }
+    },
+    "25S_과시즌S": {
+      "season_code": "25S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 1575398.0,
+        "net_sales": 1403481.0,
+        "sales_qty": 15347856.0
+      },
+      "previous": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      }
+    },
+    "24F_과시즌F": {
+      "season_code": "24F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 884811.0,
+        "net_sales": 531335.0,
+        "sales_qty": 22411241.0
+      },
+      "previous": {
+        "gross_sales": 3833143.0,
+        "net_sales": 3348140.0,
+        "sales_qty": 2362170.0
+      }
+    },
+    "21S_과시즌S": {
+      "season_code": "21S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 290.0,
+        "net_sales": 246.0,
+        "sales_qty": 52496596.0
+      },
+      "previous": {
+        "gross_sales": 2054.0,
+        "net_sales": 850.0,
+        "sales_qty": 52486070.0
+      }
+    },
+    "21F_과시즌F": {
+      "season_code": "21F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 20035989.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 20035989.0
+      }
+    },
+    "20F_과시즌F": {
+      "season_code": "20F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 11052359.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 11052359.0
+      }
+    },
+    "25N_N시즌": {
+      "season_code": "25N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 4574174.0,
+        "net_sales": 4171211.0,
+        "sales_qty": 12354787.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0
+      }
+    },
+    "21N_N시즌": {
+      "season_code": "21N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1578027.0,
+        "net_sales": 1237412.0,
+        "sales_qty": 47663031.0
+      },
+      "previous": {
+        "gross_sales": 1636565.0,
+        "net_sales": 1446315.0,
+        "sales_qty": 42060289.0
+      }
+    },
+    "25F_과시즌F": {
+      "season_code": "25F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 3959410.0,
+        "net_sales": 3500427.0,
+        "sales_qty": 2553442.0
+      },
+      "previous": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      }
+    },
+    "17F_과시즌F": {
+      "season_code": "17F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 6029319.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 6029319.0
+      }
+    },
+    "18S_과시즌S": {
+      "season_code": "18S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 32056683.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 32056683.0
+      }
+    },
+    "17S_과시즌S": {
+      "season_code": "17S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 976499.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 976499.0
+      }
+    }
+  },
+  "category_summary": {
+    "BAG": {
+      "category": "BAG",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 19073625.0,
+        "sales_qty_1m": 41590733.0,
+        "sales_qty_6m": 240627175.0,
+        "stock_months_1m": 0.45860276134109007,
+        "stock_months_6m": 0.47559777901228323
+      }
+    },
+    "HEA": {
+      "category": "HEA",
+      "category_name": "모자",
+      "current": {
+        "stock_price": 37441583.0,
+        "sales_qty_1m": 55770500.0,
+        "sales_qty_6m": 314584948.0,
+        "stock_months_1m": 0.671351036838472,
+        "stock_months_6m": 0.7141139441929053
+      }
+    },
+    "SHO": {
+      "category": "SHO",
+      "category_name": "신발",
+      "current": {
+        "stock_price": 57773887.0,
+        "sales_qty_1m": 75823824.0,
+        "sales_qty_6m": 429866908.0,
+        "stock_months_1m": 0.7619490016752518,
+        "stock_months_6m": 0.80639685341864
+      }
+    },
+    "ATC": {
+      "category": "ATC",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 1075636.0,
+        "sales_qty_1m": 2937468.0,
+        "sales_qty_6m": 16150481.0,
+        "stock_months_1m": 0.3661779464491188,
+        "stock_months_6m": 0.3996051882293784
+      }
+    },
+    "BOT": {
+      "category": "BOT",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 68712.0,
+        "sales_qty_1m": 40568.0,
+        "sales_qty_6m": 243408.0,
+        "stock_months_1m": 1.693748767501479,
+        "stock_months_6m": 1.693748767501479
+      }
+    },
+    "WTC": {
+      "category": "WTC",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 5217.0,
+        "sales_qty_1m": 11257.0,
+        "sales_qty_6m": 67542.0,
+        "stock_months_1m": 0.46344496757573067,
+        "stock_months_6m": 0.46344496757573067
+      }
+    }
+  },
+  "trend_data": [
+    {
+      "period": "2501",
+      "gross_sales": 45033125.0,
+      "net_sales": 36733760.0,
+      "sales_qty": 533413818.0,
+      "discount_rate": 18.42946719775721
+    },
+    {
+      "period": "2502",
+      "gross_sales": 21833393.0,
+      "net_sales": 17895052.0,
+      "sales_qty": 540273764.0,
+      "discount_rate": 18.038153758327898
+    },
+    {
+      "period": "2503",
+      "gross_sales": 20836468.0,
+      "net_sales": 16991207.0,
+      "sales_qty": 546794901.0,
+      "discount_rate": 18.454476065713248
+    },
+    {
+      "period": "2504",
+      "gross_sales": 21347565.0,
+      "net_sales": 17533684.0,
+      "sales_qty": 553414726.0,
+      "discount_rate": 17.8656488456646
+    },
+    {
+      "period": "2505",
+      "gross_sales": 21624423.0,
+      "net_sales": 17737285.0,
+      "sales_qty": 560083468.0,
+      "discount_rate": 17.975684252939374
+    },
+    {
+      "period": "2506",
+      "gross_sales": 18529843.0,
+      "net_sales": 15365614.0,
+      "sales_qty": 565810684.0,
+      "discount_rate": 17.076394009382597
+    },
+    {
+      "period": "2507",
+      "gross_sales": 25376984.0,
+      "net_sales": 20106269.0,
+      "sales_qty": 573600181.0,
+      "discount_rate": 20.76966671847214
+    },
+    {
+      "period": "2508",
+      "gross_sales": 32643633.0,
+      "net_sales": 24077741.0,
+      "sales_qty": 583588228.0,
+      "discount_rate": 26.240620950492854
+    },
+    {
+      "period": "2509",
+      "gross_sales": 25701769.0,
+      "net_sales": 16251970.0,
+      "sales_qty": 591524069.0,
+      "discount_rate": 36.76711513514887
+    }
+  ]
+}

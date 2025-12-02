@@ -45,35 +45,32 @@ def parse_period(period_str):
 
 def get_season_type(season_code, current_year, current_month):
     """
-    시즌 타입 결정
+    시즌 타입 결정 (단순화된 규칙)
     - N이 붙으면 N시즌
-    - 마지막 Period 기준으로 당시즌/과시즌 결정
+    - 시즌 연도 기준으로만 당시즌/과시즌 구분
+      * current_year의 뒤 두 자리와 같으면 당시즌(F/S)
+      * 더 이전 연도면 과시즌(F/S)
+    - Month(월)는 사용하지 않음  → 카드/그래프 기준 일치
     """
     if season_code.endswith('N'):
         return 'N시즌'
     
-    # 시즌 코드에서 연도 추출 (예: 25F -> 25)
-    if len(season_code) >= 2:
-        season_year = int(season_code[:2])
-        season_type = season_code[2]  # F or S
-        
-        # 현재 시즌 결정
-        if current_month >= 1 and current_month <= 6:
-            # 1-6월: F시즌이 당시즌
-            current_season = 'F'
-            if season_year == current_year and season_type == 'F':
+    # 시즌 코드에서 연도/타입 추출 (예: 25F -> 25, 'F')
+    if len(season_code) >= 3:
+        try:
+            season_year = int(season_code[:2])
+        except ValueError:
+            return '기타'
+        current_year_short = current_year % 100  # 2025 → 25
+        season_type = season_code[2]  # 'F' or 'S'
+
+        if season_type in ['F', 'S']:
+            if season_year == current_year_short:
+                # 예: 25F, 25S  → 당시즌F / 당시즌S
                 return f'당시즌{season_type}'
-        else:
-            # 7-12월: S시즌이 당시즌
-            current_season = 'S'
-            if season_year == current_year and season_type == 'S':
-                return f'당시즌{season_type}'
-        
-        # 과시즌 판단
-        if season_type == 'F':
-            return '과시즌F'
-        elif season_type == 'S':
-            return '과시즌S'
+            elif season_year < current_year_short:
+                # 예: 24F, 24S  → 과시즌F / 과시즌S
+                return f'과시즌{season_type}'
     
     return '기타'
 
@@ -404,10 +401,18 @@ def generate_dashboard_data(csv_dir, output_file_path):
     })
     
     # 월별 아이템별 데이터 생성 (추세 그래프용)
+    # - 당시즌/과시즌을 F/S로 세분화 (대만 기준과 동일 로직)
     monthly_item_data = defaultdict(lambda: {
         'period': '',
+        # F/S로 나눈 의류
+        '당시즌F': {'gross_sales': 0, 'net_sales': 0},
+        '당시즌S': {'gross_sales': 0, 'net_sales': 0},
+        '과시즌F': {'gross_sales': 0, 'net_sales': 0},
+        '과시즌S': {'gross_sales': 0, 'net_sales': 0},
+        # 레거시 집계 (기존 그래프 호환용)
         '당시즌의류': {'gross_sales': 0, 'net_sales': 0},
         '과시즌의류': {'gross_sales': 0, 'net_sales': 0},
+        # ACC
         '모자': {'gross_sales': 0, 'net_sales': 0},
         '신발': {'gross_sales': 0, 'net_sales': 0},
         '가방외': {'gross_sales': 0, 'net_sales': 0},
@@ -453,14 +458,31 @@ def generate_dashboard_data(csv_dir, output_file_path):
                 monthly_item_data[period]['가방외']['net_sales'] += net_sales
             else:
                 # 의류 (Category가 의류인 경우)
-                if '당시즌' in season_type:
+                # 시즌 타입: 당시즌F, 당시즌S, 과시즌F, 과시즌S, N시즌/기타
+                if season_type == '당시즌F':
+                    monthly_item_data[period]['당시즌F']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['당시즌F']['net_sales'] += net_sales
                     monthly_item_data[period]['당시즌의류']['gross_sales'] += gross_sales
                     monthly_item_data[period]['당시즌의류']['net_sales'] += net_sales
-                elif '과시즌' in season_type:
+                elif season_type == '당시즌S':
+                    monthly_item_data[period]['당시즌S']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['당시즌S']['net_sales'] += net_sales
+                    monthly_item_data[period]['당시즌의류']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['당시즌의류']['net_sales'] += net_sales
+                elif season_type == '과시즌F':
+                    monthly_item_data[period]['과시즌F']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['과시즌F']['net_sales'] += net_sales
+                    monthly_item_data[period]['과시즌의류']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['과시즌의류']['net_sales'] += net_sales
+                elif season_type == '과시즌S':
+                    monthly_item_data[period]['과시즌S']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['과시즌S']['net_sales'] += net_sales
                     monthly_item_data[period]['과시즌의류']['gross_sales'] += gross_sales
                     monthly_item_data[period]['과시즌의류']['net_sales'] += net_sales
                 else:
-                    # 기타는 당시즌의류로 분류
+                    # 기타/미분류는 당시즌F에 포함 (보수적으로 처리)
+                    monthly_item_data[period]['당시즌F']['gross_sales'] += gross_sales
+                    monthly_item_data[period]['당시즌F']['net_sales'] += net_sales
                     monthly_item_data[period]['당시즌의류']['gross_sales'] += gross_sales
                     monthly_item_data[period]['당시즌의류']['net_sales'] += net_sales
         
@@ -500,11 +522,13 @@ def generate_dashboard_data(csv_dir, output_file_path):
     prev_start_period = f"{prev_year % 100:02d}01"
     prev_recent_periods = sorted([p for p in periods if prev_start_period <= p <= prev_period])
     
-    # 전년도 월별 아이템별 데이터 생성
+    # 전년도 월별 아이템별 데이터 생성 (F/S 기준 세분화)
     prev_monthly_item_data = defaultdict(lambda: {
         'period': '',
-        '당시즌의류': {'gross_sales': 0, 'net_sales': 0},
-        '과시즌의류': {'gross_sales': 0, 'net_sales': 0},
+        '당시즌F': {'gross_sales': 0, 'net_sales': 0},
+        '당시즌S': {'gross_sales': 0, 'net_sales': 0},
+        '과시즌F': {'gross_sales': 0, 'net_sales': 0},
+        '과시즌S': {'gross_sales': 0, 'net_sales': 0},
         '모자': {'gross_sales': 0, 'net_sales': 0},
         '신발': {'gross_sales': 0, 'net_sales': 0},
         '가방외': {'gross_sales': 0, 'net_sales': 0},
@@ -549,6 +573,7 @@ def generate_dashboard_data(csv_dir, output_file_path):
         for row in period_data:
             category = row['Category']
             season_code = row['Season_Code']
+            # 전년도 데이터도 상세 시즌 분류 사용
             season_type = get_season_type(season_code, prev_year, last_month)
             
             gross_sales = float(row['Gross_Sales'] or 0)
@@ -565,16 +590,23 @@ def generate_dashboard_data(csv_dir, output_file_path):
                 prev_monthly_item_data[period]['가방외']['gross_sales'] += gross_sales
                 prev_monthly_item_data[period]['가방외']['net_sales'] += net_sales
             else:
-                # 의류
-                if '당시즌' in season_type:
-                    prev_monthly_item_data[period]['당시즌의류']['gross_sales'] += gross_sales
-                    prev_monthly_item_data[period]['당시즌의류']['net_sales'] += net_sales
-                elif '과시즌' in season_type:
-                    prev_monthly_item_data[period]['과시즌의류']['gross_sales'] += gross_sales
-                    prev_monthly_item_data[period]['과시즌의류']['net_sales'] += net_sales
+                # 의류 - F/S 상세 시즌별 집계
+                if season_type == '당시즌F':
+                    prev_monthly_item_data[period]['당시즌F']['gross_sales'] += gross_sales
+                    prev_monthly_item_data[period]['당시즌F']['net_sales'] += net_sales
+                elif season_type == '당시즌S':
+                    prev_monthly_item_data[period]['당시즌S']['gross_sales'] += gross_sales
+                    prev_monthly_item_data[period]['당시즌S']['net_sales'] += net_sales
+                elif season_type == '과시즌F':
+                    prev_monthly_item_data[period]['과시즌F']['gross_sales'] += gross_sales
+                    prev_monthly_item_data[period]['과시즌F']['net_sales'] += net_sales
+                elif season_type == '과시즌S':
+                    prev_monthly_item_data[period]['과시즌S']['gross_sales'] += gross_sales
+                    prev_monthly_item_data[period]['과시즌S']['net_sales'] += net_sales
                 else:
-                    prev_monthly_item_data[period]['당시즌의류']['gross_sales'] += gross_sales
-                    prev_monthly_item_data[period]['당시즌의류']['net_sales'] += net_sales
+                    # 분류 불가한 경우는 당시즌F에 포함
+                    prev_monthly_item_data[period]['당시즌F']['gross_sales'] += gross_sales
+                    prev_monthly_item_data[period]['당시즌F']['net_sales'] += net_sales
     
     # 월별 채널별 YOY 계산
     monthly_channel_yoy = {
@@ -616,13 +648,16 @@ def generate_dashboard_data(csv_dir, output_file_path):
             yoy_mc_outlet = (current_mc_outlet / prev_mc_outlet * 100) if prev_mc_outlet > 0 else 0
             monthly_channel_yoy['MC_Outlet'].append(round(yoy_mc_outlet))
     
-    # 월별 아이템별 YOY 계산
+    # 월별 아이템별 YOY 계산 (F/S 기준 세분화 + 전체 합계)
     monthly_item_yoy = {
-        '당시즌의류': [],
-        '과시즌의류': [],
+        '당시즌F': [],
+        '당시즌S': [],
+        '과시즌F': [],
+        '과시즌S': [],
         '모자': [],
         '신발': [],
         '가방외': [],
+        '전체합계': [],
     }
     
     for period in recent_periods:
@@ -631,17 +666,29 @@ def generate_dashboard_data(csv_dir, output_file_path):
         if period_year and period_month:
             prev_period_for_yoy = f"{(period_year - 1) % 100:02d}{period_month:02d}"
             
-            # 당시즌의류
-            current_net = monthly_item_data[period]['당시즌의류']['net_sales']
-            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('당시즌의류', {}).get('net_sales', 0)
+            # 당시즌F
+            current_net = monthly_item_data[period]['당시즌F']['net_sales']
+            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('당시즌F', {}).get('net_sales', 0)
             yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
-            monthly_item_yoy['당시즌의류'].append(round(yoy))
+            monthly_item_yoy['당시즌F'].append(round(yoy))
             
-            # 과시즌의류
-            current_net = monthly_item_data[period]['과시즌의류']['net_sales']
-            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('과시즌의류', {}).get('net_sales', 0)
+            # 당시즌S
+            current_net = monthly_item_data[period]['당시즌S']['net_sales']
+            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('당시즌S', {}).get('net_sales', 0)
             yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
-            monthly_item_yoy['과시즌의류'].append(round(yoy))
+            monthly_item_yoy['당시즌S'].append(round(yoy))
+            
+            # 과시즌F
+            current_net = monthly_item_data[period]['과시즌F']['net_sales']
+            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('과시즌F', {}).get('net_sales', 0)
+            yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
+            monthly_item_yoy['과시즌F'].append(round(yoy))
+            
+            # 과시즌S
+            current_net = monthly_item_data[period]['과시즌S']['net_sales']
+            prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('과시즌S', {}).get('net_sales', 0)
+            yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
+            monthly_item_yoy['과시즌S'].append(round(yoy))
             
             # 모자
             current_net = monthly_item_data[period]['모자']['net_sales']
@@ -660,6 +707,31 @@ def generate_dashboard_data(csv_dir, output_file_path):
             prev_net = prev_monthly_item_data.get(prev_period_for_yoy, {}).get('가방외', {}).get('net_sales', 0)
             yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
             monthly_item_yoy['가방외'].append(round(yoy))
+
+            # 전체합계 (당시즌F/S + 과시즌F/S + 모자 + 신발 + 가방외)
+            current_total = (
+                monthly_item_data[period]['당시즌F']['net_sales'] +
+                monthly_item_data[period]['당시즌S']['net_sales'] +
+                monthly_item_data[period]['과시즌F']['net_sales'] +
+                monthly_item_data[period]['과시즌S']['net_sales'] +
+                monthly_item_data[period]['모자']['net_sales'] +
+                monthly_item_data[period]['신발']['net_sales'] +
+                monthly_item_data[period]['가방외']['net_sales']
+            )
+            prev_total = 0
+            if prev_period_for_yoy in prev_monthly_item_data:
+                prev_item = prev_monthly_item_data[prev_period_for_yoy]
+                prev_total = (
+                    prev_item['당시즌F']['net_sales'] +
+                    prev_item['당시즌S']['net_sales'] +
+                    prev_item['과시즌F']['net_sales'] +
+                    prev_item['과시즌S']['net_sales'] +
+                    prev_item['모자']['net_sales'] +
+                    prev_item['신발']['net_sales'] +
+                    prev_item['가방외']['net_sales']
+                )
+            total_yoy = (current_total / prev_total * 100) if prev_total > 0 else 0
+            monthly_item_yoy['전체합계'].append(round(total_yoy))
     
     # 재고주수 계산 (최근 6개월 매출 필요)
     print("재고주수 계산 중...")
@@ -1410,7 +1482,7 @@ def generate_dashboard_data(csv_dir, output_file_path):
                         elif category in ['BAG', 'ACC', 'WAL', 'BEL', 'GLO', 'SCA', 'SUN', 'JEW', 'WAT', 'OTH']:
                             prev_monthly_inventory_data[prev_period_for_yoy]['가방외']['stock_price'] += stock_price
     
-    # YOY 계산
+    # YOY 계산 (아이템별 + 전체합계)
     item_keys = ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']
     for period in sorted(recent_periods):
         period_year, period_month = parse_period(period)
@@ -1427,6 +1499,20 @@ def generate_dashboard_data(csv_dir, output_file_path):
                 else:
                     # 전년 데이터가 없으면 null (None)
                     monthly_inventory_yoy[item_key].append(None)
+
+            # 전체합계 YOY (F/S + 과시즌 + ACC 전체)
+            current_total = sum(
+                monthly_inventory_data[period][key]['stock_price'] for key in item_keys
+            )
+            prev_total = 0
+            if prev_period_for_yoy in prev_monthly_inventory_data:
+                prev_item = prev_monthly_inventory_data[prev_period_for_yoy]
+                prev_total = sum(prev_item[key]['stock_price'] for key in item_keys)
+            if prev_total > 0:
+                total_yoy = (current_total / prev_total) * 100
+                monthly_inventory_yoy['전체합계'].append(round(total_yoy))
+            else:
+                monthly_inventory_yoy['전체합계'].append(None)
     
     # 당시즌F 판매 데이터 계산 (25F vs 24F)
     print("당시즌F 판매 데이터 계산 중...")
@@ -1645,6 +1731,155 @@ def generate_dashboard_data(csv_dir, output_file_path):
     total_discount_rate_previous = calculate_discount_rate(total_gross_sales_previous, total_net_sales_previous)
     total_discount_rate_change = total_discount_rate_current - total_discount_rate_previous
     
+    # ============================================================
+    # 매장 상세 대시보드용 추가 집계
+    # ============================================================
+    print("매장 상세 대시보드용 데이터 생성 중...")
+    
+    # 1. 매장별 월별 추세 (1~10월)
+    store_monthly_trends = defaultdict(list)
+    
+    # 현재 년도 1~10월 데이터
+    for period in sorted(periods):
+        year, month = parse_period(period)
+        if not year or not month or year != last_year or month > last_month:
+            continue
+        
+        period_data = [row for row in data if row['Period'] == period and row['Brand'] == 'MLB']
+        store_sales_current = defaultdict(float)
+        
+        for row in period_data:
+            store_code = row['Store_Code']
+            net_sales = float(row.get('Net_Sales', 0) or 0)
+            store_sales_current[store_code] += net_sales
+        
+        # 전년 동월 데이터
+        prev_period_str = f"{(year-1) % 100:02d}{month:02d}"
+        prev_period_data = [row for row in data if row['Period'] == prev_period_str and row['Brand'] == 'MLB']
+        store_sales_previous = defaultdict(float)
+        
+        for row in prev_period_data:
+            store_code = row['Store_Code']
+            net_sales = float(row.get('Net_Sales', 0) or 0)
+            store_sales_previous[store_code] += net_sales
+        
+        # 각 매장별 데이터 저장
+        for store_code in store_sales_current:
+            yoy = 0
+            if store_sales_previous[store_code] > 0:
+                yoy = round((store_sales_current[store_code] / store_sales_previous[store_code]) * 100)
+            
+            store_monthly_trends[store_code].append({
+                'month': month,
+                'net_sales': round(store_sales_current[store_code] / 1000, 1),  # 1K HKD
+                'yoy': yoy
+            })
+    
+    # 2. 매장별 아이템 전체 (서브카테고리 기준, 합계 포함)
+    store_item_sales = defaultdict(lambda: defaultdict(float))
+    store_item_yoy = defaultdict(lambda: defaultdict(float))
+    
+    # 현재 Period - Subcategory_Code 기준
+    for row in current_data:
+        store_code = row['Store_Code']
+        subcat_code = row.get('Subcategory_Code', '').strip()
+        if not subcat_code:
+            continue
+        net_sales = float(row.get('Net_Sales', 0) or 0)
+        store_item_sales[store_code][subcat_code] += net_sales
+    
+    # 전년 Period - Subcategory_Code 기준
+    for row in prev_data:
+        store_code = row['Store_Code']
+        subcat_code = row.get('Subcategory_Code', '').strip()
+        if not subcat_code:
+            continue
+        net_sales_prev = float(row.get('Net_Sales', 0) or 0)
+        
+        if subcat_code in store_item_sales[store_code] and net_sales_prev > 0:
+            current_sales = store_item_sales[store_code][subcat_code]
+            store_item_yoy[store_code][subcat_code] = round((current_sales / net_sales_prev) * 100)
+    
+    # 전체 아이템 추출 (서브카테고리 기준, 합계 포함)
+    store_item_all = {}
+    for store_code, items in store_item_sales.items():
+        total_sales = sum(items.values())
+        item_list = [
+            {
+                'item_name': subcat_code,  # 서브카테고리 코드 그대로 사용
+                'net_sales': round(sales / 1000, 1),  # 1K HKD
+                'yoy': store_item_yoy[store_code].get(subcat_code, 0)
+            }
+            for subcat_code, sales in sorted(items.items(), key=lambda x: x[1], reverse=True)
+        ]
+        # 합계 추가
+        total_prev = sum(
+            (sales * 100) / store_item_yoy[store_code].get(subcat_code, 100) 
+            if store_item_yoy[store_code].get(subcat_code, 0) > 0 else 0
+            for subcat_code, sales in items.items()
+        )
+        total_yoy = round((total_sales / total_prev) * 100) if total_prev > 0 else 0
+        item_list.append({
+            'item_name': '합계',
+            'net_sales': round(total_sales / 1000, 1),
+            'yoy': total_yoy
+        })
+        store_item_all[store_code] = item_list
+    
+    # 3. 아이템별 매장 TOP5 (서브카테고리 기준)
+    item_store_sales = defaultdict(lambda: defaultdict(float))
+    item_store_yoy = defaultdict(lambda: defaultdict(float))
+    
+    # 현재 Period - Subcategory_Code 기준
+    for row in current_data:
+        store_code = row['Store_Code']
+        subcat_code = row.get('Subcategory_Code', '').strip()
+        if not subcat_code:
+            continue
+        net_sales = float(row.get('Net_Sales', 0) or 0)
+        item_store_sales[subcat_code][store_code] += net_sales
+    
+    # 전년 Period - Subcategory_Code 기준
+    for row in prev_data:
+        store_code = row['Store_Code']
+        subcat_code = row.get('Subcategory_Code', '').strip()
+        if not subcat_code:
+            continue
+        net_sales_prev = float(row.get('Net_Sales', 0) or 0)
+        
+        if store_code in item_store_sales[subcat_code] and net_sales_prev > 0:
+            current_sales = item_store_sales[subcat_code][store_code]
+            item_store_yoy[subcat_code][store_code] = round((current_sales / net_sales_prev) * 100)
+    
+    # TOP5 추출 (서브카테고리별, 합계 포함)
+    item_store_top5 = {}
+    for subcat_code, stores in item_store_sales.items():
+        top5 = sorted(stores.items(), key=lambda x: x[1], reverse=True)[:5]
+        store_list = [
+            {
+                'store_code': store_code,
+                'store_name': store_summary.get(store_code, {}).get('store_name', store_code),
+                'net_sales': round(sales / 1000, 1),  # 1K HKD
+                'yoy': item_store_yoy[subcat_code].get(store_code, 0)
+            }
+            for store_code, sales in top5
+        ]
+        # 합계 추가
+        total_sales = sum(stores.values())
+        total_prev = sum(
+            (sales * 100) / item_store_yoy[subcat_code].get(store_code, 100)
+            if item_store_yoy[subcat_code].get(store_code, 0) > 0 else 0
+            for store_code, sales in stores.items()
+        )
+        total_yoy = round((total_sales / total_prev) * 100) if total_prev > 0 else 0
+        store_list.append({
+            'store_code': 'TOTAL',
+            'store_name': '합계',
+            'net_sales': round(total_sales / 1000, 1),
+            'yoy': total_yoy
+        })
+        item_store_top5[subcat_code] = store_list
+    
     # 결과 정리
     result = {
         'metadata': {
@@ -1827,6 +2062,24 @@ def generate_dashboard_data(csv_dir, output_file_path):
         'monthly_item_data': [
             {
                 'period': monthly_item_data[p]['period'],
+                # 세분화된 의류 (F/S)
+                '당시즌F': {
+                    'gross_sales': monthly_item_data[p]['당시즌F']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': monthly_item_data[p]['당시즌F']['net_sales'] / 1000,  # 1K HKD
+                },
+                '당시즌S': {
+                    'gross_sales': monthly_item_data[p]['당시즌S']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': monthly_item_data[p]['당시즌S']['net_sales'] / 1000,  # 1K HKD
+                },
+                '과시즌F': {
+                    'gross_sales': monthly_item_data[p]['과시즌F']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': monthly_item_data[p]['과시즌F']['net_sales'] / 1000,  # 1K HKD
+                },
+                '과시즌S': {
+                    'gross_sales': monthly_item_data[p]['과시즌S']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': monthly_item_data[p]['과시즌S']['net_sales'] / 1000,  # 1K HKD
+                },
+                # 레거시 집계 (기존 그래프 호환용)
                 '당시즌의류': {
                     'gross_sales': monthly_item_data[p]['당시즌의류']['gross_sales'] / 1000,  # 1K HKD
                     'net_sales': monthly_item_data[p]['당시즌의류']['net_sales'] / 1000,  # 1K HKD
@@ -1835,6 +2088,7 @@ def generate_dashboard_data(csv_dir, output_file_path):
                     'gross_sales': monthly_item_data[p]['과시즌의류']['gross_sales'] / 1000,  # 1K HKD
                     'net_sales': monthly_item_data[p]['과시즌의류']['net_sales'] / 1000,  # 1K HKD
                 },
+                # ACC
                 '모자': {
                     'gross_sales': monthly_item_data[p]['모자']['gross_sales'] / 1000,  # 1K HKD
                     'net_sales': monthly_item_data[p]['모자']['net_sales'] / 1000,  # 1K HKD
@@ -1850,6 +2104,9 @@ def generate_dashboard_data(csv_dir, output_file_path):
             }
             for p in sorted(monthly_item_data.keys())
         ],
+        'store_monthly_trends': dict(store_monthly_trends),
+        'store_item_all': store_item_all,
+        'item_store_top5': item_store_top5,
     }
     
     # JSON 저장

@@ -1,0 +1,4052 @@
+{
+  "metadata": {
+    "last_period": "2510",
+    "previous_period": "2410",
+    "last_year": 2025,
+    "last_month": 10,
+    "generated_at": "2025-12-02T17:26:40.350313"
+  },
+  "sales_summary": {
+    "total_net_sales": 20077.445,
+    "total_yoy": -7.174691306168827,
+    "total_change": -1551.834,
+    "same_store_yoy": 102.95100898865594,
+    "same_store_count": 6
+  },
+  "country_channel_summary": {
+    "HK_Online": {
+      "country": "HK",
+      "channel": "Online",
+      "current": {
+        "net_sales": 935882.0
+      },
+      "previous": {
+        "net_sales": 289498.0
+      },
+      "yoy": 323.27753559610085
+    },
+    "HK_Retail": {
+      "country": "HK",
+      "channel": "Retail",
+      "current": {
+        "net_sales": 10662487.0
+      },
+      "previous": {
+        "net_sales": 11043005.0
+      },
+      "yoy": 96.55421690020063
+    },
+    "HK_Outlet": {
+      "country": "HK",
+      "channel": "Outlet",
+      "current": {
+        "net_sales": 3104960.0
+      },
+      "previous": {
+        "net_sales": 3431143.0
+      },
+      "yoy": 90.4934594681714
+    },
+    "MO_Retail": {
+      "country": "MO",
+      "channel": "Retail",
+      "current": {
+        "net_sales": 4839735.0
+      },
+      "previous": {
+        "net_sales": 6020313.0
+      },
+      "yoy": 80.39008935249711
+    },
+    "MO_Outlet": {
+      "country": "MO",
+      "channel": "Outlet",
+      "current": {
+        "net_sales": 534381.0
+      },
+      "previous": {
+        "net_sales": 845320.0
+      },
+      "yoy": 63.216415085411434
+    }
+  },
+  "store_summary": {
+    "HE1": {
+      "store_code": "HE1",
+      "store_name": "HE1 HK Zalora Online Store",
+      "category": "MLB 온라인",
+      "brand": "MLB",
+      "channel": "Online",
+      "current": {
+        "gross_sales": 180899.0,
+        "net_sales": 110592.0,
+        "sales_qty": 3945219.0,
+        "stock_price": 9575992.0,
+        "stock_cost": 3024671.2600000007,
+        "discount_rate": 38.865333694492506
+      },
+      "previous": {
+        "gross_sales": 185202.0,
+        "net_sales": 123931.0,
+        "sales_qty": 3217297.0,
+        "stock_price": 53954.0,
+        "stock_cost": 15949.0,
+        "discount_rate": 33.083336033088194
+      },
+      "closed": false
+    },
+    "HE2": {
+      "store_code": "HE2",
+      "store_name": "HE2 HK 91APP",
+      "category": "MLB 온라인",
+      "brand": "MLB",
+      "channel": "Online",
+      "current": {
+        "gross_sales": 1115511.0,
+        "net_sales": 825290.0,
+        "sales_qty": 6689204.0,
+        "stock_price": 14164125.0,
+        "stock_cost": 4416520.13,
+        "discount_rate": 26.016865813066836
+      },
+      "previous": {
+        "gross_sales": 189055.0,
+        "net_sales": 165567.0,
+        "sales_qty": 5061383.0,
+        "stock_price": 0.0,
+        "stock_cost": 3.0,
+        "discount_rate": 12.423897807516331
+      },
+      "closed": true
+    },
+    "M01": {
+      "store_code": "M01",
+      "store_name": "M01 MLB MONG KOK",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1635923.0,
+        "net_sales": 1466476.0,
+        "sales_qty": 75295009.0,
+        "stock_price": 6362231.0,
+        "stock_cost": 1994426.75,
+        "discount_rate": 10.357883592320666
+      },
+      "previous": {
+        "gross_sales": 1837075.0,
+        "net_sales": 1635880.0,
+        "sales_qty": 69399635.0,
+        "stock_price": 10899676.0,
+        "stock_cost": 3480344.0,
+        "discount_rate": 10.951920852442061
+      },
+      "closed": true
+    },
+    "M02": {
+      "store_code": "M02",
+      "store_name": "M02 MLB Times Square",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 537573.0,
+        "net_sales": 481777.0,
+        "sales_qty": 43684499.0,
+        "stock_price": 3334149.0,
+        "stock_cost": 1074521.7299999995,
+        "discount_rate": 10.379241516966067
+      },
+      "previous": {
+        "gross_sales": 618656.0,
+        "net_sales": 556822.0,
+        "sales_qty": 41609941.0,
+        "stock_price": 4630968.0,
+        "stock_cost": 1507784.0,
+        "discount_rate": 9.994892153312989
+      },
+      "closed": true
+    },
+    "M03": {
+      "store_code": "M03",
+      "store_name": "Temp Store",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 18814153.0,
+        "stock_price": 0.0,
+        "stock_cost": 73928.98,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 15600454.0,
+        "stock_price": 0.0,
+        "stock_cost": 73870.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M04": {
+      "store_code": "M04",
+      "store_name": "M04 MLB Telford Plaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 7284628.0,
+        "stock_price": 0.0,
+        "stock_cost": -7556.560000000001,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 7284628.0,
+        "stock_price": 0.0,
+        "stock_cost": -7558.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M05": {
+      "store_code": "M05",
+      "store_name": "M05 MLB LCX",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 480399.0,
+        "net_sales": 434510.0,
+        "sales_qty": 50454913.0,
+        "stock_price": 2543780.0,
+        "stock_cost": 756915.1499999999,
+        "discount_rate": 9.552268010549565
+      },
+      "previous": {
+        "gross_sales": 798423.0,
+        "net_sales": 713348.0,
+        "sales_qty": 47120779.0,
+        "stock_price": 4649468.0,
+        "stock_cost": 1442988.0,
+        "discount_rate": 10.655379416675121
+      },
+      "closed": true
+    },
+    "M06": {
+      "store_code": "M06",
+      "store_name": "M06 MLB KIDS K11",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 1707000.0,
+        "stock_price": 0.0,
+        "stock_cost": -647.2099999999999,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 1707000.0,
+        "stock_price": 0.0,
+        "stock_cost": -647.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M07": {
+      "store_code": "M07",
+      "store_name": "M07 MLB CITYGATE OUTLET",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 2491486.0,
+        "net_sales": 1465513.0,
+        "sales_qty": 60606332.0,
+        "stock_price": 5052777.0,
+        "stock_cost": 1585507.5599999998,
+        "discount_rate": 41.17915974643245
+      },
+      "previous": {
+        "gross_sales": 3001798.0,
+        "net_sales": 1783663.0,
+        "sales_qty": 50459002.0,
+        "stock_price": 7012972.0,
+        "stock_cost": 2153361.0,
+        "discount_rate": 40.58017894608498
+      },
+      "closed": true
+    },
+    "M08": {
+      "store_code": "M08",
+      "store_name": "M08 V City",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 12241077.0,
+        "stock_price": 0.0,
+        "stock_cost": 8246.12,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 438730.0,
+        "net_sales": 388915.0,
+        "sales_qty": 10588290.0,
+        "stock_price": 3346632.0,
+        "stock_cost": 1056486.0,
+        "discount_rate": 11.354363731680078
+      },
+      "closed": true
+    },
+    "M09": {
+      "store_code": "M09",
+      "store_name": "M09 Sheung Shui",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 622411.0,
+        "net_sales": 509658.0,
+        "sales_qty": 12969900.0,
+        "stock_price": 3402784.0,
+        "stock_cost": 1058033.7199999997,
+        "discount_rate": 18.11552173724436
+      },
+      "previous": {
+        "gross_sales": 506268.0,
+        "net_sales": 452264.0,
+        "sales_qty": 10561685.0,
+        "stock_price": 4150970.0,
+        "stock_cost": 1317367.0,
+        "discount_rate": 10.667077516256212
+      },
+      "closed": true
+    },
+    "M10": {
+      "store_code": "M10",
+      "store_name": "M10 HK-I SQUARE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1569389.0,
+        "net_sales": 1404852.0,
+        "sales_qty": 27093631.0,
+        "stock_price": 4915033.0,
+        "stock_cost": 1513331.7999999998,
+        "discount_rate": 10.48414382922271
+      },
+      "previous": {
+        "gross_sales": 2164011.0,
+        "net_sales": 1918776.0,
+        "sales_qty": 19748825.0,
+        "stock_price": 6115196.0,
+        "stock_cost": 1934194.0,
+        "discount_rate": 11.332428532017628
+      },
+      "closed": false
+    },
+    "M11": {
+      "store_code": "M11",
+      "store_name": "M11-APM",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1200334.0,
+        "net_sales": 1089162.0,
+        "sales_qty": 18200094.0,
+        "stock_price": 4441358.0,
+        "stock_cost": 1364351.83,
+        "discount_rate": 9.261755478058607
+      },
+      "previous": {
+        "gross_sales": 1110760.0,
+        "net_sales": 1002629.0,
+        "sales_qty": 13703394.0,
+        "stock_price": 4947827.0,
+        "stock_cost": 1567673.0,
+        "discount_rate": 9.7348662177248
+      },
+      "closed": true
+    },
+    "M12": {
+      "store_code": "M12",
+      "store_name": "M12 World Trade Centre",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 14200.0,
+        "net_sales": 13879.0,
+        "sales_qty": 1151684.0,
+        "stock_price": 0.0,
+        "stock_cost": 6830.960000000001,
+        "discount_rate": 2.26056338028169
+      },
+      "previous": {
+        "gross_sales": 59833.0,
+        "net_sales": 54557.0,
+        "sales_qty": 937119.0,
+        "stock_price": 3218724.0,
+        "stock_cost": 1017600.0,
+        "discount_rate": 8.817876422709876
+      },
+      "closed": true
+    },
+    "M13": {
+      "store_code": "M13",
+      "store_name": "M13 Tai Po Mega Mall",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 435433.0,
+        "net_sales": 334772.0,
+        "sales_qty": 8140891.0,
+        "stock_price": 4177327.0,
+        "stock_cost": 1312879.39,
+        "discount_rate": 23.117448608626358
+      },
+      "previous": {
+        "gross_sales": 440058.0,
+        "net_sales": 384023.0,
+        "sales_qty": 6178453.0,
+        "stock_price": 4599680.0,
+        "stock_cost": 1450478.0,
+        "discount_rate": 12.733548759481705
+      },
+      "closed": true
+    },
+    "M14": {
+      "store_code": "M14",
+      "store_name": "M14 NewTownPlaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1286873.0,
+        "net_sales": 1148570.0,
+        "sales_qty": 17628752.0,
+        "stock_price": 3773766.0,
+        "stock_cost": 1156664.75,
+        "discount_rate": 10.747214371581345
+      },
+      "previous": {
+        "gross_sales": 1339755.0,
+        "net_sales": 1191944.0,
+        "sales_qty": 12701845.0,
+        "stock_price": 3766333.0,
+        "stock_cost": 1192444.0,
+        "discount_rate": 11.032688812506764
+      },
+      "closed": true
+    },
+    "M15": {
+      "store_code": "M15",
+      "store_name": "M15 YuenLongPlaza",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 887934.0,
+        "net_sales": 487355.0,
+        "sales_qty": 9526847.0,
+        "stock_price": 3966142.0,
+        "stock_cost": 1251037.06,
+        "discount_rate": 45.113600785643975
+      },
+      "previous": {
+        "gross_sales": 671306.0,
+        "net_sales": 407625.0,
+        "sales_qty": 6387067.0,
+        "stock_price": 4119909.0,
+        "stock_cost": 1274923.0,
+        "discount_rate": 39.27880876977116
+      },
+      "closed": true
+    },
+    "M16": {
+      "store_code": "M16",
+      "store_name": "M16 Hysan Place",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 579456.0,
+        "net_sales": 528212.0,
+        "sales_qty": 6494191.0,
+        "stock_price": 3685555.0,
+        "stock_cost": 1134233.4,
+        "discount_rate": 8.843466975922244
+      },
+      "previous": {
+        "gross_sales": 461292.0,
+        "net_sales": 415750.0,
+        "sales_qty": 4513686.0,
+        "stock_price": 3910470.0,
+        "stock_cost": 1237593.0,
+        "discount_rate": 9.872705357994501
+      },
+      "closed": true
+    },
+    "M17": {
+      "store_code": "M17",
+      "store_name": "M17 Tuen Mun Town Plaza",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 832072.0,
+        "net_sales": 726448.0,
+        "sales_qty": 6898201.0,
+        "stock_price": 4004622.0,
+        "stock_cost": 1231517.04,
+        "discount_rate": 12.69409378034593
+      },
+      "previous": {
+        "gross_sales": 627898.0,
+        "net_sales": 552341.0,
+        "sales_qty": 4232823.0,
+        "stock_price": 3868784.0,
+        "stock_cost": 1223432.0,
+        "discount_rate": 12.033323883815525
+      },
+      "closed": true
+    },
+    "M18": {
+      "store_code": "M18",
+      "store_name": "M18 Langham Place",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1790346.0,
+        "net_sales": 1616012.0,
+        "sales_qty": 18087392.0,
+        "stock_price": 4767024.0,
+        "stock_cost": 1466957.98,
+        "discount_rate": 9.737447398435833
+      },
+      "previous": {
+        "gross_sales": 1512755.0,
+        "net_sales": 1365992.0,
+        "sales_qty": 11258412.0,
+        "stock_price": 5398395.0,
+        "stock_cost": 1710021.0,
+        "discount_rate": 9.701703183926016
+      },
+      "closed": false
+    },
+    "M19": {
+      "store_code": "M19",
+      "store_name": "M19 NewTownPlaza KIDS",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 152803.0,
+        "net_sales": 135777.0,
+        "sales_qty": 1367261.0,
+        "stock_price": 1449345.0,
+        "stock_cost": 439755.86,
+        "discount_rate": 11.142451391661158
+      },
+      "previous": {
+        "gross_sales": 103222.0,
+        "net_sales": 92931.0,
+        "sales_qty": 776841.0,
+        "stock_price": 1243245.0,
+        "stock_cost": 395948.0,
+        "discount_rate": 9.969773885412025
+      },
+      "closed": true
+    },
+    "M20": {
+      "store_code": "M20",
+      "store_name": "M20 OceanTerminal KIDS",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 3323446.0,
+        "stock_price": 0.0,
+        "stock_cost": 10.71,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 359812.0,
+        "net_sales": 318698.0,
+        "sales_qty": 2493320.0,
+        "stock_price": 1739829.0,
+        "stock_cost": 557513.0,
+        "discount_rate": 11.42652273965293
+      },
+      "closed": true
+    },
+    "M21": {
+      "store_code": "M21",
+      "store_name": "M21 MOKO",
+      "category": "MLB 아울렛",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 1324988.0,
+        "net_sales": 817320.0,
+        "sales_qty": 11002320.0,
+        "stock_price": 5265751.0,
+        "stock_cost": 1672357.4500000002,
+        "discount_rate": 38.314913040721876
+      },
+      "previous": {
+        "gross_sales": 1466817.0,
+        "net_sales": 855832.0,
+        "sales_qty": 5772775.0,
+        "stock_price": 5468761.0,
+        "stock_cost": 1704872.0,
+        "discount_rate": 41.653798667454765
+      },
+      "closed": true
+    },
+    "M22": {
+      "store_code": "M22",
+      "store_name": "M22 YOHO Mall",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 659066.0,
+        "net_sales": 579631.0,
+        "sales_qty": 4549612.0,
+        "stock_price": 4274897.0,
+        "stock_cost": 1321709.52,
+        "discount_rate": 12.052662404068789
+      },
+      "previous": {
+        "gross_sales": 432425.0,
+        "net_sales": 382158.0,
+        "sales_qty": 2307850.0,
+        "stock_price": 4324064.0,
+        "stock_cost": 1370911.0,
+        "discount_rate": 11.624443545123432
+      },
+      "closed": false
+    },
+    "M99": {
+      "store_code": "M99",
+      "store_name": "M99 MLB HK Office",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Office",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 16782.0,
+        "stock_cost": 5055.14,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 115537.0,
+        "stock_cost": 36894.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "MC1": {
+      "store_code": "MC1",
+      "store_name": "MC1 MLB Venetian",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 3156241.0,
+        "net_sales": 2821529.0,
+        "sales_qty": 95555964.0,
+        "stock_price": 6374618.0,
+        "stock_cost": 1717172.0,
+        "discount_rate": 10.604766872998608
+      },
+      "previous": {
+        "gross_sales": 3931742.0,
+        "net_sales": 3451063.0,
+        "sales_qty": 83593822.0,
+        "stock_price": 7158825.0,
+        "stock_cost": 2033352.0,
+        "discount_rate": 12.225598729519891
+      },
+      "closed": true
+    },
+    "MC2": {
+      "store_code": "MC2",
+      "store_name": "MC2 MLB Londoner",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 882622.0,
+        "net_sales": 787023.0,
+        "sales_qty": 31040056.0,
+        "stock_price": 3685547.0,
+        "stock_cost": 1040628.0,
+        "discount_rate": 10.83125052400688
+      },
+      "previous": {
+        "gross_sales": 1040093.0,
+        "net_sales": 913660.0,
+        "sales_qty": 27662554.0,
+        "stock_price": 4641704.0,
+        "stock_cost": 1378326.0,
+        "discount_rate": 12.155932209908151
+      },
+      "closed": true
+    },
+    "MC3": {
+      "store_code": "MC3",
+      "store_name": "MC3 MLB Senado Square",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 1366374.0,
+        "net_sales": 1231183.0,
+        "sales_qty": 35121018.0,
+        "stock_price": 5508387.0,
+        "stock_cost": 1583791.0,
+        "discount_rate": 9.894143184808843
+      },
+      "previous": {
+        "gross_sales": 1854932.0,
+        "net_sales": 1655590.0,
+        "sales_qty": 29444786.0,
+        "stock_price": 6542572.0,
+        "stock_cost": 1975325.0,
+        "discount_rate": 10.74659340611947
+      },
+      "closed": true
+    },
+    "MC4": {
+      "store_code": "MC4",
+      "store_name": "MC4 Senado2",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Outlet",
+      "current": {
+        "gross_sales": 889036.0,
+        "net_sales": 534381.0,
+        "sales_qty": 9188986.0,
+        "stock_price": 3826068.0,
+        "stock_cost": 1240617.0,
+        "discount_rate": 39.892085359872944
+      },
+      "previous": {
+        "gross_sales": 1439077.0,
+        "net_sales": 845320.0,
+        "sales_qty": 4320861.0,
+        "stock_price": 3638330.0,
+        "stock_cost": 1155951.0,
+        "discount_rate": 41.25957123906504
+      },
+      "closed": false
+    },
+    "WHM": {
+      "store_code": "WHM",
+      "store_name": "WHM HK MAIN WAREHOUSE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Warehouse",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 995735.0,
+        "stock_price": 276145296.0,
+        "stock_cost": 85647221.41999997,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 995735.0,
+        "stock_price": 308855403.0,
+        "stock_cost": 96863937.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "WMM": {
+      "store_code": "WMM",
+      "store_name": "WMM MC MAIN WAREHOUSE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Warehouse",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": -399261.0,
+        "stock_cost": 425028.0,
+        "discount_rate": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 1580626.0,
+        "stock_cost": 1077987.0,
+        "discount_rate": 0
+      },
+      "closed": true
+    },
+    "M10A": {
+      "store_code": "M10A",
+      "store_name": "M10A-HK-I SQUARE",
+      "category": "리테일",
+      "brand": "MLB",
+      "channel": "Retail",
+      "current": {
+        "gross_sales": 587404.0,
+        "net_sales": 527523.0,
+        "sales_qty": 0.0,
+        "stock_price": 0.0,
+        "stock_cost": 0.0,
+        "discount_rate": 10.194176410102756
+      },
+      "previous": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
+      },
+      "closed": false
+    }
+  },
+  "season_summary": {
+    "22F_과시즌F": {
+      "season_code": "22F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 250614.0,
+        "net_sales": 106589.0,
+        "sales_qty": 27844442.0
+      },
+      "previous": {
+        "gross_sales": 413815.0,
+        "net_sales": 197432.0,
+        "sales_qty": 26317768.0
+      }
+    },
+    "22N_N시즌": {
+      "season_code": "22N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 419581.0,
+        "net_sales": 316693.0,
+        "sales_qty": 43909569.0
+      },
+      "previous": {
+        "gross_sales": 1215828.0,
+        "net_sales": 875999.0,
+        "sales_qty": 40981457.0
+      }
+    },
+    "23N_N시즌": {
+      "season_code": "23N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1099288.0,
+        "net_sales": 731764.0,
+        "sales_qty": 40991346.0
+      },
+      "previous": {
+        "gross_sales": 2130249.0,
+        "net_sales": 1581866.0,
+        "sales_qty": 35061070.0
+      }
+    },
+    "23S_과시즌S": {
+      "season_code": "23S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 356217.0,
+        "net_sales": 150739.0,
+        "sales_qty": 31227730.0
+      },
+      "previous": {
+        "gross_sales": 955667.0,
+        "net_sales": 532347.0,
+        "sales_qty": 26736500.0
+      }
+    },
+    "20S_과시즌S": {
+      "season_code": "20S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 29583961.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 29583961.0
+      }
+    },
+    "22S_과시즌S": {
+      "season_code": "22S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 20373.0,
+        "net_sales": 9880.0,
+        "sales_qty": 21647978.0
+      },
+      "previous": {
+        "gross_sales": 48328.0,
+        "net_sales": 23711.0,
+        "sales_qty": 21211088.0
+      }
+    },
+    "19F_과시즌F": {
+      "season_code": "19F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 17534196.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 17534196.0
+      }
+    },
+    "23F_과시즌F": {
+      "season_code": "23F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 766650.0,
+        "net_sales": 397996.0,
+        "sales_qty": 29643352.0
+      },
+      "previous": {
+        "gross_sales": 2443997.0,
+        "net_sales": 1341987.0,
+        "sales_qty": 24039225.0
+      }
+    },
+    "19S_과시즌S": {
+      "season_code": "19S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 42843625.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 42843625.0
+      }
+    },
+    "24N_N시즌": {
+      "season_code": "24N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1393065.0,
+        "net_sales": 1073633.0,
+        "sales_qty": 32144434.0
+      },
+      "previous": {
+        "gross_sales": 7663903.0,
+        "net_sales": 6824819.0,
+        "sales_qty": 17733635.0
+      }
+    },
+    "24S_과시즌S": {
+      "season_code": "24S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 711706.0,
+        "net_sales": 426384.0,
+        "sales_qty": 25095447.0
+      },
+      "previous": {
+        "gross_sales": 492062.0,
+        "net_sales": 441668.0,
+        "sales_qty": 19381053.0
+      }
+    },
+    "18F_과시즌F": {
+      "season_code": "18F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 27643958.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 27643958.0
+      }
+    },
+    "25S_과시즌S": {
+      "season_code": "25S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 596555.0,
+        "net_sales": 513366.0,
+        "sales_qty": 15532517.0
+      },
+      "previous": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      }
+    },
+    "24F_과시즌F": {
+      "season_code": "24F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 2510717.0,
+        "net_sales": 1543003.0,
+        "sales_qty": 23208569.0
+      },
+      "previous": {
+        "gross_sales": 9152136.0,
+        "net_sales": 7989022.0,
+        "sales_qty": 5284293.0
+      }
+    },
+    "21S_과시즌S": {
+      "season_code": "21S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 52496596.0
+      },
+      "previous": {
+        "gross_sales": 6385.0,
+        "net_sales": 2682.0,
+        "sales_qty": 52487936.0
+      }
+    },
+    "21F_과시즌F": {
+      "season_code": "21F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 20035989.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 20035989.0
+      }
+    },
+    "20F_과시즌F": {
+      "season_code": "20F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 11052359.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 11052359.0
+      }
+    },
+    "25N_N시즌": {
+      "season_code": "25N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 6451081.0,
+        "net_sales": 5888313.0,
+        "sales_qty": 14317224.0
+      },
+      "previous": {
+        "gross_sales": 13812.0,
+        "net_sales": 12334.0,
+        "sales_qty": 4592.0
+      }
+    },
+    "21N_N시즌": {
+      "season_code": "21N",
+      "season_type": "N시즌",
+      "current": {
+        "gross_sales": 1464701.0,
+        "net_sales": 1343472.0,
+        "sales_qty": 48047609.0
+      },
+      "previous": {
+        "gross_sales": 2054813.0,
+        "net_sales": 1805412.0,
+        "sales_qty": 42645056.0
+      }
+    },
+    "25F_과시즌F": {
+      "season_code": "25F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 8638225.0,
+        "net_sales": 7575613.0,
+        "sales_qty": 5194613.0
+      },
+      "previous": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      }
+    },
+    "17F_과시즌F": {
+      "season_code": "17F",
+      "season_type": "과시즌F",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 6029319.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 6029319.0
+      }
+    },
+    "18S_과시즌S": {
+      "season_code": "18S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 32056683.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 32056683.0
+      }
+    },
+    "17S_과시즌S": {
+      "season_code": "17S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 976499.0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 976499.0
+      }
+    }
+  },
+  "category_summary": {
+    "BAG": {
+      "category": "BAG",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 17706565.0,
+        "sales_qty_1m": 42008471.0,
+        "sales_qty_6m": 243815329.0,
+        "stock_months_1m": 0.4214998684432004,
+        "stock_months_6m": 0.4357371229927877
+      }
+    },
+    "HEA": {
+      "category": "HEA",
+      "category_name": "모자",
+      "current": {
+        "stock_price": 40099503.0,
+        "sales_qty_1m": 57074561.0,
+        "sales_qty_6m": 322343122.0,
+        "stock_months_1m": 0.7025810150340008,
+        "stock_months_6m": 0.7464003466467636
+      }
+    },
+    "SHO": {
+      "category": "SHO",
+      "category_name": "신발",
+      "current": {
+        "stock_price": 55056965.0,
+        "sales_qty_1m": 77279676.0,
+        "sales_qty_6m": 438964404.0,
+        "stock_months_1m": 0.7124378342372968,
+        "stock_months_6m": 0.7525480129819364
+      }
+    },
+    "ATC": {
+      "category": "ATC",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 1292065.0,
+        "sales_qty_1m": 2995649.0,
+        "sales_qty_6m": 16705141.0,
+        "stock_months_1m": 0.4313138822338665,
+        "stock_months_6m": 0.4640721081013324
+      }
+    },
+    "BOT": {
+      "category": "BOT",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 68712.0,
+        "sales_qty_1m": 40568.0,
+        "sales_qty_6m": 243408.0,
+        "stock_months_1m": 1.693748767501479,
+        "stock_months_6m": 1.693748767501479
+      }
+    },
+    "WTC": {
+      "category": "WTC",
+      "category_name": "가방외",
+      "current": {
+        "stock_price": 5217.0,
+        "sales_qty_1m": 11257.0,
+        "sales_qty_6m": 67542.0,
+        "stock_months_1m": 0.46344496757573067,
+        "stock_months_6m": 0.46344496757573067
+      }
+    }
+  },
+  "trend_data": [
+    {
+      "period": "2501",
+      "gross_sales": 45033125.0,
+      "net_sales": 36733760.0,
+      "sales_qty": 533413818.0,
+      "discount_rate": 18.42946719775721
+    },
+    {
+      "period": "2502",
+      "gross_sales": 21833393.0,
+      "net_sales": 17895052.0,
+      "sales_qty": 540273764.0,
+      "discount_rate": 18.038153758327898
+    },
+    {
+      "period": "2503",
+      "gross_sales": 20836468.0,
+      "net_sales": 16991207.0,
+      "sales_qty": 546794901.0,
+      "discount_rate": 18.454476065713248
+    },
+    {
+      "period": "2504",
+      "gross_sales": 21347565.0,
+      "net_sales": 17533684.0,
+      "sales_qty": 553414726.0,
+      "discount_rate": 17.8656488456646
+    },
+    {
+      "period": "2505",
+      "gross_sales": 21624423.0,
+      "net_sales": 17737285.0,
+      "sales_qty": 560083468.0,
+      "discount_rate": 17.975684252939374
+    },
+    {
+      "period": "2506",
+      "gross_sales": 18529843.0,
+      "net_sales": 15365614.0,
+      "sales_qty": 565810684.0,
+      "discount_rate": 17.076394009382597
+    },
+    {
+      "period": "2507",
+      "gross_sales": 25376984.0,
+      "net_sales": 20106269.0,
+      "sales_qty": 573600181.0,
+      "discount_rate": 20.76966671847214
+    },
+    {
+      "period": "2508",
+      "gross_sales": 32643633.0,
+      "net_sales": 24077741.0,
+      "sales_qty": 583588228.0,
+      "discount_rate": 26.240620950492854
+    },
+    {
+      "period": "2509",
+      "gross_sales": 25701769.0,
+      "net_sales": 16251970.0,
+      "sales_qty": 591524069.0,
+      "discount_rate": 36.76711513514887
+    },
+    {
+      "period": "2510",
+      "gross_sales": 24678773.0,
+      "net_sales": 20077445.0,
+      "sales_qty": 599058015.0,
+      "discount_rate": 18.64488157494702
+    }
+  ],
+  "store_monthly_trends": {
+    "HE1": [
+      {
+        "month": 1,
+        "net_sales": 181133.0,
+        "yoy": 2210826
+      },
+      {
+        "month": 2,
+        "net_sales": 173672.0,
+        "yoy": 8758043
+      },
+      {
+        "month": 3,
+        "net_sales": 95992.0,
+        "yoy": 210754
+      },
+      {
+        "month": 4,
+        "net_sales": 93585.0,
+        "yoy": 5751998
+      },
+      {
+        "month": 5,
+        "net_sales": 82954.0,
+        "yoy": 2447743
+      },
+      {
+        "month": 6,
+        "net_sales": 114005.0,
+        "yoy": 450150
+      },
+      {
+        "month": 7,
+        "net_sales": 68309.0,
+        "yoy": 317524
+      },
+      {
+        "month": 8,
+        "net_sales": 147698.0,
+        "yoy": 2238188
+      },
+      {
+        "month": 9,
+        "net_sales": 62172.0,
+        "yoy": 489505
+      },
+      {
+        "month": 10,
+        "net_sales": 110175.417,
+        "yoy": 2184287
+      }
+    ],
+    "HE2": [
+      {
+        "month": 1,
+        "net_sales": 267742.0,
+        "yoy": 578927
+      },
+      {
+        "month": 2,
+        "net_sales": 147332.0,
+        "yoy": 2968010
+      },
+      {
+        "month": 3,
+        "net_sales": 127215.0,
+        "yoy": 1117195
+      },
+      {
+        "month": 4,
+        "net_sales": 137185.0,
+        "yoy": 1065515
+      },
+      {
+        "month": 5,
+        "net_sales": 246686.0,
+        "yoy": 2580128
+      },
+      {
+        "month": 6,
+        "net_sales": 391409.0,
+        "yoy": 3458593
+      },
+      {
+        "month": 7,
+        "net_sales": 255429.0,
+        "yoy": 1703769
+      },
+      {
+        "month": 8,
+        "net_sales": 623472.0,
+        "yoy": 11021248
+      },
+      {
+        "month": 9,
+        "net_sales": 526852.0,
+        "yoy": 4078433
+      },
+      {
+        "month": 10,
+        "net_sales": 825290.0,
+        "yoy": 6486599
+      }
+    ],
+    "M01": [
+      {
+        "month": 1,
+        "net_sales": 3288067.0,
+        "yoy": 17994128
+      },
+      {
+        "month": 2,
+        "net_sales": 1225117.0,
+        "yoy": 1515727
+      },
+      {
+        "month": 3,
+        "net_sales": 1284553.0,
+        "yoy": 754390
+      },
+      {
+        "month": 4,
+        "net_sales": 1285618.0,
+        "yoy": 1059875
+      },
+      {
+        "month": 5,
+        "net_sales": 299375.0,
+        "yoy": 226099
+      },
+      {
+        "month": 6,
+        "net_sales": 522573.0,
+        "yoy": 499205
+      },
+      {
+        "month": 7,
+        "net_sales": 1443375.0,
+        "yoy": 903753
+      },
+      {
+        "month": 8,
+        "net_sales": 1422771.0,
+        "yoy": 907165
+      },
+      {
+        "month": 9,
+        "net_sales": 906559.0,
+        "yoy": 609660
+      },
+      {
+        "month": 10,
+        "net_sales": 1466476.0,
+        "yoy": 684476
+      }
+    ],
+    "M02": [
+      {
+        "month": 1,
+        "net_sales": 813218.0,
+        "yoy": 7417165
+      },
+      {
+        "month": 2,
+        "net_sales": 407268.0,
+        "yoy": 1385972
+      },
+      {
+        "month": 3,
+        "net_sales": 336230.0,
+        "yoy": 869440
+      },
+      {
+        "month": 4,
+        "net_sales": 378031.0,
+        "yoy": 1456991
+      },
+      {
+        "month": 5,
+        "net_sales": 430507.0,
+        "yoy": 1332550
+      },
+      {
+        "month": 6,
+        "net_sales": 396160.0,
+        "yoy": 1437028
+      },
+      {
+        "month": 7,
+        "net_sales": 527995.0,
+        "yoy": 838806
+      },
+      {
+        "month": 8,
+        "net_sales": 722246.0,
+        "yoy": 1436276
+      },
+      {
+        "month": 9,
+        "net_sales": 393922.0,
+        "yoy": 1154080
+      },
+      {
+        "month": 10,
+        "net_sales": 481777.0,
+        "yoy": 1127966
+      }
+    ],
+    "M03": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 553480.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 2590566.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M04": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M05": [
+      {
+        "month": 1,
+        "net_sales": 1420749.0,
+        "yoy": 14609244
+      },
+      {
+        "month": 2,
+        "net_sales": 792977.0,
+        "yoy": 2466185
+      },
+      {
+        "month": 3,
+        "net_sales": 533571.0,
+        "yoy": 1373661
+      },
+      {
+        "month": 4,
+        "net_sales": 637409.0,
+        "yoy": 1373460
+      },
+      {
+        "month": 5,
+        "net_sales": 724665.0,
+        "yoy": 1768036
+      },
+      {
+        "month": 6,
+        "net_sales": 714159.0,
+        "yoy": 2478858
+      },
+      {
+        "month": 7,
+        "net_sales": 1020612.0,
+        "yoy": 1457060
+      },
+      {
+        "month": 8,
+        "net_sales": 940799.0,
+        "yoy": 1096323
+      },
+      {
+        "month": 9,
+        "net_sales": 447680.0,
+        "yoy": 881173
+      },
+      {
+        "month": 10,
+        "net_sales": 434510.0,
+        "yoy": 687027
+      }
+    ],
+    "M06": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M07": [
+      {
+        "month": 1,
+        "net_sales": 2250930.0,
+        "yoy": 7441829
+      },
+      {
+        "month": 2,
+        "net_sales": 1317077.0,
+        "yoy": 7275463
+      },
+      {
+        "month": 3,
+        "net_sales": 1526057.0,
+        "yoy": 3648759
+      },
+      {
+        "month": 4,
+        "net_sales": 1583265.0,
+        "yoy": 2361743
+      },
+      {
+        "month": 5,
+        "net_sales": 1478187.0,
+        "yoy": 3703152
+      },
+      {
+        "month": 6,
+        "net_sales": 1113204.0,
+        "yoy": 2830204
+      },
+      {
+        "month": 7,
+        "net_sales": 1633942.0,
+        "yoy": 4757438
+      },
+      {
+        "month": 8,
+        "net_sales": 1596083.0,
+        "yoy": 5776212
+      },
+      {
+        "month": 9,
+        "net_sales": 909576.0,
+        "yoy": 3712707
+      },
+      {
+        "month": 10,
+        "net_sales": 1465513.0,
+        "yoy": 2075357
+      }
+    ],
+    "M08": [
+      {
+        "month": 1,
+        "net_sales": 819500.0,
+        "yoy": 1037473
+      },
+      {
+        "month": 2,
+        "net_sales": 306389.0,
+        "yoy": 440708
+      },
+      {
+        "month": 3,
+        "net_sales": 386654.0,
+        "yoy": 2120744
+      },
+      {
+        "month": 4,
+        "net_sales": 422464.0,
+        "yoy": 1296658
+      },
+      {
+        "month": 5,
+        "net_sales": 395354.0,
+        "yoy": 1790634
+      },
+      {
+        "month": 6,
+        "net_sales": 306348.0,
+        "yoy": 2099712
+      },
+      {
+        "month": 7,
+        "net_sales": 389027.0,
+        "yoy": 1185660
+      },
+      {
+        "month": 8,
+        "net_sales": 320717.0,
+        "yoy": 1306915
+      },
+      {
+        "month": 9,
+        "net_sales": 139327.0,
+        "yoy": 511442
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M09": [
+      {
+        "month": 1,
+        "net_sales": 1320935.0,
+        "yoy": 827882
+      },
+      {
+        "month": 2,
+        "net_sales": 407294.0,
+        "yoy": 6126564
+      },
+      {
+        "month": 3,
+        "net_sales": 416172.0,
+        "yoy": 1345398
+      },
+      {
+        "month": 4,
+        "net_sales": 492763.0,
+        "yoy": 1888126
+      },
+      {
+        "month": 5,
+        "net_sales": 496067.0,
+        "yoy": 1478061
+      },
+      {
+        "month": 6,
+        "net_sales": 430617.0,
+        "yoy": 1310380
+      },
+      {
+        "month": 7,
+        "net_sales": 416021.0,
+        "yoy": 837806
+      },
+      {
+        "month": 8,
+        "net_sales": 423182.0,
+        "yoy": 908818
+      },
+      {
+        "month": 9,
+        "net_sales": 360279.0,
+        "yoy": 553254
+      },
+      {
+        "month": 10,
+        "net_sales": 509658.0,
+        "yoy": 894545
+      }
+    ],
+    "M10": [
+      {
+        "month": 1,
+        "net_sales": 2611581.0,
+        "yoy": 13732876
+      },
+      {
+        "month": 2,
+        "net_sales": 1752819.0,
+        "yoy": 3055342
+      },
+      {
+        "month": 3,
+        "net_sales": 1510393.0,
+        "yoy": 964122
+      },
+      {
+        "month": 4,
+        "net_sales": 1442876.0,
+        "yoy": 1112463
+      },
+      {
+        "month": 5,
+        "net_sales": 1592248.0,
+        "yoy": 1504875
+      },
+      {
+        "month": 6,
+        "net_sales": 1383825.0,
+        "yoy": 1244324
+      },
+      {
+        "month": 7,
+        "net_sales": 1681607.0,
+        "yoy": 1260679
+      },
+      {
+        "month": 8,
+        "net_sales": 1978111.0,
+        "yoy": 1070644
+      },
+      {
+        "month": 9,
+        "net_sales": 1171451.0,
+        "yoy": 786589
+      },
+      {
+        "month": 10,
+        "net_sales": 1404338.514,
+        "yoy": 635793
+      }
+    ],
+    "M11": [
+      {
+        "month": 1,
+        "net_sales": 2164095.0,
+        "yoy": 16556461
+      },
+      {
+        "month": 2,
+        "net_sales": 742392.0,
+        "yoy": 3169365
+      },
+      {
+        "month": 3,
+        "net_sales": 832584.0,
+        "yoy": 923954
+      },
+      {
+        "month": 4,
+        "net_sales": 891889.0,
+        "yoy": 1132184
+      },
+      {
+        "month": 5,
+        "net_sales": 1160047.0,
+        "yoy": 1628342
+      },
+      {
+        "month": 6,
+        "net_sales": 928463.0,
+        "yoy": 1293412
+      },
+      {
+        "month": 7,
+        "net_sales": 1005694.0,
+        "yoy": 1169520
+      },
+      {
+        "month": 8,
+        "net_sales": 944493.0,
+        "yoy": 1058457
+      },
+      {
+        "month": 9,
+        "net_sales": 703063.0,
+        "yoy": 586340
+      },
+      {
+        "month": 10,
+        "net_sales": 1089162.0,
+        "yoy": 1094492
+      }
+    ],
+    "M12": [
+      {
+        "month": 1,
+        "net_sales": 98791.0,
+        "yoy": 405114
+      },
+      {
+        "month": 2,
+        "net_sales": 43037.0,
+        "yoy": 533825
+      },
+      {
+        "month": 3,
+        "net_sales": 31820.0,
+        "yoy": 815688
+      },
+      {
+        "month": 4,
+        "net_sales": 45146.0,
+        "yoy": 1550343
+      },
+      {
+        "month": 5,
+        "net_sales": 59095.0,
+        "yoy": 5975228
+      },
+      {
+        "month": 6,
+        "net_sales": 43240.0,
+        "yoy": 1149694
+      },
+      {
+        "month": 7,
+        "net_sales": 54370.0,
+        "yoy": 1168242
+      },
+      {
+        "month": 8,
+        "net_sales": 64372.0,
+        "yoy": 919206
+      },
+      {
+        "month": 9,
+        "net_sales": 28522.0,
+        "yoy": 610096
+      },
+      {
+        "month": 10,
+        "net_sales": 13879.0,
+        "yoy": 793086
+      }
+    ],
+    "M13": [
+      {
+        "month": 1,
+        "net_sales": 954904.0,
+        "yoy": 1208097
+      },
+      {
+        "month": 2,
+        "net_sales": 347844.0,
+        "yoy": 37242398
+      },
+      {
+        "month": 3,
+        "net_sales": 267392.0,
+        "yoy": 2102634
+      },
+      {
+        "month": 4,
+        "net_sales": 329468.0,
+        "yoy": 1323430
+      },
+      {
+        "month": 5,
+        "net_sales": 299441.0,
+        "yoy": 1691470
+      },
+      {
+        "month": 6,
+        "net_sales": 225441.0,
+        "yoy": 851524
+      },
+      {
+        "month": 7,
+        "net_sales": 383951.0,
+        "yoy": 1442178
+      },
+      {
+        "month": 8,
+        "net_sales": 367852.0,
+        "yoy": 1667053
+      },
+      {
+        "month": 9,
+        "net_sales": 255281.0,
+        "yoy": 921526
+      },
+      {
+        "month": 10,
+        "net_sales": 334772.0,
+        "yoy": 1116875
+      }
+    ],
+    "M14": [
+      {
+        "month": 1,
+        "net_sales": 2432042.0,
+        "yoy": 12665566
+      },
+      {
+        "month": 2,
+        "net_sales": 793427.0,
+        "yoy": 1517620
+      },
+      {
+        "month": 3,
+        "net_sales": 924935.0,
+        "yoy": 899900
+      },
+      {
+        "month": 4,
+        "net_sales": 1039827.0,
+        "yoy": 733404
+      },
+      {
+        "month": 5,
+        "net_sales": 1073019.0,
+        "yoy": 807485
+      },
+      {
+        "month": 6,
+        "net_sales": 962474.0,
+        "yoy": 813753
+      },
+      {
+        "month": 7,
+        "net_sales": 1021314.0,
+        "yoy": 741012
+      },
+      {
+        "month": 8,
+        "net_sales": 1096189.0,
+        "yoy": 850069
+      },
+      {
+        "month": 9,
+        "net_sales": 782363.0,
+        "yoy": 457688
+      },
+      {
+        "month": 10,
+        "net_sales": 1148570.0,
+        "yoy": 616738
+      }
+    ],
+    "M15": [
+      {
+        "month": 1,
+        "net_sales": 883858.0,
+        "yoy": 9337186
+      },
+      {
+        "month": 2,
+        "net_sales": 398392.0,
+        "yoy": 16334235
+      },
+      {
+        "month": 3,
+        "net_sales": 453732.0,
+        "yoy": 9490316
+      },
+      {
+        "month": 4,
+        "net_sales": 406751.0,
+        "yoy": 2169917
+      },
+      {
+        "month": 5,
+        "net_sales": 356668.0,
+        "yoy": 3243321
+      },
+      {
+        "month": 6,
+        "net_sales": 301717.0,
+        "yoy": 1363754
+      },
+      {
+        "month": 7,
+        "net_sales": 386945.0,
+        "yoy": 1967184
+      },
+      {
+        "month": 8,
+        "net_sales": 536128.0,
+        "yoy": 3092749
+      },
+      {
+        "month": 9,
+        "net_sales": 449230.0,
+        "yoy": 1715077
+      },
+      {
+        "month": 10,
+        "net_sales": 487355.0,
+        "yoy": 1627229
+      }
+    ],
+    "M16": [
+      {
+        "month": 1,
+        "net_sales": 808489.0,
+        "yoy": 954161
+      },
+      {
+        "month": 2,
+        "net_sales": 442728.0,
+        "yoy": 568906
+      },
+      {
+        "month": 3,
+        "net_sales": 356408.0,
+        "yoy": 865614
+      },
+      {
+        "month": 4,
+        "net_sales": 369678.0,
+        "yoy": 1344479
+      },
+      {
+        "month": 5,
+        "net_sales": 469458.0,
+        "yoy": 2310097
+      },
+      {
+        "month": 6,
+        "net_sales": 381520.0,
+        "yoy": 983730
+      },
+      {
+        "month": 7,
+        "net_sales": 481039.0,
+        "yoy": 931759
+      },
+      {
+        "month": 8,
+        "net_sales": 517423.0,
+        "yoy": 1035695
+      },
+      {
+        "month": 9,
+        "net_sales": 289119.0,
+        "yoy": 842814
+      },
+      {
+        "month": 10,
+        "net_sales": 528212.0,
+        "yoy": 1481453
+      }
+    ],
+    "M17": [
+      {
+        "month": 1,
+        "net_sales": 1350997.0,
+        "yoy": 905306
+      },
+      {
+        "month": 2,
+        "net_sales": 494571.0,
+        "yoy": 16983894
+      },
+      {
+        "month": 3,
+        "net_sales": 463092.0,
+        "yoy": 1355100
+      },
+      {
+        "month": 4,
+        "net_sales": 504720.0,
+        "yoy": 2036311
+      },
+      {
+        "month": 5,
+        "net_sales": 530367.0,
+        "yoy": 2045143
+      },
+      {
+        "month": 6,
+        "net_sales": 497301.0,
+        "yoy": 1905952
+      },
+      {
+        "month": 7,
+        "net_sales": 550116.0,
+        "yoy": 1983973
+      },
+      {
+        "month": 8,
+        "net_sales": 509020.0,
+        "yoy": 903270
+      },
+      {
+        "month": 9,
+        "net_sales": 456575.0,
+        "yoy": 765770
+      },
+      {
+        "month": 10,
+        "net_sales": 726448.0,
+        "yoy": 1542123
+      }
+    ],
+    "M18": [
+      {
+        "month": 1,
+        "net_sales": 2708644.0,
+        "yoy": 11882623
+      },
+      {
+        "month": 2,
+        "net_sales": 1211527.0,
+        "yoy": 2162785
+      },
+      {
+        "month": 3,
+        "net_sales": 1261604.0,
+        "yoy": 825646
+      },
+      {
+        "month": 4,
+        "net_sales": 1312065.0,
+        "yoy": 857015
+      },
+      {
+        "month": 5,
+        "net_sales": 1834950.0,
+        "yoy": 1621267
+      },
+      {
+        "month": 6,
+        "net_sales": 1448682.0,
+        "yoy": 1443255
+      },
+      {
+        "month": 7,
+        "net_sales": 1767306.0,
+        "yoy": 1278507
+      },
+      {
+        "month": 8,
+        "net_sales": 2077790.0,
+        "yoy": 1282776
+      },
+      {
+        "month": 9,
+        "net_sales": 1201462.264,
+        "yoy": 739543
+      },
+      {
+        "month": 10,
+        "net_sales": 1615873.139,
+        "yoy": 1084850
+      }
+    ],
+    "M19": [
+      {
+        "month": 1,
+        "net_sales": 284806.95999999996,
+        "yoy": 2438207
+      },
+      {
+        "month": 2,
+        "net_sales": 62716.0,
+        "yoy": 469607
+      },
+      {
+        "month": 3,
+        "net_sales": 102894.0,
+        "yoy": 12625031
+      },
+      {
+        "month": 4,
+        "net_sales": 139328.0,
+        "yoy": 3698646
+      },
+      {
+        "month": 5,
+        "net_sales": 93288.0,
+        "yoy": 1845825
+      },
+      {
+        "month": 6,
+        "net_sales": 95368.0,
+        "yoy": 20868271
+      },
+      {
+        "month": 7,
+        "net_sales": 149137.0,
+        "yoy": 15967559
+      },
+      {
+        "month": 8,
+        "net_sales": 149284.0,
+        "yoy": 2632411
+      },
+      {
+        "month": 9,
+        "net_sales": 72805.0,
+        "yoy": 4307988
+      },
+      {
+        "month": 10,
+        "net_sales": 135777.0,
+        "yoy": 4386979
+      }
+    ],
+    "M20": [
+      {
+        "month": 1,
+        "net_sales": 565931.0,
+        "yoy": 13241249
+      },
+      {
+        "month": 2,
+        "net_sales": 255436.0,
+        "yoy": 3965166
+      },
+      {
+        "month": 3,
+        "net_sales": 188745.0,
+        "yoy": 4416121
+      },
+      {
+        "month": 4,
+        "net_sales": 267926.0,
+        "yoy": 3759837
+      },
+      {
+        "month": 5,
+        "net_sales": 210106.0,
+        "yoy": 6531116
+      },
+      {
+        "month": 6,
+        "net_sales": 140822.0,
+        "yoy": 7867151
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M21": [
+      {
+        "month": 1,
+        "net_sales": 1389253.0,
+        "yoy": 3409628
+      },
+      {
+        "month": 2,
+        "net_sales": 489388.0,
+        "yoy": 1216203
+      },
+      {
+        "month": 3,
+        "net_sales": 806638.0,
+        "yoy": 2582564
+      },
+      {
+        "month": 4,
+        "net_sales": 704092.0,
+        "yoy": 1471334
+      },
+      {
+        "month": 5,
+        "net_sales": 639379.0,
+        "yoy": 1409069
+      },
+      {
+        "month": 6,
+        "net_sales": 541994.0,
+        "yoy": 1295768
+      },
+      {
+        "month": 7,
+        "net_sales": 876859.0,
+        "yoy": 1665133
+      },
+      {
+        "month": 8,
+        "net_sales": 1001224.0,
+        "yoy": 2136036
+      },
+      {
+        "month": 9,
+        "net_sales": 601208.0,
+        "yoy": 1879597
+      },
+      {
+        "month": 10,
+        "net_sales": 817320.0,
+        "yoy": 2255298
+      }
+    ],
+    "M22": [
+      {
+        "month": 1,
+        "net_sales": 1121813.0,
+        "yoy": 7978188
+      },
+      {
+        "month": 2,
+        "net_sales": 327547.0,
+        "yoy": 1198050
+      },
+      {
+        "month": 3,
+        "net_sales": 387501.0,
+        "yoy": 988372
+      },
+      {
+        "month": 4,
+        "net_sales": 425307.0,
+        "yoy": 1505352
+      },
+      {
+        "month": 5,
+        "net_sales": 472146.0,
+        "yoy": 2076645
+      },
+      {
+        "month": 6,
+        "net_sales": 454234.0,
+        "yoy": 4577587
+      },
+      {
+        "month": 7,
+        "net_sales": 496346.0,
+        "yoy": 1865542
+      },
+      {
+        "month": 8,
+        "net_sales": 495927.125,
+        "yoy": 1484901
+      },
+      {
+        "month": 9,
+        "net_sales": 365326.121,
+        "yoy": 1206493
+      },
+      {
+        "month": 10,
+        "net_sales": 579492.139,
+        "yoy": 1295215
+      }
+    ],
+    "M99": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "MC1": [
+      {
+        "month": 1,
+        "net_sales": 4364269.0,
+        "yoy": 10548082
+      },
+      {
+        "month": 2,
+        "net_sales": 2740058.0,
+        "yoy": 1980655
+      },
+      {
+        "month": 3,
+        "net_sales": 2210085.0,
+        "yoy": 923848
+      },
+      {
+        "month": 4,
+        "net_sales": 2239479.0,
+        "yoy": 1023430
+      },
+      {
+        "month": 5,
+        "net_sales": 2582943.0,
+        "yoy": 1237848
+      },
+      {
+        "month": 6,
+        "net_sales": 1769441.0,
+        "yoy": 1298872
+      },
+      {
+        "month": 7,
+        "net_sales": 2798162.0,
+        "yoy": 1127060
+      },
+      {
+        "month": 8,
+        "net_sales": 4078577.0,
+        "yoy": 1438697
+      },
+      {
+        "month": 9,
+        "net_sales": 1832718.0,
+        "yoy": 299953846
+      },
+      {
+        "month": 10,
+        "net_sales": 2821529.0,
+        "yoy": 67613923
+      }
+    ],
+    "MC2": [
+      {
+        "month": 1,
+        "net_sales": 1193472.0,
+        "yoy": 38166677
+      },
+      {
+        "month": 2,
+        "net_sales": 830188.0,
+        "yoy": 2325913
+      },
+      {
+        "month": 3,
+        "net_sales": 591674.0,
+        "yoy": 857586
+      },
+      {
+        "month": 4,
+        "net_sales": 647628.0,
+        "yoy": 1168223
+      },
+      {
+        "month": 5,
+        "net_sales": 737371.0,
+        "yoy": 1156697
+      },
+      {
+        "month": 6,
+        "net_sales": 661899.0,
+        "yoy": 1848364
+      },
+      {
+        "month": 7,
+        "net_sales": 804516.0,
+        "yoy": 1047206
+      },
+      {
+        "month": 8,
+        "net_sales": 1009714.0,
+        "yoy": 1158141
+      },
+      {
+        "month": 9,
+        "net_sales": 465096.0,
+        "yoy": 597856
+      },
+      {
+        "month": 10,
+        "net_sales": 787023.0,
+        "yoy": 128809002
+      }
+    ],
+    "MC3": [
+      {
+        "month": 1,
+        "net_sales": 2072918.0,
+        "yoy": 9290597
+      },
+      {
+        "month": 2,
+        "net_sales": 1374024.0,
+        "yoy": 2060995
+      },
+      {
+        "month": 3,
+        "net_sales": 1204845.0,
+        "yoy": 545949
+      },
+      {
+        "month": 4,
+        "net_sales": 1132972.0,
+        "yoy": 905147
+      },
+      {
+        "month": 5,
+        "net_sales": 869419.0,
+        "yoy": 611294
+      },
+      {
+        "month": 6,
+        "net_sales": 1134536.0,
+        "yoy": 877540
+      },
+      {
+        "month": 7,
+        "net_sales": 1304345.0,
+        "yoy": 1062941
+      },
+      {
+        "month": 8,
+        "net_sales": 1646637.0,
+        "yoy": 910816
+      },
+      {
+        "month": 9,
+        "net_sales": 823242.0,
+        "yoy": 692277
+      },
+      {
+        "month": 10,
+        "net_sales": 1231183.0,
+        "yoy": 213376603
+      }
+    ],
+    "MC4": [
+      {
+        "month": 1,
+        "net_sales": 1364663.0,
+        "yoy": 2739187
+      },
+      {
+        "month": 2,
+        "net_sales": 811832.0,
+        "yoy": 2074175
+      },
+      {
+        "month": 3,
+        "net_sales": 690421.0,
+        "yoy": 2157498
+      },
+      {
+        "month": 4,
+        "net_sales": 604212.0,
+        "yoy": 1769288
+      },
+      {
+        "month": 5,
+        "net_sales": 603545.0,
+        "yoy": 2106835
+      },
+      {
+        "month": 6,
+        "net_sales": 406182.0,
+        "yoy": 3684190
+      },
+      {
+        "month": 7,
+        "net_sales": 589291.561,
+        "yoy": 2331335
+      },
+      {
+        "month": 8,
+        "net_sales": 854163.264,
+        "yoy": 2770918
+      },
+      {
+        "month": 9,
+        "net_sales": 416663.528,
+        "yoy": 1406269
+      },
+      {
+        "month": 10,
+        "net_sales": 534117.264,
+        "yoy": 531423
+      }
+    ],
+    "WHM": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "WMM": [
+      {
+        "month": 1,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 2,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 3,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 4,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 5,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 6,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 7,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 8,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 9,
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "month": 10,
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M10A": [
+      {
+        "month": 10,
+        "net_sales": 527398.125,
+        "yoy": 0
+      }
+    ]
+  },
+  "store_item_top5": {
+    "HE1": [
+      {
+        "item_name": "INN",
+        "net_sales": 37.9,
+        "yoy": 352
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 27.2,
+        "yoy": 374
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 21.8,
+        "yoy": 433
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 11.4,
+        "yoy": 1075
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 9.6,
+        "yoy": 1485
+      }
+    ],
+    "HE2": [
+      {
+        "item_name": "INN",
+        "net_sales": 285.2,
+        "yoy": 38487
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 224.4,
+        "yoy": 16633
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 153.2,
+        "yoy": 1204
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 67.4,
+        "yoy": 1938
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 42.0,
+        "yoy": 1890
+      }
+    ],
+    "M01": [
+      {
+        "item_name": "모자",
+        "net_sales": 391.5,
+        "yoy": 2326
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 321.3,
+        "yoy": 1199
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 311.9,
+        "yoy": 146
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 249.9,
+        "yoy": 320
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 113.3,
+        "yoy": 400
+      }
+    ],
+    "M02": [
+      {
+        "item_name": "모자",
+        "net_sales": 192.1,
+        "yoy": 1265
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 99.4,
+        "yoy": 789
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 81.3,
+        "yoy": 190
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 57.0,
+        "yoy": 268
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 24.2,
+        "yoy": 1116
+      }
+    ],
+    "M03": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M04": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M05": [
+      {
+        "item_name": "모자",
+        "net_sales": 165.1,
+        "yoy": 572
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 103.1,
+        "yoy": 583
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 60.3,
+        "yoy": 95
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 56.8,
+        "yoy": 150
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 30.7,
+        "yoy": 189
+      }
+    ],
+    "M06": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M07": [
+      {
+        "item_name": "INN",
+        "net_sales": 572.7,
+        "yoy": 463
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 365.1,
+        "yoy": 13528
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 258.3,
+        "yoy": 729
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 163.5,
+        "yoy": 232
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 65.0,
+        "yoy": 319
+      }
+    ],
+    "M08": [
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M09": [
+      {
+        "item_name": "INN",
+        "net_sales": 158.1,
+        "yoy": 594
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 106.9,
+        "yoy": 188
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 104.4,
+        "yoy": 382
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 63.1,
+        "yoy": 732
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 36.9,
+        "yoy": 397
+      }
+    ],
+    "M10": [
+      {
+        "item_name": "모자",
+        "net_sales": 376.2,
+        "yoy": 1196
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 327.3,
+        "yoy": 33093
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 269.4,
+        "yoy": 316
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 260.4,
+        "yoy": 118
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 105.8,
+        "yoy": 252
+      }
+    ],
+    "M11": [
+      {
+        "item_name": "INN",
+        "net_sales": 322.3,
+        "yoy": 2307
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 241.9,
+        "yoy": 1461
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 178.3,
+        "yoy": 345
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 169.7,
+        "yoy": 171
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 91.5,
+        "yoy": 424
+      }
+    ],
+    "M12": [
+      {
+        "item_name": "모자",
+        "net_sales": 5.3,
+        "yoy": 363
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 4.0,
+        "yoy": 231
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 1.8,
+        "yoy": 127
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 1.4,
+        "yoy": 284
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 1.1,
+        "yoy": 21
+      }
+    ],
+    "M13": [
+      {
+        "item_name": "INN",
+        "net_sales": 103.4,
+        "yoy": 856
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 66.7,
+        "yoy": 222
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 58.1,
+        "yoy": 870
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 55.8,
+        "yoy": 175
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 28.2,
+        "yoy": 389
+      }
+    ],
+    "M14": [
+      {
+        "item_name": "모자",
+        "net_sales": 281.9,
+        "yoy": 977
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 273.4,
+        "yoy": 147
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 265.5,
+        "yoy": 1897
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 175.3,
+        "yoy": 303
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 77.7,
+        "yoy": 517
+      }
+    ],
+    "M15": [
+      {
+        "item_name": "INN",
+        "net_sales": 197.3,
+        "yoy": 514
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 69.9,
+        "yoy": 2943
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 68.8,
+        "yoy": 230
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 62.0,
+        "yoy": 10782
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 58.4,
+        "yoy": 12429
+      }
+    ],
+    "M16": [
+      {
+        "item_name": "모자",
+        "net_sales": 188.2,
+        "yoy": 1898
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 114.8,
+        "yoy": 1337
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 88.0,
+        "yoy": 247
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 78.0,
+        "yoy": 3843
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 38.1,
+        "yoy": 458
+      }
+    ],
+    "M17": [
+      {
+        "item_name": "INN",
+        "net_sales": 204.3,
+        "yoy": 3774
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 165.4,
+        "yoy": 535
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 158.3,
+        "yoy": 336
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 97.6,
+        "yoy": 1688
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 51.7,
+        "yoy": 487
+      }
+    ],
+    "M18": [
+      {
+        "item_name": "모자",
+        "net_sales": 434.7,
+        "yoy": 1540
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 417.5,
+        "yoy": 2141
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 263.7,
+        "yoy": 177
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 250.1,
+        "yoy": 284
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 127.0,
+        "yoy": 592
+      }
+    ],
+    "M19": [
+      {
+        "item_name": "모자",
+        "net_sales": 39.4,
+        "yoy": 1154
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 29.8,
+        "yoy": 1103
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 19.4,
+        "yoy": 417
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 14.8,
+        "yoy": 250
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 11.7,
+        "yoy": 258
+      }
+    ],
+    "M20": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M21": [
+      {
+        "item_name": "INN",
+        "net_sales": 286.7,
+        "yoy": 542
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 161.4,
+        "yoy": 445
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 132.9,
+        "yoy": 6552
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 124.3,
+        "yoy": 8470
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 59.7,
+        "yoy": 983
+      }
+    ],
+    "M22": [
+      {
+        "item_name": "INN",
+        "net_sales": 160.2,
+        "yoy": 1602
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 126.0,
+        "yoy": 362
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 111.2,
+        "yoy": 249
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 79.5,
+        "yoy": 2666
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 58.4,
+        "yoy": 782
+      }
+    ],
+    "M99": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "MC1": [
+      {
+        "item_name": "모자",
+        "net_sales": 689.6,
+        "yoy": 1788
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 624.7,
+        "yoy": 1181
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 616.7,
+        "yoy": 14778
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 490.0,
+        "yoy": 225
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 214.8,
+        "yoy": 461
+      }
+    ],
+    "MC2": [
+      {
+        "item_name": "신발",
+        "net_sales": 189.3,
+        "yoy": 30975
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 181.8,
+        "yoy": 802
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 156.3,
+        "yoy": 215
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 143.7,
+        "yoy": 1755
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 72.0,
+        "yoy": 391
+      }
+    ],
+    "MC3": [
+      {
+        "item_name": "모자",
+        "net_sales": 334.1,
+        "yoy": 1073
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 326.8,
+        "yoy": 56632
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 236.5,
+        "yoy": 450
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 169.2,
+        "yoy": 209
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 85.5,
+        "yoy": 416
+      }
+    ],
+    "MC4": [
+      {
+        "item_name": "신발",
+        "net_sales": 165.9,
+        "yoy": 165
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 158.0,
+        "yoy": 27439
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 99.5,
+        "yoy": 18813
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 70.3,
+        "yoy": 5523
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 20.4,
+        "yoy": 650
+      }
+    ],
+    "WHM": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "WMM": [
+      {
+        "item_name": "ATC",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "BOT",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "모자",
+        "net_sales": 0.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 0.0,
+        "yoy": 0
+      }
+    ],
+    "M10A": [
+      {
+        "item_name": "모자",
+        "net_sales": 143.1,
+        "yoy": 0
+      },
+      {
+        "item_name": "INN",
+        "net_sales": 116.1,
+        "yoy": 0
+      },
+      {
+        "item_name": "신발",
+        "net_sales": 107.0,
+        "yoy": 0
+      },
+      {
+        "item_name": "OUT",
+        "net_sales": 80.2,
+        "yoy": 0
+      },
+      {
+        "item_name": "BAG",
+        "net_sales": 44.0,
+        "yoy": 0
+      }
+    ]
+  },
+  "item_store_top5": {
+    "BAG": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 164.8,
+        "yoy": 940
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 112.1,
+        "yoy": 1050
+      },
+      {
+        "store_code": "MC3",
+        "store_name": "MC3 MLB Senado Square",
+        "net_sales": 85.5,
+        "yoy": 416
+      },
+      {
+        "store_code": "M11",
+        "store_name": "M11-APM",
+        "net_sales": 74.9,
+        "yoy": 1753
+      },
+      {
+        "store_code": "M07",
+        "store_name": "M07 MLB CITYGATE OUTLET",
+        "net_sales": 65.0,
+        "yoy": 319
+      }
+    ],
+    "BOT": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 214.8,
+        "yoy": 461
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 127.0,
+        "yoy": 592
+      },
+      {
+        "store_code": "M01",
+        "store_name": "M01 MLB MONG KOK",
+        "net_sales": 113.3,
+        "yoy": 400
+      },
+      {
+        "store_code": "M10",
+        "store_name": "M10 HK-I SQUARE",
+        "net_sales": 105.8,
+        "yoy": 252
+      },
+      {
+        "store_code": "M11",
+        "store_name": "M11-APM",
+        "net_sales": 91.5,
+        "yoy": 424
+      }
+    ],
+    "모자": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 689.6,
+        "yoy": 1788
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 434.7,
+        "yoy": 1540
+      },
+      {
+        "store_code": "M01",
+        "store_name": "M01 MLB MONG KOK",
+        "net_sales": 391.5,
+        "yoy": 2326
+      },
+      {
+        "store_code": "M10",
+        "store_name": "M10 HK-I SQUARE",
+        "net_sales": 376.2,
+        "yoy": 1196
+      },
+      {
+        "store_code": "M07",
+        "store_name": "M07 MLB CITYGATE OUTLET",
+        "net_sales": 365.1,
+        "yoy": 13528
+      }
+    ],
+    "INN": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 624.7,
+        "yoy": 1181
+      },
+      {
+        "store_code": "M07",
+        "store_name": "M07 MLB CITYGATE OUTLET",
+        "net_sales": 572.7,
+        "yoy": 463
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 417.5,
+        "yoy": 2141
+      },
+      {
+        "store_code": "M10",
+        "store_name": "M10 HK-I SQUARE",
+        "net_sales": 327.3,
+        "yoy": 33093
+      },
+      {
+        "store_code": "M11",
+        "store_name": "M11-APM",
+        "net_sales": 322.3,
+        "yoy": 2307
+      }
+    ],
+    "OUT": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 490.0,
+        "yoy": 225
+      },
+      {
+        "store_code": "M10",
+        "store_name": "M10 HK-I SQUARE",
+        "net_sales": 269.4,
+        "yoy": 316
+      },
+      {
+        "store_code": "M07",
+        "store_name": "M07 MLB CITYGATE OUTLET",
+        "net_sales": 258.3,
+        "yoy": 729
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 250.1,
+        "yoy": 284
+      },
+      {
+        "store_code": "M01",
+        "store_name": "M01 MLB MONG KOK",
+        "net_sales": 249.9,
+        "yoy": 320
+      }
+    ],
+    "신발": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 616.7,
+        "yoy": 14778
+      },
+      {
+        "store_code": "MC3",
+        "store_name": "MC3 MLB Senado Square",
+        "net_sales": 326.8,
+        "yoy": 56632
+      },
+      {
+        "store_code": "M01",
+        "store_name": "M01 MLB MONG KOK",
+        "net_sales": 311.9,
+        "yoy": 146
+      },
+      {
+        "store_code": "M14",
+        "store_name": "M14 NewTownPlaza",
+        "net_sales": 273.4,
+        "yoy": 147
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 263.7,
+        "yoy": 177
+      }
+    ],
+    "WTC": [
+      {
+        "store_code": "M19",
+        "store_name": "M19 NewTownPlaza KIDS",
+        "net_sales": 10.1,
+        "yoy": 327
+      },
+      {
+        "store_code": "HE2",
+        "store_name": "HE2 HK 91APP",
+        "net_sales": 4.6,
+        "yoy": 546
+      },
+      {
+        "store_code": "MC4",
+        "store_name": "MC4 Senado2",
+        "net_sales": 1.5,
+        "yoy": 0
+      },
+      {
+        "store_code": "M15",
+        "store_name": "M15 YuenLongPlaza",
+        "net_sales": 1.3,
+        "yoy": 0
+      },
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 0.9,
+        "yoy": 7
+      }
+    ],
+    "ATC": [
+      {
+        "store_code": "MC1",
+        "store_name": "MC1 MLB Venetian",
+        "net_sales": 20.0,
+        "yoy": 139
+      },
+      {
+        "store_code": "M10",
+        "store_name": "M10 HK-I SQUARE",
+        "net_sales": 15.1,
+        "yoy": 92
+      },
+      {
+        "store_code": "M01",
+        "store_name": "M01 MLB MONG KOK",
+        "net_sales": 15.1,
+        "yoy": 173
+      },
+      {
+        "store_code": "MC3",
+        "store_name": "MC3 MLB Senado Square",
+        "net_sales": 11.5,
+        "yoy": 78
+      },
+      {
+        "store_code": "M18",
+        "store_name": "M18 Langham Place",
+        "net_sales": 10.9,
+        "yoy": 135
+      }
+    ]
+  }
+}

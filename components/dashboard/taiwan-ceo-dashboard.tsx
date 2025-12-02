@@ -473,12 +473,12 @@ const TaiwanCEODashboard = () => {
                   if (offlineEfficiency?.total?.yoy && offlineEfficiency.total.yoy >= 100) {
                     insights.push(
                       <div key="store_efficiency" className="flex items-start">
-                        <span className="text-green-600 font-bold mr-2">✓</span>
-                        <span>
-                          <span className="font-semibold">매장효율성 개선:</span> 점당매출 {formatNumber(offlineEfficiency?.total?.current?.sales_per_store)}K 
-                          (<span className="bg-green-100 px-1 rounded font-bold">YOY {formatPercent(offlineEfficiency?.total?.yoy)}%</span>)
-                        </span>
-                      </div>
+                  <span className="text-green-600 font-bold mr-2">✓</span>
+                  <span>
+                    <span className="font-semibold">매장효율성 개선:</span> 점당매출 {formatNumber(offlineEfficiency?.total?.current?.sales_per_store)}K 
+                    (<span className="bg-green-100 px-1 rounded font-bold">YOY {formatPercent(offlineEfficiency?.total?.yoy)}%</span>) 
+                  </span>
+                </div>
                     );
                   }
                   
@@ -488,13 +488,13 @@ const TaiwanCEODashboard = () => {
                   if (salesRateChange >= 0) {
                     insights.push(
                       <div key="season_sales" className="flex items-start">
-                        <span className="text-green-600 font-bold mr-2">✓</span>
-                        <span>
-                          <span className="font-semibold">당시즌 판매율 개선:</span> 
+                  <span className="text-green-600 font-bold mr-2">✓</span>
+                  <span>
+                    <span className="font-semibold">당시즌 판매율 개선:</span> 
                           <span className="bg-green-100 px-1 rounded font-bold">{formatPercent(salesRate, 1)}%</span>로 
                           전년 대비 <span className="bg-green-100 px-1 rounded font-bold">+{formatPercent(salesRateChange, 1)}%p</span> 상승 (25F 의류)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -508,13 +508,13 @@ const TaiwanCEODashboard = () => {
                   if (onlineYoy >= 100) {
                     insights.push(
                       <div key="online_growth" className="flex items-start">
-                        <span className="text-green-600 font-bold mr-2">✓</span>
-                        <span>
+                  <span className="text-green-600 font-bold mr-2">✓</span>
+                  <span>
                           <span className="font-semibold">온라인 성장:</span> 매출 {formatNumber(onlineSales)}K 
                           (<span className="bg-blue-100 px-1 rounded font-bold">YOY {formatPercent(onlineYoy)}%</span>, 비중 {formatPercent(onlineShare, 1)}%), 
                           직접이익 {formatNumber(onlineDirectProfit)}K ({formatPercent(onlineDirectProfitYoy)}%)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -523,12 +523,12 @@ const TaiwanCEODashboard = () => {
                   if (inventoryYoy <= 110) {
                     insights.push(
                       <div key="inventory" className="flex items-start">
-                        <span className="text-green-600 font-bold mr-2">✓</span>
-                        <span>
+                  <span className="text-green-600 font-bold mr-2">✓</span>
+                  <span>
                           <span className="font-semibold">재고 안정화:</span> 총재고 YOY {formatPercent(inventoryYoy)}% 
                           (전년 {formatNumber(endingInventory?.total?.previous)}K → {formatNumber(endingInventory?.total?.current)}K)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -541,13 +541,13 @@ const TaiwanCEODashboard = () => {
                   if (directProfitRate > prevDirectProfitRate) {
                     insights.push(
                       <div key="direct_profit" className="flex items-start">
-                        <span className="text-green-600 font-bold mr-2">✓</span>
-                        <span>
+                  <span className="text-green-600 font-bold mr-2">✓</span>
+                  <span>
                           <span className="font-semibold">직접이익률 개선:</span> 
                           <span className="bg-green-100 px-1 rounded font-bold">{formatPercent(directProfitRate, 1)}%</span> 
                           (전년 {formatPercent(prevDirectProfitRate, 1)}% → <span className="bg-green-100 px-1 rounded font-bold">+{formatPercent(directProfitRate - prevDirectProfitRate, 1)}%p</span>)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -578,16 +578,16 @@ const TaiwanCEODashboard = () => {
                   
                   risks.push(
                     <div key="operating_profit" className="flex items-start">
-                      <span className="text-orange-600 font-bold mr-2">•</span>
-                      <span>
+                  <span className="text-orange-600 font-bold mr-2">•</span>
+                  <span>
                         <span className="font-semibold">{isProfit ? '영업이익' : '영업손실'} {isImproving ? '개선' : isDeteriorating ? '악화' : '전환'}:</span> 
                         <span className={`px-1 rounded font-bold ${isProfit ? 'bg-green-200' : 'bg-red-200'}`}>{formatNumber(operatingProfit)}K</span> 
                         (전년 {formatNumber(prevOperatingProfit)}K), 
                         <span className={`px-1 rounded font-bold ${operatingProfitChange >= 0 ? 'bg-green-200' : 'bg-red-200'}`}>
                           {operatingProfitChange >= 0 ? '+' : ''}{formatNumber(Math.abs(operatingProfitChange))}K {operatingProfitChange >= 0 ? '증가' : '감소'}
                         </span>
-                      </span>
-                    </div>
+                  </span>
+                </div>
                   );
                   
                   // 2. 과시즌 FW 재고
@@ -600,15 +600,15 @@ const TaiwanCEODashboard = () => {
                     
                     risks.push(
                       <div key="past_fw" className="flex items-start">
-                        <span className="text-orange-600 font-bold mr-2">•</span>
-                        <span>
-                          <span className="font-semibold">과시즌 FW 재고:</span> {formatNumber(pastSeasonFW?.total?.current || 0)}K 
+                  <span className="text-orange-600 font-bold mr-2">•</span>
+                  <span>
+                    <span className="font-semibold">과시즌 FW 재고:</span> {formatNumber(pastSeasonFW?.total?.current || 0)}K 
                           (<span className="bg-red-200 px-1 rounded font-bold">YOY {formatPercent(pastFWYoy)}%</span>), 
                           1년차 24FW {formatNumber(year1Stock)}K ({formatPercent(year1Yoy)}%), 
                           2년차 23FW {formatNumber(year2Stock)}K 
                           (<span className="bg-red-200 px-1 rounded font-bold">{formatPercent(year2Yoy)}%</span>)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -622,14 +622,14 @@ const TaiwanCEODashboard = () => {
                   if (avgOfflineYoy < 120) {
                     risks.push(
                       <div key="offline_growth" className="flex items-start">
-                        <span className="text-orange-600 font-bold mr-2">•</span>
-                        <span>
-                          <span className="font-semibold">오프라인 성장:</span> 매출 {formatNumber(((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0)) / 1000)}K 
+                  <span className="text-orange-600 font-bold mr-2">•</span>
+                  <span>
+                    <span className="font-semibold">오프라인 성장:</span> 매출 {formatNumber(((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0)) / 1000)}K 
                           (<span className={`px-1 rounded font-bold ${avgOfflineYoy >= 100 ? 'bg-green-200' : 'bg-orange-200'}`}>YOY {formatPercent(avgOfflineYoy)}%</span>), 
                           직접이익 {formatNumber(offlineDirectProfit)}K 
                           (<span className={`px-1 rounded font-bold ${offlineDirectProfitYoy >= 100 ? 'bg-green-200' : 'bg-orange-200'}`}>{formatPercent(offlineDirectProfitYoy)}%</span>)
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -643,16 +643,16 @@ const TaiwanCEODashboard = () => {
                   if (sgAYoy > 100) {
                     risks.push(
                       <div key="sg_a" className="flex items-start">
-                        <span className="text-orange-600 font-bold mr-2">•</span>
-                        <span>
-                          <span className="font-semibold">영업비 증가:</span> {formatNumber(pl?.sg_a)}K 
+                  <span className="text-orange-600 font-bold mr-2">•</span>
+                  <span>
+                    <span className="font-semibold">영업비 증가:</span> {formatNumber(pl?.sg_a)}K 
                           (<span className="bg-orange-200 px-1 rounded font-bold">YOY {formatPercent(sgAYoy)}%</span>, 
                           전년비 <span className="bg-orange-200 px-1 rounded font-bold">+{formatNumber(sgAChange)}K</span>), 
                           {salaryChange > 0 && <span>급여+{formatNumber(salaryChange)}K</span>}
                           {salaryChange > 0 && marketingChange > 0 && <span>, </span>}
                           {marketingChange > 0 && <span>마케팅비+{formatNumber(marketingChange)}K</span>}
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -667,14 +667,14 @@ const TaiwanCEODashboard = () => {
                   if (lossCount > 0) {
                     risks.push(
                       <div key="loss_stores" className="flex items-start">
-                        <span className="text-orange-600 font-bold mr-2">•</span>
-                        <span>
+                  <span className="text-orange-600 font-bold mr-2">•</span>
+                  <span>
                           <span className="font-semibold">적자매장:</span> {lossCount}개 
                           {topLossStores.length > 0 && (
                             <span className="bg-red-200 px-1 rounded font-bold">{topLossStores.join(', ')}</span>
                           )} 모니터링 필요
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -717,13 +717,13 @@ const TaiwanCEODashboard = () => {
                   const targetOpRate = 5.0;
                   strategies.push(
                     <div key="profitability" className="flex items-start">
-                      <span className="text-purple-600 font-bold mr-2">1.</span>
-                      <span>
+                  <span className="text-purple-600 font-bold mr-2">1.</span>
+                  <span>
                         <span className="font-semibold">수익성 회복:</span> 영업이익률 
                         <span className="bg-purple-100 px-1 rounded font-bold">{formatPercent(currentOpRate, 1)}% → {targetOpRate}%</span> 목표, 
-                        매출 개선을 통해 달성
-                      </span>
-                    </div>
+                    매출 개선을 통해 달성
+                  </span>
+                </div>
                   );
                   
                   // 2. 과시즌 FW 소진
@@ -739,22 +739,22 @@ const TaiwanCEODashboard = () => {
                     if (topCategories) {
                       strategies.push(
                         <div key="past_fw_clearance" className="flex items-start">
-                          <span className="text-purple-600 font-bold mr-2">2.</span>
-                          <span>
-                            <span className="font-semibold">과시즌 FW 소진:</span> 
+                  <span className="text-purple-600 font-bold mr-2">2.</span>
+                  <span>
+                    <span className="font-semibold">과시즌 FW 소진:</span> 
                             <span className="bg-purple-100 px-1 rounded font-bold">{topCategories}</span> 집중 프로모션
-                          </span>
-                        </div>
+                  </span>
+                </div>
                       );
                     } else {
                       strategies.push(
                         <div key="past_fw_clearance" className="flex items-start">
                           <span className="text-purple-600 font-bold mr-2">2.</span>
-                          <span>
+                  <span>
                             <span className="font-semibold">과시즌 FW 소진:</span> 
                             <span className="bg-purple-100 px-1 rounded font-bold">{formatNumber(pastFWTotal)}K</span> 재고 소진 전략 수립
-                          </span>
-                        </div>
+                  </span>
+                </div>
                       );
                     }
                   }
@@ -770,11 +770,11 @@ const TaiwanCEODashboard = () => {
                     strategies.push(
                       <div key="loss_store_improvement" className="flex items-start">
                         <span className="text-purple-600 font-bold mr-2">3.</span>
-                        <span>
-                          <span className="font-semibold">적자매장 개선:</span> 
+                  <span>
+                    <span className="font-semibold">적자매장 개선:</span> 
                           <span className="bg-purple-100 px-1 rounded font-bold">{topLossStores.join(', ')}</span> 적자개선 액션플랜 도출 필요
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -784,12 +784,12 @@ const TaiwanCEODashboard = () => {
                     strategies.push(
                       <div key="online_expansion" className="flex items-start">
                         <span className="text-purple-600 font-bold mr-2">{strategies.length + 1}.</span>
-                        <span>
-                          <span className="font-semibold">온라인 확대:</span> 
+                  <span>
+                    <span className="font-semibold">온라인 확대:</span> 
                           <span className="bg-purple-100 px-1 rounded font-bold">YOY {formatPercent(onlineYoyForStrategy)}%</span> 성장 모멘텀 유지, 
                           디지털 마케팅 강화
-                        </span>
-                      </div>
+                  </span>
+                </div>
                     );
                   }
                   
@@ -805,7 +805,7 @@ const TaiwanCEODashboard = () => {
                           Retail YOY {formatPercent(retailYoyForStrategy)}%, Outlet YOY {formatPercent(outletYoyForStrategy)}% - 
                           채널별 맞춤 전략 수립 필요
                         </span>
-                      </div>
+              </div>
                     );
                   }
                   
@@ -3138,7 +3138,7 @@ const TaiwanCEODashboard = () => {
                     data={(dashboardData?.monthly_channel_data || []).map((item: any, idx: number) => {
                       const isLastMonth = idx === (dashboardData?.monthly_channel_data || []).length - 1;
                       return {
-                        month: `${item.period.slice(2, 4)}월`,
+                      month: `${item.period.slice(2, 4)}월`,
                         twRetail: isLastMonth 
                           ? Math.round(twRetail?.yoy || 0)
                           : (dashboardData?.monthly_channel_yoy?.['TW_Retail']?.[idx] || 0),
@@ -3297,14 +3297,14 @@ const TaiwanCEODashboard = () => {
                                     yoy = (dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[channelKey]?.[idx] : 0) || 0;
                                   }
                                   return (
-                                    <td 
-                                      key={idx} 
-                                      className={`border border-gray-300 px-1 py-1 text-center font-bold ${
-                                        yoy >= 100 ? 'text-green-600' : 'text-red-600'
-                                      }`}
-                                    >
-                                      {yoy}%
-                                    </td>
+                                <td 
+                                  key={idx} 
+                                    className={`border border-gray-300 px-1 py-1 text-center font-bold ${
+                                      yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                                    }`}
+                                >
+                                  {yoy}%
+                                </td>
                                   );
                                 }
                               )}
@@ -3335,14 +3335,14 @@ const TaiwanCEODashboard = () => {
                             yoy = (dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[channelKey]?.[idx] : 0) || 0;
                           }
                           return (
-                            <td 
-                              key={idx} 
-                              className={`border border-gray-300 px-1 py-1 text-center font-bold ${
-                                yoy >= 100 ? 'text-green-600' : 'text-red-600'
-                              }`}
-                            >
-                              {yoy}%
-                            </td>
+                          <td 
+                            key={idx} 
+                            className={`border border-gray-300 px-1 py-1 text-center font-bold ${
+                              yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                            }`}
+                          >
+                            {yoy}%
+                          </td>
                           );
                         })}
                       </tr>
@@ -3844,7 +3844,7 @@ const TaiwanCEODashboard = () => {
                 }}
               >
                   {item.emoji} {item.name}
-                </button>
+              </button>
             ))}
           </div>
           
@@ -3904,7 +3904,7 @@ const TaiwanCEODashboard = () => {
                       }
                       
                       return {
-                        month: `${item.period.slice(2, 4)}월`,
+                      month: `${item.period.slice(2, 4)}월`,
                         당시즌F,
                         당시즌S,
                         과시즌F,
@@ -3978,7 +3978,7 @@ const TaiwanCEODashboard = () => {
                       }
                       
                       return {
-                        month: `${item.period.slice(2, 4)}월`,
+                      month: `${item.period.slice(2, 4)}월`,
                         yoy
                       };
                     })} 
@@ -4071,12 +4071,12 @@ const TaiwanCEODashboard = () => {
                               }
                               
                               return (
-                                <td 
-                                  key={idx} 
-                                  className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
-                                >
-                                  {yoy}%
-                                </td>
+                              <td 
+                                key={idx} 
+                                className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
+                              >
+                                {yoy}%
+                              </td>
                               );
                             })}
                           </tr>
@@ -4126,12 +4126,12 @@ const TaiwanCEODashboard = () => {
                           }
                           
                           return (
-                            <td 
-                              key={idx} 
-                              className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
-                            >
-                              {yoy}%
-                            </td>
+                          <td 
+                            key={idx} 
+                            className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
+                          >
+                            {yoy}%
+                          </td>
                           );
                         })}
                       </tr>
@@ -4483,7 +4483,7 @@ const TaiwanCEODashboard = () => {
                     color: '#000000',
                     borderColor: selectedInventoryItem === item.name ? '#9333EA' : '#D1D5DB'
                   }}
-                  >
+                >
                   {item.emoji} {item.displayName}
                 </button>
               ))}
@@ -4706,7 +4706,7 @@ const TaiwanCEODashboard = () => {
                             }
                           }
                           return {
-                            month,
+                          month,
                             value: yoyValue
                           };
                         })} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
@@ -5216,7 +5216,7 @@ const TaiwanCEODashboard = () => {
                           })}
                         </div>
                     </div>
-                  )}
+                    )}
                   
                   <div className="border-t border-red-300 pt-2 mt-3">
                     <div className="text-xs text-red-700 mb-1">
@@ -5368,55 +5368,55 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600 w-24">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 w-24">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800 text-right">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600 w-24">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 w-24">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
+                  </div>
+                </div>
+
+                {/* 당월 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, salary: !prev.salary }))}
+                    className="w-full flex items-center justify-between text-xs text-cyan-600 hover:text-cyan-800 font-semibold"
+                  >
+                    <span>당월 증감 분석</span>
+                    {showDirectCostItemAnalysis.salary ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.salary && (() => {
+
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-start">
+                            <span className="text-cyan-600 mr-1">•</span>
+                            <span className="text-gray-700">인건비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-cyan-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-cyan-600 mr-1">•</span>
+                            <span className="text-gray-700">인원수 변화 및 매출 대비 효율성 분석</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 당월 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, salary: !prev.salary }))}
-                          className="w-full flex items-center justify-between text-xs text-cyan-600 hover:text-cyan-800 font-semibold"
-                        >
-                          <span>당월 증감 분석</span>
-                          {showDirectCostItemAnalysis.salary ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.salary && (() => {
-
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="flex items-start">
-                                  <span className="text-cyan-600 mr-1">•</span>
-                                  <span className="text-gray-700">인건비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-cyan-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-cyan-600 mr-1">•</span>
-                                  <span className="text-gray-700">인원수 변화 및 매출 대비 효율성 분석</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5442,51 +5442,51 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600 w-24">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 w-24">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800 text-right">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600 w-24">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 w-24">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
+                  </div>
+                </div>
+
+                {/* 누적 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, salary: !prev.salary }))}
+                    className="w-full flex items-center justify-between text-xs text-cyan-600 hover:text-cyan-800 font-semibold"
+                  >
+                    <span>누적 증감 분석</span>
+                    {showDirectCostItemAnalysis.salary ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.salary && (() => {
+
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-start">
+                            <span className="text-cyan-600 mr-1">•</span>
+                            <span className="text-gray-700">인건비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-cyan-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 누적 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, salary: !prev.salary }))}
-                          className="w-full flex items-center justify-between text-xs text-cyan-600 hover:text-cyan-800 font-semibold"
-                        >
-                          <span>누적 증감 분석</span>
-                          {showDirectCostItemAnalysis.salary ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.salary && (() => {
-
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="flex items-start">
-                                  <span className="text-cyan-600 mr-1">•</span>
-                                  <span className="text-gray-700">인건비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-cyan-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5524,56 +5524,56 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
+                  </div>
+                </div>
+
+                {/* 당월 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, rent: !prev.rent }))}
+                    className="w-full flex items-center justify-between text-xs text-teal-600 hover:text-teal-800 font-semibold"
+                  >
+                    <span>당월 증감 분석</span>
+                    {showDirectCostItemAnalysis.rent ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.rent && (() => {
+
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-teal-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="font-semibold text-teal-800 mb-1">임차료 할인효과</div>
+                          <div className="flex items-start">
+                            <span className="text-teal-600 mr-1">•</span>
+                            <span className="text-gray-700">임차료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-teal-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-teal-600 mr-1">•</span>
+                            <span className="text-gray-700">LCX, Yuenlong, Megamall 할인 및 폐점 매장 효과</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 당월 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, rent: !prev.rent }))}
-                          className="w-full flex items-center justify-between text-xs text-teal-600 hover:text-teal-800 font-semibold"
-                        >
-                          <span>당월 증감 분석</span>
-                          {showDirectCostItemAnalysis.rent ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.rent && (() => {
-
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-teal-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="font-semibold text-teal-800 mb-1">임차료 할인효과</div>
-                                <div className="flex items-start">
-                                  <span className="text-teal-600 mr-1">•</span>
-                                  <span className="text-gray-700">임차료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-teal-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-teal-600 mr-1">•</span>
-                                  <span className="text-gray-700">LCX, Yuenlong, Megamall 할인 및 폐점 매장 효과</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5601,52 +5601,52 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
+                  </div>
+                </div>
+
+                {/* 누적 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, rent: !prev.rent }))}
+                    className="w-full flex items-center justify-between text-xs text-teal-600 hover:text-teal-800 font-semibold"
+                  >
+                    <span>누적 증감 분석</span>
+                    {showDirectCostItemAnalysis.rent ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.rent && (() => {
+
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-teal-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="font-semibold text-teal-800 mb-1">임차료 할인효과</div>
+                          <div className="flex items-start">
+                            <span className="text-teal-600 mr-1">•</span>
+                            <span className="text-gray-700">임차료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-teal-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 누적 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, rent: !prev.rent }))}
-                          className="w-full flex items-center justify-between text-xs text-teal-600 hover:text-teal-800 font-semibold"
-                        >
-                          <span>누적 증감 분석</span>
-                          {showDirectCostItemAnalysis.rent ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.rent && (() => {
-
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-teal-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="font-semibold text-teal-800 mb-1">임차료 할인효과</div>
-                                <div className="flex items-start">
-                                  <span className="text-teal-600 mr-1">•</span>
-                                  <span className="text-gray-700">임차료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-teal-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5684,58 +5684,58 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
+                  </div>
+                </div>
+
+                {/* 당월 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, logistics: !prev.logistics }))}
+                    className="w-full flex items-center justify-between text-xs text-amber-600 hover:text-amber-800 font-semibold"
+                  >
+                    <span>당월 증감 분석</span>
+                    {showDirectCostItemAnalysis.logistics ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.logistics && (() => {
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-amber-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-start">
+                            <span className="text-amber-600 mr-1">•</span>
+                            <span className="text-gray-700">물류비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-amber-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-amber-600 mr-1">•</span>
+                            <span className="text-gray-700">보관비, 취급비, 배송비 절감으로 총 {formatNumber(Math.abs(change))}K 절감</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-amber-600 mr-1">•</span>
+                            <span className="text-gray-700">재고 고갈 및 재고 효율성 개선 효과</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 당월 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, logistics: !prev.logistics }))}
-                          className="w-full flex items-center justify-between text-xs text-amber-600 hover:text-amber-800 font-semibold"
-                        >
-                          <span>당월 증감 분석</span>
-                          {showDirectCostItemAnalysis.logistics ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.logistics && (() => {
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-amber-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="flex items-start">
-                                  <span className="text-amber-600 mr-1">•</span>
-                                  <span className="text-gray-700">물류비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-amber-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-amber-600 mr-1">•</span>
-                                  <span className="text-gray-700">보관비, 취급비, 배송비 절감으로 총 {formatNumber(Math.abs(change))}K 절감</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-amber-600 mr-1">•</span>
-                                  <span className="text-gray-700">재고 고갈 및 재고 효율성 개선 효과</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5761,19 +5761,19 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매출대비율</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매출대비율</span>
                           <span className="text-xs font-semibold text-gray-800">{formatPercent(currentRatio, 1)}%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">전년비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">전년비</span>
                           <span className={`text-xs font-semibold text-right ${ratioChange >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
                             {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p
                           </span>
-                        </div>
-                      </div>
+                  </div>
+                </div>
                     </>
                   );
                 })()}
@@ -5825,56 +5825,56 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매장관리비</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매장관리비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(maintenance)}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">감가상각비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">감가상각비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(depreciation)}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">지급수수료</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">지급수수료</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(fee)}K</span>
+                  </div>
+                </div>
+
+                {/* 당월 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
+                    className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
+                  >
+                    <span>당월 증감 분석</span>
+                    {showDirectCostItemAnalysis.other ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.other && (() => {
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-start">
+                            <span className="text-purple-600 mr-1">•</span>
+                            <span className="text-gray-700">기타 직접비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-purple-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-purple-600 mr-1">•</span>
+                            <span className="text-gray-700">매장관리비, 감가상각비, 지급수수료 등 상세 항목 변화</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 당월 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
-                          className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
-                        >
-                          <span>당월 증감 분석</span>
-                          {showDirectCostItemAnalysis.other ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.other && (() => {
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="flex items-start">
-                                  <span className="text-purple-600 mr-1">•</span>
-                                  <span className="text-gray-700">기타 직접비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-purple-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-purple-600 mr-1">•</span>
-                                  <span className="text-gray-700">매장관리비, 감가상각비, 지급수수료 등 상세 항목 변화</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}
@@ -5914,52 +5914,52 @@ const TaiwanCEODashboard = () => {
                       <div className={`text-xs mb-3 ${changeRate >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
                         YOY {formatPercent(changeRate)}% ({change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(change))}K)
                       </div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">매장관리비</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">매장관리비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(maintenance)}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">감가상각비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">감가상각비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(depreciation)}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">지급수수료</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">지급수수료</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(fee)}K</span>
+                  </div>
+                </div>
+
+                {/* 누적 증감 분석 */}
+                <div className="mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
+                    className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
+                  >
+                    <span>누적 증감 분석</span>
+                    {showDirectCostItemAnalysis.other ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  {showDirectCostItemAnalysis.other && (() => {
+                    return (
+                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex items-start">
+                            <span className="text-purple-600 mr-1">•</span>
+                            <span className="text-gray-700">기타 직접비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-purple-600 mr-1">•</span>
+                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 누적 증감 분석 */}
-                      <div className="mt-3 pt-3 border-t">
-                        <button
-                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
-                          className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
-                        >
-                          <span>누적 증감 분석</span>
-                          {showDirectCostItemAnalysis.other ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showDirectCostItemAnalysis.other && (() => {
-                          return (
-                            <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
-                              <div className="space-y-1.5 text-xs">
-                                <div className="flex items-start">
-                                  <span className="text-purple-600 mr-1">•</span>
-                                  <span className="text-gray-700">기타 직접비 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                                </div>
-                                <div className="flex items-start">
-                                  <span className="text-purple-600 mr-1">•</span>
-                                  <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio, 1)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange, 1)}%p)</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
+                    );
+                  })()}
+                </div>
                     </>
                   );
                 })()}

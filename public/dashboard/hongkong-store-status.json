@@ -1,0 +1,446 @@
+{
+  "metadata": {
+    "period": "202510",
+    "previous_period": "202410",
+    "generated_at": "2025-11-25T19:16:55.215472"
+  },
+  "summary": {
+    "total_stores": 19,
+    "hk_stores": 15,
+    "mc_stores": 4,
+    "total_direct_profit": 226.88556571139034,
+    "sales_per_store": 983.8492152631579,
+    "overall_yoy": 94.10446621235728
+  },
+  "categories": {
+    "profit_improving": {
+      "name": "흑자 & 매출개선",
+      "count": 5,
+      "total_direct_profit": 1017.3923823396099,
+      "avg_yoy": 118.14110519088611,
+      "avg_rent_labor_ratio": 38.478793010435034,
+      "stores": [
+        {
+          "shop_cd": "M17",
+          "shop_nm": "TMT",
+          "country": "HK",
+          "current": {
+            "net_sales": 726.4445,
+            "direct_profit": 229.527052242302,
+            "rent_labor_ratio": 32.42092135049546,
+            "rent": 235.52,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 552.3385,
+            "direct_profit": 122.85056183760278
+          },
+          "yoy": 131.5216121997652,
+          "category": "profit_improving"
+        },
+        {
+          "shop_cd": "M18",
+          "shop_nm": "LANGHAM ",
+          "country": "HK",
+          "current": {
+            "net_sales": 1616.0085,
+            "direct_profit": 320.030765940322,
+            "rent_labor_ratio": 45.7965357236673,
+            "rent": 740.07591,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1365.989,
+            "direct_profit": 304.0418335237116
+          },
+          "yoy": 118.30318545756957,
+          "category": "profit_improving"
+        },
+        {
+          "shop_cd": "M09",
+          "shop_nm": "Shangshui",
+          "country": "HK",
+          "current": {
+            "net_sales": 509.656,
+            "direct_profit": 17.496913606688167,
+            "rent_labor_ratio": 57.37203133093695,
+            "rent": 292.4,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 452.2625,
+            "direct_profit": -3.57797994689156
+          },
+          "yoy": 112.69030706724523,
+          "category": "profit_improving"
+        },
+        {
+          "shop_cd": "M11",
+          "shop_nm": "APM",
+          "country": "HK",
+          "current": {
+            "net_sales": 1089.1615,
+            "direct_profit": 379.0252801082587,
+            "rent_labor_ratio": 30.863191546891805,
+            "rent": 336.15,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1002.627,
+            "direct_profit": 308.8352096053112
+          },
+          "yoy": 108.63077694895509,
+          "category": "profit_improving"
+        },
+        {
+          "shop_cd": "M15",
+          "shop_nm": "Yuenlong",
+          "country": "HK",
+          "current": {
+            "net_sales": 487.355,
+            "direct_profit": 71.31237044203905,
+            "rent_labor_ratio": 25.941285100183638,
+            "rent": 126.42614999999998,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 407.625,
+            "direct_profit": 45.5290201355719
+          },
+          "yoy": 119.55964428089543,
+          "category": "profit_improving"
+        }
+      ]
+    },
+    "profit_deteriorating": {
+      "name": "흑자 & 매출악화",
+      "count": 2,
+      "total_direct_profit": 231.30298885298743,
+      "avg_yoy": 88.83151249361408,
+      "avg_rent_labor_ratio": 35.67555806345137,
+      "stores": [
+        {
+          "shop_cd": "M07",
+          "shop_nm": "Citygate",
+          "country": "HK",
+          "current": {
+            "net_sales": 1465.5125,
+            "direct_profit": 157.4451997921226,
+            "rent_labor_ratio": 33.67422659308604,
+            "rent": 493.5,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1783.6615,
+            "direct_profit": 290.80487593692067
+          },
+          "yoy": 82.16315147240662,
+          "category": "profit_deteriorating"
+        },
+        {
+          "shop_cd": "M21",
+          "shop_nm": "Moko",
+          "country": "HK",
+          "current": {
+            "net_sales": 817.318,
+            "direct_profit": 73.85778906086483,
+            "rent_labor_ratio": 37.6768895338167,
+            "rent": 307.93999999999994,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 855.8315,
+            "direct_profit": 89.4293159717534
+          },
+          "yoy": 95.49987351482154,
+          "category": "profit_deteriorating"
+        }
+      ]
+    },
+    "loss_improving": {
+      "name": "적자 & 매출개선",
+      "count": 4,
+      "total_direct_profit": -678.0620083677236,
+      "avg_yoy": 131.38445395242917,
+      "avg_rent_labor_ratio": 112.20403136146761,
+      "stores": [
+        {
+          "shop_cd": "M16",
+          "shop_nm": "Hysan",
+          "country": "HK",
+          "current": {
+            "net_sales": 528.2115,
+            "direct_profit": -57.7432302346819,
+            "rent_labor_ratio": 76.94834360857347,
+            "rent": 406.45000000000005,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 415.7485,
+            "direct_profit": -137.52311451991727
+          },
+          "yoy": 127.05072898639442,
+          "category": "loss_improving"
+        },
+        {
+          "shop_cd": "M19",
+          "shop_nm": "NTP 3",
+          "country": "HK",
+          "current": {
+            "net_sales": 135.776,
+            "direct_profit": -169.76222364940043,
+            "rent_labor_ratio": 189.54748998350223,
+            "rent": 257.36,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 92.9305,
+            "direct_profit": -186.8482420300142
+          },
+          "yoy": 146.10488483328942,
+          "category": "loss_improving"
+        },
+        {
+          "shop_cd": "M10",
+          "shop_nm": "ISQ",
+          "country": "HK",
+          "current": {
+            "net_sales": 1932.3725,
+            "direct_profit": -207.23647083600417,
+            "rent_labor_ratio": 75.92928796078398,
+            "rent": 1467.2366800000004,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1918.7735,
+            "direct_profit": 524.7299418231776
+          },
+          "yoy": 100.70873399074982,
+          "category": "loss_improving"
+        },
+        {
+          "shop_cd": "M22",
+          "shop_nm": "Yoho",
+          "country": "HK",
+          "current": {
+            "net_sales": 579.6285,
+            "direct_profit": -243.32008364763703,
+            "rent_labor_ratio": 106.39100389301079,
+            "rent": 616.67258,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 382.1555,
+            "direct_profit": -355.89825443520533
+          },
+          "yoy": 151.67346799928302,
+          "category": "loss_improving"
+        }
+      ]
+    },
+    "loss_deteriorating": {
+      "name": "적자 & 매출악화",
+      "count": 4,
+      "total_direct_profit": -394.44121518600446,
+      "avg_yoy": 89.92536165813213,
+      "avg_rent_labor_ratio": 81.06565282090546,
+      "stores": [
+        {
+          "shop_cd": "M02",
+          "shop_nm": "TSQ",
+          "country": "HK",
+          "current": {
+            "net_sales": 481.7715,
+            "direct_profit": -245.59341145639462,
+            "rent_labor_ratio": 116.41410917831378,
+            "rent": 560.85,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 556.821,
+            "direct_profit": -249.64924422855006
+          },
+          "yoy": 86.52179066522275,
+          "category": "loss_deteriorating"
+        },
+        {
+          "shop_cd": "M01",
+          "shop_nm": "Mongkok",
+          "country": "HK",
+          "current": {
+            "net_sales": 1466.474,
+            "direct_profit": -74.73952516890802,
+            "rent_labor_ratio": 70.52631004709255,
+            "rent": 1034.25,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1635.876,
+            "direct_profit": -107.61020053065931
+          },
+          "yoy": 89.64456963730747,
+          "category": "loss_deteriorating"
+        },
+        {
+          "shop_cd": "M14",
+          "shop_nm": "NTP",
+          "country": "HK",
+          "current": {
+            "net_sales": 1148.5635,
+            "direct_profit": -38.63058807773996,
+            "rent_labor_ratio": 68.42373103446174,
+            "rent": 785.89,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 1191.942,
+            "direct_profit": -23.805298929108062
+          },
+          "yoy": 96.36068701329427,
+          "category": "loss_deteriorating"
+        },
+        {
+          "shop_cd": "M13",
+          "shop_nm": "Megamall",
+          "country": "HK",
+          "current": {
+            "net_sales": 334.768,
+            "direct_profit": -35.47769048296189,
+            "rent_labor_ratio": 68.89846102375378,
+            "rent": 230.65,
+            "labor_cost": 0.0
+          },
+          "previous": {
+            "net_sales": 384.021,
+            "direct_profit": -28.208633932762808
+          },
+          "yoy": 87.17439931670403,
+          "category": "loss_deteriorating"
+        }
+      ]
+    }
+  },
+  "mc_summary": {
+    "count": 4,
+    "total_direct_profit": 50.69341807252101,
+    "overall_yoy": 78.27555104717591,
+    "avg_rent_labor_ratio": 66.07595486550989,
+    "stores": [
+      {
+        "shop_cd": "MC4",
+        "shop_nm": "Senado-1",
+        "country": "MC",
+        "current": {
+          "net_sales": 534.38301,
+          "direct_profit": -123.88487829063132,
+          "rent_labor_ratio": 67.36741125059346,
+          "rent": 360.0,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 845.32427,
+          "direct_profit": 10.087543090076906
+        },
+        "yoy": 63.21633353789784,
+        "category": "loss_deteriorating"
+      },
+      {
+        "shop_cd": "MC2",
+        "shop_nm": "Londoner",
+        "country": "MC",
+        "current": {
+          "net_sales": 787.02379,
+          "direct_profit": -17.06277780563522,
+          "rent_labor_ratio": 65.9192271684697,
+          "rent": 518.8,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 913.65825,
+          "direct_profit": 140.83201105621646
+        },
+        "yoy": 86.13984386393928,
+        "category": "loss_deteriorating"
+      },
+      {
+        "shop_cd": "MC1",
+        "shop_nm": "Venetian",
+        "country": "MC",
+        "current": {
+          "net_sales": 2821.52621,
+          "direct_profit": 398.3930928649211,
+          "rent_labor_ratio": 49.79432744663393,
+          "rent": 1404.96,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 3451.06311,
+          "direct_profit": 1101.6831537917328
+        },
+        "yoy": 81.75817480196703,
+        "category": "profit_deteriorating"
+      },
+      {
+        "shop_cd": "MC3",
+        "shop_nm": "Senado",
+        "country": "MC",
+        "current": {
+          "net_sales": 1231.18058,
+          "direct_profit": -206.75201869613352,
+          "rent_labor_ratio": 81.22285359634247,
+          "rent": 1000.0,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 1655.58932,
+          "direct_profit": 41.24193471923945
+        },
+        "yoy": 74.36509556609123,
+        "category": "loss_deteriorating"
+      }
+    ]
+  },
+  "excluded_stores": {
+    "count": 2,
+    "stores": [
+      {
+        "shop_cd": "M12",
+        "shop_nm": "WTC",
+        "country": "HK",
+        "current": {
+          "net_sales": 13.879,
+          "direct_profit": -61.593521893154886,
+          "rent_labor_ratio": 511.20404928308955,
+          "rent": 70.95000999999999,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 54.557,
+          "direct_profit": -165.26906391980944
+        },
+        "yoy": 25.43944865003574,
+        "category": null,
+        "exclusion_reason": "10/11 종료"
+      },
+      {
+        "shop_cd": "M05",
+        "shop_nm": "LCX",
+        "country": "HK",
+        "current": {
+          "net_sales": 434.51,
+          "direct_profit": -312.1948500898694,
+          "rent_labor_ratio": 137.69533497502934,
+          "rent": 598.3,
+          "labor_cost": 0.0
+        },
+        "previous": {
+          "net_sales": 713.346,
+          "direct_profit": -295.90272513604884
+        },
+        "yoy": 60.91153521572982,
+        "category": null,
+        "exclusion_reason": "10/13-11/7 리뉴얼중"
+      }
+    ]
+  }
+}
