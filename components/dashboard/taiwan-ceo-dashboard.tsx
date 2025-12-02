@@ -32,7 +32,7 @@ const TaiwanCEODashboard = () => {
   const [showYear1OthersDetail, setShowYear1OthersDetail] = useState(false);
   const [showYear2OthersDetail, setShowYear2OthersDetail] = useState(false);
   const [showDiscoveryDetail, setShowDiscoveryDetail] = useState(false);
-  const [expandedItems, setExpandedItems] = useState({});
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [expenseType, setExpenseType] = useState<'당월' | '누적'>('당월');
   const [opexType, setOpexType] = useState<'당월' | '누적'>('당월');
   const [showDirectCostItemAnalysis, setShowDirectCostItemAnalysis] = useState<{[key: string]: boolean}>({});
@@ -72,7 +72,7 @@ const TaiwanCEODashboard = () => {
     setShowPastSeasonDetail(newState);
   };
 
-  const toggleActionItem = (index: number) => {
+  const toggleActionItem = (index: string) => {
     setExpandedItems(prev => ({
       ...prev,
       [index]: !prev[index]

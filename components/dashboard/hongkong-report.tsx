@@ -96,7 +96,7 @@ const HongKongReport = () => {
   const [showDiscoveryDetail, setShowDiscoveryDetail] = useState(false);
   const [showProfitStores, setShowProfitStores] = useState(false);
   const [showLossStores, setShowLossStores] = useState(false);
-  const [expandedItems, setExpandedItems] = useState({});
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [muType, setMuType] = useState('발주'); // '발주' 또는 '매출'
   const [costType, setCostType] = useState('발주'); // '발주' 또는 '매출' (25FW 원가현황)
   const [expenseType, setExpenseType] = useState('당월'); // '당월' 또는 '누적' (비용요약)
@@ -232,7 +232,7 @@ const HongKongReport = () => {
     setShowEndInventoryDetail(newState);
   };
 
-  const toggleActionItem = (index) => {
+  const toggleActionItem = (index: string) => {
     setExpandedItems(prev => ({
       ...prev,
       [index]: !prev[index]
