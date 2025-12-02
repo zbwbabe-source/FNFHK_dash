@@ -1582,7 +1582,7 @@ const HongKongCEODashboard = () => {
                     {(() => {
                       const categories = ['SHO', 'HEA', 'BAG'];
                       return categories.map((key) => {
-                        const item = accStock?.by_category?.[key];
+                        const item = accStock?.by_category ? (accStock.by_category as any)[key] : undefined;
                         if (!item) return null;
                         return (
                           <div key={key} className="flex justify-between text-xs">
