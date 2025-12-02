@@ -1800,7 +1800,7 @@ const CEOReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {channelYOY[selectedChannel].map((yoy, idx) => (
+                          {selectedChannel && channelYOY[selectedChannel as keyof typeof channelYOY] ? channelYOY[selectedChannel as keyof typeof channelYOY].map((yoy, idx) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                               {yoy}%
                             </td>
