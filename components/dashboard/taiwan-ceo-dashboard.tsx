@@ -293,7 +293,7 @@ const TaiwanCEODashboard = () => {
   const prevMonthDiscountRate = useMemo(() => {
     const prevMonth = plData?.current_month?.prev_month?.total;
     if (!prevMonth) return 0;
-    if (prevMonth.discount_rate !== undefined) return prevMonth.discount_rate;
+    if ((prevMonth as any).discount_rate !== undefined) return (prevMonth as any).discount_rate;
     if (prevMonth.tag_sales > 0) {
       return ((prevMonth.tag_sales - prevMonth.net_sales) / prevMonth.tag_sales) * 100;
     }
@@ -304,7 +304,7 @@ const TaiwanCEODashboard = () => {
   const cumulativeDiscount = useMemo(() => {
     const cumulative = plData?.cumulative?.total;
     if (!cumulative) return 0;
-    if (cumulative.discount !== undefined) return cumulative.discount;
+    if ((cumulative as any).discount !== undefined) return (cumulative as any).discount;
     if (cumulative.tag_sales > 0) {
       return cumulative.tag_sales - cumulative.net_sales;
     }
@@ -315,7 +315,7 @@ const TaiwanCEODashboard = () => {
   const prevCumulativeDiscountRate = useMemo(() => {
     const prevCumulative = plData?.cumulative?.prev_cumulative?.total;
     if (!prevCumulative) return 0;
-    if (prevCumulative.discount_rate !== undefined) return prevCumulative.discount_rate;
+    if ((prevCumulative as any).discount_rate !== undefined) return (prevCumulative as any).discount_rate;
     if (prevCumulative.tag_sales > 0) {
       return ((prevCumulative.tag_sales - prevCumulative.net_sales) / prevCumulative.tag_sales) * 100;
     }
@@ -686,7 +686,7 @@ const TaiwanCEODashboard = () => {
               <div className="text-sm font-semibold mb-3">
                 <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>
                   {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'}{(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'}
-                </span> | <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>이익률 {formatPercent(pl?.operating_profit_rate, 1)}%</span>
+                </span> | <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>이익률 {formatPercent((pl as any)?.operating_profit_rate, 1)}%</span>
               </div>
               
               {/* 채널별 직접이익[이익률] */}
@@ -770,8 +770,8 @@ const TaiwanCEODashboard = () => {
                           <td className="text-right py-1 px-2 text-red-600 font-semibold">△{formatNumber(Math.abs(plChange?.tag_sales || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent(pl?.discount_rate)}%)</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.discount)}</td>
+                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent((pl as any)?.discount_rate)}%)</td>
+                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber((pl as any)?.discount)}</td>
                           <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.discount)}%</td>
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.discount || 0))}</td>
                         </tr>
@@ -782,13 +782,13 @@ const TaiwanCEODashboard = () => {
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">△{formatNumber(Math.abs(plChange?.net_sales || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent(pl?.cogs_rate)}%)</td>
+                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent((pl as any)?.cogs_rate)}%)</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.cogs)}</td>
                           <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.cogs)}%</td>
                           <td className="text-right py-1 px-2 text-red-600">△{formatNumber(Math.abs(plChange?.cogs || 0))}</td>
                         </tr>
                         <tr className="bg-green-50 font-semibold">
-                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent(pl?.gross_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent((pl as any)?.gross_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-green-800 border-t border-green-200">{formatNumber(pl?.gross_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(plYoy?.gross_profit)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">△{formatNumber(Math.abs(plChange?.gross_profit || 0))}</td>
@@ -800,7 +800,7 @@ const TaiwanCEODashboard = () => {
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.direct_cost || 0))}</td>
                         </tr>
                         <tr className="bg-yellow-50 font-semibold">
-                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent(pl?.direct_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent((pl as any)?.direct_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(plYoy?.direct_profit)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">△{formatNumber(Math.abs(plChange?.direct_profit || 0))}</td>
@@ -812,7 +812,7 @@ const TaiwanCEODashboard = () => {
                           <td className="text-right py-1 px-2 text-red-600">+{formatNumber(plChange?.sg_a || 0)}</td>
                         </tr>
                         <tr className="bg-red-50 font-bold">
-                          <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent(pl?.operating_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent((pl as any)?.operating_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-red-800 border-t-2 border-red-300">{formatNumber(pl?.operating_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">적자악화</td>
                           <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">△{formatNumber(Math.abs(plChange?.operating_profit || 0))}</td>
@@ -1409,11 +1409,11 @@ const TaiwanCEODashboard = () => {
                 <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
               </div>
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {formatPercent(pl?.discount_rate || 0)}%
+                {formatPercent((pl as any)?.discount_rate || 0)}%
               </div>
               <div className="text-sm font-semibold mb-3">
                 <span className="text-gray-600">전년 {formatPercent(prevMonthDiscountRate)}%</span> | 
-                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - prevMonthDiscountRate)}%p</span>
+                <span className="text-green-600"> 전년비 {formatPercent(((pl as any)?.discount_rate || 0) - prevMonthDiscountRate)}%p</span>
               </div>
               
               {/* 할인 상세보기 */}
@@ -1436,7 +1436,7 @@ const TaiwanCEODashboard = () => {
                     <span className="text-gray-600">TW (대만)</span>
                     <span className="font-semibold text-purple-600">
                       {formatPercent(plData?.current_month?.total?.discount_rate || 0)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.total?.discount_rate || 0) - (plData?.current_month?.prev_month?.total?.discount_rate || 0))}%p)</span>
+                      <span className="text-gray-500"> (전년비 {formatPercent(((plData?.current_month?.total as any)?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0))}%p)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
@@ -2134,18 +2134,18 @@ const TaiwanCEODashboard = () => {
           <div className="space-y-2 mb-4">
             <div className={`p-3 rounded border-l-4 ${(pl?.operating_profit || 0) >= 0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(pl?.operating_profit_rate || 0)}%
+                <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((pl as any)?.operating_profit_rate || 0)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% (+{formatNumber(plChange?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {formatPercent(pl?.direct_profit_rate || 0, 1)}% → {formatPercent(plData?.current_month?.prev_month?.total?.direct_profit_rate || 0, 1)}%)
+                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% (+{formatNumber(plChange?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {formatPercent((pl as any)?.direct_profit_rate || 0, 1)}% → {formatPercent((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0, 1)}%)
               </p>
             </div>
             <div className={`p-3 rounded border-l-4 ${(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? 'bg-green-50 border-green-500' : 'bg-blue-50 border-blue-500'}`}>
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0)}%
+                <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((plData?.cumulative?.total as any)?.operating_profit_rate || 0)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 △{formatNumber(plData?.cumulative?.change?.net_sales || 0)}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% (+{formatNumber(plData?.cumulative?.change?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {formatPercent(plData?.cumulative?.total?.direct_profit_rate || 0)}% → {formatPercent(plData?.cumulative?.prev_cumulative?.total?.direct_profit_rate || 0)}%)
+                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 △{formatNumber(plData?.cumulative?.change?.net_sales || 0)}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% (+{formatNumber(plData?.cumulative?.change?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {formatPercent((plData?.cumulative?.total as any)?.direct_profit_rate || 0)}% → {formatPercent((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0)}%)
               </p>
             </div>
           </div>
@@ -2225,15 +2225,15 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.current_month?.online?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.current_month?.total?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.offline?.discount_rate || 0) - (plData?.current_month?.prev_month?.offline?.discount_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.online?.discount_rate || 0) - (plData?.current_month?.prev_month?.online?.discount_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.current_month?.total?.discount_rate || 0) - (plData?.current_month?.prev_month?.total?.discount_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(((plData?.current_month?.online as any)?.discount_rate || 0) - ((plData?.current_month?.prev_month?.online as any)?.discount_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.current_month?.total as any)?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">-</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.offline?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.online?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.cumulative?.total?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.offline?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.offline?.discount_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.online?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.online?.discount_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.cumulative?.total?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.discount_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.cumulative?.total as any)?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0))}%p</td>
                   <td className="p-2 text-right">-</td>
                 </tr>
                 {/* (Tag 원가율) */}
@@ -2244,14 +2244,14 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.current_month?.total?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.offline?.cogs_rate || 0) - (plData?.current_month?.prev_month?.offline?.cogs_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.online?.cogs_rate || 0) - (plData?.current_month?.prev_month?.online?.cogs_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.current_month?.total?.cogs_rate || 0) - (plData?.current_month?.prev_month?.total?.cogs_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.current_month?.total as any)?.cogs_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.cogs_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">-</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.offline?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.online?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.cumulative?.total?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.offline?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.offline?.cogs_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.online?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.online?.cogs_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.cumulative?.total?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.cogs_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.cumulative?.total as any)?.cogs_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.cogs_rate || 0))}%p</td>
                   <td className="p-2 text-right">-</td>
                 </tr>
                 {/* 매출총이익 */}
@@ -2280,14 +2280,14 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.current_month?.total?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.offline?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.offline?.gross_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.online?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.online?.gross_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.current_month?.total?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.total?.gross_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.current_month?.total as any)?.gross_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.gross_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">-</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.offline?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.online?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.cumulative?.total?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.offline?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.offline?.gross_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.online?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.online?.gross_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.cumulative?.total?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.gross_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.cumulative?.total as any)?.gross_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.gross_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right">-</td>
                 </tr>
                 {/* 직접비 합계 */}
@@ -2334,14 +2334,14 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.current_month?.total?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.offline?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.offline?.direct_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.online?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.online?.direct_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.current_month?.total?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.total?.direct_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.current_month?.total as any)?.direct_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">-</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.offline?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.online?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.cumulative?.total?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.offline?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.offline?.direct_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.online?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.online?.direct_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.cumulative?.total?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.direct_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.cumulative?.total as any)?.direct_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right">-</td>
                 </tr>
                 {/* 영업비 소계 */}
@@ -2404,14 +2404,14 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.current_month?.total?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.offline?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.offline?.operating_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.current_month?.online?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.online?.operating_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.current_month?.total?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.total?.operating_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.current_month?.total as any)?.operating_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.operating_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">-</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.offline?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent(plData?.cumulative?.online?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.offline?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.offline?.operating_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatPercent((plData?.cumulative?.online?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.online?.operating_profit_rate || 0))}%p</td>
-                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent((plData?.cumulative?.total?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.operating_profit_rate || 0))}%p</td>
+                  <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatPercent(((plData?.cumulative?.total as any)?.operating_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.operating_profit_rate || 0))}%p</td>
                   <td className="p-2 text-right">-</td>
                 </tr>
               </tbody>
@@ -2779,8 +2779,8 @@ const TaiwanCEODashboard = () => {
             ) : salesPriceType === '할인율' ? (
               <LineChart
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
-                  const calc = (gross: number, net: number) => {
-                    if (gross === 0) return 0;
+                  const calc = (gross: number, net: number): string => {
+                    if (gross === 0) return "0";
                     return ((gross - net) / gross * 100).toFixed(1);
                   };
                   return {
