@@ -2707,9 +2707,7 @@ const TaiwanCEODashboard = () => {
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-blue-50">
                           YOY
                         </td>
-                        {(dashboardData?.monthly_channel_yoy?.[
-                          selectedChannel.replace(' ', '_')
-                        ] || []
+                        {((dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[selectedChannel.replace(' ', '_')] : undefined) || []
                         ).map((yoy: number, idx: number) => (
                           <td
                             key={idx}

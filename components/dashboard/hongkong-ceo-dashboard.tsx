@@ -3347,7 +3347,7 @@ const HongKongCEODashboard = () => {
                         {['당시즌의류', '과시즌의류', '모자', '신발', '가방외'].map((item) => (
                           <tr key={item}>
                             <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">{item}</td>
-                            {(dashboardData?.monthly_item_yoy?.[item] || []).map((yoy: number, idx: number) => (
+                            {((dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[item] : undefined) || []).map((yoy: number, idx: number) => (
                               <td 
                                 key={idx} 
                                 className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
@@ -3361,7 +3361,7 @@ const HongKongCEODashboard = () => {
                     ) : (
                       <tr>
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">YOY</td>
-                        {(dashboardData?.monthly_item_yoy?.[selectedItem] || []).map((yoy: number, idx: number) => (
+                        {((dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[selectedItem] : undefined) || []).map((yoy: number, idx: number) => (
                           <td 
                             key={idx} 
                             className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
