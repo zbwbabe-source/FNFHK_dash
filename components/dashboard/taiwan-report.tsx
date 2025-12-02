@@ -2014,7 +2014,7 @@ const TaiwanReport = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={months.map((month, idx) => ({
                       month,
-                      yoy: channelYOY[selectedChannel]?.[idx]
+                      yoy: (channelYOY as any)[selectedChannel]?.[idx]
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -2056,7 +2056,7 @@ const TaiwanReport = () => {
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {channelYOY[selectedChannel].map((yoy: number, idx: number) => (
+                          {(channelYOY as any)[selectedChannel].map((yoy: number, idx: number) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                               {yoy}%
                             </td>
