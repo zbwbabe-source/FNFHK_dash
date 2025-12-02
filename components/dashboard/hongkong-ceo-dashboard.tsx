@@ -1202,8 +1202,8 @@ const HongKongCEODashboard = () => {
                 {formatPercent(pl?.discount_rate || 0)}%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(plData?.current_month?.prev_month?.total?.discount_rate || 0)}%</span> | 
-                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - (plData?.current_month?.prev_month?.total?.discount_rate || 0))}%p</span>
+                <span className="text-gray-600">전년 {formatPercent((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0)}%</span> | 
+                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0))}%p</span>
               </div>
               
               {/* 할인 상세보기 */}
@@ -1282,7 +1282,7 @@ const HongKongCEODashboard = () => {
                       <span className="text-gray-600">누적 할인</span>
                       <span className="font-semibold text-purple-600">
                         {formatNumber(plData?.cumulative?.total?.discount || 0)}K
-                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.discount_rate || 0))}%p)</span>
+                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0))}%p)</span>
                       </span>
                     </div>
                   </div>
@@ -1970,7 +1970,7 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.discount_rate || 0) - (plData?.current_month?.prev_month?.total?.discount_rate || 0));
+                    const change = formatChange((plData?.current_month?.total?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -1986,7 +1986,7 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.total?.discount_rate || 0));
+                    const change = formatChange((plData?.cumulative?.total?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
