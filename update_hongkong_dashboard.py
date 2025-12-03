@@ -1412,11 +1412,53 @@ def generate_dashboard_data(csv_dir, output_file_path):
                             elif item_key == '가방외' and season_code.endswith('N') and category in ['BAG', 'ACC', 'WAL', 'BEL', 'GLO', 'SCA', 'SUN', 'JEW', 'WAT', 'OTH']:
                                 gross_sales_6m += float(row['Gross_Sales'] or 0)
                 
-                # 재고주수 계산 (주 단위)
-                avg_monthly_sales = gross_sales_6m / 6 if 6 > 0 else 0
-                if avg_monthly_sales > 0:
-                    stock_weeks = (stock_price / avg_monthly_sales) * 4
+                # 재고주수 계산 (주 단위) - 최근 1개월 매출 기준
+                # 해당 월의 매출 계산
+                monthly_sales = 0
+                period_data = [row for row in data 
+                              if row['Period'] == period 
+                              and row['Brand'] == 'MLB']
+                
+                for row in period_data:
+                    season_code = row['Season_Code']
+                    category = row['Category']
+                    
+                    # 아이템별 필터링
+                    if item_key == 'F당시즌':
+                        if period_year and period_month:
+                            if period_month <= 6:
+                                prev_season_f = f"{(period_year - 1) % 100:02d}F"
+                                if season_code == prev_season_f:
+                                    monthly_sales += float(row['Gross_Sales'] or 0)
+                            else:
+                                if season_code == current_season_f:
+                                    monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == 'S당시즌' and season_code == current_season_s:
+                        monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == '과시즌FW':
+                        if period_year and period_month:
+                            if period_month <= 6:
+                                prev_season_f = f"{(period_year - 1) % 100:02d}F"
+                                if season_code.endswith('F') and season_code != prev_season_f:
+                                    monthly_sales += float(row['Gross_Sales'] or 0)
+                            else:
+                                if season_code.endswith('F') and season_code != current_season_f:
+                                    monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == '과시즌SS' and season_code.endswith('S'):
+                        monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == '모자' and season_code.endswith('N') and category == 'HEA':
+                        monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == '신발' and season_code.endswith('N') and category == 'SHO':
+                        monthly_sales += float(row['Gross_Sales'] or 0)
+                    elif item_key == '가방외' and season_code.endswith('N') and category in ['BAG', 'ACC', 'WAL', 'BEL', 'GLO', 'SCA', 'SUN', 'JEW', 'WAT', 'OTH']:
+                        monthly_sales += float(row['Gross_Sales'] or 0)
+                
+                # 재고주수 = (재고금액 / 해당 월 매출) * 4주
+                if monthly_sales > 0:
+                    stock_weeks = (stock_price / monthly_sales) * 4
                     monthly_inventory_data[period][item_key]['stock_weeks'] = round(stock_weeks, 1)
+                else:
+                    monthly_inventory_data[period][item_key]['stock_weeks'] = 0
     
     # 재고 YOY 데이터 계산
     print("재고 YOY 데이터 계산 중...")
@@ -1481,6 +1523,65 @@ def generate_dashboard_data(csv_dir, output_file_path):
                             prev_monthly_inventory_data[prev_period_for_yoy]['신발']['stock_price'] += stock_price
                         elif category in ['BAG', 'ACC', 'WAL', 'BEL', 'GLO', 'SCA', 'SUN', 'JEW', 'WAT', 'OTH']:
                             prev_monthly_inventory_data[prev_period_for_yoy]['가방외']['stock_price'] += stock_price
+    
+    # 전년 재고주수 계산 (전년 매출 기준)
+    print("전년 재고주수 계산 중...")
+    for period in sorted(recent_periods):
+        period_year, period_month = parse_period(period)
+        if period_year and period_month:
+            prev_period_for_yoy = f"{(period_year - 1) % 100:02d}{period_month:02d}"
+            if prev_period_for_yoy in periods:
+                # 전년 Period의 매출 데이터
+                prev_period_data = [row for row in data if row['Period'] == prev_period_for_yoy and row['Brand'] == 'MLB']
+                prev_year, prev_month = parse_period(prev_period_for_yoy)
+                
+                # 전년 기준 시즌 코드
+                prev_season_f = f"{(prev_year - 1) % 100:02d}F" if prev_month <= 6 else f"{prev_year % 100:02d}F"
+                prev_season_s = f"{prev_year % 100:02d}S"
+                
+                for item_key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']:
+                    prev_stock_price = prev_monthly_inventory_data[prev_period_for_yoy][item_key]['stock_price']
+                    
+                    # 전년 해당 월 매출 계산 (전년 기준으로 시즌 판단)
+                    prev_monthly_sales = 0
+                    for row in prev_period_data:
+                        season_code = row['Season_Code']
+                        category = row['Category']
+                        
+                        # 아이템별 필터링 (전년 기준)
+                        if item_key == 'F당시즌':
+                            # 전년의 F당시즌: 전년 1~6월은 전전년F, 7~12월은 전년F
+                            if prev_month <= 6:
+                                prev_prev_season_f = f"{(prev_year - 2) % 100:02d}F"
+                                if season_code == prev_prev_season_f:
+                                    prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                            else:
+                                if season_code == prev_season_f:
+                                    prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == 'S당시즌':
+                            if season_code == prev_season_s:
+                                prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == '과시즌FW':
+                            if prev_month <= 6:
+                                prev_prev_season_f = f"{(prev_year - 2) % 100:02d}F"
+                                if season_code.endswith('F') and season_code != prev_prev_season_f:
+                                    prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                            else:
+                                if season_code.endswith('F') and season_code != prev_season_f:
+                                    prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == '과시즌SS' and season_code.endswith('S'):
+                            prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == '모자' and season_code.endswith('N') and category == 'HEA':
+                            prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == '신발' and season_code.endswith('N') and category == 'SHO':
+                            prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                        elif item_key == '가방외' and season_code.endswith('N') and category in ['BAG', 'ACC', 'WAL', 'BEL', 'GLO', 'SCA', 'SUN', 'JEW', 'WAT', 'OTH']:
+                            prev_monthly_sales += float(row['Gross_Sales'] or 0)
+                    
+                    # 전년 재고주수 계산
+                    if prev_monthly_sales > 0:
+                        prev_stock_weeks = (prev_stock_price / prev_monthly_sales) * 4
+                        prev_monthly_inventory_data[prev_period_for_yoy][item_key]['stock_weeks'] = round(prev_stock_weeks, 1)
     
     # YOY 계산 (아이템별 + 전체합계)
     item_keys = ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']
@@ -2066,6 +2167,40 @@ def generate_dashboard_data(csv_dir, output_file_path):
                 },
             }
             for p in sorted(monthly_inventory_data.keys())
+        ],
+        'prev_monthly_inventory_data': [
+            {
+                'period': prev_monthly_inventory_data[p]['period'],
+                'F당시즌': {
+                    'stock_price': prev_monthly_inventory_data[p]['F당시즌']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['F당시즌']['stock_weeks'],
+                },
+                'S당시즌': {
+                    'stock_price': prev_monthly_inventory_data[p]['S당시즌']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['S당시즌']['stock_weeks'],
+                },
+                '과시즌FW': {
+                    'stock_price': prev_monthly_inventory_data[p]['과시즌FW']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['과시즌FW']['stock_weeks'],
+                },
+                '과시즌SS': {
+                    'stock_price': prev_monthly_inventory_data[p]['과시즌SS']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['과시즌SS']['stock_weeks'],
+                },
+                '모자': {
+                    'stock_price': prev_monthly_inventory_data[p]['모자']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['모자']['stock_weeks'],
+                },
+                '신발': {
+                    'stock_price': prev_monthly_inventory_data[p]['신발']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['신발']['stock_weeks'],
+                },
+                '가방외': {
+                    'stock_price': prev_monthly_inventory_data[p]['가방외']['stock_price'] / 1000,  # 1K HKD
+                    'stock_weeks': prev_monthly_inventory_data[p]['가방외']['stock_weeks'],
+                },
+            }
+            for p in sorted(prev_monthly_inventory_data.keys())
         ],
         'monthly_item_data': [
             {

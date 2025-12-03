@@ -4,7 +4,7 @@
     "previous_period": "2509",
     "last_year": 2025,
     "last_month": 10,
-    "generated_at": "2025-12-03T09:01:41.569769"
+    "generated_at": "2025-12-03T22:12:28.508551"
   },
   "sales_summary": {
     "total_net_sales": 19629.056,
@@ -3168,310 +3168,622 @@
       "period": "2501",
       "F당시즌": {
         "stock_price": 67257.341,
-        "stock_weeks": 35.4
+        "stock_weeks": 15.8
       },
       "S당시즌": {
         "stock_price": 38064.478,
-        "stock_weeks": 0
+        "stock_weeks": 82.4
       },
       "과시즌FW": {
         "stock_price": 69233.848,
-        "stock_weeks": 124.8
+        "stock_weeks": 48.4
       },
       "과시즌SS": {
         "stock_price": 87692.26,
-        "stock_weeks": 81.7
+        "stock_weeks": 143.5
       },
       "모자": {
         "stock_price": 43843.647,
-        "stock_weeks": 42.8
+        "stock_weeks": 35.3
       },
       "신발": {
         "stock_price": 57606.743,
-        "stock_weeks": 41.3
+        "stock_weeks": 18.5
       },
       "가방외": {
         "stock_price": 23717.646,
-        "stock_weeks": 40.9
+        "stock_weeks": 47.0
       }
     },
     {
       "period": "2502",
       "F당시즌": {
         "stock_price": 62406.638,
-        "stock_weeks": 24.4
+        "stock_weeks": 50.8
       },
       "S당시즌": {
         "stock_price": 70172.429,
-        "stock_weeks": 911.2
+        "stock_weeks": 86.1
       },
       "과시즌FW": {
         "stock_price": 64844.628,
-        "stock_weeks": 83.1
+        "stock_weeks": 110.3
       },
       "과시즌SS": {
         "stock_price": 85171.648,
-        "stock_weeks": 117.2
+        "stock_weeks": 85.7
       },
       "모자": {
         "stock_price": 40066.07,
-        "stock_weeks": 38.5
+        "stock_weeks": 39.3
       },
       "신발": {
         "stock_price": 51850.184,
-        "stock_weeks": 30.7
+        "stock_weeks": 42.9
       },
       "가방외": {
         "stock_price": 25024.57,
-        "stock_weeks": 46.8
+        "stock_weeks": 69.1
       }
     },
     {
       "period": "2503",
       "F당시즌": {
         "stock_price": 61392.28,
-        "stock_weeks": 23.1
+        "stock_weeks": 219.1
       },
       "S당시즌": {
         "stock_price": 74926.608,
-        "stock_weeks": 352.1
+        "stock_weeks": 50.2
       },
       "과시즌FW": {
         "stock_price": 63845.666,
-        "stock_weeks": 74.3
+        "stock_weeks": 251.3
       },
       "과시즌SS": {
         "stock_price": 82204.277,
-        "stock_weeks": 157.2
+        "stock_weeks": 37.0
       },
       "모자": {
         "stock_price": 39490.228,
-        "stock_weeks": 39.6
+        "stock_weeks": 41.0
       },
       "신발": {
         "stock_price": 51376.213,
-        "stock_weeks": 30.6
+        "stock_weeks": 46.8
       },
       "가방외": {
         "stock_price": 23657.215,
-        "stock_weeks": 52.4
+        "stock_weeks": 66.5
       }
     },
     {
       "period": "2504",
       "F당시즌": {
         "stock_price": 61318.954,
-        "stock_weeks": 24.1
+        "stock_weeks": 2438.3
       },
       "S당시즌": {
         "stock_price": 69152.984,
-        "stock_weeks": 149.8
+        "stock_weeks": 34.8
       },
       "과시즌FW": {
         "stock_price": 63463.253,
-        "stock_weeks": 73.1
+        "stock_weeks": 657.7
       },
       "과시즌SS": {
         "stock_price": 78629.508,
-        "stock_weeks": 104.8
+        "stock_weeks": 27.3
       },
       "모자": {
         "stock_price": 37571.194,
-        "stock_weeks": 37.0
+        "stock_weeks": 39.6
       },
       "신발": {
         "stock_price": 50225.881,
-        "stock_weeks": 30.1
+        "stock_weeks": 48.9
       },
       "가방외": {
         "stock_price": 22907.815,
-        "stock_weeks": 52.3
+        "stock_weeks": 71.9
       }
     },
     {
       "period": "2505",
       "F당시즌": {
         "stock_price": 61312.418,
-        "stock_weeks": 28.3
+        "stock_weeks": 37794.7
       },
       "S당시즌": {
         "stock_price": 60632.356,
-        "stock_weeks": 76.5
+        "stock_weeks": 28.7
       },
       "과시즌FW": {
         "stock_price": 64756.361,
-        "stock_weeks": 84.6
+        "stock_weeks": 1356.4
       },
       "과시즌SS": {
         "stock_price": 75117.582,
-        "stock_weeks": 64.4
+        "stock_weeks": 25.2
       },
       "모자": {
         "stock_price": 37591.441,
-        "stock_weeks": 37.6
+        "stock_weeks": 38.2
       },
       "신발": {
         "stock_price": 49706.073,
-        "stock_weeks": 31.5
+        "stock_weeks": 51.4
       },
       "가방외": {
         "stock_price": 21811.698,
-        "stock_weeks": 55.3
+        "stock_weeks": 59.8
       }
     },
     {
       "period": "2506",
       "F당시즌": {
         "stock_price": 61305.911,
-        "stock_weeks": 35.8
+        "stock_weeks": 37593.7
       },
       "S당시즌": {
         "stock_price": 53543.903,
-        "stock_weeks": 46.8
+        "stock_weeks": 30.3
       },
       "과시즌FW": {
         "stock_price": 73305.546,
-        "stock_weeks": 116.7
+        "stock_weeks": 2069.6
       },
       "과시즌SS": {
         "stock_price": 72352.586,
-        "stock_weeks": 44.1
+        "stock_weeks": 29.6
       },
       "모자": {
         "stock_price": 37450.302,
-        "stock_weeks": 36.2
+        "stock_weeks": 44.5
       },
       "신발": {
         "stock_price": 51962.163,
-        "stock_weeks": 34.1
+        "stock_weeks": 58.3
       },
       "가방외": {
         "stock_price": 21400.606,
-        "stock_weeks": 54.5
+        "stock_weeks": 63.4
       }
     },
     {
       "period": "2507",
       "F당시즌": {
         "stock_price": 17967.365,
-        "stock_weeks": 0
+        "stock_weeks": 66.7
       },
       "S당시즌": {
         "stock_price": 45834.299,
-        "stock_weeks": 31.9
+        "stock_weeks": 23.9
       },
       "과시즌FW": {
         "stock_price": 124023.23,
-        "stock_weeks": 90.4
+        "stock_weeks": 1358.6
       },
       "과시즌SS": {
         "stock_price": 67933.884,
-        "stock_weeks": 33.6
+        "stock_weeks": 22.5
       },
       "모자": {
         "stock_price": 37423.662,
-        "stock_weeks": 37.4
+        "stock_weeks": 30.6
       },
       "신발": {
         "stock_price": 51692.327,
-        "stock_weeks": 37.3
+        "stock_weeks": 43.6
       },
       "가방외": {
         "stock_price": 20984.308,
-        "stock_weeks": 56.1
+        "stock_weeks": 47.2
       }
     },
     {
       "period": "2508",
       "F당시즌": {
         "stock_price": 51450.181,
-        "stock_weeks": 1145.7
+        "stock_weeks": 61.0
       },
       "S당시즌": {
         "stock_price": 40212.991,
-        "stock_weeks": 23.9
+        "stock_weeks": 29.0
       },
       "과시즌FW": {
         "stock_price": 123027.43,
-        "stock_weeks": 278.7
+        "stock_weeks": 508.3
       },
       "과시즌SS": {
         "stock_price": 61140.609,
-        "stock_weeks": 25.2
+        "stock_weeks": 19.9
       },
       "모자": {
         "stock_price": 35308.077,
-        "stock_weeks": 35.4
+        "stock_weeks": 22.6
       },
       "신발": {
         "stock_price": 62395.696,
-        "stock_weeks": 58.7
+        "stock_weeks": 35.6
       },
       "가방외": {
         "stock_price": 20487.233,
-        "stock_weeks": 56.3
+        "stock_weeks": 34.3
       }
     },
     {
       "period": "2509",
       "F당시즌": {
         "stock_price": 64392.263,
-        "stock_weeks": 347.4
+        "stock_weeks": 65.1
       },
       "S당시즌": {
         "stock_price": 38613.712,
-        "stock_weeks": 21.7
+        "stock_weeks": 98.0
       },
       "과시즌FW": {
         "stock_price": 120204.747,
-        "stock_weeks": 670.5
+        "stock_weeks": 178.1
       },
       "과시즌SS": {
         "stock_price": 55220.523,
-        "stock_weeks": 19.9
+        "stock_weeks": 28.8
       },
       "모자": {
         "stock_price": 37441.583,
-        "stock_weeks": 34.5
+        "stock_weeks": 40.7
       },
       "신발": {
         "stock_price": 57773.887,
-        "stock_weeks": 50.1
+        "stock_weeks": 41.4
       },
       "가방외": {
         "stock_price": 19073.625,
-        "stock_weeks": 47.3
+        "stock_weeks": 39.7
       }
     },
     {
       "period": "2510",
       "F당시즌": {
         "stock_price": 61186.601,
-        "stock_weeks": 174.6
+        "stock_weeks": 28.3
       },
       "S당시즌": {
         "stock_price": 38109.261,
-        "stock_weeks": 23.9
+        "stock_weeks": 255.5
       },
       "과시즌FW": {
         "stock_price": 116639.078,
-        "stock_weeks": 575.4
+        "stock_weeks": 132.2
       },
       "과시즌SS": {
         "stock_price": 54150.128,
-        "stock_weeks": 19.9
+        "stock_weeks": 128.6
       },
       "모자": {
         "stock_price": 40099.503,
-        "stock_weeks": 37.1
+        "stock_weeks": 35.2
       },
       "신발": {
         "stock_price": 55056.965,
-        "stock_weeks": 45.7
+        "stock_weeks": 46.6
       },
       "가방외": {
         "stock_price": 17706.565,
+        "stock_weeks": 52.2
+      }
+    }
+  ],
+  "prev_monthly_inventory_data": [
+    {
+      "period": "2401",
+      "F당시즌": {
+        "stock_price": 72909.408,
+        "stock_weeks": 57.0
+      },
+      "S당시즌": {
+        "stock_price": 27880.532,
+        "stock_weeks": 54.7
+      },
+      "과시즌FW": {
+        "stock_price": 32202.054,
+        "stock_weeks": 8.9
+      },
+      "과시즌SS": {
+        "stock_price": 67957.687,
+        "stock_weeks": 105.0
+      },
+      "모자": {
+        "stock_price": 37639.141,
+        "stock_weeks": 33.0
+      },
+      "신발": {
+        "stock_price": 82960.329,
+        "stock_weeks": 31.1
+      },
+      "가방외": {
+        "stock_price": 36477.487,
+        "stock_weeks": 42.1
+      }
+    },
+    {
+      "period": "2402",
+      "F당시즌": {
+        "stock_price": 63471.644,
+        "stock_weeks": 70.8
+      },
+      "S당시즌": {
+        "stock_price": 74977.287,
+        "stock_weeks": 67.3
+      },
+      "과시즌FW": {
+        "stock_price": 28580.077,
+        "stock_weeks": 11.6
+      },
+      "과시즌SS": {
+        "stock_price": 66843.693,
+        "stock_weeks": 47.8
+      },
+      "모자": {
+        "stock_price": 49184.433,
+        "stock_weeks": 32.9
+      },
+      "신발": {
+        "stock_price": 86704.754,
+        "stock_weeks": 31.4
+      },
+      "가방외": {
+        "stock_price": 34323.781,
+        "stock_weeks": 33.2
+      }
+    },
+    {
+      "period": "2403",
+      "F당시즌": {
+        "stock_price": 62119.227,
+        "stock_weeks": 166.9
+      },
+      "S당시즌": {
+        "stock_price": 88929.643,
+        "stock_weeks": 46.5
+      },
+      "과시즌FW": {
+        "stock_price": 28008.283,
+        "stock_weeks": 82.8
+      },
+      "과시즌SS": {
+        "stock_price": 63857.966,
+        "stock_weeks": 24.0
+      },
+      "모자": {
+        "stock_price": 45332.969,
+        "stock_weeks": 34.0
+      },
+      "신발": {
+        "stock_price": 79250.386,
         "stock_weeks": 41.8
+      },
+      "가방외": {
+        "stock_price": 31576.795,
+        "stock_weeks": 39.5
+      }
+    },
+    {
+      "period": "2404",
+      "F당시즌": {
+        "stock_price": 62025.149,
+        "stock_weeks": 702.4
+      },
+      "S당시즌": {
+        "stock_price": 78718.986,
+        "stock_weeks": 31.8
+      },
+      "과시즌FW": {
+        "stock_price": 27625.828,
+        "stock_weeks": 1667.1
+      },
+      "과시즌SS": {
+        "stock_price": 59251.236,
+        "stock_weeks": 16.4
+      },
+      "모자": {
+        "stock_price": 43923.29,
+        "stock_weeks": 38.6
+      },
+      "신발": {
+        "stock_price": 72082.57,
+        "stock_weeks": 50.0
+      },
+      "가방외": {
+        "stock_price": 28368.814,
+        "stock_weeks": 33.9
+      }
+    },
+    {
+      "period": "2405",
+      "F당시즌": {
+        "stock_price": 62167.52,
+        "stock_weeks": 1678.8
+      },
+      "S당시즌": {
+        "stock_price": 69746.317,
+        "stock_weeks": 30.8
+      },
+      "과시즌FW": {
+        "stock_price": 27666.167,
+        "stock_weeks": 1131.0
+      },
+      "과시즌SS": {
+        "stock_price": 55555.081,
+        "stock_weeks": 17.3
+      },
+      "모자": {
+        "stock_price": 42721.159,
+        "stock_weeks": 39.9
+      },
+      "신발": {
+        "stock_price": 73855.358,
+        "stock_weeks": 54.8
+      },
+      "가방외": {
+        "stock_price": 26732.263,
+        "stock_weeks": 28.6
+      }
+    },
+    {
+      "period": "2406",
+      "F당시즌": {
+        "stock_price": 62095.546,
+        "stock_weeks": 2741.8
+      },
+      "S당시즌": {
+        "stock_price": 61858.262,
+        "stock_weeks": 31.4
+      },
+      "과시즌FW": {
+        "stock_price": 35312.157,
+        "stock_weeks": 1903.9
+      },
+      "과시즌SS": {
+        "stock_price": 52492.527,
+        "stock_weeks": 19.2
+      },
+      "모자": {
+        "stock_price": 44244.053,
+        "stock_weeks": 44.9
+      },
+      "신발": {
+        "stock_price": 75779.495,
+        "stock_weeks": 61.9
+      },
+      "가방외": {
+        "stock_price": 27664.314,
+        "stock_weeks": 34.0
+      }
+    },
+    {
+      "period": "2407",
+      "F당시즌": {
+        "stock_price": 19931.903,
+        "stock_weeks": 62.8
+      },
+      "S당시즌": {
+        "stock_price": 54279.288,
+        "stock_weeks": 28.9
+      },
+      "과시즌FW": {
+        "stock_price": 88451.496,
+        "stock_weeks": 1190.1
+      },
+      "과시즌SS": {
+        "stock_price": 49230.766,
+        "stock_weeks": 18.3
+      },
+      "모자": {
+        "stock_price": 47513.047,
+        "stock_weeks": 41.5
+      },
+      "신발": {
+        "stock_price": 80272.223,
+        "stock_weeks": 58.3
+      },
+      "가방외": {
+        "stock_price": 25306.762,
+        "stock_weeks": 32.5
+      }
+    },
+    {
+      "period": "2408",
+      "F당시즌": {
+        "stock_price": 81088.203,
+        "stock_weeks": 134.1
+      },
+      "S당시즌": {
+        "stock_price": 47731.539,
+        "stock_weeks": 30.9
+      },
+      "과시즌FW": {
+        "stock_price": 88130.965,
+        "stock_weeks": 742.7
+      },
+      "과시즌SS": {
+        "stock_price": 46407.294,
+        "stock_weeks": 20.9
+      },
+      "모자": {
+        "stock_price": 45392.277,
+        "stock_weeks": 35.5
+      },
+      "신발": {
+        "stock_price": 74597.999,
+        "stock_weeks": 58.8
+      },
+      "가방외": {
+        "stock_price": 26264.112,
+        "stock_weeks": 30.6
+      }
+    },
+    {
+      "period": "2409",
+      "F당시즌": {
+        "stock_price": 114734.078,
+        "stock_weeks": 119.7
+      },
+      "S당시즌": {
+        "stock_price": 46032.865,
+        "stock_weeks": 86.0
+      },
+      "과시즌FW": {
+        "stock_price": 87165.745,
+        "stock_weeks": 443.0
+      },
+      "과시즌SS": {
+        "stock_price": 45272.001,
+        "stock_weeks": 52.9
+      },
+      "모자": {
+        "stock_price": 43702.01,
+        "stock_weeks": 51.8
+      },
+      "신발": {
+        "stock_price": 70668.211,
+        "stock_weeks": 62.3
+      },
+      "가방외": {
+        "stock_price": 24747.02,
+        "stock_weeks": 56.8
+      }
+    },
+    {
+      "period": "2410",
+      "F당시즌": {
+        "stock_price": 112811.993,
+        "stock_weeks": 49.3
+      },
+      "S당시즌": {
+        "stock_price": 45577.522,
+        "stock_weeks": 370.5
+      },
+      "과시즌FW": {
+        "stock_price": 84212.009,
+        "stock_weeks": 117.9
+      },
+      "과시즌SS": {
+        "stock_price": 44249.848,
+        "stock_weeks": 117.8
+      },
+      "모자": {
+        "stock_price": 43961.306,
+        "stock_weeks": 41.9
+      },
+      "신발": {
+        "stock_price": 63897.917,
+        "stock_weeks": 40.2
+      },
+      "가방외": {
+        "stock_price": 23237.181,
+        "stock_weeks": 40.1
       }
     }
   ],

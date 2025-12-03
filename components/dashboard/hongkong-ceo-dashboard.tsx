@@ -70,6 +70,7 @@ const HongKongCEODashboard = () => {
     return '';
   });
   const [isEditingYoySummary, setIsEditingYoySummary] = useState(false);
+  const [showStockWeeksModal, setShowStockWeeksModal] = useState(false);
 
   // ============================================================
   // 헬퍼 함수
@@ -103,6 +104,10 @@ const HongKongCEODashboard = () => {
     console.log('dashboardData:', dashboardData);
     console.log('plData:', plData);
     console.log('storeStatusData:', storeStatusData);
+    console.log('prev_monthly_inventory_data:', (dashboardData as any)?.prev_monthly_inventory_data);
+    console.log('prev_monthly_inventory_data 길이:', ((dashboardData as any)?.prev_monthly_inventory_data || []).length);
+    const prev2401 = ((dashboardData as any)?.prev_monthly_inventory_data || []).find((p: any) => p.period === '2401');
+    console.log('2401월 모자 데이터:', prev2401?.모자);
   }, []);
   
   const salesSummary = dashboardData?.sales_summary || {};
@@ -1888,16 +1893,55 @@ const HongKongCEODashboard = () => {
                 <h3 className="text-sm font-semibold text-gray-600">ACC 재고주수</h3>
               </div>
               <div className="text-3xl font-bold text-green-600 mb-2">
-                {formatStockWeeks(accStock?.total?.current?.stock_weeks || 0)}주
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatStockWeeks(accStock?.total?.previous?.stock_weeks || 0)}주</span> | 
-                <span className="text-green-600"> YOY △{formatStockWeeks((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0))}주</span>
+                {(() => {
+                  // 가중평균 계산 (재고금액으로 가중) - 모자 + 신발 + 가방외
+                  const data = dashboardData?.monthly_inventory_data || [];
+                  const totalWeightedSum = data.reduce((sum: number, item: any) => {
+                    const hatWeeks = item.모자?.stock_weeks || 0;
+                    const shoeWeeks = item.신발?.stock_weeks || 0;
+                    const bagWeeks = item.가방외?.stock_weeks || 0;
+                    const hatWeight = item.모자?.stock_price || 0;
+                    const shoeWeight = item.신발?.stock_price || 0;
+                    const bagWeight = item.가방외?.stock_price || 0;
+                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight);
+                  }, 0);
+                  const totalWeight = data.reduce((sum: number, item: any) => {
+                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방외?.stock_price || 0);
+                  }, 0);
+                  const currentWeeks = totalWeight > 0 ? totalWeightedSum / totalWeight : 0;
+                  
+                  // 전년 가중평균
+                  const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
+                  const prevTotalWeightedSum = prevData.reduce((sum: number, item: any) => {
+                    const hatWeeks = item.모자?.stock_weeks || 0;
+                    const shoeWeeks = item.신발?.stock_weeks || 0;
+                    const bagWeeks = item.가방외?.stock_weeks || 0;
+                    const hatWeight = item.모자?.stock_price || 0;
+                    const shoeWeight = item.신발?.stock_price || 0;
+                    const bagWeight = item.가방외?.stock_price || 0;
+                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight);
+                  }, 0);
+                  const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
+                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방외?.stock_price || 0);
+                  }, 0);
+                  const prevWeeks = prevTotalWeight > 0 ? prevTotalWeightedSum / prevTotalWeight : 0;
+                  const change = currentWeeks - prevWeeks;
+                  
+                  return (
+                    <>
+                      {formatStockWeeks(currentWeeks)}주
+                      <div className="text-sm font-semibold mt-1">
+                        <span className="text-gray-600">전년 {formatStockWeeks(prevWeeks)}주</span> | 
+                        <span className={change > 0 ? 'text-red-600' : 'text-green-600'}> YOY {change > 0 ? '+' : ''}{formatStockWeeks(change)}주</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
               
               <div className="bg-pink-50 rounded p-2 mb-3">
                 <div className="text-xs text-pink-800">
-                  <span className="font-semibold">📌 계산기준:</span> 직전 6개월간 누적매출 기준
+                  <span className="font-semibold">📌 계산기준:</span> 재고주수 = (재고금액 / 월간 매출) × 4주
                 </div>
               </div>
               
@@ -1919,16 +1963,48 @@ const HongKongCEODashboard = () => {
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
                     {(() => {
-                      const categories = ['SHO', 'HEA', 'BAG'];
-                      return categories.map((key) => {
-                        const item = accStock?.by_category ? (accStock.by_category as any)[key] : undefined;
-                        if (!item) return null;
+                      // 모자, 신발, 가방외 가중평균 계산
+                      const data = dashboardData?.monthly_inventory_data || [];
+                      const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
+                      
+                      const items = [
+                        { key: '모자', name: '모자' },
+                        { key: '신발', name: '신발' },
+                        { key: '가방외', name: '가방외' }
+                      ];
+                      
+                      return items.map((itemInfo) => {
+                        // 현재 연도 가중평균
+                        const weightedSum = data.reduce((sum: number, item: any) => {
+                          const weeks = item[itemInfo.key]?.stock_weeks || 0;
+                          const weight = item[itemInfo.key]?.stock_price || 0;
+                          return sum + (weeks * weight);
+                        }, 0);
+                        const totalWeight = data.reduce((sum: number, item: any) => {
+                          return sum + (item[itemInfo.key]?.stock_price || 0);
+                        }, 0);
+                        const currentWeeks = totalWeight > 0 ? weightedSum / totalWeight : 0;
+                        
+                        // 전년 연도 가중평균
+                        const prevWeightedSum = prevData.reduce((sum: number, item: any) => {
+                          const weeks = item[itemInfo.key]?.stock_weeks || 0;
+                          const weight = item[itemInfo.key]?.stock_price || 0;
+                          return sum + (weeks * weight);
+                        }, 0);
+                        const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
+                          return sum + (item[itemInfo.key]?.stock_price || 0);
+                        }, 0);
+                        const prevWeeks = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
+                        const change = currentWeeks - prevWeeks;
+                        
                         return (
-                          <div key={key} className="flex justify-between text-xs">
-                            <span className="text-gray-600">{item.category_name || key}</span>
+                          <div key={itemInfo.key} className="flex justify-between text-xs">
+                            <span className="text-gray-600">{itemInfo.name}</span>
                             <span className="font-semibold text-green-600">
-                              {formatStockWeeks(item.current?.stock_weeks || 0)}주 
-                              <span className="text-gray-500"> (△{formatStockWeeks((item.current?.stock_weeks || 0) - (item.previous?.stock_weeks || 0))}주)</span>
+                              {formatStockWeeks(currentWeeks)}주 
+                              <span className={`${change > 0 ? 'text-red-600' : change < 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                {' '}({change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주)
+                              </span>
                             </span>
                           </div>
                         );
@@ -3785,8 +3861,15 @@ const HongKongCEODashboard = () => {
               <div className="w-2 h-20 rounded-full mr-2"></div>
               2025년 월별 아이템별 재고 추세 (TAG, 1K HKD)
             </h3>
+            <button
+              className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded hover:bg-indigo-700 transition-colors whitespace-nowrap"
+              onClick={() => setShowStockWeeksModal(true)}
+            >
+              재고주수 추세
+            </button>
           </div>
           
+          <div style={{ position: 'relative' }}>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart 
               data={(dashboardData?.monthly_inventory_data || []).map((item: any) => ({
@@ -3829,13 +3912,10 @@ const HongKongCEODashboard = () => {
               <Bar dataKey="모자" stackId="a" fill="#93C5FD" name="🧢 모자" />
               <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
               <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" name="👜 가방외" />
-              {/* 재고주수 레이블 - 맨 마지막에 렌더링하여 막대 위에 표시 */}
               <Layer>
-                {(dashboardData?.monthly_inventory_data || []).map((item: any, index: number) => {
-                  const chartData = (dashboardData?.monthly_inventory_data || []);
-                  if (chartData.length === 0) return null;
-                  
-                  const mappedData = chartData.map((d: any) => ({
+                {(dashboardData?.monthly_inventory_data || []).map((item: any, dataIndex: number) => {
+                  // 차트 데이터 매핑
+                  const chartData = (dashboardData?.monthly_inventory_data || []).map((d: any) => ({
                     F당시즌: Math.round(d.F당시즌?.stock_price || 0),
                     S당시즌: Math.round(d.S당시즌?.stock_price || 0),
                     과시즌FW: Math.round(d.과시즌FW?.stock_price || 0),
@@ -3845,58 +3925,66 @@ const HongKongCEODashboard = () => {
                     가방외: Math.round(d.가방외?.stock_price || 0),
                   }));
                   
-                  const maxValue = Math.max(...mappedData.map((d: any) => 
+                  if (chartData.length === 0) return null;
+                  
+                  const maxValue = Math.max(...chartData.map((d: any) => 
                     d.F당시즌 + d.S당시즌 + d.과시즌FW + d.과시즌SS + d.모자 + d.신발 + d.가방외
                   ));
                   
-                  const chartHeight = 205;
-                  const marginTop = 40;
-                  const yBase = marginTop + chartHeight;
-                  
-                  const 모자Weeks = item.모자?.stock_weeks || 0;
-                  const 신발Weeks = item.신발?.stock_weeks || 0;
-                  const 가방외Weeks = item.가방외?.stock_weeks || 0;
-                  
-                  if (!모자Weeks && !신발Weeks && !가방외Weeks) return null;
-                  
-                  const F당시즌 = mappedData[index].F당시즌;
-                  const S당시즌 = mappedData[index].S당시즌;
-                  const 과시즌FW = mappedData[index].과시즌FW;
-                  const 과시즌SS = mappedData[index].과시즌SS;
-                  const 모자 = mappedData[index].모자;
-                  const 신발 = mappedData[index].신발;
-                  const 가방외 = mappedData[index].가방외;
+                  const currentData = chartData[dataIndex];
+                  const F당시즌 = currentData.F당시즌;
+                  const S당시즌 = currentData.S당시즌;
+                  const 과시즌FW = currentData.과시즌FW;
+                  const 과시즌SS = currentData.과시즌SS;
+                  const 모자 = currentData.모자;
+                  const 신발 = currentData.신발;
+                  const 가방외 = currentData.가방외;
                   
                   const 누적_모자 = F당시즌 + S당시즌 + 과시즌FW + 과시즌SS + 모자;
                   const 누적_신발 = 누적_모자 + 신발;
                   const 누적_가방외 = 누적_신발 + 가방외;
                   
-                  const 모자Y = yBase - (누적_모자 / maxValue * chartHeight) - 5;
-                  const 신발Y = yBase - (누적_신발 / maxValue * chartHeight) - 5;
-                  const 가방외Y = yBase - (누적_가방외 / maxValue * chartHeight) - 5;
+                  const 모자Weeks = item.모자?.stock_weeks || 0;
+                  const 신발Weeks = item.신발?.stock_weeks || 0;
+                  const 가방외Weeks = item.가방외?.stock_weeks || 0;
                   
-                  const barX = 47 + index * 94;
+                  // 차트 설정
+                  const chartHeight = 205;
+                  const marginTop = 40;
+                  const marginLeft = 60;
+                  const yBase = marginTop + chartHeight;
+                  
+                  // 막대 너비 및 X 위치 계산 (10개 월 기준)
+                  const totalWidth = 175 - marginLeft - 30; // 전체 너비에서 여백 제외
+                  const barWidth = totalWidth / chartData.length;
+                  const barX = marginLeft + (dataIndex * barWidth) + (barWidth / 2);
+                  
+                  // Y 위치 계산
+                  const 모자Y = yBase - (누적_모자 / maxValue * chartHeight);
+                  const 신발Y = yBase - (누적_신발 / maxValue * chartHeight);
+                  const 가방외Y = yBase - (누적_가방외 / maxValue * chartHeight);
                   
                   return (
-                    <g key={`labels-${index}`}>
+                    <g key={`stock-weeks-${dataIndex}`}>
                       {모자Weeks > 0 && (
                         <g>
-                          {/* 흰색 배경 - 레이블이 막대 위에 보이도록 */}
                           <rect
-                            x={barX - 12}
-                            y={모자Y - 8}
-                            width={24}
-                            height={10}
+                            x={barX - 15}
+                            y={모자Y - 16}
+                            width={30}
+                            height={13}
                             fill="white"
-                            fillOpacity={1}
-                            stroke="none"
+                            fillOpacity={0.95}
+                            stroke="#93C5FD"
+                            strokeWidth={1}
+                            rx={2}
                           />
-                          <text 
-                            x={barX} 
-                            y={모자Y} 
-                            textAnchor="middle" 
-                            fill="#000000" 
-                            fontSize="9" 
+                          <text
+                            x={barX}
+                            y={모자Y - 5}
+                            textAnchor="middle"
+                            fill="#1e3a8a"
+                            fontSize="9"
                             fontWeight="700"
                             style={{ pointerEvents: 'none' }}
                           >
@@ -3907,20 +3995,22 @@ const HongKongCEODashboard = () => {
                       {신발Weeks > 0 && (
                         <g>
                           <rect
-                            x={barX - 12}
-                            y={신발Y - 8}
-                            width={24}
-                            height={10}
+                            x={barX - 15}
+                            y={신발Y - 16}
+                            width={30}
+                            height={13}
                             fill="white"
-                            fillOpacity={1}
-                            stroke="none"
+                            fillOpacity={0.95}
+                            stroke="#FCD34D"
+                            strokeWidth={1}
+                            rx={2}
                           />
-                          <text 
-                            x={barX} 
-                            y={신발Y} 
-                            textAnchor="middle" 
-                            fill="#000000" 
-                            fontSize="9" 
+                          <text
+                            x={barX}
+                            y={신발Y - 5}
+                            textAnchor="middle"
+                            fill="#854d0e"
+                            fontSize="9"
                             fontWeight="700"
                             style={{ pointerEvents: 'none' }}
                           >
@@ -3931,20 +4021,22 @@ const HongKongCEODashboard = () => {
                       {가방외Weeks > 0 && (
                         <g>
                           <rect
-                            x={barX - 12}
-                            y={가방외Y - 8}
-                            width={24}
-                            height={10}
+                            x={barX - 15}
+                            y={가방외Y - 16}
+                            width={30}
+                            height={13}
                             fill="white"
-                            fillOpacity={1}
-                            stroke="none"
+                            fillOpacity={0.95}
+                            stroke="#C4B5FD"
+                            strokeWidth={1}
+                            rx={2}
                           />
-                          <text 
-                            x={barX} 
-                            y={가방외Y} 
-                            textAnchor="middle" 
-                            fill="#000000" 
-                            fontSize="9" 
+                          <text
+                            x={barX}
+                            y={가방외Y - 5}
+                            textAnchor="middle"
+                            fill="#5b21b6"
+                            fontSize="9"
                             fontWeight="700"
                             style={{ pointerEvents: 'none' }}
                           >
@@ -3958,6 +4050,8 @@ const HongKongCEODashboard = () => {
               </Layer>
             </BarChart>
           </ResponsiveContainer>
+          
+          </div>
           
           {/* 범례 클릭 가능하게 만들기 */}
           <div className="mt-4">
@@ -4193,12 +4287,12 @@ const HongKongCEODashboard = () => {
               >
                 YOY 추세
               </button>
-              <button
-                className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
-                onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
-              >
+            <button
+              className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
+              onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
+            >
                 매장효율성 분석
-              </button>
+            </button>
             </div>
           </div>
           
@@ -4228,35 +4322,35 @@ const HongKongCEODashboard = () => {
                   </div>
                   <div className="text-[9px] text-slate-400 mt-1">
                     *온라인 종료매장·리뉴얼(LCX·WTC) 제외, 정상운영 {totalStoreCurrent}개 매장 기준
-                  </div>
                 </div>
+                    </div>
                 
                 {/* 전체 직접이익 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="flex items-center justify-between">
                     <div className="text-slate-300 text-[10px]">전체 직접이익</div>
                     <div className={`font-bold text-sm ${(storeStatusData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {Math.round(storeStatusData?.summary?.total_direct_profit || 0)}K HKD
-                    </div>
+                    {Math.round(storeStatusData?.summary?.total_direct_profit || 0)}K HKD
                   </div>
                 </div>
+                      </div>
                 
                 {/* 홍콩 오프라인 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="text-white font-semibold text-xs mb-2">
                     홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)
-                  </div>
+                      </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold">흑자 & 개선</span>
                       <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
-                    </div>
+                      </div>
                     <div className="bg-blue-700 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-orange-300 text-sm">▲</span>
                       <span className="text-white text-xs font-semibold">흑자 & 악화</span>
                       <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
-                    </div>
+                      </div>
                     <div className="bg-amber-700 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold">적자 & 개선</span>
@@ -4266,7 +4360,7 @@ const HongKongCEODashboard = () => {
                       <span className="text-red-200 text-sm">↓</span>
                       <span className="text-white text-xs font-semibold">적자 & 악화</span>
                       <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
-                    </div>
+                </div>
                     <div className="bg-slate-500 rounded px-2 py-1.5 flex items-center gap-1.5 col-span-2">
                       <span className="text-white text-xs font-semibold">리뉴얼 중</span>
                       <span className="text-white text-xs font-bold ml-auto">1개 (LCX)</span>
@@ -4284,19 +4378,19 @@ const HongKongCEODashboard = () => {
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold">흑자</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                        const mcStores = storeStatusData?.mc_summary?.stores || [];
-                        return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
-                      })()}개</span>
-                    </div>
+                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
+                        })()}개</span>
+                      </div>
                     <div className="bg-red-600 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold">적자 (Senado)</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                        const mcStores = storeStatusData?.mc_summary?.stores || [];
-                        return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
-                      })()}개</span>
+                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
+                        })()}개</span>
+                      </div>
                     </div>
-                  </div>
                 </div>
                 
                 {/* YOY 성과 */}
@@ -4304,16 +4398,16 @@ const HongKongCEODashboard = () => {
                   <div className="text-white text-[10px] mb-1">최고YOY</div>
                   <div className="font-bold text-green-400 text-xs">
                     {(() => {
-                      if (activeHKStores.length === 0) return '-';
-                      const maxStore = activeHKStores.reduce((max: any, s: any) => s.yoy > max.yoy ? s : max, activeHKStores[0]);
+                    if (activeHKStores.length === 0) return '-';
+                    const maxStore = activeHKStores.reduce((max: any, s: any) => s.yoy > max.yoy ? s : max, activeHKStores[0]);
                       return `${maxStore.shop_nm} ${Math.round(maxStore.yoy)}%`;
                     })()}
                   </div>
                   <div className="text-white text-[10px] mt-2 mb-1">최저YOY</div>
                   <div className="font-bold text-red-400 text-xs">
                     {(() => {
-                      if (activeHKStores.length === 0) return '-';
-                      const minStore = activeHKStores.reduce((min: any, s: any) => s.yoy < min.yoy ? s : min, activeHKStores[0]);
+                    if (activeHKStores.length === 0) return '-';
+                    const minStore = activeHKStores.reduce((min: any, s: any) => s.yoy < min.yoy ? s : min, activeHKStores[0]);
                       return `${minStore.shop_nm} ${Math.round(minStore.yoy)}%`;
                     })()}
                   </div>
@@ -4324,7 +4418,7 @@ const HongKongCEODashboard = () => {
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-yellow-400 text-sm">💡</span>
                     <span className="text-white font-semibold text-xs">전략 인사이트</span>
-                  </div>
+                            </div>
                   <div className="text-[10px] text-slate-200 space-y-1.5">
                     <div>적자 {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개 매장 집중 관리 필요 (HK {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개, MC {(() => {
                       const mcStores = storeStatusData?.mc_summary?.stores || [];
@@ -4333,9 +4427,9 @@ const HongKongCEODashboard = () => {
                     <div className="flex items-start gap-1.5">
                       <span className="text-orange-400 text-xs">▲</span>
                       <span>BEP 달성 기준: 임차료+인건비율 45% 미만 유지 필요</span>
+                          </div>
+                        </div>
                     </div>
-                  </div>
-                </div>
               </div>
             </div>
             
@@ -4406,16 +4500,16 @@ const HongKongCEODashboard = () => {
                       )}
                     </button>
                     {expandedStoreCategories.profit_improving.rentLabor && (() => {
-                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
                       const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
                       const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
                       return (
                         <>
                           <div className="text-[10px] text-green-600 mt-1">
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
-                          </div>
+                        </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
@@ -4515,16 +4609,16 @@ const HongKongCEODashboard = () => {
                       )}
                     </button>
                     {expandedStoreCategories.profit_deteriorating.rentLabor && (() => {
-                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
                       const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
                       const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
                       return (
                         <>
                           <div className="text-[10px] text-blue-600 mt-1">
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
-                          </div>
+                        </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
@@ -4624,16 +4718,16 @@ const HongKongCEODashboard = () => {
                       )}
                     </button>
                     {expandedStoreCategories.loss_improving.rentLabor && (() => {
-                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
                       const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
                       const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
                       return (
                         <>
                           <div className="text-[10px] text-yellow-600 mt-1">
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
-                          </div>
+                        </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
@@ -4739,16 +4833,16 @@ const HongKongCEODashboard = () => {
                       )}
                     </button>
                     {expandedStoreCategories.loss_deteriorating.rentLabor && (() => {
-                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
                       const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
                       const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
                       return (
                         <>
                           <div className="text-[10px] text-red-600 mt-1">
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
-                          </div>
+                        </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.filter((s: any) => s.shop_cd !== 'M05').map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
@@ -4848,16 +4942,16 @@ const HongKongCEODashboard = () => {
                       )}
                     </button>
                     {expandedStoreCategories.mc_summary.rentLabor && (() => {
-                      const totalRent = mc.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                      const totalSales = mc.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                            const totalRent = mc.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                            const totalSales = mc.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
                       const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                      const totalLabor = mc.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                            const totalLabor = mc.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
                       const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
                       return (
                         <>
                           <div className="text-[10px] text-purple-600 mt-1">
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
-                          </div>
+                        </div>
                         <div className="mt-2 space-y-0.5">
                           {mc.stores.map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
@@ -6471,6 +6565,472 @@ const HongKongCEODashboard = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 재고주수 추세 모달 */}
+      {showStockWeeksModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowStockWeeksModal(false)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">
+                📊 2025년 월별 재고주수 추세 (모자·신발·가방외)
+              </h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                onClick={() => setShowStockWeeksModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-gray-100 to-gray-200">
+                      <th className="border border-gray-300 px-4 py-3 text-left font-bold text-gray-800">카테고리</th>
+                      {(dashboardData?.monthly_inventory_data || []).map((item: any) => (
+                        <th key={item.period} className="border border-gray-300 px-3 py-3 text-center font-bold text-gray-800">
+                          {item.period.slice(2, 4)}월
+                        </th>
+                      ))}
+                      <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-800">평균</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="bg-blue-50 hover:bg-blue-100 transition-colors">
+                      <td className="border border-gray-300 px-4 py-3 font-bold text-blue-900 text-base">
+                        🧢 모자
+                      </td>
+                      {(dashboardData?.monthly_inventory_data || []).map((item: any, idx: number) => {
+                        const weeks = item.모자?.stock_weeks || 0;
+                        // 전년 동월 Period 찾기
+                        const periodYear = parseInt(item.period.slice(0, 2));
+                        const periodMonth = parseInt(item.period.slice(2, 4));
+                        const prevYear = (periodYear - 1) % 100;
+                        const prevPeriod = `${prevYear.toString().padStart(2, '0')}${periodMonth.toString().padStart(2, '0')}`;
+                        const prevData = ((dashboardData as any)?.prev_monthly_inventory_data || []).find((p: any) => p.period === prevPeriod);
+                        const prevWeeks = prevData?.모자?.stock_weeks || 0;
+                        // change 계산: 현재 - 전년 (양수면 증가, 음수면 감소)
+                        const change = prevWeeks > 0 ? weeks - prevWeeks : 0;
+                        
+                        // 디버깅: 1~4월만 콘솔에 출력
+                        if (periodMonth >= 1 && periodMonth <= 4) {
+                          console.log(`[모자 ${item.period}] weeks: ${weeks}, prevWeeks: ${prevWeeks}, change: ${change}, change > 0: ${change > 0}, prevPeriod: ${prevPeriod}`);
+                        }
+                        
+                        const changeText = prevWeeks > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                        const isIncrease = change > 0;
+                        const isDecrease = change < 0;
+                        
+                        return (
+                          <td key={`hat-${item.period}`} className="border border-gray-300 px-3 py-3 text-center text-blue-800 font-semibold text-base">
+                            <div>{weeks > 0 ? `${formatStockWeeks(weeks)}주` : '-'}</div>
+                            {changeText && (
+                              <div className={`text-[10px] mt-0.5 ${isIncrease ? 'text-red-600' : isDecrease ? 'text-green-600' : 'text-gray-600'}`}>
+                                {isIncrease ? '+' : isDecrease ? '△' : ''}{Math.abs(change).toFixed(1)}주
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="border border-gray-300 px-4 py-3 text-center font-bold text-blue-900 text-base bg-blue-100">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
+                          
+                          // 현재 연도 가중평균: 재고금액으로 가중
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.모자?.stock_weeks || 0;
+                            const weight = item.모자?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.모자?.stock_price || 0);
+                          }, 0);
+                          if (totalWeight === 0) return '-';
+                          const weightedAvg = weightedSum / totalWeight;
+                          
+                          // 전년 연도 가중평균: 재고금액으로 가중
+                          const prevWeightedSum = prevData.reduce((sum: number, item: any) => {
+                            const weeks = item.모자?.stock_weeks || 0;
+                            const weight = item.모자?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
+                            return sum + (item.모자?.stock_price || 0);
+                          }, 0);
+                          const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
+                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                          
+                          return (
+                            <div>
+                              <div>{weightedAvg.toFixed(1)}주</div>
+                              {prevWeightedAvg > 0 && (
+                                <div className="text-xs text-gray-600 mt-0.5">
+                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                </div>
+                              )}
+                              {changeText && (
+                                <div className={`text-[10px] mt-0.5 ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                  {change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+                    </tr>
+                    <tr className="bg-yellow-50 hover:bg-yellow-100 transition-colors">
+                      <td className="border border-gray-300 px-4 py-3 font-bold text-yellow-900 text-base">
+                        👟 신발
+                      </td>
+                      {(dashboardData?.monthly_inventory_data || []).map((item: any, idx: number) => {
+                        const weeks = item.신발?.stock_weeks || 0;
+                        // 전년 동월 Period 찾기
+                        const periodYear = parseInt(item.period.slice(0, 2));
+                        const periodMonth = parseInt(item.period.slice(2, 4));
+                        const prevYear = (periodYear - 1) % 100;
+                        const prevPeriod = `${prevYear.toString().padStart(2, '0')}${periodMonth.toString().padStart(2, '0')}`;
+                        const prevData = ((dashboardData as any)?.prev_monthly_inventory_data || []).find((p: any) => p.period === prevPeriod);
+                        const prevWeeks = prevData?.신발?.stock_weeks || 0;
+                        const change = prevWeeks > 0 ? weeks - prevWeeks : 0;
+                        const changeText = prevWeeks > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                        
+                        return (
+                          <td key={`shoe-${item.period}`} className="border border-gray-300 px-3 py-3 text-center text-yellow-800 font-semibold text-base">
+                            <div>{weeks > 0 ? `${formatStockWeeks(weeks)}주` : '-'}</div>
+                            {changeText && (
+                              <div className={`text-[10px] mt-0.5 ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                {change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="border border-gray-300 px-4 py-3 text-center font-bold text-yellow-900 text-base bg-yellow-100">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
+                          
+                          // 현재 연도 가중평균: 재고금액으로 가중
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.신발?.stock_weeks || 0;
+                            const weight = item.신발?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.신발?.stock_price || 0);
+                          }, 0);
+                          if (totalWeight === 0) return '-';
+                          const weightedAvg = weightedSum / totalWeight;
+                          
+                          // 전년 연도 가중평균: 재고금액으로 가중
+                          const prevWeightedSum = prevData.reduce((sum: number, item: any) => {
+                            const weeks = item.신발?.stock_weeks || 0;
+                            const weight = item.신발?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
+                            return sum + (item.신발?.stock_price || 0);
+                          }, 0);
+                          const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
+                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                          
+                          return (
+                            <div>
+                              <div>{weightedAvg.toFixed(1)}주</div>
+                              {prevWeightedAvg > 0 && (
+                                <div className="text-xs text-gray-600 mt-0.5">
+                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                </div>
+                              )}
+                              {changeText && (
+                                <div className={`text-[10px] mt-0.5 ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                  {change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+                    </tr>
+                    <tr className="bg-purple-50 hover:bg-purple-100 transition-colors">
+                      <td className="border border-gray-300 px-4 py-3 font-bold text-purple-900 text-base">
+                        👜 가방외
+                      </td>
+                      {(dashboardData?.monthly_inventory_data || []).map((item: any, idx: number) => {
+                        const weeks = item.가방외?.stock_weeks || 0;
+                        // 전년 동월 Period 찾기
+                        const periodYear = parseInt(item.period.slice(0, 2));
+                        const periodMonth = parseInt(item.period.slice(2, 4));
+                        const prevYear = (periodYear - 1) % 100;
+                        const prevPeriod = `${prevYear.toString().padStart(2, '0')}${periodMonth.toString().padStart(2, '0')}`;
+                        const prevData = ((dashboardData as any)?.prev_monthly_inventory_data || []).find((p: any) => p.period === prevPeriod);
+                        const prevWeeks = prevData?.가방외?.stock_weeks || 0;
+                        const change = prevWeeks > 0 ? weeks - prevWeeks : 0;
+                        const changeText = prevWeeks > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                        
+                        return (
+                          <td key={`bag-${item.period}`} className="border border-gray-300 px-3 py-3 text-center text-purple-800 font-semibold text-base">
+                            <div>{weeks > 0 ? `${formatStockWeeks(weeks)}주` : '-'}</div>
+                            {changeText && (
+                              <div className={`text-[10px] mt-0.5 ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                {change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="border border-gray-300 px-4 py-3 text-center font-bold text-purple-900 text-base bg-purple-100">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
+                          
+                          // 현재 연도 가중평균: 재고금액으로 가중
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.가방외?.stock_weeks || 0;
+                            const weight = item.가방외?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.가방외?.stock_price || 0);
+                          }, 0);
+                          if (totalWeight === 0) return '-';
+                          const weightedAvg = weightedSum / totalWeight;
+                          
+                          // 전년 연도 가중평균: 재고금액으로 가중
+                          const prevWeightedSum = prevData.reduce((sum: number, item: any) => {
+                            const weeks = item.가방외?.stock_weeks || 0;
+                            const weight = item.가방외?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
+                            return sum + (item.가방외?.stock_price || 0);
+                          }, 0);
+                          const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
+                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
+                          
+                          return (
+                            <div>
+                              <div>{weightedAvg.toFixed(1)}주</div>
+                              {prevWeightedAvg > 0 && (
+                                <div className="text-xs text-gray-600 mt-0.5">
+                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                </div>
+                              )}
+                              {changeText && (
+                                <div className={`text-[10px] mt-0.5 ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                  {change > 0 ? '+' : '△'}{Math.abs(change).toFixed(1)}주
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* 재고주수 추세 분석 */}
+              <div className="mt-6 space-y-4">
+                {/* 월별 추세 분석 */}
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                  <h3 className="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                    📊 2025년 재고주수 추세 분석
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    {/* 모자 분석 */}
+                    <div className="p-3 bg-white rounded-md border border-blue-100">
+                      <div className="font-bold text-blue-900 mb-1">🧢 모자</div>
+                      <div className="text-gray-700 text-xs leading-relaxed">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          if (data.length === 0) return '데이터 없음';
+                          
+                          // 가중평균 계산 (재고금액으로 가중)
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.모자?.stock_weeks || 0;
+                            const weight = item.모자?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.모자?.stock_price || 0);
+                          }, 0);
+                          const avg = totalWeight > 0 ? (weightedSum / totalWeight).toFixed(1) : '0.0';
+                          
+                          // 최저/최고
+                          const weeksData = data.map((item: any) => item.모자?.stock_weeks || 0).filter((v: number) => v > 0);
+                          const min = weeksData.length > 0 ? Math.min(...weeksData).toFixed(1) : '0.0';
+                          const max = weeksData.length > 0 ? Math.max(...weeksData).toFixed(1) : '0.0';
+                          
+                          // 하반기(8~10월) 가중평균
+                          const recent3 = data.slice(-3);
+                          const recentWeightedSum = recent3.reduce((sum: number, item: any) => {
+                            const weeks = item.모자?.stock_weeks || 0;
+                            const weight = item.모자?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const recentTotalWeight = recent3.reduce((sum: number, item: any) => {
+                            return sum + (item.모자?.stock_price || 0);
+                          }, 0);
+                          const recentAvg = recentTotalWeight > 0 ? (recentWeightedSum / recentTotalWeight).toFixed(1) : '0.0';
+                          
+                          // 상반기(1~3월) 가중평균
+                          const first3 = data.slice(0, 3);
+                          const firstWeightedSum = first3.reduce((sum: number, item: any) => {
+                            const weeks = item.모자?.stock_weeks || 0;
+                            const weight = item.모자?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const firstTotalWeight = first3.reduce((sum: number, item: any) => {
+                            return sum + (item.모자?.stock_price || 0);
+                          }, 0);
+                          const firstAvg = firstTotalWeight > 0 ? (firstWeightedSum / firstTotalWeight).toFixed(1) : '0.0';
+                          
+                          const trend = parseFloat(recentAvg) > parseFloat(firstAvg) ? '증가' : '감소';
+                          
+                          return `연평균 ${avg}주 (최저 ${min}주, 최고 ${max}주). 하반기(8~10월) 평균 ${recentAvg}주로 상반기 ${firstAvg}주 대비 ${trend} 추세입니다.`;
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {/* 신발 분석 */}
+                    <div className="p-3 bg-white rounded-md border border-yellow-100">
+                      <div className="font-bold text-yellow-900 mb-1">👟 신발</div>
+                      <div className="text-gray-700 text-xs leading-relaxed">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          if (data.length === 0) return '데이터 없음';
+                          
+                          // 가중평균 계산 (재고금액으로 가중)
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.신발?.stock_weeks || 0;
+                            const weight = item.신발?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.신발?.stock_price || 0);
+                          }, 0);
+                          const avg = totalWeight > 0 ? (weightedSum / totalWeight).toFixed(1) : '0.0';
+                          
+                          // 최저/최고
+                          const weeksData = data.map((item: any) => item.신발?.stock_weeks || 0).filter((v: number) => v > 0);
+                          const min = weeksData.length > 0 ? Math.min(...weeksData).toFixed(1) : '0.0';
+                          const max = weeksData.length > 0 ? Math.max(...weeksData).toFixed(1) : '0.0';
+                          
+                          // 하반기(8~10월) 가중평균
+                          const recent3 = data.slice(-3);
+                          const recentWeightedSum = recent3.reduce((sum: number, item: any) => {
+                            const weeks = item.신발?.stock_weeks || 0;
+                            const weight = item.신발?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const recentTotalWeight = recent3.reduce((sum: number, item: any) => {
+                            return sum + (item.신발?.stock_price || 0);
+                          }, 0);
+                          const recentAvg = recentTotalWeight > 0 ? (recentWeightedSum / recentTotalWeight).toFixed(1) : '0.0';
+                          
+                          // 상반기(1~3월) 가중평균
+                          const first3 = data.slice(0, 3);
+                          const firstWeightedSum = first3.reduce((sum: number, item: any) => {
+                            const weeks = item.신발?.stock_weeks || 0;
+                            const weight = item.신발?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const firstTotalWeight = first3.reduce((sum: number, item: any) => {
+                            return sum + (item.신발?.stock_price || 0);
+                          }, 0);
+                          const firstAvg = firstTotalWeight > 0 ? (firstWeightedSum / firstTotalWeight).toFixed(1) : '0.0';
+                          
+                          const trend = parseFloat(recentAvg) > parseFloat(firstAvg) ? '증가' : '감소';
+                          
+                          return `연평균 ${avg}주 (최저 ${min}주, 최고 ${max}주). 하반기(8~10월) 평균 ${recentAvg}주로 상반기 ${firstAvg}주 대비 ${trend} 추세입니다.`;
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {/* 가방외 분석 */}
+                    <div className="p-3 bg-white rounded-md border border-purple-100">
+                      <div className="font-bold text-purple-900 mb-1">👜 가방외</div>
+                      <div className="text-gray-700 text-xs leading-relaxed">
+                        {(() => {
+                          const data = dashboardData?.monthly_inventory_data || [];
+                          if (data.length === 0) return '데이터 없음';
+                          
+                          // 가중평균 계산 (재고금액으로 가중)
+                          const weightedSum = data.reduce((sum: number, item: any) => {
+                            const weeks = item.가방외?.stock_weeks || 0;
+                            const weight = item.가방외?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const totalWeight = data.reduce((sum: number, item: any) => {
+                            return sum + (item.가방외?.stock_price || 0);
+                          }, 0);
+                          const avg = totalWeight > 0 ? (weightedSum / totalWeight).toFixed(1) : '0.0';
+                          
+                          // 최저/최고
+                          const weeksData = data.map((item: any) => item.가방외?.stock_weeks || 0).filter((v: number) => v > 0);
+                          const min = weeksData.length > 0 ? Math.min(...weeksData).toFixed(1) : '0.0';
+                          const max = weeksData.length > 0 ? Math.max(...weeksData).toFixed(1) : '0.0';
+                          
+                          // 하반기(8~10월) 가중평균
+                          const recent3 = data.slice(-3);
+                          const recentWeightedSum = recent3.reduce((sum: number, item: any) => {
+                            const weeks = item.가방외?.stock_weeks || 0;
+                            const weight = item.가방외?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const recentTotalWeight = recent3.reduce((sum: number, item: any) => {
+                            return sum + (item.가방외?.stock_price || 0);
+                          }, 0);
+                          const recentAvg = recentTotalWeight > 0 ? (recentWeightedSum / recentTotalWeight).toFixed(1) : '0.0';
+                          
+                          // 상반기(1~3월) 가중평균
+                          const first3 = data.slice(0, 3);
+                          const firstWeightedSum = first3.reduce((sum: number, item: any) => {
+                            const weeks = item.가방외?.stock_weeks || 0;
+                            const weight = item.가방외?.stock_price || 0;
+                            return sum + (weeks * weight);
+                          }, 0);
+                          const firstTotalWeight = first3.reduce((sum: number, item: any) => {
+                            return sum + (item.가방외?.stock_price || 0);
+                          }, 0);
+                          const firstAvg = firstTotalWeight > 0 ? (firstWeightedSum / firstTotalWeight).toFixed(1) : '0.0';
+                          
+                          const trend = parseFloat(recentAvg) > parseFloat(firstAvg) ? '증가' : '감소';
+                          
+                          return `연평균 ${avg}주 (최저 ${min}주, 최고 ${max}주). 하반기(8~10월) 평균 ${recentAvg}주로 상반기 ${firstAvg}주 대비 ${trend} 추세입니다.`;
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 계산 방식 설명 */}
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-xs font-bold text-gray-800 mb-2">📌 참고: 재고주수 계산 방식</h3>
+                  <div className="text-xs text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-indigo-700">계산식:</span>
+                      <span>재고주수 = (재고금액 / 해당 월 매출) × 4주</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

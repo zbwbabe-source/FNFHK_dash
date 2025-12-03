@@ -660,7 +660,7 @@ const HongKongStoreDashboard: React.FC = () => {
         </div>
         
         {/* AI 분석 */}
-        {(() => {
+            {(() => {
           const storesWithTurnover = allStores.filter(s => s.turnover_rate_achievement > 0);
           const belowTarget = storesWithTurnover.filter(s => s.turnover_rate_achievement < 100);
           
@@ -1248,21 +1248,21 @@ const HongKongStoreDashboard: React.FC = () => {
           const directProfitRateChange = turnoverAchievementHkTotalDirectProfitRate - hkCurrentDirectProfitRate;
           const operatingProfitRateChange = turnoverAchievementHkTotalOperatingProfitRate - hkCurrentOperatingProfitRate;
 
-                  return (
+                    return (
             <div className="mb-4 bg-white rounded-lg shadow-md p-4">
               <div className="mb-2">
                 <h2 className="text-sm font-semibold text-gray-900">
                   3. 매출증가에 따른 손익구조 시뮬레이션
                   <span className="ml-1 text-xs align-middle text-gray-600">*(마카오 제외)</span>
                 </h2>
-              </div>
+                      </div>
               
               {/* AI 분석 */}
               {(() => {
                 const defaultText = `턴오버 100% 달성 시 ${formatPercent(salesIncreaseRate, 1)}의 매출 증가로 영업이익이 ${formatNumber(operatingProfitChange)}K HKD 개선되며, 영업이익률은 ${formatPercent(hkCurrentOperatingProfitRate, 1)}에서 ${formatPercent(turnoverAchievementHkTotalOperatingProfitRate, 1)}로 상승합니다. BEP(손익분기점) 달성을 위해서는 추가적인 매출 증가가 필요합니다.`;
                 const displayText = aiAnalysisTexts['section3'] || defaultText;
-                
-                return (
+
+                  return (
                   <div className="mb-4 p-3 bg-purple-50 border-l-4 border-purple-500 rounded">
                     {editingAiAnalysis === 'section3' ? (
                       <div>
@@ -1298,8 +1298,8 @@ const HongKongStoreDashboard: React.FC = () => {
                           >
                             취소
                           </button>
-                        </div>
-                      </div>
+                          </div>
+                            </div>
                     ) : (
                       <div className="flex items-start justify-between">
                         <p className="text-xs text-gray-700 flex-1">
@@ -1311,35 +1311,35 @@ const HongKongStoreDashboard: React.FC = () => {
                         >
                           수정
                         </button>
-                      </div>
+                            </div>
                     )}
-                  </div>
-                );
-              })()}
+                    </div>
+                  );
+                })()}
 
               <div className="grid grid-cols-4 gap-4">
                 {/* 1. 현재 상태 */}
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
                   <div className="text-center mb-3">
                     <div className="text-sm font-bold text-gray-800">홍콩 10월 실적</div>
-                            </div>
+              </div>
                   <div className="space-y-3">
                     <div className="pb-2 border-b border-gray-200">
                       <div className="text-xs text-gray-500 mb-1">매출액</div>
                       <div className="text-lg font-bold text-gray-900">{formatNumber(hkTotalSales)}K</div>
-                            </div>
+                </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <div className="text-gray-500">임차료</div>
                         <div className="font-semibold text-gray-800">{formatNumber(hkTotalRent)}K</div>
                         <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentRentRate, 1)}</div>
-                          </div>
+              </div>
                       <div>
                         <div className="text-gray-500">인건비</div>
                         <div className="font-semibold text-gray-800">{formatNumber(hkTotalLaborCost)}K</div>
                         <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentLaborCostRate, 1)}</div>
-                        </div>
-                    </div>
+          </div>
+        </div>
                     <div className="pt-2 border-t border-gray-300">
                       <div className="text-xs text-gray-500 mb-1">직접이익</div>
                       <div className={`text-xl font-bold ${hkCurrentDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
