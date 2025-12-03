@@ -4,7 +4,7 @@
     "previous_period": "2509",
     "last_year": 2025,
     "last_month": 10,
-    "generated_at": "2025-12-02T19:50:20.440549"
+    "generated_at": "2025-12-03T09:01:41.569769"
   },
   "sales_summary": {
     "total_net_sales": 19629.056,
@@ -596,6 +596,173 @@
             "subcategory_code": "KC",
             "subcategory_name": "Knit Cardigan",
             "net_sales": 610.03
+          }
+        ],
+        "subcategory_detail": [
+          {
+            "subcategory_code": "TS",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 1187.927
+          },
+          {
+            "subcategory_code": "MT",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_sales": 1000.238
+          },
+          {
+            "subcategory_code": "S1",
+            "subcategory_name": "T-Shirt & Sweatpants",
+            "net_sales": 31.138
+          },
+          {
+            "subcategory_code": "DP",
+            "subcategory_name": "PANTS",
+            "net_sales": 50.746
+          },
+          {
+            "subcategory_code": "DS",
+            "subcategory_name": "SKIRT",
+            "net_sales": 53.615
+          },
+          {
+            "subcategory_code": "PT",
+            "subcategory_name": "PANTS",
+            "net_sales": 515.195
+          },
+          {
+            "subcategory_code": "SK",
+            "subcategory_name": "SKIRT",
+            "net_sales": 129.598
+          },
+          {
+            "subcategory_code": "WP",
+            "subcategory_name": "PANTS",
+            "net_sales": 313.326
+          },
+          {
+            "subcategory_code": "CP",
+            "subcategory_name": "CAP",
+            "net_sales": 193.841
+          },
+          {
+            "subcategory_code": "DR",
+            "subcategory_name": "DENIM SHIRT",
+            "net_sales": 211.587
+          },
+          {
+            "subcategory_code": "HD",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_sales": 377.555
+          },
+          {
+            "subcategory_code": "TR",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 724.98
+          },
+          {
+            "subcategory_code": "JP",
+            "subcategory_name": "JUMPER",
+            "net_sales": 375.024
+          },
+          {
+            "subcategory_code": "KC",
+            "subcategory_name": "Knit Cardigan",
+            "net_sales": 610.03
+          },
+          {
+            "subcategory_code": "WJ",
+            "subcategory_name": "Windbreaker",
+            "net_sales": 1011.326
+          },
+          {
+            "subcategory_code": "BN",
+            "subcategory_name": "Beanie",
+            "net_sales": 93.467
+          },
+          {
+            "subcategory_code": "DJ",
+            "subcategory_name": "JUMPER",
+            "net_sales": 362.627
+          },
+          {
+            "subcategory_code": "DV",
+            "subcategory_name": "VEST",
+            "net_sales": 208.75
+          },
+          {
+            "subcategory_code": "CB",
+            "subcategory_name": "Beret",
+            "net_sales": 27.616
+          },
+          {
+            "subcategory_code": "HT",
+            "subcategory_name": "Hat",
+            "net_sales": 20.101
+          },
+          {
+            "subcategory_code": "KP",
+            "subcategory_name": "Sweater Pullover",
+            "net_sales": 188.777
+          },
+          {
+            "subcategory_code": "OP",
+            "subcategory_name": "ONEPIECE",
+            "net_sales": 18.634
+          },
+          {
+            "subcategory_code": "DK",
+            "subcategory_name": "DENIM JACKET",
+            "net_sales": 99.922
+          },
+          {
+            "subcategory_code": "FD",
+            "subcategory_name": "Fleece Jumper",
+            "net_sales": 19.011
+          },
+          {
+            "subcategory_code": "PD",
+            "subcategory_name": "Padded Jumper",
+            "net_sales": 96.458
+          },
+          {
+            "subcategory_code": "SH",
+            "subcategory_name": "SHOES",
+            "net_sales": 11.814
+          },
+          {
+            "subcategory_code": "S2",
+            "subcategory_name": "Sweatshirt & Sweatpants",
+            "net_sales": 39.294
+          },
+          {
+            "subcategory_code": "LG",
+            "subcategory_name": "PANTS",
+            "net_sales": 1.352
+          },
+          {
+            "subcategory_code": "WS",
+            "subcategory_name": "WOVEN SHIRTS",
+            "net_sales": 9.712
+          },
+          {
+            "subcategory_code": "WB",
+            "subcategory_name": "Winter Boots",
+            "net_sales": 5.361
+          },
+          {
+            "subcategory_code": "ET",
+            "subcategory_name": "ACCESSARY",
+            "net_sales": 0.0
+          },
+          {
+            "subcategory_code": "MF",
+            "subcategory_name": "MUFFLER",
+            "net_sales": 0.0
+          },
+          {
+            "subcategory_code": "CR",
+            "subcategory_name": "Crossbody Bag",
+            "net_sales": 0.0
           }
         ]
       },

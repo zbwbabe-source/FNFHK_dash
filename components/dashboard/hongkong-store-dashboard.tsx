@@ -14,10 +14,14 @@ import {
   ScatterChart,
   Scatter,
   ZAxis,
+  ReferenceLine,
 } from 'recharts';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, ChevronRight, ArrowRight } from 'lucide-react';
 import storeStatusData from './hongkong-store-status.json';
 import dashboardData from './hongkong-dashboard-data.json';
+import storeAreasData from './hongkong-store-areas.json';
+import storeTurnoverTargetsData from './hongkong-store-turnover-targets.json';
+import plData from './hongkong-pl-data.json';
 
 type StoreCategoryKey = 'profit_improving' | 'profit_deteriorating' | 'loss_improving' | 'loss_deteriorating';
 
@@ -29,6 +33,8 @@ interface StoreRecord {
     net_sales: number;
     direct_profit: number;
     rent_labor_ratio: number;
+    rent?: number;
+    labor_cost?: number;
   };
   previous?: {
     net_sales?: number;
@@ -46,6 +52,19 @@ interface FlattenedStoreRow {
   direct_profit: number;
   yoy: number;
   rent_labor_ratio: number;
+  rent_rate: number; // 임차료율 (%)
+  labor_rate: number; // 인건비율 (%)
+  sales_per_pyeong: number; // 평당매출
+  turnover_rate_achievement: number; // 턴오버율 달성률 (0-100, 목표 대비 달성률)
+  turnover_target_sales: number; // 턴오버 목표 매출 (고정임차료 / 턴오버 기준율)
+  turnover_shortfall: number; // 턴오버 목표 대비 부족 매출 (목표 매출 - 실제 매출, 음수면 초과)
+  efficiency_score: number; // 종합 효율성 점수 (0-100)
+  efficiency_grade: string; // 효율성 등급 (S, A, B, C, D)
+  // 턴오버 달성시 시나리오
+  turnover_achievement_rent_rate: number; // 턴오버 달성시 임차료율 (%)
+  turnover_achievement_labor_rate: number; // 턴오버 달성시 인건비율 (%)
+  turnover_achievement_direct_profit: number; // 턴오버 달성시 직접이익
+  turnover_achievement_direct_profit_rate: number; // 턴오버 달성시 직접이익률 (%)
 }
 
 const CATEGORY_LABEL: Record<StoreCategoryKey, string> = {
@@ -55,28 +74,234 @@ const CATEGORY_LABEL: Record<StoreCategoryKey, string> = {
   loss_deteriorating: '적자 & 매출악화',
 };
 
+// 효율성 점수에 따른 등급 계산 함수 (백분위 기반 - 상대 평가)
+const getEfficiencyGrade = (score: number, allScores: number[]): string => {
+  if (allScores.length === 0) return 'D';
+  
+  // 점수 배열을 내림차순 정렬
+  const sortedScores = [...allScores].sort((a, b) => b - a);
+  
+  // 현재 점수보다 높은 점수의 개수 계산
+  const higherCount = sortedScores.filter(s => s > score).length;
+  
+  // 백분위 계산 (상위 몇 %인지)
+  const percentile = (higherCount / allScores.length) * 100;
+  
+  // 백분위 기반 등급 부여 (상위 20%씩 구분)
+  if (percentile < 20) return 'S';  // 상위 20%
+  if (percentile < 40) return 'A';  // 상위 21-40%
+  if (percentile < 60) return 'B';  // 상위 41-60%
+  if (percentile < 80) return 'C';  // 상위 61-80%
+  return 'D';  // 하위 20%
+};
+
+// 등급별 색상 및 스타일
+const getGradeStyle = (grade: string) => {
+  switch (grade) {
+    case 'S':
+      return { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' };
+    case 'A':
+      return { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' };
+    case 'B':
+      return { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' };
+    case 'C':
+      return { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300' };
+    case 'D':
+      return { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' };
+    default:
+      return { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-300' };
+  }
+};
+
 const HongKongStoreDashboard: React.FC = () => {
+  const ALL_CATEGORY_KEYS: StoreCategoryKey[] = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'];
   const [selectedStore, setSelectedStore] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'category' | 'sales' | 'yoy' | 'direct_profit_rate' | 'sales_per_pyeong' | 'turnover'>('category'); // 정렬 기준 (기본값: 카테고리별)
+  const [showCurrentDetails, setShowCurrentDetails] = useState(true); // 현재 지표 상세 컬럼 표시 (엑셀 그룹처럼) - 기본값: 펼침
+  const [showTurnoverDetails, setShowTurnoverDetails] = useState(false); // 턴오버 달성시 상세 컬럼 표시 (엑셀 그룹처럼) - 사용 안 함
+  const [showTurnoverSummary, setShowTurnoverSummary] = useState(true); // 상단 요약(턴오버 달성 효과) 토글
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set()); // 펼쳐진 카테고리 목록
+  const [showSalesPerPyeongAnalysis, setShowSalesPerPyeongAnalysis] = useState(true); // 1번 섹션 접기/펼치기
+  const [expandedCategoriesSalesPerPyeong, setExpandedCategoriesSalesPerPyeong] = useState<Set<string>>(new Set()); // 1번 섹션 펼쳐진 카테고리 목록
+  const [showTurnoverRentExplanation, setShowTurnoverRentExplanation] = useState(false); // 턴오버 임차료 설명 접기/펼치기
+  
+  // AI 분석 편집 상태
+  const [editingAiAnalysis, setEditingAiAnalysis] = useState<string | null>(null);
+  const [aiAnalysisTexts, setAiAnalysisTexts] = useState<{[key: string]: string}>({});
+  
+  // AI 분석 로컬 스토리지에서 로드
+  useEffect(() => {
+    const saved = localStorage.getItem('hongkong-store-ai-analysis');
+    if (saved) {
+      try {
+        setAiAnalysisTexts(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse AI analysis from localStorage', e);
+      }
+    }
+  }, []);
+  
+  // AI 분석 로컬 스토리지에 저장
+  const saveAiAnalysis = (section: string, text: string) => {
+    const newTexts = { ...aiAnalysisTexts, [section]: text };
+    setAiAnalysisTexts(newTexts);
+    localStorage.setItem('hongkong-store-ai-analysis', JSON.stringify(newTexts));
+    setEditingAiAnalysis(null);
+  };
+  const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>(() => {
+    // 로컬스토리지에서 AI 분석 데이터 로드
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('hk_store_ai_analysis');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+  const [editingStoreCode, setEditingStoreCode] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState<string>('');
   
   const allStores: FlattenedStoreRow[] = useMemo(() => {
     const categories = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'] as StoreCategoryKey[];
     const result: FlattenedStoreRow[] = [];
+    const storeAreas = (storeAreasData as any)?.store_areas || {};
 
     categories.forEach((cat) => {
       const catData = (storeStatusData as any)?.categories?.[cat];
       if (!catData?.stores) return;
       (catData.stores as StoreRecord[]).forEach((s) => {
+        const area = storeAreas[s.shop_cd] || 0; // 평 단위
+        const netSales = s.current?.net_sales ?? 0;
+        const salesPerPyeong = area > 0 ? netSales / area : 0; // 평당매출 (1K HKD/평)
+        
+        const rent = s.current?.rent ?? 0;
+        const laborCost = s.current?.labor_cost ?? 0;
+        const rentRate = netSales > 0 ? (rent / netSales) * 100 : 0;
+        const laborRate = netSales > 0 ? (laborCost / netSales) * 100 : 0;
+        
+        // 턴오버 기준 달성률 계산
+        const storeTurnoverTargets = (storeTurnoverTargetsData as any)?.store_turnover_targets || {};
+        const turnoverTarget = storeTurnoverTargets[s.shop_cd];
+        let turnoverTargetSales = 0;
+        let turnoverShortfall = 0;
+        let turnoverAchievement = 0;
+        
+        // 턴오버 달성시 시나리오 계산 변수
+        let turnoverAchievementRentRate = 0;
+        let turnoverAchievementLaborRate = laborRate; // 인건비율은 동일
+        let turnoverAchievementDirectProfit = s.current?.direct_profit ?? 0;
+        let turnoverAchievementDirectProfitRate = 0;
+        
+        if (turnoverTarget && turnoverTarget.turnover_rate > 0) {
+          // 턴오버 기준: 매출 × 턴오버 기준율 >= 고정임차료
+          // 목표 매출 = 고정임차료 / 턴오버 기준율 (턴오버 기준을 달성하기 위한 최소 매출)
+          turnoverTargetSales = turnoverTarget.fixed_rent / turnoverTarget.turnover_rate;
+          // 부족 매출 = 목표 매출 - 실제 매출 (음수면 초과)
+          turnoverShortfall = turnoverTargetSales - netSales;
+          // 달성률 = (매출 × 턴오버 기준율 / 고정임차료) × 100
+          // 100% 이상이면 턴오버 기준 달성 (매출 × 턴오버 기준율 >= 고정임차료)
+          const turnoverBasedRent = netSales * turnoverTarget.turnover_rate;
+          turnoverAchievement = turnoverTarget.fixed_rent > 0 
+            ? (turnoverBasedRent / turnoverTarget.fixed_rent) * 100 
+            : 0;
+          
+          // 턴오버 달성시 직접이익 계산 (사용자 요청 로직)
+          // 1. 현재 매출총이익 = 현재 직접이익 + 현재 임차료 + 인건비
+          const currentGrossProfit = (s.current?.direct_profit ?? 0) + rent + laborCost;
+          // 2. 현재 매출원가 = 현재 매출 - 현재 매출총이익 (최소 0)
+          const currentCogs = Math.max(0, netSales - currentGrossProfit);
+          // 3. 현재 매출원가율 = 현재 매출원가 / 현재 매출 (0-1 사이로 제한)
+          const currentCogsRate = netSales > 0 ? Math.max(0, Math.min(1, currentCogs / netSales)) : 0;
+          
+          // 4. 턴오버 달성시 매출 = 목표 매출 (현재 매출이 목표보다 높으면 현재 매출 유지)
+          const turnoverAchievementSales = Math.max(netSales, turnoverTargetSales);
+          // 5. 턴오버 달성시 매출원가 = 턴오버 달성시 매출 × 현재 매출원가율
+          const turnoverAchievementCogs = turnoverAchievementSales * currentCogsRate;
+          // 6. 턴오버 달성시 매출총이익 = 턴오버 달성시 매출 - 턴오버 달성시 매출원가
+          const turnoverAchievementGrossProfit = turnoverAchievementSales - turnoverAchievementCogs;
+          
+          // 7. 턴오버 달성시 임차료 = 현재 임차료 금액 동일
+          const turnoverAchievementRent = rent;
+          
+          // 8. 턴오버 달성시 인건비 = 현재 인건비 금액 동일 (고정)
+          const turnoverAchievementLaborCost = laborCost;
+          
+          // 9. 턴오버 달성시 직접이익 = 턴오버 달성시 매출총이익 - 임차료 - 인건비
+          turnoverAchievementDirectProfit = turnoverAchievementGrossProfit - turnoverAchievementRent - turnoverAchievementLaborCost;
+          
+          // 턴오버 달성시 임차료율
+          turnoverAchievementRentRate = turnoverAchievementSales > 0 ? (turnoverAchievementRent / turnoverAchievementSales) * 100 : 0;
+          // 턴오버 달성시 인건비율 (매출 증가로 인해 비율은 감소)
+          turnoverAchievementLaborRate = turnoverAchievementSales > 0 ? (turnoverAchievementLaborCost / turnoverAchievementSales) * 100 : 0;
+          // 턴오버 달성시 직접이익률
+          turnoverAchievementDirectProfitRate = turnoverAchievementSales > 0 ? (turnoverAchievementDirectProfit / turnoverAchievementSales) * 100 : 0;
+        }
+        
         result.push({
           store_code: s.shop_cd,
           store_name: s.shop_nm.trim(),
           category: cat,
-          net_sales: s.current?.net_sales ?? 0,
+          net_sales: netSales,
           direct_profit: s.current?.direct_profit ?? 0,
           yoy: s.yoy ?? 0,
           rent_labor_ratio: s.current?.rent_labor_ratio ?? 0,
+          rent_rate: rentRate,
+          labor_rate: laborRate,
+          sales_per_pyeong: salesPerPyeong,
+          turnover_rate_achievement: turnoverAchievement,
+          turnover_target_sales: turnoverTargetSales,
+          turnover_shortfall: turnoverShortfall,
+          efficiency_score: 0, // 나중에 계산
+          efficiency_grade: 'D', // 나중에 계산
+          turnover_achievement_rent_rate: turnoverAchievementRentRate,
+          turnover_achievement_labor_rate: turnoverAchievementLaborRate,
+          turnover_achievement_direct_profit: turnoverAchievementDirectProfit,
+          turnover_achievement_direct_profit_rate: turnoverAchievementDirectProfitRate,
         });
       });
+    });
+
+    // 종합 효율성 점수 계산을 위해 전체 데이터의 최소/최대값 필요
+    const allYoy = result.map(s => s.yoy);
+    const allDirectProfitRate = result.map(s => s.net_sales > 0 ? (s.direct_profit / s.net_sales) * 100 : 0);
+    const allSalesPerPyeong = result.map(s => s.sales_per_pyeong);
+    const allRentRatio = result.map(s => s.rent_labor_ratio);
+
+    const minYoy = Math.min(...allYoy);
+    const maxYoy = Math.max(...allYoy);
+    const minDirectProfitRate = Math.min(...allDirectProfitRate);
+    const maxDirectProfitRate = Math.max(...allDirectProfitRate);
+    const minSalesPerPyeong = Math.min(...allSalesPerPyeong);
+    const maxSalesPerPyeong = Math.max(...allSalesPerPyeong);
+    const minRentRatio = Math.min(...allRentRatio);
+    const maxRentRatio = Math.max(...allRentRatio);
+
+    // 각 매장의 종합 효율성 점수 계산
+    result.forEach(store => {
+      const directProfitRate = store.net_sales > 0 ? (store.direct_profit / store.net_sales) * 100 : 0;
+      
+      // 각 지표를 0-100 점수로 정규화
+      const yoyScore = maxYoy > minYoy ? ((store.yoy - minYoy) / (maxYoy - minYoy)) * 100 : 50;
+      const directProfitRateScore = maxDirectProfitRate > minDirectProfitRate 
+        ? ((directProfitRate - minDirectProfitRate) / (maxDirectProfitRate - minDirectProfitRate)) * 100 
+        : 50;
+      const salesPerPyeongScore = maxSalesPerPyeong > minSalesPerPyeong
+        ? ((store.sales_per_pyeong - minSalesPerPyeong) / (maxSalesPerPyeong - minSalesPerPyeong)) * 100
+        : 50;
+      // 턴오버율 달성률 (높을수록 좋음)
+      const turnoverScore = store.turnover_rate_achievement || 0;
+
+      // 가중 평균: 매출 YOY 30%, 직접이익률 30%, 평당매출 30%, 턴오버율 달성 10%
+      store.efficiency_score = 
+        yoyScore * 0.3 +
+        directProfitRateScore * 0.3 +
+        salesPerPyeongScore * 0.3 +
+        turnoverScore * 0.1;
+    });
+
+    // 모든 점수를 계산한 후 등급 부여 (백분위 기반 상대 평가)
+    const allScores = result.map(s => s.efficiency_score);
+    result.forEach(store => {
+      store.efficiency_grade = getEfficiencyGrade(store.efficiency_score, allScores);
     });
 
     return result;
@@ -93,8 +318,10 @@ const HongKongStoreDashboard: React.FC = () => {
 
   const formatNumber = (num: number) =>
     (Number.isFinite(num) ? Math.round(num).toLocaleString('ko-KR') : '0');
-  const formatPercent = (num: number) =>
-    (Number.isFinite(num) ? `${Math.round(num)}%` : '0%');
+  const formatPercent = (num: number, decimals: number = 0) => {
+    if (!Number.isFinite(num)) return '0%';
+    return `${Number(num).toFixed(decimals)}%`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -102,395 +329,1292 @@ const HongKongStoreDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto mb-6">
         <div className="bg-gradient-to-r from-slate-800 to-slate-600 text-white rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">홍콩 오프라인 매장 상세 대시보드 (25년 10월 기준)</h1>
+            <h1 className="text-2xl font-bold mb-1">매장효율성 분석 (25년 10월 기준)</h1>
             <p className="text-sm text-slate-200">
-              매장별 실판매출, 직접이익, YOY 및 효율성을 한눈에 보는 상세 분석 화면입니다.
+              매장별 평당매출, 턴오버 달성률, 손익구조를 분석하여 효율성을 한눈에 파악하는 화면입니다.
             </p>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* 매장별 1~10월 YOY 추세 테이블 */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h2 className="text-sm font-semibold text-gray-900 mb-3">매장별 2025년 YOY 추세</h2>
+      {/* 1. 매장별 평당매출 분석 */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-900">1. 매장별 평당매출 분석</h2>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const allCategoryKeys = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'];
+                if (expandedCategoriesSalesPerPyeong.size === allCategoryKeys.length) {
+                  setExpandedCategoriesSalesPerPyeong(new Set());
+                } else {
+                  setExpandedCategoriesSalesPerPyeong(new Set(allCategoryKeys));
+                }
+              }}
+              className="px-3 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            >
+              {expandedCategoriesSalesPerPyeong.size === 4 ? '전체 접기' : '전체 펼치기'}
+            </button>
+          </div>
+        </div>
+        
+        {/* AI 분석 */}
+        {(() => {
+          const profitStores = allStores.filter(s => s.direct_profit > 0 && s.sales_per_pyeong > 0);
+          const lossStores = allStores.filter(s => s.direct_profit <= 0 && s.sales_per_pyeong > 0);
+          
+          if (profitStores.length === 0 && lossStores.length === 0) return null;
+          
+          const avgProfitSalesPerPyeong = profitStores.length > 0
+            ? profitStores.reduce((sum, s) => sum + s.sales_per_pyeong, 0) / profitStores.length
+            : 0;
+          const minProfitSalesPerPyeong = profitStores.length > 0
+            ? Math.min(...profitStores.map(s => s.sales_per_pyeong))
+            : 0;
+          const maxLossSalesPerPyeong = lossStores.length > 0
+            ? Math.max(...lossStores.map(s => s.sales_per_pyeong))
+            : 0;
+          
+          const breakEvenThreshold = Math.max(minProfitSalesPerPyeong, maxLossSalesPerPyeong);
+          
+          const defaultText = `평당매출이 ${formatNumber(breakEvenThreshold)}K HKD/평 이상이어야 흑자 전환 가능성이 높습니다. 현재 흑자 매장(${profitStores.length}개)의 평균 평당매출은 ${formatNumber(avgProfitSalesPerPyeong)}K HKD/평입니다.`;
+          const displayText = aiAnalysisTexts['section1'] || defaultText;
+          
+          return (
+            <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+              {editingAiAnalysis === 'section1' ? (
+                <div>
+                  <textarea
+                    className="w-full text-xs p-2 border border-blue-300 rounded"
+                    rows={3}
+                    value={displayText}
+                    onChange={(e) => setAiAnalysisTexts({ ...aiAnalysisTexts, section1: e.target.value })}
+                    onBlur={() => saveAiAnalysis('section1', displayText)}
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => saveAiAnalysis('section1', displayText)}
+                      className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newTexts = { ...aiAnalysisTexts };
+                        delete newTexts['section1'];
+                        setAiAnalysisTexts(newTexts);
+                        localStorage.setItem('hongkong-store-ai-analysis', JSON.stringify(newTexts));
+                        setEditingAiAnalysis(null);
+                      }}
+                      className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500"
+                    >
+                      기본값으로 복원
+                    </button>
+                    <button
+                      onClick={() => setEditingAiAnalysis(null)}
+                      className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <p className="text-xs text-gray-700 flex-1">
+                    <span className="font-semibold text-blue-700">💡 AI 분석:</span> {displayText}
+                  </p>
+                  <button
+                    onClick={() => setEditingAiAnalysis('section1')}
+                    className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                  >
+                    수정
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+        
+        
+        {showSalesPerPyeongAnalysis && (() => {
+          // 평당매출 기준으로 정렬된 매장 목록 (높은 순)
+          const sortedStoresBySalesPerPyeong = [...allStores]
+            .filter(s => s.sales_per_pyeong > 0) // 면적이 있는 매장만
+            .sort((a, b) => (b.sales_per_pyeong || 0) - (a.sales_per_pyeong || 0));
+          
+          // 통계 계산
+          const validStores = sortedStoresBySalesPerPyeong.filter(s => s.sales_per_pyeong > 0);
+          const maxSalesPerPyeong = validStores.length > 0
+            ? Math.max(...validStores.map(s => s.sales_per_pyeong))
+            : 0;
+          const minSalesPerPyeong = validStores.length > 0
+            ? Math.min(...validStores.map(s => s.sales_per_pyeong))
+            : 0;
+          
+          // 카테고리별 그룹화
+          const categoryGroups: Record<string, typeof sortedStoresBySalesPerPyeong> = {
+            profit_improving: [],
+            profit_deteriorating: [],
+            loss_improving: [],
+            loss_deteriorating: [],
+          };
+          
+          sortedStoresBySalesPerPyeong.forEach(store => {
+            if (categoryGroups[store.category]) {
+              categoryGroups[store.category].push(store);
+            }
+          });
+          
+          // 색상 강도 계산 함수
+          const getHeatmapColor = (value: number) => {
+            const ratio = maxSalesPerPyeong > minSalesPerPyeong
+              ? (value - minSalesPerPyeong) / (maxSalesPerPyeong - minSalesPerPyeong)
+              : 0.5;
+            
+            // 초록 계열 (높은 값)
+            if (ratio >= 0.8) return { bg: 'bg-green-600', text: 'text-white' };
+            if (ratio >= 0.6) return { bg: 'bg-green-400', text: 'text-white' };
+            if (ratio >= 0.4) return { bg: 'bg-green-200', text: 'text-gray-800' };
+            // 노랑 계열 (중간)
+            if (ratio >= 0.3) return { bg: 'bg-yellow-200', text: 'text-gray-800' };
+            if (ratio >= 0.2) return { bg: 'bg-yellow-100', text: 'text-gray-800' };
+            // 빨강 계열 (낮은 값)
+            if (ratio >= 0.1) return { bg: 'bg-red-100', text: 'text-gray-800' };
+            if (ratio >= 0.05) return { bg: 'bg-red-200', text: 'text-gray-800' };
+            return { bg: 'bg-red-300', text: 'text-gray-800' };
+          };
+          
+          return (
         <div className="overflow-x-auto">
-          <table className="w-full text-[10px]">
+              <table className="min-w-full text-xs border-collapse">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left p-2 font-semibold">매장명</th>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((m) => (
-                  <th key={m} className="text-center p-2 font-semibold">{m}월</th>
-                ))}
-                <th className="text-center p-2 font-semibold">추세</th>
+                  <tr className="bg-gray-200 border-b-2 border-gray-400">
+                    <th className="p-2 text-left font-semibold">매장명</th>
+                    <th className="p-2 text-right font-semibold">평당매출</th>
+                    <th className="p-2 text-right font-semibold">매출액</th>
+                    <th className="p-2 text-right font-semibold">당월직접이익</th>
+                    <th className="p-2 text-right font-semibold">면적(평)</th>
+                    <th className="p-2 text-right font-semibold">순위</th>
+                    <th className="p-2 text-left font-semibold">개선전략</th>
               </tr>
             </thead>
             <tbody>
-              {allStores.map((store) => {
-                const monthlyData = (dashboardData as any)?.store_monthly_trends?.[store.store_code] || [];
-                
-                return (
-                  <tr key={store.store_code} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="p-2 font-medium">{store.store_name}</td>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((month) => {
-                      const monthData = monthlyData.find((d: any) => d.month === month);
-                      const yoy = monthData?.yoy || 0;
-                      let colorClass = 'text-gray-400';
-                      if (yoy >= 100) colorClass = 'text-green-600 font-semibold';
-                      else if (yoy >= 90) colorClass = 'text-gray-600';
-                      else if (yoy > 0) colorClass = 'text-red-600';
+                  {Object.entries(categoryGroups).map(([catKey, stores]) => {
+                    if (stores.length === 0) return null;
+                    const categoryName = CATEGORY_LABEL[catKey as StoreCategoryKey];
+                    const isExpanded = expandedCategoriesSalesPerPyeong.has(catKey);
+                    
+                    // 카테고리별 합계 계산
+                    const totalSales = stores.reduce((sum, s) => sum + s.net_sales, 0);
+                    const totalDirectProfit = stores.reduce((sum, s) => sum + s.direct_profit, 0);
+                    const totalArea = stores.reduce((sum, s) => {
+                      const area = (storeAreasData as any)?.store_areas?.[s.store_code] || 0;
+                      return sum + area;
+                    }, 0);
+                    const avgSalesPerPyeong = totalArea > 0 ? totalSales / totalArea : 0;
+                    
+                    const toggleCategory = () => {
+                      setExpandedCategoriesSalesPerPyeong((prev) => {
+                        const newSet = new Set(prev);
+                        if (newSet.has(catKey)) {
+                          newSet.delete(catKey);
+                        } else {
+                          newSet.add(catKey);
+                        }
+                        return newSet;
+                      });
+                    };
                       
                       return (
-                        <td key={month} className={`text-center p-2 ${colorClass}`}>
-                          {yoy > 0 ? `${yoy}%` : '-'}
+                      <React.Fragment key={catKey}>
+                        {/* 카테고리 합계 행 */}
+                        <tr
+                          className="border-b-2 border-gray-400 bg-gray-100 hover:bg-gray-200 font-bold"
+                          onClick={toggleCategory}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td className="p-2 font-semibold border-r border-gray-300 sticky left-0 bg-gray-100 z-10">
+                            <div className="flex items-center gap-2">
+                              {isExpanded ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                              <span>{categoryName}</span>
+                              <span className="text-xs font-normal text-gray-600">({stores.length}개 매장)</span>
+                            </div>
                         </td>
-                      );
-                    })}
-                    <td className="text-center p-2">
-                      {(() => {
-                        // 3Q(7,8,9월) vs 10월 비교
-                        const q3Data = monthlyData.filter((d: any) => [7, 8, 9].includes(d.month));
-                        const octData = monthlyData.find((d: any) => d.month === 10);
-                        if (q3Data.length === 0 || !octData) return '-';
+                          <td className={`p-2 text-right border-r border-gray-300 font-bold ${getHeatmapColor(avgSalesPerPyeong).bg} ${getHeatmapColor(avgSalesPerPyeong).text}`}>
+                            {avgSalesPerPyeong.toFixed(1)}K HKD/평
+                          </td>
+                          <td className="p-2 text-right border-r border-gray-300 bg-white">
+                            {formatNumber(totalSales)}K
+                          </td>
+                          <td className={`p-2 text-right border-r border-gray-300 bg-white font-semibold ${
+                            totalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {formatNumber(totalDirectProfit)}K
+                          </td>
+                          <td className="p-2 text-right border-r border-gray-300 bg-white">
+                            {totalArea > 0 ? `${totalArea}평` : '-'}
+                          </td>
+                          <td className="p-2 text-right border-r border-gray-300 bg-white">
+                            -
+                          </td>
+                          <td className="p-2 text-left bg-white text-gray-500">
+                            -
+                          </td>
+                        </tr>
                         
-                        const q3Avg = q3Data.reduce((sum: number, d: any) => sum + d.yoy, 0) / q3Data.length;
-                        const trend = octData.yoy > q3Avg;
-                        
-                        return trend ? (
-                          <TrendingUp className="w-4 h-4 text-green-600 inline" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-red-600 inline" />
-                        );
-                      })()}
+                        {/* 매장별 행 (펼쳐진 경우만 표시) */}
+                        {isExpanded && stores.map((store, index) => {
+                          const area = (storeAreasData as any)?.store_areas?.[store.store_code] || 0;
+                          const globalRank = sortedStoresBySalesPerPyeong.findIndex(s => s.store_code === store.store_code) + 1;
+                          const colorStyle = getHeatmapColor(store.sales_per_pyeong);
+                          
+                          return (
+                            <tr key={store.store_code} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2 text-gray-600">{store.store_name}</td>
+                              <td className={`p-2 text-right font-bold ${colorStyle.bg} ${colorStyle.text}`}>
+                                {store.sales_per_pyeong.toFixed(1)}K HKD/평
+                              </td>
+                              <td className="p-2 text-right bg-white">{formatNumber(store.net_sales)}K</td>
+                              <td className={`p-2 text-right bg-white font-semibold ${
+                                store.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                {formatNumber(store.direct_profit)}K
+                              </td>
+                              <td className="p-2 text-right bg-white">{area > 0 ? `${area}평` : '-'}</td>
+                              <td className="p-2 text-right bg-white font-medium">#{globalRank}</td>
+                              <td className="p-2 text-left bg-white text-gray-500">
+                                {/* 개선전략은 나중에 추가할 수 있도록 빈 셀로 유지 */}
+                                -
                     </td>
                   </tr>
+                          );
+                        })}
+                      </React.Fragment>
                 );
               })}
             </tbody>
           </table>
         </div>
+          );
+        })()}
       </div>
 
-      {/* 매장 선택 → 아이템 버블 차트 */}
+      {/* 2. 턴오버임차료 기준매출 달성시 매장별 지표변화 */}
       <div className="bg-white rounded-lg shadow-md p-4">
-        <div className="mb-3">
-          <h2 className="text-sm font-semibold text-gray-900 mb-2">당시즌 (25F) 아이템별 판매 분석 (버블 차트) - 실판매출 TOP 10</h2>
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-600">매장 선택:</span>
-            <select
-              value={selectedStore}
-              onChange={(e) => setSelectedStore(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 text-xs"
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-900">
+            2. 턴오버임차료 기준매출 달성시 매장별 지표변화
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const allExpanded = ALL_CATEGORY_KEYS.every((key) => expandedCategories.has(key));
+                if (allExpanded) {
+                  setExpandedCategories(new Set());
+                } else {
+                  setExpandedCategories(new Set(ALL_CATEGORY_KEYS));
+                }
+              }}
+              className="px-3 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
             >
-              <option value="ALL">전체</option>
-              {allStores.map((s) => (
-                <option key={s.store_code} value={s.store_code}>
-                  {s.store_name}
-                </option>
-              ))}
-            </select>
+              {ALL_CATEGORY_KEYS.every((key) => expandedCategories.has(key)) ? '전체 접기' : '전체 펼치기'}
+            </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 h-80">
-            <ResponsiveContainer width="100%" height="100%">
+        
+        {/* 턴오버 임차료 기준 매출 설명 */}
+        <div className="mb-4 bg-gray-50 border border-gray-200 rounded">
+          <button
+            type="button"
+            onClick={() => setShowTurnoverRentExplanation(!showTurnoverRentExplanation)}
+            className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-blue-600 text-sm">ℹ️</span>
+              <h3 className="text-xs font-semibold text-gray-800">턴오버 임차료 기준 매출이란?</h3>
+            </div>
+            {showTurnoverRentExplanation ? (
+              <ChevronDown className="w-4 h-4 text-gray-600" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-600" />
+            )}
+          </button>
+          {showTurnoverRentExplanation && (
+            <div className="px-3 pb-3">
+              <p className="text-xs text-gray-600 leading-relaxed">
+                <span className="font-semibold">턴오버 임차료(Turnover Rent)</span>는 매장 매출액의 일정 비율을 임차료로 지불하는 계약 방식입니다. 
+                일반적으로 <span className="font-semibold text-blue-700">"고정 임차료 + 초과 매출의 일정 %"</span> 또는 
+                <span className="font-semibold text-blue-700">"매출의 일정 % 중 더 높은 금액"</span>으로 계산됩니다. 
+                턴오버 기준 100% 달성 시란, <span className="font-semibold text-green-700">현재 지불하는 고정 임차료가 매출의 몇 %에 해당하는 매출 수준</span>을 의미합니다. 
+                이 수준에 도달하면 임차료 부담이 줄어들어 수익성이 크게 개선됩니다.
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* AI 분석 */}
+        {(() => {
+          const storesWithTurnover = allStores.filter(s => s.turnover_rate_achievement > 0);
+          const belowTarget = storesWithTurnover.filter(s => s.turnover_rate_achievement < 100);
+          
+          // 전체 합계 행과 동일한 계산 방식
+          const totalNetSales = storesWithTurnover.reduce((sum, s) => sum + s.net_sales, 0);
+          const totalRent = storesWithTurnover.reduce((sum, s) => {
+            const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+            return sum + (storeRecord?.current?.rent || 0);
+          }, 0);
+          
+          const avgCurrentRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
+          
+          const totalTurnoverSales = storesWithTurnover.reduce((sum, s) => {
+            return sum + (s.turnover_target_sales > 0 ? Math.max(s.net_sales, s.turnover_target_sales) : s.net_sales);
+          }, 0);
+          
+          const avgTargetRentRate = totalTurnoverSales > 0 ? (totalRent / totalTurnoverSales) * 100 : 0;
+          
+          const avgAchievement = storesWithTurnover.length > 0
+            ? storesWithTurnover.reduce((sum, s) => sum + s.turnover_rate_achievement, 0) / storesWithTurnover.length
+            : 0;
+          
+          const defaultText = `턴오버 100% 달성 시 임차료율이 평균 ${formatPercent(avgTargetRentRate, 1)}로 하락합니다 (현재 ${formatPercent(avgCurrentRentRate, 1)}, ${formatPercent(avgCurrentRentRate - avgTargetRentRate, 1)}%p 개선). 현재 평균 달성률은 ${formatPercent(avgAchievement, 1)}이며, ${belowTarget.length}개 매장이 목표 미달 상태입니다.`;
+          const displayText = aiAnalysisTexts['section2'] || defaultText;
+          
+          return (
+            <div className="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded">
+              {editingAiAnalysis === 'section2' ? (
+                <div>
+                  <textarea
+                    className="w-full text-xs p-2 border border-green-300 rounded"
+                    rows={3}
+                    value={displayText}
+                    onChange={(e) => setAiAnalysisTexts({ ...aiAnalysisTexts, section2: e.target.value })}
+                    onBlur={() => saveAiAnalysis('section2', displayText)}
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => saveAiAnalysis('section2', displayText)}
+                      className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newTexts = { ...aiAnalysisTexts };
+                        delete newTexts['section2'];
+                        setAiAnalysisTexts(newTexts);
+                        localStorage.setItem('hongkong-store-ai-analysis', JSON.stringify(newTexts));
+                        setEditingAiAnalysis(null);
+                      }}
+                      className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500"
+                    >
+                      기본값으로 복원
+                    </button>
+                    <button
+                      onClick={() => setEditingAiAnalysis(null)}
+                      className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <p className="text-xs text-gray-700 flex-1">
+                    <span className="font-semibold text-green-700">💡 AI 분석:</span> {displayText}
+                  </p>
+                  <button
+                    onClick={() => setEditingAiAnalysis('section2')}
+                    className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200"
+                  >
+                    수정
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+        
+        
+        {/* 통합 테이블 (카테고리별 합계 + 매장별 내역) */}
+        <div>
+          <div className="mb-4">
+            <div className="overflow-x-auto">
+                <table className="min-w-full text-xs border-collapse">
+                  <thead>
+                    {/* 그룹 헤더 행 (엑셀 그룹처럼) */}
+                    <tr className="bg-gray-200 border-b-2 border-gray-400">
+                      <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 sticky left-0 bg-gray-100 z-10">매장명<br/>(면적, YOY)</th>
+                      <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300">턴오버율<br/>달성률 (%)</th>
+                      <th colSpan={3} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
+                        <span>현재 지표</span>
+                      </th>
+                      <th colSpan={3} className="text-center p-2 font-bold bg-green-50">
+                        <span>턴오버 100% 달성시 지표</span>
+                      </th>
+                    </tr>
+                    {/* 컬럼 헤더 행 */}
+                    <tr className="bg-gray-100 border-b-2 border-gray-300">
+                      {/* 현재 지표 그룹 */}
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50">직접이익률<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50">임차료율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r-2 border-gray-400 bg-blue-50">인건비율<br/>(%)</th>
+                      
+                      {/* 턴오버 달성시 지표 그룹 */}
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">직접이익률<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">임차료율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold bg-green-50">인건비율<br/>(%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
             {(() => {
-              if (!selectedStore) {
-                return <div className="flex items-center justify-center h-full text-gray-500 text-sm">매장을 선택해주세요</div>;
-              }
-              
-              // 25F 아이템 서브카테고리 목록 가져오기
-              const seasonSales = (dashboardData as any)?.season_sales?.current_season_f;
-              const subcategoryTop5 = seasonSales?.october?.subcategory_top5 || [];
-              const subcategory25F = new Set(subcategoryTop5.map((item: any) => item.subcategory_code));
-              
-              const storeItemAll = (dashboardData as any)?.store_item_all || {};
-              let rawData: any[] = [];
-              let totalSales = 0;
-
-              if (selectedStore === 'ALL') {
-                // 모든 매장 데이터를 서브카테고리별로 합산 (25F만)
-                const aggregated: Record<string, { net_sales: number; prev_sales: number }> = {};
-
-                Object.values(storeItemAll).forEach((storeData: any) => {
-                  if (Array.isArray(storeData)) {
-                    storeData.forEach((item: any) => {
-                      // 25F 서브카테고리만 필터링
-                      if (item.item_name !== '합계' && subcategory25F.has(item.item_name)) {
-                        if (!aggregated[item.item_name]) {
-                          aggregated[item.item_name] = { net_sales: 0, prev_sales: 0 };
-                        }
-                        aggregated[item.item_name].net_sales += item.net_sales || 0;
-                        // YOY 계산을 위한 전년 매출 추정
-                        // YOY = (현재 / 전년) * 100 이므로, 전년 = 현재 * 100 / YOY
-                        const currentSales = item.net_sales || 0;
-                        const yoy = item.yoy || 0;
-                        const prevSales = yoy > 0 && yoy < 10000 ? (currentSales * 100) / yoy : 0;
-                        aggregated[item.item_name].prev_sales += prevSales;
+                      // 필터링된 매장 데이터 가져오기
+                      let filteredStores = allStores;
+                      if (selectedStore !== 'ALL') {
+                        filteredStores = allStores.filter((s) => s.category === selectedStore);
                       }
-                    });
-                  }
-                });
 
-                // 합산된 데이터를 배열로 변환
-                rawData = Object.entries(aggregated).map(([item_name, data]) => {
-                  const yoy = data.prev_sales > 0 ? (data.net_sales / data.prev_sales) * 100 : 0;
-                  return {
-                    item_name,
-                    net_sales: data.net_sales,
-                    yoy: Number.isFinite(yoy) ? yoy : 0,
-                  };
-                });
+                      // 카테고리 순서 정의
+                      const categoryOrder: Record<StoreCategoryKey, number> = {
+                        profit_improving: 1,
+                        profit_deteriorating: 2,
+                        loss_improving: 3,
+                        loss_deteriorating: 4,
+                      };
+                      
+                      // 카테고리별로 그룹화
+                      const categoryGroups: Record<string, typeof allStores> = {
+                        profit_improving: [],
+                        profit_deteriorating: [],
+                        loss_improving: [],
+                        loss_deteriorating: [],
+                      };
+                      
+                      filteredStores.forEach(store => {
+                        if (categoryGroups[store.category]) {
+                          categoryGroups[store.category].push(store);
+                        }
+                      });
+                      
+                      // 각 카테고리 내에서 정렬
+                      Object.keys(categoryGroups).forEach(catKey => {
+                        categoryGroups[catKey].sort((a, b) => {
+                          switch (sortBy) {
+                            case 'sales':
+                              return (b.net_sales || 0) - (a.net_sales || 0);
+                            case 'yoy':
+                              return (b.yoy || 0) - (a.yoy || 0);
+                            case 'direct_profit_rate': {
+                              const aRate = a.net_sales > 0 ? (a.direct_profit / a.net_sales) * 100 : 0;
+                              const bRate = b.net_sales > 0 ? (b.direct_profit / b.net_sales) * 100 : 0;
+                              return bRate - aRate;
+                            }
+                            case 'sales_per_pyeong':
+                              return (b.sales_per_pyeong || 0) - (a.sales_per_pyeong || 0);
+                            case 'turnover':
+                              return (b.turnover_rate_achievement || 0) - (a.turnover_rate_achievement || 0);
+                            default:
+                              return (b.turnover_rate_achievement || 0) - (a.turnover_rate_achievement || 0);
+                          }
+                        });
+                      });
 
-                totalSales = rawData.reduce((sum: number, d: any) => sum + (d.net_sales || 0), 0);
-              } else {
-                // 개별 매장: 25F 서브카테고리만 필터링
-                const allItems = storeItemAll?.[selectedStore] || [];
-                rawData = allItems.filter((item: any) => 
-                  item.item_name !== '합계' && subcategory25F.has(item.item_name)
-                );
-                totalSales = rawData.reduce((sum: number, d: any) => sum + (d.net_sales || 0), 0);
-              }
+                      // 행 전체 색상 함수 (효율성 점수 기반) - 흰색으로 통일
+                      const getRowColor = (score: number) => {
+                        return 'bg-white hover:bg-gray-50';
+                      };
 
-              if (rawData.length === 0) {
-                return <div className="flex items-center justify-center h-full text-gray-500 text-sm">데이터가 없습니다</div>;
-              }
-              // 합계 레코드 분리 및 TOP 10 정렬
-              const itemData = rawData
-                .filter((d: any) => d.item_name !== '합계')
-                .sort((a: any, b: any) => (b.net_sales || 0) - (a.net_sales || 0))
-                .slice(0, 10);
-              
-              if (itemData.length === 0) {
-                return <div className="flex items-center justify-center h-full text-gray-500 text-sm">데이터가 없습니다</div>;
-              }
+                      // 각 지표별 최소/최대값 계산 (전체 매장 기준)
+                      const allYoyValues = filteredStores.map((s) => s.yoy);
+                      const allDirectProfitRateValues = filteredStores.map((s) => 
+                        s.net_sales > 0 ? (s.direct_profit / s.net_sales) * 100 : 0
+                      );
+                      const allRentRateValues = filteredStores.map((s) => s.rent_rate);
+                      const allLaborRateValues = filteredStores.map((s) => s.labor_rate);
+                      const allTurnoverValues = filteredStores.map((s) => s.turnover_rate_achievement || 0);
 
-              // 버블 차트 데이터 준비: X축(YOY), Y축(판매율), 크기(매출액)
-              const colors = [
-                '#4F46E5', '#7C3AED', '#DB2777', '#DC2626', '#EA580C',
-                '#D97706', '#CA8A04', '#65A30D', '#059669', '#0891B2',
-              ];
-              
-              // 최소/최대 매출액 계산 (버블 크기 계산용)
-              const salesValues = itemData.map((d: any) => d.net_sales || 0);
-              const minSales = Math.min(...salesValues);
-              const maxSales = Math.max(...salesValues);
-              const salesRange = maxSales - minSales || 1; // 0으로 나누기 방지
-              
-              const data = itemData.map((d: any, idx: number) => {
-                const netSales = d.net_sales || 0;
-                // 버블 크기: 최소 10px, 최대 50px로 정규화
-                const bubbleSize = salesRange > 0 
-                  ? 10 + ((netSales - minSales) / salesRange) * 40 
-                  : 20;
-                
-                return {
-                  name: d.item_name,
-                  x: d.yoy || 0, // X축: YOY
-                  y: totalSales > 0 ? parseFloat(((netSales / totalSales) * 100).toFixed(2)) : 0, // Y축: 판매율 (%)
-                  z: netSales, // Z축(버블 크기): 매출액 (툴팁용)
-                  net_sales: netSales,
-                  ratio: totalSales > 0 ? ((netSales / totalSales) * 100).toFixed(1) : '0.0',
-                  fill: colors[idx % colors.length], // 각 포인트별 색상
-                  bubbleSize: bubbleSize, // 계산된 버블 크기
-                };
-              });
+                      const minYoy = Math.min(...allYoyValues);
+                      const maxYoy = Math.max(...allYoyValues);
+                      const minDirectProfitRate = Math.min(...allDirectProfitRateValues);
+                      const maxDirectProfitRate = Math.max(...allDirectProfitRateValues);
+                      const minRentRate = Math.min(...allRentRateValues);
+                      const maxRentRate = Math.max(...allRentRateValues);
+                      const minLaborRate = Math.min(...allLaborRateValues);
+                      const maxLaborRate = Math.max(...allLaborRateValues);
+                      const minTurnover = Math.min(...allTurnoverValues);
+                      const maxTurnover = Math.max(...allTurnoverValues);
+
+                      const storeAreas = (storeAreasData as any)?.store_areas || {};
+                      
+                      // 카테고리 토글 함수
+                      const toggleCategory = (categoryKey: string) => {
+                        setExpandedCategories(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(categoryKey)) {
+                            newSet.delete(categoryKey);
+                          } else {
+                            newSet.add(categoryKey);
+                          }
+                          return newSet;
+                        });
+                      };
+                      
+                      // 카테고리별로 렌더링
+                      return Object.entries(categoryGroups).map(([catKey, stores]) => {
+                        if (stores.length === 0) return null;
+                        
+                        const isExpanded = expandedCategories.has(catKey);
+                        const categoryName = CATEGORY_LABEL[catKey as StoreCategoryKey];
+                        
+                        // 카테고리별 합계 계산
+                        const totalSales = stores.reduce((sum, s) => sum + s.net_sales, 0);
+                        const totalDirectProfit = stores.reduce((sum, s) => sum + s.direct_profit, 0);
+                        const avgYoy = stores.reduce((sum, s) => sum + s.yoy, 0) / stores.length;
+                        const avgDirectProfitRate = totalSales > 0 ? (totalDirectProfit / totalSales) * 100 : 0;
+                        const avgTurnoverAchievement = stores.reduce((sum, s) => sum + (s.turnover_rate_achievement || 0), 0) / stores.length;
+                        const avgRentRate = totalSales > 0 ? stores.reduce((sum, s) => sum + (s.rent_rate * s.net_sales), 0) / totalSales : 0;
+                        const avgLaborRate = totalSales > 0 ? stores.reduce((sum, s) => sum + (s.labor_rate * s.net_sales), 0) / totalSales : 0;
+                        
+                        // 턴오버 달성시 평균 계산
+                        const storesWithTurnover = stores.filter(s => s.turnover_rate_achievement > 0);
+                        const avgTurnoverDirectProfitRate = storesWithTurnover.length > 0
+                          ? storesWithTurnover.reduce((sum, s) => sum + s.turnover_achievement_direct_profit_rate, 0) / storesWithTurnover.length
+                          : 0;
+                        const avgTurnoverRentRate = storesWithTurnover.length > 0
+                          ? storesWithTurnover.reduce((sum, s) => sum + s.turnover_achievement_rent_rate, 0) / storesWithTurnover.length
+                          : 0;
+                        const storesWithTurnoverLabor = stores.filter(s => s.turnover_rate_achievement > 0 && s.turnover_achievement_labor_rate > 0);
+                        const avgTurnoverLaborRate = storesWithTurnoverLabor.length > 0
+                          ? storesWithTurnoverLabor.reduce((sum, s) => sum + s.turnover_achievement_labor_rate, 0) / storesWithTurnoverLabor.length
+                          : 0;
 
               return (
-                <ScatterChart
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    type="number"
-                    dataKey="x"
-                    name="YOY"
-                    label={{ value: 'YOY (%)', position: 'insideBottom', offset: -5 }}
-                    tick={{ fontSize: 10 }}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="y"
-                    name="판매율"
-                    label={{ value: '판매율 (%)', angle: -90, position: 'insideLeft' }}
-                    tick={{ fontSize: 10 }}
-                  />
-                  <ZAxis
-                    type="number"
-                    dataKey="z"
-                    range={[10, 50]} // 버블 크기 범위 (픽셀)
-                    name="매출액"
-                  />
-                  <Tooltip
-                    cursor={{ strokeDasharray: '3 3' }}
-                    content={({ active, payload }: any) => {
-                      if (!active || !payload || !payload[0]) return null;
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-gray-900 text-white p-3 rounded shadow-lg text-xs">
-                          <div className="font-semibold mb-1">{data.name}</div>
-                          <div>매출액: {formatNumber(data.net_sales)}K HKD</div>
-                          <div>비중: {data.ratio}%</div>
-                          <div>YOY: {formatPercent(data.x)}</div>
+                          <React.Fragment key={catKey}>
+                            {/* 카테고리 합계 행 */}
+                            <tr
+                              className="border-b-2 border-gray-400 bg-gray-100 hover:bg-gray-200 font-bold"
+                              onClick={() => toggleCategory(catKey)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <td className="p-2 font-semibold border-r border-gray-300 sticky left-0 bg-gray-100 z-10">
+                                <div className="flex items-center gap-2">
+                                  {isExpanded ? (
+                                    <ChevronDown className="w-4 h-4" />
+                                  ) : (
+                                    <ChevronRight className="w-4 h-4" />
+                                  )}
+                                  <span>{categoryName}</span>
+                                  <span className="text-xs font-normal text-gray-600">({stores.length}개 매장)</span>
                         </div>
-                      );
-                    }}
-                  />
-                  {data.map((item: any, index: number) => (
-                    <Scatter
-                      key={`scatter-${index}`}
-                      name={item.name}
-                      data={[item]}
-                      fill={item.fill}
-                      shape={(props: any) => {
-                        const { cx, cy, payload } = props;
-                        // payload.bubbleSize를 사용하여 크기 설정
-                        const radius = payload.bubbleSize || 20;
-                        return (
-                          <circle
-                            cx={cx}
-                            cy={cy}
-                            r={radius}
-                            fill={payload.fill || '#4F46E5'}
-                            opacity={selectedItem === payload.name ? 1 : 0.7}
-                            stroke={selectedItem === payload.name ? '#000' : '#fff'}
-                            strokeWidth={selectedItem === payload.name ? 2 : 1}
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => setSelectedItem(payload.name)}
-                          />
+                              </td>
+                              <td className="p-2 text-center border-r border-gray-300 bg-white">
+                                {formatPercent(avgTurnoverAchievement, 1)}
+                              </td>
+                              <td className={`p-2 text-center border-r border-gray-300 bg-white ${avgDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {formatPercent(avgDirectProfitRate, 1)}
+                              </td>
+                              <td className="p-2 text-center border-r border-gray-300 bg-white">
+                                {avgRentRate.toFixed(1)}%
+                              </td>
+                              <td className="p-2 text-center border-r-2 border-gray-400 bg-white">
+                                {avgLaborRate > 0 ? avgLaborRate.toFixed(1) + '%' : '-'}
+                              </td>
+                              <td className={`p-2 text-center border-r border-gray-300 bg-white ${avgTurnoverDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {avgTurnoverDirectProfitRate > 0 ? avgTurnoverDirectProfitRate.toFixed(1) + '%' : '-'}
+                              </td>
+                              <td className="p-2 text-center border-r border-gray-300 bg-white">
+                                {avgTurnoverRentRate > 0 ? avgTurnoverRentRate.toFixed(1) + '%' : '-'}
+                              </td>
+                              <td className="p-2 text-center bg-white">
+                                {avgTurnoverLaborRate > 0 ? avgTurnoverLaborRate.toFixed(1) + '%' : '-'}
+                              </td>
+                            </tr>
+                            
+                            {/* 매장별 내역 (펼쳐진 경우만 표시) */}
+                            {isExpanded && stores.map((store) => {
+                              const directProfitRate = store.net_sales > 0 
+                                ? (store.direct_profit / store.net_sales) * 100 
+                                : 0;
+                              const area = storeAreas[store.store_code] || 0;
+
+                      return (
+                                <React.Fragment key={store.store_code}>
+                                  <tr
+                                    className={`border-b border-gray-200 bg-white hover:bg-gray-50`}
+                                  >
+                                    <td className="p-2 font-medium border-r border-gray-300 sticky left-0 bg-white z-10">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-600">{store.store_name}</span>
+                                        <span className={`px-1.5 py-0.5 rounded text-[9px] ${
+                                          store.category === 'profit_improving' ? 'bg-green-100 text-green-800' :
+                                          store.category === 'profit_deteriorating' ? 'bg-yellow-100 text-yellow-800' :
+                                          store.category === 'loss_improving' ? 'bg-blue-100 text-blue-800' :
+                                          'bg-red-100 text-red-800'
+                                        }`}>
+                                          {CATEGORY_LABEL[store.category]}
+                                        </span>
+                        </div>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        {area > 0 && (
+                                          <div className="text-[10px] text-gray-500">{area}평</div>
+                                        )}
+                                        <div className="text-[10px] font-semibold text-gray-700 px-1.5 py-0.5 rounded">
+                                          YOY {formatPercent(store.yoy)}
+                                        </div>
+                        </div>
+                                    </td>
+                                    <td className="p-2 text-right border-r border-gray-300 bg-white">
+                                      <div className="flex items-center justify-end gap-2">
+                                        <div className="flex-1 min-w-[60px]">
+                                          <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                                            <div 
+                                              className={`h-full rounded-full transition-all ${
+                                                (store.turnover_rate_achievement || 0) >= 100 ? 'bg-green-500' :
+                                                (store.turnover_rate_achievement || 0) >= 80 ? 'bg-yellow-500' :
+                                                'bg-red-500'
+                                              }`}
+                                              style={{ 
+                                                width: `${Math.min((store.turnover_rate_achievement || 0), 150)}%` 
+                                              }}
+                                            />
+                                          </div>
+                                        </div>
+                                        <span className="text-xs font-semibold min-w-[45px] text-right">
+                                          {(store.turnover_rate_achievement || 0).toFixed(1)}%
+                                        </span>
+                                      </div>
+                                    </td>
+                                    
+                                    {/* 현재 지표: 직접이익률, 임차료율, 인건비율 */}
+                                    <td className={`p-2 text-right border-r border-gray-300 bg-white ${directProfitRate >= 0 ? 'text-green-600' : 'text-red-600'} font-semibold`}>
+                                      {directProfitRate.toFixed(1)}%
+                                    </td>
+                                    <td
+                                      className={`
+                                        p-2 text-right border-r border-gray-300 bg-white font-semibold
+                                        ${store.rent_rate >= 25 ? 'text-red-600' : store.rent_rate >= 20 ? 'text-yellow-600' : 'text-green-600'}
+                                      `}
+                                    >
+                                      {store.rent_rate.toFixed(1)}%
+                                    </td>
+                                    <td
+                                      className={`
+                                        p-2 text-right border-r-2 border-gray-400 bg-white font-semibold
+                                        ${store.labor_rate === 0 ? 'text-gray-400' : store.labor_rate > 12 ? 'text-red-600' : store.labor_rate > 10 ? 'text-yellow-600' : 'text-green-600'}
+                                      `}
+                                    >
+                                      {store.labor_rate > 0 ? `${store.labor_rate.toFixed(1)}%` : '-'}
+                                    </td>
+                                    
+                                    {/* 턴오버 달성시 지표: 직접이익률, 임차료율, 인건비율 */}
+                                    <td
+                                      className={`
+                                        p-2 text-right border-r border-gray-300 bg-white font-semibold
+                                        ${
+                                          store.turnover_rate_achievement > 0
+                                            ? store.turnover_achievement_direct_profit_rate >= 0
+                                              ? 'text-green-600'
+                                              : 'text-red-600'
+                                            : 'text-gray-400'
+                                        }
+                                      `}
+                                    >
+                                      {store.turnover_rate_achievement > 0 ? store.turnover_achievement_direct_profit_rate.toFixed(1) + '%' : '-'}
+                                    </td>
+                                    <td
+                                      className={`
+                                        p-2 text-right border-r border-gray-300 bg-white font-semibold
+                                        ${
+                                          store.turnover_rate_achievement > 0
+                                            ? store.turnover_achievement_rent_rate <= 20
+                                              ? 'text-green-600'
+                                              : store.turnover_achievement_rent_rate <= 25
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600'
+                                            : 'text-gray-400'
+                                        }
+                                      `}
+                                    >
+                                      {store.turnover_rate_achievement > 0 ? store.turnover_achievement_rent_rate.toFixed(1) + '%' : '-'}
+                                    </td>
+                                    <td
+                                      className={`
+                                        p-2 text-right bg-white font-semibold
+                                        ${
+                                          store.turnover_rate_achievement > 0 && store.turnover_achievement_labor_rate > 0
+                                            ? store.turnover_achievement_labor_rate <= 10
+                                              ? 'text-green-600'
+                                              : store.turnover_achievement_labor_rate <= 12
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600'
+                                            : 'text-gray-400'
+                                        }
+                                      `}
+                                    >
+                                      {store.turnover_rate_achievement > 0 && store.turnover_achievement_labor_rate > 0 ? store.turnover_achievement_labor_rate.toFixed(1) + '%' : '-'}
+                                    </td>
+                                  </tr>
+                                </React.Fragment>
+                              );
+                            })}
+                          </React.Fragment>
                         );
-                      }}
-                    />
-                  ))}
-                </ScatterChart>
-              );
+                      }).filter(Boolean);
             })()}
-          </ResponsiveContainer>
+                    
+                    {/* 전체 합계 행 */}
+                    {(() => {
+                      const allStoresWithTurnover = allStores.filter(s => s.turnover_rate_achievement > 0);
+                      
+                      // 전체 합계 계산
+                      const totalNetSales = allStoresWithTurnover.reduce((sum, s) => sum + s.net_sales, 0);
+                      const totalDirectProfit = allStoresWithTurnover.reduce((sum, s) => sum + s.direct_profit, 0);
+                      const totalRent = allStoresWithTurnover.reduce((sum, s) => {
+                        const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+                        return sum + (storeRecord?.current?.rent || 0);
+                      }, 0);
+                      const totalLaborCost = allStoresWithTurnover.reduce((sum, s) => {
+                        const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+                        return sum + (storeRecord?.current?.labor_cost || 0);
+                      }, 0);
+                      
+                      // 현재 지표 평균
+                      const avgCurrentDirectProfitRate = totalNetSales > 0 ? (totalDirectProfit / totalNetSales) * 100 : 0;
+                      const avgCurrentRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
+                      const avgCurrentLaborRate = totalNetSales > 0 ? (totalLaborCost / totalNetSales) * 100 : 0;
+                      
+                      // 턴오버 달성시 합계
+                      const totalTurnoverSales = allStoresWithTurnover.reduce((sum, s) => {
+                        return sum + (s.turnover_target_sales > 0 ? Math.max(s.net_sales, s.turnover_target_sales) : s.net_sales);
+                      }, 0);
+                      const totalTurnoverDirectProfit = allStoresWithTurnover.reduce((sum, s) => sum + s.turnover_achievement_direct_profit, 0);
+                      const totalTurnoverRent = totalRent; // 임차료는 고정
+                      const totalTurnoverLaborCost = totalLaborCost; // 인건비는 고정
+                      
+                      // 턴오버 달성시 지표
+                      const avgTurnoverDirectProfitRate = totalTurnoverSales > 0 ? (totalTurnoverDirectProfit / totalTurnoverSales) * 100 : 0;
+                      const avgTurnoverRentRate = totalTurnoverSales > 0 ? (totalTurnoverRent / totalTurnoverSales) * 100 : 0;
+                      const avgTurnoverLaborRate = totalTurnoverSales > 0 ? (totalTurnoverLaborCost / totalTurnoverSales) * 100 : 0;
+                      
+                      // 평균 달성률
+                      const avgAchievement = allStoresWithTurnover.length > 0
+                        ? allStoresWithTurnover.reduce((sum, s) => sum + s.turnover_rate_achievement, 0) / allStoresWithTurnover.length
+                        : 0;
+                      
+                      return (
+                        <tr className="bg-gradient-to-r from-blue-100 to-blue-50 border-t-4 border-blue-500 font-bold text-sm">
+                          <td className="p-3 border-r border-gray-300 sticky left-0 bg-blue-100 z-10">
+                            전체 합계 ({allStoresWithTurnover.length}개 매장)
+                          </td>
+                          <td className="p-3 text-center border-r border-gray-300 text-blue-800">
+                            {formatPercent(avgAchievement, 1)}
+                          </td>
+                          
+                          {/* 현재 지표 */}
+                          <td className="p-3 text-right border-r border-gray-300 bg-blue-50">
+                            {formatPercent(avgCurrentDirectProfitRate, 1)}
+                          </td>
+                          <td className="p-3 text-right border-r border-gray-300 bg-blue-50">
+                            {formatPercent(avgCurrentRentRate, 1)}
+                          </td>
+                          <td className="p-3 text-right border-r-2 border-gray-400 bg-blue-50">
+                            {formatPercent(avgCurrentLaborRate, 1)}
+                          </td>
+                          
+                          {/* 턴오버 달성시 지표 */}
+                          <td className="p-3 text-right border-r border-gray-300 bg-green-50">
+                            {formatPercent(avgTurnoverDirectProfitRate, 1)}
+                          </td>
+                          <td className="p-3 text-right border-r border-gray-300 bg-green-50">
+                            {formatPercent(avgTurnoverRentRate, 1)}
+                          </td>
+                          <td className="p-3 text-right bg-green-50">
+                            {formatPercent(avgTurnoverLaborRate, 1)}
+                          </td>
+                        </tr>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
           
-          {/* 매장별 판매 순위 */}
-          <div className="lg:col-span-1">
-            {selectedItem ? (
-              <div className="bg-white rounded-lg shadow-md p-4 h-80 overflow-y-auto">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                  {selectedItem} 매장별 판매 순위
-                </h3>
+        {/* 홍콩 현재 영업이익/직접이익 및 턴오버 달성시 영업이익 요약 */}
                 {(() => {
-                  const storeItemAll = (dashboardData as any)?.store_item_all || {};
-                  const storeRankings: Array<{ store_name: string; store_code: string; net_sales: number; yoy: number }> = [];
-
-                  Object.entries(storeItemAll).forEach(([storeCode, storeData]: [string, any]) => {
-                    if (Array.isArray(storeData)) {
-                      const itemData = storeData.find((d: any) => d.item_name === selectedItem);
-                      if (itemData) {
-                        const storeName = allStores.find((s) => s.store_code === storeCode)?.store_name || storeCode;
-                        storeRankings.push({
-                          store_name: storeName,
-                          store_code: storeCode,
-                          net_sales: itemData.net_sales || 0,
-                          yoy: itemData.yoy || 0,
-                        });
-                      }
-                    }
-                  });
-
-                  // 매출액 기준 내림차순 정렬
-                  storeRankings.sort((a, b) => (b.net_sales || 0) - (a.net_sales || 0));
-
-                  if (storeRankings.length === 0) {
-                    return (
-                      <div className="text-center text-gray-500 text-sm py-8">
-                        해당 아이템을 판매한 매장이 없습니다.
-                      </div>
-                    );
-                  }
+          // 홍콩 전체 현재 영업이익, 직접이익
+          const hkCurrentOperatingProfit = (plData as any)?.current_month?.hk?.operating_profit || 0;
+          const hkCurrentDirectProfit = (plData as any)?.current_month?.hk?.direct_profit || 0;
+          
+          // 필터링된 매장 데이터 가져오기
+          let filteredStores = allStores;
+          if (selectedStore !== 'ALL') {
+            filteredStores = allStores.filter((s) => s.category === selectedStore);
+          }
+          
+          // 홍콩 오프라인 매장만 필터링 (country === 'HK')
+          const hkOfflineStores = filteredStores.filter((s) => {
+            const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+            return storeRecord?.country === 'HK';
+          });
+          
+          // 홍콩 전체 직접이익 및 영업이익 (pl-data 기준)
+          const hkTotalDirectProfit = (plData as any)?.current_month?.hk?.direct_profit || 0;
+          const hkTotalOperatingProfit = (plData as any)?.current_month?.hk?.operating_profit || 0;
+          const hkTotalSgA = (plData as any)?.current_month?.hk?.sg_a || 0;
+          const hkTotalSales = (plData as any)?.current_month?.hk?.net_sales || 0;
+          
+          // 직접이익률 및 영업이익률 계산
+          const hkCurrentDirectProfitRate = hkTotalSales > 0 ? (hkTotalDirectProfit / hkTotalSales) * 100 : 0;
+          const hkCurrentOperatingProfitRate = hkTotalSales > 0 ? (hkTotalOperatingProfit / hkTotalSales) * 100 : 0;
+          
+          // 현재 홍콩 오프라인 직접이익 (pl-data 기준 사용)
+          const currentHkOfflineDirectProfit = (plData as any)?.channel_direct_profit?.hk_offline?.direct_profit || 0;
+          
+          // 턴오버 달성시 매출 증가분 계산 (오프라인 매장들의 목표 매출 합계)
+          const currentHkOfflineSales = hkOfflineStores.reduce((sum, s) => sum + s.net_sales, 0);
+          
+          // 홍콩 전체 임차료 및 인건비 계산 (오프라인 매장 합계)
+          const hkTotalRent = hkOfflineStores.reduce((sum, s) => {
+            const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+            return sum + (storeRecord?.current?.rent || 0);
+          }, 0);
+          const hkTotalLaborCost = hkOfflineStores.reduce((sum, s) => {
+            const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
+            return sum + (storeRecord?.current?.labor_cost || 0);
+          }, 0);
+          
+          // 임차료율 및 인건비율 계산 (오프라인 매출 기준)
+          const hkCurrentRentRate = currentHkOfflineSales > 0 ? (hkTotalRent / currentHkOfflineSales) * 100 : 0;
+          const hkCurrentLaborCostRate = currentHkOfflineSales > 0 ? (hkTotalLaborCost / currentHkOfflineSales) * 100 : 0;
+          
+          // 턴오버 달성시 홍콩 오프라인 직접이익 합계 (모든 매장 포함)
+          const turnoverAchievementHkOfflineDirectProfit = hkOfflineStores.reduce((sum, s) => {
+            return sum + s.turnover_achievement_direct_profit;
+          }, 0);
+          
+          // 오프라인 직접이익 증가분
+          const offlineDirectProfitIncrease = turnoverAchievementHkOfflineDirectProfit - currentHkOfflineDirectProfit;
+          const turnoverAchievementHkOfflineSales = hkOfflineStores.reduce((sum, s) => {
+            if (s.turnover_target_sales > 0) {
+              return sum + Math.max(s.net_sales, s.turnover_target_sales);
+            }
+            return sum + s.net_sales;
+          }, 0);
+          const offlineSalesIncrease = turnoverAchievementHkOfflineSales - currentHkOfflineSales;
+          
+          // 턴오버 달성시 홍콩 전체 매출 = 현재 전체 매출 + 오프라인 매출 증가분
+          const turnoverAchievementHkTotalSales = hkTotalSales + offlineSalesIncrease;
+          
+          // 턴오버 달성시 홍콩 전체 직접이익 = 현재 전체 직접이익 + 오프라인 직접이익 증가분
+          const turnoverAchievementHkTotalDirectProfit = hkTotalDirectProfit + offlineDirectProfitIncrease;
+          
+          // 턴오버 달성시 홍콩 전체 영업이익 = 턴오버 달성시 전체 직접이익 - 전체 영업비 (고정)
+          const turnoverAchievementHkTotalOperatingProfit = turnoverAchievementHkTotalDirectProfit - hkTotalSgA;
+          
+          // 턴오버 달성시 임차료 및 인건비 (고정)
+          const turnoverAchievementHkTotalRent = hkTotalRent;
+          const turnoverAchievementHkTotalLaborCost = hkTotalLaborCost;
+          
+          // 턴오버 달성시 임차료율 및 인건비율 계산 (오프라인 매출 기준)
+          const turnoverAchievementHkTotalRentRate = turnoverAchievementHkOfflineSales > 0 
+            ? (turnoverAchievementHkTotalRent / turnoverAchievementHkOfflineSales) * 100 
+            : 0;
+          const turnoverAchievementHkTotalLaborCostRate = turnoverAchievementHkOfflineSales > 0 
+            ? (turnoverAchievementHkTotalLaborCost / turnoverAchievementHkOfflineSales) * 100 
+            : 0;
+          
+          // 턴오버 달성시 직접이익률 및 영업이익률 계산
+          const turnoverAchievementHkTotalDirectProfitRate = turnoverAchievementHkTotalSales > 0 
+            ? (turnoverAchievementHkTotalDirectProfit / turnoverAchievementHkTotalSales) * 100 
+            : 0;
+          const turnoverAchievementHkTotalOperatingProfitRate = turnoverAchievementHkTotalSales > 0 
+            ? (turnoverAchievementHkTotalOperatingProfit / turnoverAchievementHkTotalSales) * 100 
+            : 0;
+          
+          // 변화량 계산
+          const salesIncrease = turnoverAchievementHkTotalSales - hkTotalSales;
+          const salesIncreaseRate = hkTotalSales > 0 ? (salesIncrease / hkTotalSales) * 100 : 0;
+          const directProfitChange = turnoverAchievementHkTotalDirectProfit - hkCurrentDirectProfit;
+          const operatingProfitChange = turnoverAchievementHkTotalOperatingProfit - hkCurrentOperatingProfit;
+          const rentRateChange = turnoverAchievementHkTotalRentRate - hkCurrentRentRate;
+          const laborRateChange = turnoverAchievementHkTotalLaborCostRate - hkCurrentLaborCostRate;
+          const directProfitRateChange = turnoverAchievementHkTotalDirectProfitRate - hkCurrentDirectProfitRate;
+          const operatingProfitRateChange = turnoverAchievementHkTotalOperatingProfitRate - hkCurrentOperatingProfitRate;
 
                   return (
-                    <div className="space-y-2">
-                      {storeRankings.map((store, index) => (
-                        <div
-                          key={store.store_code}
-                          className={`flex items-center justify-between p-2 rounded ${
-                            index === 0 ? 'bg-yellow-50 border border-yellow-200' :
-                            index < 3 ? 'bg-gray-50 border border-gray-200' :
-                            'hover:bg-gray-50'
-                          }`}
+            <div className="mb-4 bg-white rounded-lg shadow-md p-4">
+              <div className="mb-2">
+                <h2 className="text-sm font-semibold text-gray-900">
+                  3. 매출증가에 따른 손익구조 시뮬레이션
+                  <span className="ml-1 text-xs align-middle text-gray-600">*(마카오 제외)</span>
+                </h2>
+              </div>
+              
+              {/* AI 분석 */}
+              {(() => {
+                const defaultText = `턴오버 100% 달성 시 ${formatPercent(salesIncreaseRate, 1)}의 매출 증가로 영업이익이 ${formatNumber(operatingProfitChange)}K HKD 개선되며, 영업이익률은 ${formatPercent(hkCurrentOperatingProfitRate, 1)}에서 ${formatPercent(turnoverAchievementHkTotalOperatingProfitRate, 1)}로 상승합니다. BEP(손익분기점) 달성을 위해서는 추가적인 매출 증가가 필요합니다.`;
+                const displayText = aiAnalysisTexts['section3'] || defaultText;
+                
+                return (
+                  <div className="mb-4 p-3 bg-purple-50 border-l-4 border-purple-500 rounded">
+                    {editingAiAnalysis === 'section3' ? (
+                      <div>
+                        <textarea
+                          className="w-full text-xs p-2 border border-purple-300 rounded"
+                          rows={3}
+                          value={displayText}
+                          onChange={(e) => setAiAnalysisTexts({ ...aiAnalysisTexts, section3: e.target.value })}
+                          onBlur={() => saveAiAnalysis('section3', displayText)}
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => saveAiAnalysis('section3', displayText)}
+                            className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
+                          >
+                            저장
+                          </button>
+                          <button
+                            onClick={() => {
+                              const newTexts = { ...aiAnalysisTexts };
+                              delete newTexts['section3'];
+                              setAiAnalysisTexts(newTexts);
+                              localStorage.setItem('hongkong-store-ai-analysis', JSON.stringify(newTexts));
+                              setEditingAiAnalysis(null);
+                            }}
+                            className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500"
+                          >
+                            기본값으로 복원
+                          </button>
+                          <button
+                            onClick={() => setEditingAiAnalysis(null)}
+                            className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between">
+                        <p className="text-xs text-gray-700 flex-1">
+                          <span className="font-semibold text-purple-700">💡 AI 분석:</span> {displayText}
+                        </p>
+                        <button
+                          onClick={() => setEditingAiAnalysis('section3')}
+                          className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-semibold ${
-                              index === 0 ? 'text-yellow-600' :
-                              index < 3 ? 'text-gray-600' :
-                              'text-gray-400'
-                            }`}>
-                              {index + 1}
-                            </span>
-                            <span className="text-xs text-gray-900 font-medium truncate max-w-[120px]">
-                              {store.store_name}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs font-semibold text-gray-900">
-                              {formatNumber(store.net_sales)}K
+                          수정
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div className="grid grid-cols-4 gap-4">
+                {/* 1. 현재 상태 */}
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+                  <div className="text-center mb-3">
+                    <div className="text-sm font-bold text-gray-800">홍콩 10월 실적</div>
                             </div>
-                            <div className="text-[10px] text-gray-500">
-                              YOY {formatPercent(store.yoy)}
+                  <div className="space-y-3">
+                    <div className="pb-2 border-b border-gray-200">
+                      <div className="text-xs text-gray-500 mb-1">매출액</div>
+                      <div className="text-lg font-bold text-gray-900">{formatNumber(hkTotalSales)}K</div>
+                            </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <div className="text-gray-500">임차료</div>
+                        <div className="font-semibold text-gray-800">{formatNumber(hkTotalRent)}K</div>
+                        <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentRentRate, 1)}</div>
+                          </div>
+                      <div>
+                        <div className="text-gray-500">인건비</div>
+                        <div className="font-semibold text-gray-800">{formatNumber(hkTotalLaborCost)}K</div>
+                        <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentLaborCostRate, 1)}</div>
+                        </div>
+                    </div>
+                    <div className="pt-2 border-t border-gray-300">
+                      <div className="text-xs text-gray-500 mb-1">직접이익</div>
+                      <div className={`text-xl font-bold ${hkCurrentDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatNumber(hkCurrentDirectProfit)}K
+              </div>
+                      <div className="text-[10px] text-gray-400">{formatPercent(hkCurrentDirectProfitRate, 1)}</div>
+                </div>
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">영업이익</div>
+                      <div className={`text-xl font-bold ${hkCurrentOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatNumber(hkCurrentOperatingProfit)}K
+              </div>
+                      <div className="text-[10px] text-gray-400">{formatPercent(hkCurrentOperatingProfitRate, 1)}</div>
+          </div>
+        </div>
+                </div>
+                
+                {/* 세 번째: 1차 목표 달성시 (BEP: 영업이익 0) */}
+          {(() => {
+                  // 1차 목표: BEP(영업이익 0) 달성 (매출총이익으로 고정비 회수)
+                  const targetOperatingProfitRate = 0.0;
+                  
+                  // 현재 오프라인 매출 기준으로 계산
+                  // 현재 오프라인 직접이익과 영업이익 (pl-data 기준)
+                  const currentHkOfflineDirectProfit = (plData as any)?.channel_direct_profit?.hk_offline?.direct_profit || 0;
+                  const currentHkOfflineOperatingProfit = currentHkOfflineDirectProfit - hkTotalSgA;
+                  
+                  // 현재 오프라인 매출 기준 매출총이익 계산
+                  // 직접이익 = 매출총이익 - 임차료 - 인건비
+                  // 매출총이익 = 직접이익 + 임차료 + 인건비
+                  const currentHkOfflineGrossProfit = currentHkOfflineDirectProfit + hkTotalRent + hkTotalLaborCost;
+                  const currentHkOfflineGrossProfitRate = currentHkOfflineSales > 0 
+                    ? (currentHkOfflineGrossProfit / currentHkOfflineSales) * 100 
+                    : 0;
+                  
+                  // 고정비용 (임차료 + 인건비 + 영업비) - 모두 고정
+                  const fixedCosts = hkTotalRent + hkTotalLaborCost + hkTotalSgA;
+                  
+                  // BEP(영업이익 0) 달성을 위한 필요 오프라인 매출 계산
+                  // 영업이익 = 매출 * 0.0
+                  // 영업이익 = 직접이익 - 영업비
+                  // 직접이익 = 매출총이익 - 임차료 - 인건비
+                  // 매출총이익 = 매출 * 매출총이익률
+                  // 따라서: 0 = (매출 * 매출총이익률 - 임차료 - 인건비) - 영업비
+                  // 0 = 매출 * 매출총이익률 - 고정비용
+                  // 매출 * 매출총이익률 = 고정비용
+                  // 매출 = 고정비용 / 매출총이익률
+                  const grossProfitRateDecimal = currentHkOfflineGrossProfitRate / 100;
+                  const targetRateDecimal = targetOperatingProfitRate / 100;
+                  
+                  // 분모가 양수인지 확인 (매출총이익률이 0보다 커야 함)
+                  const denominator = grossProfitRateDecimal - targetRateDecimal;
+                  
+                  // 목표 달성을 위한 오프라인 매출 계산
+                  const primaryTargetOfflineSales = denominator > 0 
+                    ? fixedCosts / denominator
+                    : currentHkOfflineSales;
+                  
+                  // 오프라인 매출 증가분
+                  const primaryTargetOfflineSalesIncrease = primaryTargetOfflineSales - currentHkOfflineSales;
+                  
+                  // 전체 홍콩 매출 = 현재 전체 매출 + 오프라인 매출 증가분 (온라인 매출은 고정)
+                  const primaryTargetHkTotalSales = hkTotalSales + primaryTargetOfflineSalesIncrease;
+                  
+                  // 검증: 계산된 매출로 영업이익률이 정확히 5%가 되는지 확인
+                  // (이미 위에서 계산했지만, 매출액이 먼저 표시되도록 순서 확인)
+                  
+                  // 1차 목표 달성시 오프라인 매출 기준으로 계산
+                  // 현재 오프라인 매출원가율 계산
+                  const currentHkOfflineCogs = currentHkOfflineSales - currentHkOfflineGrossProfit;
+                  const currentHkOfflineCogsRate = currentHkOfflineSales > 0 
+                    ? (currentHkOfflineCogs / currentHkOfflineSales) * 100 
+                    : 0;
+                  
+                  // 1차 목표 달성시 오프라인 매출원가 (현재 매출원가율 유지)
+                  const primaryTargetOfflineCogs = (primaryTargetOfflineSales * currentHkOfflineCogsRate) / 100;
+                  const primaryTargetOfflineGrossProfit = primaryTargetOfflineSales - primaryTargetOfflineCogs;
+                  
+                  // 1차 목표 달성시 오프라인 직접이익 = 매출총이익 - 임차료 - 인건비
+                  const primaryTargetOfflineDirectProfit = primaryTargetOfflineGrossProfit - hkTotalRent - hkTotalLaborCost;
+                  
+                  // 1차 목표 달성시 오프라인 직접이익 증가분
+                  const primaryTargetOfflineDirectProfitIncrease = primaryTargetOfflineDirectProfit - currentHkOfflineDirectProfit;
+                  
+                  // 1차 목표 달성시 홍콩 전체 직접이익 = 현재 전체 직접이익 + 오프라인 직접이익 증가분
+                  const primaryTargetHkTotalDirectProfit = hkTotalDirectProfit + primaryTargetOfflineDirectProfitIncrease;
+                  
+                  // 1차 목표 달성시 홍콩 전체 영업이익 = 전체 직접이익 - 영업비 (고정)
+                  const primaryTargetHkTotalOperatingProfit = primaryTargetHkTotalDirectProfit - hkTotalSgA;
+                  
+                  // 1차 목표 달성시 홍콩 전체 매출총이익 계산 (표시용)
+                  const primaryTargetHkTotalGrossProfit = primaryTargetHkTotalSales - (primaryTargetHkTotalSales * currentHkOfflineCogsRate / 100);
+                  
+                  // 1차 목표 달성시 임차료율 및 인건비율
+                  const primaryTargetRentRate = primaryTargetHkTotalSales > 0 
+                    ? (hkTotalRent / primaryTargetHkTotalSales) * 100 
+                    : 0;
+                  const primaryTargetLaborCostRate = primaryTargetHkTotalSales > 0 
+                    ? (hkTotalLaborCost / primaryTargetHkTotalSales) * 100 
+                    : 0;
+                  
+                  // 1차 목표 달성시 직접이익률 및 영업이익률
+                  const primaryTargetDirectProfitRate = primaryTargetHkTotalSales > 0 
+                    ? (primaryTargetHkTotalDirectProfit / primaryTargetHkTotalSales) * 100 
+                    : 0;
+                  const primaryTargetOperatingProfitRate = primaryTargetHkTotalSales > 0 
+                    ? (primaryTargetHkTotalOperatingProfit / primaryTargetHkTotalSales) * 100 
+                    : 0;
+                  
+                  // 변화량 계산
+                  const primaryTargetSalesIncreaseRate = currentHkOfflineSales > 0 ? (primaryTargetOfflineSalesIncrease / currentHkOfflineSales) * 100 : 0;
+                  const primaryTargetDirectProfitChange = primaryTargetHkTotalDirectProfit - hkCurrentDirectProfit;
+                  const primaryTargetOperatingProfitChange = primaryTargetHkTotalOperatingProfit - hkCurrentOperatingProfit;
+                  const primaryTargetDirectProfitRateChange = primaryTargetDirectProfitRate - hkCurrentDirectProfitRate;
+                  const primaryTargetOperatingProfitRateChange = primaryTargetOperatingProfitRate - hkCurrentOperatingProfitRate;
+                  const primaryTargetRentRateChange = primaryTargetRentRate - hkCurrentRentRate;
+                  const primaryTargetLaborCostRateChange = primaryTargetLaborCostRate - hkCurrentLaborCostRate;
+                  
+                  // 변수명 통일 (표시용)
+                  const primaryTargetDirectProfit = primaryTargetHkTotalDirectProfit;
+                  const primaryTargetOperatingProfit = primaryTargetHkTotalOperatingProfit;
+
+            return (
+                    <>
+                      {/* 변화량 표시 */}
+                      <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200 flex flex-col justify-center">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center pb-3 border-b border-indigo-300">
+                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full p-3 shadow-lg">
+                              <ArrowRight className="w-12 h-12 text-white" strokeWidth={3.5} />
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">매출 증가</div>
+                            <div className="text-lg font-bold text-blue-600">+{formatPercent(primaryTargetSalesIncreaseRate, 1)}</div>
+                            <div className="text-[10px] text-gray-400">+{formatNumber(primaryTargetOfflineSalesIncrease)}K</div>
+                          </div>
+                          
+                          <div className="pt-2 border-t border-indigo-200">
+                            <div className="text-xs text-gray-500 mb-1">직접이익 변화</div>
+                            <div className={`text-lg font-bold ${
+                              primaryTargetDirectProfitChange >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {primaryTargetDirectProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetDirectProfitChange)}K
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              {primaryTargetDirectProfitRateChange >= 0 ? '+' : ''}{formatPercent(primaryTargetDirectProfitRateChange, 1)}%p
+                            </div>
+                          </div>
+                          
+                          <div className="pt-2 border-t border-indigo-200">
+                            <div className="text-xs text-gray-500 mb-1">영업이익 변화</div>
+                            <div className={`text-lg font-bold ${
+                              primaryTargetOperatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {primaryTargetOperatingProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetOperatingProfitChange)}K
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              {primaryTargetOperatingProfitRateChange >= 0 ? '+' : ''}{formatPercent(primaryTargetOperatingProfitRateChange, 1)}%p
                             </div>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                      
+                      {/* 2. 1차 목표 (BEP) */}
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-300">
+                      <div className="text-center mb-3">
+                        <div className="text-sm font-bold text-purple-800">1차목표, BEP수준 달성</div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="pb-2 border-b border-purple-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs text-gray-500">매출액</div>
+                            <div className="text-xs font-semibold text-purple-600">+{formatPercent(primaryTargetSalesIncreaseRate, 1)}</div>
+                          </div>
+                          <div className="text-lg font-bold text-gray-900">{formatNumber(primaryTargetHkTotalSales)}K</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <div className="text-gray-500">임차료</div>
+                            <div className="font-semibold text-gray-800">{formatNumber(hkTotalRent)}K</div>
+                            <div className="text-gray-400 text-[10px]">{formatPercent(primaryTargetRentRate, 1)}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-500">인건비</div>
+                            <div className="font-semibold text-gray-800">{formatNumber(hkTotalLaborCost)}K</div>
+                            <div className="text-gray-400 text-[10px]">{formatPercent(primaryTargetLaborCostRate, 1)}</div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-purple-300">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs text-gray-500">직접이익</div>
+                            <div className={`text-xs font-semibold ${primaryTargetDirectProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {primaryTargetDirectProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetDirectProfitChange)}K
+                            </div>
+                          </div>
+                          <div className={`text-xl font-bold ${primaryTargetHkTotalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatNumber(primaryTargetHkTotalDirectProfit)}K
+                          </div>
+                          <div className="text-[10px] text-gray-400">{formatPercent(primaryTargetDirectProfitRate, 1)}</div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs text-gray-500">영업이익</div>
+                            <div className={`text-xs font-semibold ${primaryTargetOperatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {primaryTargetOperatingProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetOperatingProfitChange)}K
+                            </div>
+                          </div>
+                          <div className={`text-xl font-bold ${primaryTargetHkTotalOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatNumber(primaryTargetHkTotalOperatingProfit)}K
+                          </div>
+                          <div className="text-[10px] text-gray-400">{formatPercent(primaryTargetOperatingProfitRate, 1)} ✓</div>
+                        </div>
+                      </div>
                     </div>
-                  );
-                })()}
-              </div>
-            ) : (
-              <div className="bg-gray-50 rounded-lg shadow-md p-4 h-80 flex items-center justify-center">
-                <div className="text-center text-gray-400 text-sm">
-                  버블을 클릭하면<br />매장별 판매 순위가 표시됩니다
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <p className="text-[10px] text-gray-500 mt-2">
-          * X축: YOY (%), Y축: 판매율 (%), 원의 크기: 매출액 (1K HKD)
-          {(() => {
-            const storeItemAll = (dashboardData as any)?.store_item_all || {};
-            let totalRecord: any = null;
-
-            if (selectedStore === 'ALL') {
-              // 모든 매장의 합계 레코드 합산
-              let totalNetSales = 0;
-              let totalPrevSales = 0;
-
-              Object.values(storeItemAll).forEach((storeData: any) => {
-                if (Array.isArray(storeData)) {
-                  const storeTotal = storeData.find((d: any) => d.item_name === '합계');
-                  if (storeTotal) {
-                    totalNetSales += storeTotal.net_sales || 0;
-                    const prevSales = storeTotal.yoy > 0 ? (storeTotal.net_sales || 0) / (storeTotal.yoy / 100) : 0;
-                    totalPrevSales += prevSales;
-                  }
-                }
-              });
-
-              totalRecord = {
-                net_sales: totalNetSales,
-                yoy: totalPrevSales > 0 ? (totalNetSales / totalPrevSales) * 100 : 0,
-              };
-            } else {
-              const rawData = storeItemAll?.[selectedStore] || [];
-              totalRecord = rawData.find((d: any) => d.item_name === '합계');
-            }
-
-            if (!totalRecord) return null;
-
-            return (
-              <span className="ml-2 font-semibold text-gray-700">
-                합계: {formatNumber(totalRecord.net_sales)}K HKD, YOY {formatPercent(totalRecord.yoy)}
-              </span>
+                    </>
             );
           })()}
-        </p>
+                
+                {/* 3. 턴오버 100% 달성 */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-300">
+                  <div className="text-center mb-3">
+                    <div className="text-sm font-bold text-green-800">턴오버 기준 100% 달성시</div>
+      </div>
+                  <div className="space-y-3">
+                    <div className="pb-2 border-b border-green-200">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs text-gray-500">매출액</div>
+                        <div className="text-xs font-semibold text-green-600">+{formatPercent(salesIncreaseRate, 1)}</div>
+                      </div>
+                      <div className="text-lg font-bold text-gray-900">{formatNumber(turnoverAchievementHkTotalSales)}K</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <div className="text-gray-500">임차료</div>
+                        <div className="font-semibold text-gray-800">{formatNumber(turnoverAchievementHkTotalRent)}K</div>
+                        <div className="text-gray-400 text-[10px]">{formatPercent(turnoverAchievementHkTotalRentRate, 1)}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">인건비</div>
+                        <div className="font-semibold text-gray-800">{formatNumber(turnoverAchievementHkTotalLaborCost)}K</div>
+                        <div className="text-gray-400 text-[10px]">{formatPercent(turnoverAchievementHkTotalLaborCostRate, 1)}</div>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-green-300">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs text-gray-500">직접이익</div>
+                        <div className={`text-xs font-semibold ${directProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {directProfitChange >= 0 ? '+' : ''}{formatNumber(directProfitChange)}K
+                        </div>
+                      </div>
+                      <div className={`text-xl font-bold ${turnoverAchievementHkTotalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatNumber(turnoverAchievementHkTotalDirectProfit)}K
+                      </div>
+                      <div className="text-[10px] text-gray-400">{formatPercent(turnoverAchievementHkTotalDirectProfitRate, 1)}</div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs text-gray-500">영업이익</div>
+                        <div className={`text-xs font-semibold ${operatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {operatingProfitChange >= 0 ? '+' : ''}{formatNumber(operatingProfitChange)}K
+                        </div>
+                      </div>
+                      <div className={`text-xl font-bold ${turnoverAchievementHkTotalOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatNumber(turnoverAchievementHkTotalOperatingProfit)}K
+                      </div>
+                      <div className="text-[10px] text-gray-400">{formatPercent(turnoverAchievementHkTotalOperatingProfitRate, 1)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
       </div>
     </div>

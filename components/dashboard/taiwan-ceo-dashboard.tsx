@@ -2391,18 +2391,30 @@ const TaiwanCEODashboard = () => {
           <div className="space-y-2 mb-4">
             <div className={`p-3 rounded border-l-4 ${(pl?.operating_profit || 0) >= 0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((pl as any)?.operating_profit_rate || 0, 1)}%
+                <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((pl as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% (+{formatNumber(plChange?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {formatPercent((pl as any)?.direct_profit_rate || 0, 1)}% → {formatPercent((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0, 1)}%)
+                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({formatChange(plChange?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                  const prevMonthTotal = plData?.current_month?.prev_month?.total || {};
+                  const prevDirectProfitRate = (prevMonthTotal as any)?.direct_profit_rate !== undefined 
+                    ? (prevMonthTotal as any).direct_profit_rate
+                    : (prevMonthTotal.net_sales > 0 ? ((prevMonthTotal.direct_profit || 0) / prevMonthTotal.net_sales) * 100 : 0);
+                  return formatPercent(prevDirectProfitRate, 1);
+                })()}% → {formatPercent((pl as any)?.direct_profit_rate || 0, 1)}%)
               </p>
             </div>
-            <div className={`p-3 rounded border-l-4 ${(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? 'bg-green-50 border-green-500' : 'bg-blue-50 border-blue-500'}`}>
+            <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((plData?.cumulative?.total as any)?.operating_profit_rate || 0, 1)}%
+                <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((plData?.cumulative?.total as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 △{formatNumber(plData?.cumulative?.change?.net_sales || 0)}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% (+{formatNumber(plData?.cumulative?.change?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {formatPercent((plData?.cumulative?.total as any)?.direct_profit_rate || 0)}% → {formatPercent((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0)}%)
+                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {formatChange(plData?.cumulative?.change?.net_sales || 0).text}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({formatChange(plData?.cumulative?.change?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                  const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                  const prevCumulativeDirectProfitRate = (prevCumulativeTotal as any)?.direct_profit_rate !== undefined 
+                    ? (prevCumulativeTotal as any).direct_profit_rate
+                    : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.direct_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                  return formatPercent(prevCumulativeDirectProfitRate, 1);
+                })()}% → {formatPercent((plData?.cumulative?.total as any)?.direct_profit_rate || 0, 1)}%)
               </p>
             </div>
           </div>
@@ -2412,30 +2424,27 @@ const TaiwanCEODashboard = () => {
             <table className="min-w-full text-xs border-collapse">
               <thead>
                 <tr className="bg-gray-100 border-b-2 border-gray-300">
-                  <th className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">당월</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">당월 전년비</th>
-                  <th className="text-center p-2 font-semibold border-r border-gray-300">YOY</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">누적</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">누적 전년비</th>
-                  <th className="text-center p-2 font-semibold">누적 YOY</th>
+                  <th rowSpan={2} className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">당월</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-orange-50">당월 전년비</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-purple-50">YOY</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-cyan-50">누적</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-amber-50">누적 전년비</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold bg-indigo-50">누적 YOY</th>
                 </tr>
                 <tr className="bg-gray-50 border-b border-gray-300">
-                  <th className="p-1 border-r border-gray-300"></th>
-                  <th className="p-1 text-center border-r border-gray-300">오프라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">온라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300">오프라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">온라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300"></th>
-                  <th className="p-1 text-center border-r border-gray-300">오프라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">온라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300">오프라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">온라인</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center"></th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">오프라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">온라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">오프라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">온라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">오프라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">온라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">오프라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">온라인</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">합계</th>
                 </tr>
               </thead>
               <tbody>

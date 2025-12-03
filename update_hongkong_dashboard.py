@@ -1961,6 +1961,14 @@ def generate_dashboard_data(csv_dir, output_file_path):
                         }
                         for subcat_code, data in previous_season_f_oct_sorted
                     ],
+                    'subcategory_detail': [
+                        {
+                            'subcategory_code': subcat_code,
+                            'subcategory_name': data['subcategory_name'],
+                            'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                        }
+                        for subcat_code, data in previous_season_f_oct.items()
+                    ],
                 },
                 'accumulated': {
                     'total_net_sales': season_f_accumulated_previous['total']['net_sales'] / 1000,  # 1K HKD

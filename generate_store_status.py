@@ -63,15 +63,17 @@ def get_store_data(pl_data, period, shop_cd):
             store_data['cogs'] += value
         elif account_nm == '매출총이익':
             store_data['gross_profit'] += value
-        elif account_nm == '1. 급여' or account_cd == 'LABOR_EXP':
+        elif account_nm == '판매관리비':
+            store_data['selling_expense'] += value
+        elif account_nm in ['1. 급여', '1. 급 여'] or account_cd == 'LABOR_EXP':
             store_data['labor_cost'] += value
-        elif account_nm == '4. 임차료' or account_cd == 'FIX_RENT':
+        elif account_nm == '4. 임차료':  # '4. 임차료' 계정 사용 (임차료율 표시용)
             store_data['rent'] += value
         elif account_nm == '영업이익':
             store_data['operating_profit'] += value
     
-    # 직접이익 = 매출총이익 - 직접비용 (임차료 + 인건비)
-    store_data['direct_profit'] = store_data['gross_profit'] - store_data['rent'] - store_data['labor_cost']
+    # 직접이익 = 매출총이익 - 판매관리비 (CSV 기준)
+    store_data['direct_profit'] = store_data['gross_profit'] - store_data['selling_expense']
     
     # 임차료/인건비율 = (임차료 + 인건비) / 실매출액 * 100
     if store_data['net_sales'] > 0:

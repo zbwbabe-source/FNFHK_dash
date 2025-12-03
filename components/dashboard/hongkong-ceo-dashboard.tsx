@@ -52,6 +52,16 @@ const HongKongCEODashboard = () => {
     excludedStores: false,
     insights: false
   });
+  const [showYoyTrend, setShowYoyTrend] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('hk_store_ai_analysis');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+  const [editingStoreCode, setEditingStoreCode] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState<string>('');
 
   // ============================================================
   // 헬퍼 함수
@@ -62,7 +72,9 @@ const HongKongCEODashboard = () => {
     setShowProfitDetail(newState);
     setShowExpenseDetail(newState);
     setShowStoreDetail(newState);
+    setShowDiscountDetail(newState);
     setShowSeasonSalesDetail(newState);
+    setShowCurrentSeasonDetail(newState);
     setShowAccInventoryDetail(newState);
     setShowEndInventoryDetail(newState);
     setShowPastSeasonDetail(newState);
@@ -116,6 +128,248 @@ const HongKongCEODashboard = () => {
   const pl = plData?.current_month?.total || {};
   const plYoy = plData?.current_month?.yoy || {};
   const plChange = plData?.current_month?.change || {};
+
+  // 전년 할인율 계산 (prev_month에 discount_rate가 없는 경우)
+  const prevMonthDiscountRate = useMemo(() => {
+    const prevMonth = plData?.current_month?.prev_month?.total;
+    if (!prevMonth) return 0;
+    if ((prevMonth as any).discount_rate !== undefined) return (prevMonth as any).discount_rate;
+    if (prevMonth.tag_sales > 0) {
+      return ((prevMonth.tag_sales - prevMonth.net_sales) / prevMonth.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // HK 전년 할인율 계산
+  const prevMonthHKDiscountRate = useMemo(() => {
+    const prevMonth = plData?.current_month?.prev_month?.hk;
+    if (!prevMonth) return 0;
+    if ((prevMonth as any).discount_rate !== undefined) return (prevMonth as any).discount_rate;
+    if (prevMonth.tag_sales > 0) {
+      return ((prevMonth.tag_sales - prevMonth.net_sales) / prevMonth.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // MC 전년 할인율 계산
+  const prevMonthMCDiscountRate = useMemo(() => {
+    const prevMonth = plData?.current_month?.prev_month?.mc;
+    if (!prevMonth) return 0;
+    if ((prevMonth as any).discount_rate !== undefined) return (prevMonth as any).discount_rate;
+    if (prevMonth.tag_sales > 0) {
+      return ((prevMonth.tag_sales - prevMonth.net_sales) / prevMonth.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // 전년 누적 할인율 계산
+  const prevCumulativeDiscountRate = useMemo(() => {
+    const prevCumulative = plData?.cumulative?.prev_cumulative?.total;
+    if (!prevCumulative) return 0;
+    if ((prevCumulative as any).discount_rate !== undefined) return (prevCumulative as any).discount_rate;
+    if (prevCumulative.tag_sales > 0) {
+      return ((prevCumulative.tag_sales - prevCumulative.net_sales) / prevCumulative.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // HK 누적 전년 할인율 계산
+  const prevCumulativeHKDiscountRate = useMemo(() => {
+    const prevCumulative = plData?.cumulative?.prev_cumulative?.hk;
+    if (!prevCumulative) return 0;
+    if ((prevCumulative as any).discount_rate !== undefined) return (prevCumulative as any).discount_rate;
+    if (prevCumulative.tag_sales > 0) {
+      return ((prevCumulative.tag_sales - prevCumulative.net_sales) / prevCumulative.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // MC 누적 전년 할인율 계산
+  const prevCumulativeMCDiscountRate = useMemo(() => {
+    const prevCumulative = plData?.cumulative?.prev_cumulative?.mc;
+    if (!prevCumulative) return 0;
+    if ((prevCumulative as any).discount_rate !== undefined) return (prevCumulative as any).discount_rate;
+    if (prevCumulative.tag_sales > 0) {
+      return ((prevCumulative.tag_sales - prevCumulative.net_sales) / prevCumulative.tag_sales) * 100;
+    }
+    return 0;
+  }, [plData]);
+
+  // 전년 당월 total의 원가율 계산 (HK + MC 합산)
+  const prevMonthTotalCogsRate = useMemo(() => {
+    const prevMonthHK = plData?.current_month?.prev_month?.hk;
+    const prevMonthMC = plData?.current_month?.prev_month?.mc;
+    if (!prevMonthHK || !prevMonthMC) return 0;
+    
+    // HK와 MC의 cogs_rate가 있으면 가중평균 계산, 없으면 cogs/net_sales로 계산
+    const hkCogsRate = prevMonthHK.cogs_rate !== undefined ? prevMonthHK.cogs_rate : 
+      (prevMonthHK.net_sales > 0 && (prevMonthHK as any).cogs !== undefined ? 
+        ((prevMonthHK as any).cogs / prevMonthHK.net_sales) * 100 : 0);
+    const mcCogsRate = prevMonthMC.cogs_rate !== undefined ? prevMonthMC.cogs_rate : 
+      (prevMonthMC.net_sales > 0 && (prevMonthMC as any).cogs !== undefined ? 
+        ((prevMonthMC as any).cogs / prevMonthMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevMonthHK.net_sales + prevMonthMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevMonthHK.net_sales * hkCogsRate + prevMonthMC.net_sales * mcCogsRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 당월 total의 매출총이익률 계산 (HK + MC 합산)
+  const prevMonthTotalGrossProfitRate = useMemo(() => {
+    const prevMonthHK = plData?.current_month?.prev_month?.hk;
+    const prevMonthMC = plData?.current_month?.prev_month?.mc;
+    if (!prevMonthHK || !prevMonthMC) return 0;
+    
+    // HK와 MC의 gross_profit_rate가 있으면 가중평균 계산
+    const hkGrossProfitRate = prevMonthHK.gross_profit_rate !== undefined ? prevMonthHK.gross_profit_rate : 
+      (prevMonthHK.net_sales > 0 && prevMonthHK.gross_profit !== undefined ? 
+        (prevMonthHK.gross_profit / prevMonthHK.net_sales) * 100 : 0);
+    const mcGrossProfitRate = prevMonthMC.gross_profit_rate !== undefined ? prevMonthMC.gross_profit_rate : 
+      (prevMonthMC.net_sales > 0 && prevMonthMC.gross_profit !== undefined ? 
+        (prevMonthMC.gross_profit / prevMonthMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevMonthHK.net_sales + prevMonthMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevMonthHK.net_sales * hkGrossProfitRate + prevMonthMC.net_sales * mcGrossProfitRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 누적 total의 원가율 계산 (HK + MC 합산)
+  const prevCumulativeTotalCogsRate = useMemo(() => {
+    const prevCumulativeHK = plData?.cumulative?.prev_cumulative?.hk;
+    const prevCumulativeMC = plData?.cumulative?.prev_cumulative?.mc;
+    if (!prevCumulativeHK || !prevCumulativeMC) return 0;
+    
+    // HK와 MC의 cogs_rate가 있으면 가중평균 계산, 없으면 cogs/net_sales로 계산
+    const hkCogsRate = prevCumulativeHK.cogs_rate !== undefined ? prevCumulativeHK.cogs_rate : 
+      (prevCumulativeHK.net_sales > 0 && (prevCumulativeHK as any).cogs !== undefined ? 
+        ((prevCumulativeHK as any).cogs / prevCumulativeHK.net_sales) * 100 : 0);
+    const mcCogsRate = prevCumulativeMC.cogs_rate !== undefined ? prevCumulativeMC.cogs_rate : 
+      (prevCumulativeMC.net_sales > 0 && (prevCumulativeMC as any).cogs !== undefined ? 
+        ((prevCumulativeMC as any).cogs / prevCumulativeMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevCumulativeHK.net_sales + prevCumulativeMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevCumulativeHK.net_sales * hkCogsRate + prevCumulativeMC.net_sales * mcCogsRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 누적 total의 매출총이익률 계산 (HK + MC 합산)
+  const prevCumulativeTotalGrossProfitRate = useMemo(() => {
+    const prevCumulativeHK = plData?.cumulative?.prev_cumulative?.hk;
+    const prevCumulativeMC = plData?.cumulative?.prev_cumulative?.mc;
+    if (!prevCumulativeHK || !prevCumulativeMC) return 0;
+    
+    // HK와 MC의 gross_profit_rate가 있으면 가중평균 계산
+    const hkGrossProfitRate = prevCumulativeHK.gross_profit_rate !== undefined ? prevCumulativeHK.gross_profit_rate : 
+      (prevCumulativeHK.net_sales > 0 && prevCumulativeHK.gross_profit !== undefined ? 
+        (prevCumulativeHK.gross_profit / prevCumulativeHK.net_sales) * 100 : 0);
+    const mcGrossProfitRate = prevCumulativeMC.gross_profit_rate !== undefined ? prevCumulativeMC.gross_profit_rate : 
+      (prevCumulativeMC.net_sales > 0 && prevCumulativeMC.gross_profit !== undefined ? 
+        (prevCumulativeMC.gross_profit / prevCumulativeMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevCumulativeHK.net_sales + prevCumulativeMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevCumulativeHK.net_sales * hkGrossProfitRate + prevCumulativeMC.net_sales * mcGrossProfitRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 당월 total의 직접이익률 계산 (HK + MC 합산)
+  const prevMonthTotalDirectProfitRate = useMemo(() => {
+    const prevMonthHK = plData?.current_month?.prev_month?.hk;
+    const prevMonthMC = plData?.current_month?.prev_month?.mc;
+    if (!prevMonthHK || !prevMonthMC) return 0;
+    
+    // HK와 MC의 direct_profit_rate가 있으면 가중평균 계산
+    const hkDirectProfitRate = prevMonthHK.direct_profit_rate !== undefined ? prevMonthHK.direct_profit_rate : 
+      (prevMonthHK.net_sales > 0 && prevMonthHK.direct_profit !== undefined ? 
+        (prevMonthHK.direct_profit / prevMonthHK.net_sales) * 100 : 0);
+    const mcDirectProfitRate = prevMonthMC.direct_profit_rate !== undefined ? prevMonthMC.direct_profit_rate : 
+      (prevMonthMC.net_sales > 0 && prevMonthMC.direct_profit !== undefined ? 
+        (prevMonthMC.direct_profit / prevMonthMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevMonthHK.net_sales + prevMonthMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevMonthHK.net_sales * hkDirectProfitRate + prevMonthMC.net_sales * mcDirectProfitRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 누적 total의 직접이익률 계산 (HK + MC 합산)
+  const prevCumulativeTotalDirectProfitRate = useMemo(() => {
+    const prevCumulativeHK = plData?.cumulative?.prev_cumulative?.hk;
+    const prevCumulativeMC = plData?.cumulative?.prev_cumulative?.mc;
+    if (!prevCumulativeHK || !prevCumulativeMC) return 0;
+    
+    // HK와 MC의 direct_profit_rate가 있으면 가중평균 계산
+    const hkDirectProfitRate = prevCumulativeHK.direct_profit_rate !== undefined ? prevCumulativeHK.direct_profit_rate : 
+      (prevCumulativeHK.net_sales > 0 && prevCumulativeHK.direct_profit !== undefined ? 
+        (prevCumulativeHK.direct_profit / prevCumulativeHK.net_sales) * 100 : 0);
+    const mcDirectProfitRate = prevCumulativeMC.direct_profit_rate !== undefined ? prevCumulativeMC.direct_profit_rate : 
+      (prevCumulativeMC.net_sales > 0 && prevCumulativeMC.direct_profit !== undefined ? 
+        (prevCumulativeMC.direct_profit / prevCumulativeMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevCumulativeHK.net_sales + prevCumulativeMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevCumulativeHK.net_sales * hkDirectProfitRate + prevCumulativeMC.net_sales * mcDirectProfitRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 당월 total의 영업이익률 계산 (HK + MC 합산)
+  const prevMonthTotalOperatingProfitRate = useMemo(() => {
+    const prevMonthHK = plData?.current_month?.prev_month?.hk;
+    const prevMonthMC = plData?.current_month?.prev_month?.mc;
+    if (!prevMonthHK || !prevMonthMC) return 0;
+    
+    // HK와 MC의 operating_profit_rate가 있으면 가중평균 계산
+    const hkOperatingProfitRate = prevMonthHK.operating_profit_rate !== undefined ? prevMonthHK.operating_profit_rate : 
+      (prevMonthHK.net_sales > 0 && prevMonthHK.operating_profit !== undefined ? 
+        (prevMonthHK.operating_profit / prevMonthHK.net_sales) * 100 : 0);
+    const mcOperatingProfitRate = prevMonthMC.operating_profit_rate !== undefined ? prevMonthMC.operating_profit_rate : 
+      (prevMonthMC.net_sales > 0 && prevMonthMC.operating_profit !== undefined ? 
+        (prevMonthMC.operating_profit / prevMonthMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevMonthHK.net_sales + prevMonthMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevMonthHK.net_sales * hkOperatingProfitRate + prevMonthMC.net_sales * mcOperatingProfitRate) / totalNetSales);
+  }, [plData]);
+
+  // 전년 누적 total의 영업이익률 계산 (HK + MC 합산)
+  const prevCumulativeTotalOperatingProfitRate = useMemo(() => {
+    const prevCumulativeHK = plData?.cumulative?.prev_cumulative?.hk;
+    const prevCumulativeMC = plData?.cumulative?.prev_cumulative?.mc;
+    if (!prevCumulativeHK || !prevCumulativeMC) return 0;
+    
+    // HK와 MC의 operating_profit_rate가 있으면 가중평균 계산
+    const hkOperatingProfitRate = prevCumulativeHK.operating_profit_rate !== undefined ? prevCumulativeHK.operating_profit_rate : 
+      (prevCumulativeHK.net_sales > 0 && prevCumulativeHK.operating_profit !== undefined ? 
+        (prevCumulativeHK.operating_profit / prevCumulativeHK.net_sales) * 100 : 0);
+    const mcOperatingProfitRate = prevCumulativeMC.operating_profit_rate !== undefined ? prevCumulativeMC.operating_profit_rate : 
+      (prevCumulativeMC.net_sales > 0 && prevCumulativeMC.operating_profit !== undefined ? 
+        (prevCumulativeMC.operating_profit / prevCumulativeMC.net_sales) * 100 : 0);
+    
+    // HK와 MC의 net_sales 합산
+    const totalNetSales = prevCumulativeHK.net_sales + prevCumulativeMC.net_sales;
+    if (totalNetSales <= 0) return 0;
+    
+    // 가중평균으로 계산
+    return ((prevCumulativeHK.net_sales * hkOperatingProfitRate + prevCumulativeMC.net_sales * mcOperatingProfitRate) / totalNetSales);
+  }, [plData]);
 
   // 아이템/재고 전체합계 YOY (백엔드 값이 없을 경우 대비)
   const overallItemYoy: number[] = useMemo(() => {
@@ -184,7 +438,7 @@ const HongKongCEODashboard = () => {
 
   const formatPercent = (num: number | undefined | null, decimals: number = 0) => {
     if (num === undefined || num === null || isNaN(num)) return '0';
-    return Math.round(num).toFixed(decimals);
+    return Number(num).toFixed(decimals);
   };
 
   // 재고주수 포맷팅 (소수점 첫째자리까지)
@@ -216,6 +470,19 @@ const HongKongCEODashboard = () => {
   const formatRate = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(num)) return '0.0';
     return num.toFixed(1);
+  };
+
+  // 소수점 첫째자리 항목의 증감 포맷팅 (증가: +, 감소: △, 소수점 첫째자리까지, 색상 강조)
+  const formatChangeRate = (num: number | undefined | null) => {
+    if (num === undefined || num === null || isNaN(num)) return { text: '0.0', className: 'text-gray-600' };
+    const value = Number(num);
+    if (value > 0) {
+      return { text: `+${formatPercent(value, 1)}`, className: 'text-green-600 font-semibold' };
+    } else if (value < 0) {
+      return { text: `△${formatPercent(Math.abs(value), 1)}`, className: 'text-red-600 font-semibold' };
+    } else {
+      return { text: '0.0', className: 'text-gray-600' };
+    }
   };
 
   return (
@@ -423,7 +690,7 @@ const HongKongCEODashboard = () => {
                 {formatNumber(pl?.net_sales)}
               </div>
               <div className="text-sm text-red-600 font-semibold mb-3">
-                YOY {formatPercent(plYoy?.net_sales)}% (△{formatNumber(Math.abs(plChange?.net_sales || 0))})
+                YOY {formatPercent(plYoy?.net_sales)}% ({formatChange(plChange?.net_sales || 0).text})
               </div>
               
               {/* 채널별 상세보기 */}
@@ -573,7 +840,7 @@ const HongKongCEODashboard = () => {
                   </div>
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-gray-700">직접이익률</span>
-                    <span className="text-red-600">{formatPercent(plData?.channel_direct_profit?.total?.direct_profit_rate || 0)}%</span>
+                    <span className="text-red-600">{formatPercent(plData?.channel_direct_profit?.total?.direct_profit_rate || 0, 1)}%</span>
                   </div>
                 </div>
               )}
@@ -609,55 +876,55 @@ const HongKongCEODashboard = () => {
                           <td className="py-1 px-2 text-gray-700">택매출</td>
                           <td className="text-right py-1 px-2 font-semibold">{formatNumber(pl?.tag_sales)}</td>
                           <td className="text-right py-1 px-2 text-red-600 font-semibold">{formatPercent(plYoy?.tag_sales)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600 font-semibold">△{formatNumber(Math.abs(plChange?.tag_sales || 0))}</td>
+                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.tag_sales || 0).className}`}>{formatChange(plChange?.tag_sales || 0).text}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent(pl?.discount_rate)}%)</td>
+                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent(pl?.discount_rate, 1)}%)</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.discount)}</td>
                           <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.discount)}%</td>
-                          <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.discount || 0))}</td>
+                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.discount || 0).className}`}>{formatChange(plChange?.discount || 0).text}</td>
                         </tr>
                         <tr className="bg-blue-50 font-semibold">
                           <td className="py-1.5 px-2 text-blue-800 border-t border-blue-200">= 실판매출</td>
                           <td className="text-right py-1.5 px-2 text-blue-800 border-t border-blue-200">{formatNumber(pl?.net_sales)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(plYoy?.net_sales)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">△{formatNumber(Math.abs(plChange?.net_sales || 0))}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-blue-200 ${formatChange(plChange?.net_sales || 0).className}`}>{formatChange(plChange?.net_sales || 0).text}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent(pl?.cogs_rate)}%)</td>
+                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent(pl?.cogs_rate, 1)}%)</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.cogs)}</td>
                           <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.cogs)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600">△{formatNumber(Math.abs(plChange?.cogs || 0))}</td>
+                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.cogs || 0).className}`}>{formatChange(plChange?.cogs || 0).text}</td>
                         </tr>
                         <tr className="bg-green-50 font-semibold">
-                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent(pl?.gross_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent(pl?.gross_profit_rate, 1)}%)</td>
                           <td className="text-right py-1.5 px-2 text-green-800 border-t border-green-200">{formatNumber(pl?.gross_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(plYoy?.gross_profit)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">△{formatNumber(Math.abs(plChange?.gross_profit || 0))}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-green-200 ${formatChange(plChange?.gross_profit || 0).className}`}>{formatChange(plChange?.gross_profit || 0).text}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 직접비</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.direct_cost)}</td>
                           <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.direct_cost)}%</td>
-                          <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.direct_cost || 0))}</td>
+                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.direct_cost || 0).className}`}>{formatChange(plChange?.direct_cost || 0).text}</td>
                         </tr>
                         <tr className="bg-yellow-50 font-semibold">
-                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent(pl?.direct_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent(pl?.direct_profit_rate, 1)}%)</td>
                           <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(plYoy?.direct_profit)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">△{formatNumber(Math.abs(plChange?.direct_profit || 0))}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-yellow-200 ${formatChange(plChange?.direct_profit || 0).className}`}>{formatChange(plChange?.direct_profit || 0).text}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 영업비</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.sg_a)}</td>
                           <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.sg_a)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600">+{formatNumber(plChange?.sg_a || 0)}</td>
+                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.sg_a || 0).className}`}>{formatChange(plChange?.sg_a || 0).text}</td>
                         </tr>
                         <tr className="bg-red-50 font-bold">
-                          <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent(pl?.operating_profit_rate)}%)</td>
+                          <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent(pl?.operating_profit_rate, 1)}%)</td>
                           <td className="text-right py-1.5 px-2 text-red-800 border-t-2 border-red-300">{formatNumber(pl?.operating_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">적자악화</td>
-                          <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">△{formatNumber(Math.abs(plChange?.operating_profit || 0))}</td>
+                          <td className={`text-right py-1.5 px-2 font-semibold border-t-2 border-red-300 ${formatChange(plChange?.operating_profit || 0).className}`}>{formatChange(plChange?.operating_profit || 0).text}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -690,7 +957,7 @@ const HongKongCEODashboard = () => {
                           <span className="text-purple-700">실판매출</span>
                           <span className="font-semibold text-purple-900">
                             {formatNumber(plData?.discovery?.net_sales)} 
-                            <span className="text-purple-600"> (할인율 {formatPercent(plData?.discovery?.discount_rate)}%)</span>
+                            <span className="text-purple-600"> (할인율 {formatPercent(plData?.discovery?.discount_rate, 1)}%)</span>
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -1251,11 +1518,11 @@ const HongKongCEODashboard = () => {
                 <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
               </div>
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {formatPercent(pl?.discount_rate || 0)}%
+                {formatPercent(pl?.discount_rate || 0, 1)}%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0)}%</span> | 
-                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0))}%p</span>
+                <span className="text-gray-600">전년 {formatPercent(prevMonthDiscountRate, 1)}%</span> | 
+                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - prevMonthDiscountRate, 1)}%p</span>
               </div>
               
               {/* 할인 상세보기 */}
@@ -1277,46 +1544,51 @@ const HongKongCEODashboard = () => {
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">HK (홍콩)</span>
                     <span className="font-semibold text-purple-600">
-                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.hk?.discount_rate || 0) - (plData?.current_month?.prev_month?.hk?.discount_rate || 0))}%p)</span>
+                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.hk?.discount_rate || 0) - prevMonthHKDiscountRate, 1)}%p)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- Retail</span>
                     <span className="font-semibold">
-                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0)}%
+                      {formatPercent(hkRetail?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkRetail?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- Outlet</span>
                     <span className="font-semibold">
-                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0)}%
+                      {formatPercent(hkOutlet?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkOutlet?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- Online</span>
                     <span className="font-semibold">
-                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0)}%
+                      {formatPercent(hkOnline?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkOnline?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   
                   <div className="flex justify-between text-xs font-semibold mt-3 pt-2 border-t">
                     <span className="text-gray-700">MC (마카오)</span>
                     <span className="text-purple-600">
-                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.mc?.discount_rate || 0) - (plData?.current_month?.prev_month?.mc?.discount_rate || 0))}%p)</span>
+                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.mc?.discount_rate || 0) - prevMonthMCDiscountRate, 1)}%p)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- Retail</span>
                     <span className="font-semibold">
-                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0)}%
+                      {formatPercent(mcRetail?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(mcRetail?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- Outlet</span>
                     <span className="font-semibold">
-                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0)}%
+                      {formatPercent(mcOutlet?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   
@@ -1334,7 +1606,7 @@ const HongKongCEODashboard = () => {
                       <span className="text-gray-600">누적 할인</span>
                       <span className="font-semibold text-purple-600">
                         {formatNumber((plData?.cumulative?.total as any)?.discount || 0)}K
-                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0))}%p)</span>
+                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate, 1)}%p)</span>
                       </span>
                     </div>
                   </div>
@@ -1446,8 +1718,12 @@ const HongKongCEODashboard = () => {
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
                     {(seasonSales?.current_season_f?.october?.subcategory_top5 || []).map((item: any, idx: number) => {
-                      const prevItem = seasonSales?.previous_season_f?.october?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
-                      const yoy = prevItem ? ((item.net_sales / prevItem.net_sales) * 100) : 999;
+                      // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
+                      const prevItemTop5 = seasonSales?.previous_season_f?.october?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                      const prevOctoberData = seasonSales?.previous_season_f?.october as any;
+                      const prevItemDetail = prevOctoberData?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                      const prevItem = prevItemTop5 || prevItemDetail;
+                      const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 999;
                       return (
                         <div key={idx} className="flex justify-between text-xs">
                           <span className="text-gray-600">{item.subcategory_code}</span>
@@ -1493,10 +1769,13 @@ const HongKongCEODashboard = () => {
               </div>
               
               <div className="text-3xl font-bold text-indigo-600 mb-1">
-                {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0)}%
+                {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0, 1)}%
               </div>
-              <div className="text-sm font-semibold text-green-600 mb-3">
-                (전년비 +{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0)}%p)
+              <div className="text-sm font-semibold mb-3">
+                {(() => {
+                  const change = formatChangeRate(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0);
+                  return <span className={change.className}>(전년비 {change.text}%p)</span>;
+                })()}
               </div>
               
               {/* 시각적 표현 개선 */}
@@ -1547,13 +1826,13 @@ const HongKongCEODashboard = () => {
                               <>
                                 {tsItem && (
                                   <div>
-                                    • <span className="font-semibold">T/SHIRTS</span>: 판매율 {formatPercent(tsItem.sales_rate)}% 
+                                    • <span className="font-semibold">T/SHIRTS</span>: 판매율 {formatPercent(tsItem.sales_rate, 1)}% 
                                     <span className="bg-red-300 px-1 rounded font-bold">재고일수 {formatNumber(tsItem.stock_days)}일</span>
                                   </div>
                                 )}
                                 {ptItem && (
                                   <div>
-                                    • <span className="font-semibold">PANTS</span>: 판매율 {formatPercent(ptItem.sales_rate)}% 
+                                    • <span className="font-semibold">PANTS</span>: 판매율 {formatPercent(ptItem.sales_rate, 1)}% 
                                     <span className="bg-orange-300 px-1 rounded font-bold">재고일수 {formatNumber(ptItem.stock_days)}일</span>
                                   </div>
                                 )}
@@ -1580,7 +1859,7 @@ const HongKongCEODashboard = () => {
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
                               <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
-                              <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0)}%</span>
+                              <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
                             </span>
                           </div>
                         ));
@@ -1887,18 +2166,34 @@ const HongKongCEODashboard = () => {
           <div className="space-y-2 mb-4">
             <div className="bg-red-50 p-3 rounded border-l-4 border-red-500">
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>당월:</strong> 영업손실 {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(pl?.operating_profit_rate || 0)}%
+                <strong>당월:</strong> 영업손실 {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(pl?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                적자 악화 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (MC 오프라인 YOY {formatPercent((plData?.current_month?.mc?.net_sales || 0) / (plData?.current_month?.prev_month?.mc?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% (+{formatNumber(plChange?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {formatPercent(pl?.direct_profit_rate || 0, 1)}% → {formatPercent((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0, 1)}%)
+                적자 악화 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (MC 오프라인 YOY {formatPercent((() => {
+                  const mcOfflineCurrent = (mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0);
+                  const mcOfflinePrevious = (mcRetail?.previous?.net_sales || 0) + (mcOutlet?.previous?.net_sales || 0);
+                  return mcOfflinePrevious > 0 ? (mcOfflineCurrent / mcOfflinePrevious) * 100 : 0;
+                })())}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({formatChange(plChange?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                  const prevMonthTotal = plData?.current_month?.prev_month?.total || {};
+                  const prevDirectProfitRate = (prevMonthTotal as any)?.direct_profit_rate !== undefined 
+                    ? (prevMonthTotal as any).direct_profit_rate
+                    : (prevMonthTotal.net_sales > 0 ? ((prevMonthTotal.direct_profit || 0) / prevMonthTotal.net_sales) * 100 : 0);
+                  return formatPercent(prevDirectProfitRate, 1);
+                })()}% → {formatPercent(pl?.direct_profit_rate || 0, 1)}%)
               </p>
             </div>
             <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
               <p className="text-sm font-semibold text-gray-800 mb-1">
-                <strong>누적:</strong> 영업손실 {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0)}%
+                <strong>누적:</strong> 영업손실 {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                적자 지속: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 △{formatNumber(plData?.cumulative?.change?.net_sales || 0)}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% (+{formatNumber(plData?.cumulative?.change?.sg_a || 0)}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {formatPercent(plData?.cumulative?.total?.direct_profit_rate || 0)}% → {formatPercent((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0)}%)
+                적자 지속: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {formatChange(plData?.cumulative?.change?.net_sales || 0).text}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({formatChange(plData?.cumulative?.change?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                  const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                  const prevCumulativeDirectProfitRate = (prevCumulativeTotal as any)?.direct_profit_rate !== undefined 
+                    ? (prevCumulativeTotal as any).direct_profit_rate
+                    : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.direct_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                  return formatPercent(prevCumulativeDirectProfitRate, 1);
+                })()}% → {formatPercent(plData?.cumulative?.total?.direct_profit_rate || 0, 1)}%)
               </p>
             </div>
           </div>
@@ -1908,30 +2203,27 @@ const HongKongCEODashboard = () => {
             <table className="min-w-full text-xs border-collapse">
               <thead>
                 <tr className="bg-gray-100 border-b-2 border-gray-300">
-                  <th className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">당월</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">당월 전년비</th>
-                  <th className="text-center p-2 font-semibold border-r border-gray-300">YOY</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">누적</th>
-                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300">누적 전년비</th>
-                  <th className="text-center p-2 font-semibold">누적 YOY</th>
+                  <th rowSpan={2} className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">당월</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-orange-50">당월 전년비</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-purple-50">YOY</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-cyan-50">누적</th>
+                  <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-amber-50">누적 전년비</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold bg-indigo-50">누적 YOY</th>
                 </tr>
                 <tr className="bg-gray-50 border-b border-gray-300">
-                  <th className="p-1 border-r border-gray-300"></th>
-                  <th className="p-1 text-center border-r border-gray-300">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300"></th>
-                  <th className="p-1 text-center border-r border-gray-300">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300">합계</th>
-                  <th className="p-1 text-center"></th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">홍콩</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">마카오</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">홍콩</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">마카오</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">홍콩</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">마카오</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">합계</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">홍콩</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">마카오</th>
+                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">합계</th>
                 </tr>
               </thead>
               <tbody>
@@ -2014,15 +2306,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.current_month?.mc?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.current_month?.total?.discount_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.current_month?.hk?.discount_rate || 0) - (plData?.current_month?.prev_month?.hk?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.hk?.discount_rate || 0) - prevMonthHKDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.mc?.discount_rate || 0) - (plData?.current_month?.prev_month?.mc?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.mc?.discount_rate || 0) - prevMonthMCDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.total?.discount_rate || 0) - prevMonthDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -2030,15 +2322,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.cumulative?.mc?.discount_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.cumulative?.total?.discount_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.hk?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.hk?.discount_rate || 0) - prevCumulativeHKDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.mc?.discount_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.mc?.discount_rate || 0) - prevCumulativeMCDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
@@ -2050,15 +2342,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.current_month?.mc?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.current_month?.total?.cogs_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.current_month?.hk?.cogs_rate || 0) - (plData?.current_month?.prev_month?.hk?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.hk?.cogs_rate || 0) - (plData?.current_month?.prev_month?.hk?.cogs_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.mc?.cogs_rate || 0) - (plData?.current_month?.prev_month?.mc?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.mc?.cogs_rate || 0) - (plData?.current_month?.prev_month?.mc?.cogs_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.cogs_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.total?.cogs_rate || 0) - prevMonthTotalCogsRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -2066,15 +2358,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.cumulative?.mc?.cogs_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.cumulative?.total?.cogs_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.hk?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.hk?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.cogs_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.mc?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.mc?.cogs_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.cogs_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.cogs_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.cogs_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.total?.cogs_rate || 0) - prevCumulativeTotalCogsRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
@@ -2122,15 +2414,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.current_month?.mc?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.current_month?.total?.gross_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.current_month?.hk?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.hk?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.gross_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.mc?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.mc?.gross_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.gross_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.gross_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.total?.gross_profit_rate || 0) - prevMonthTotalGrossProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -2138,15 +2430,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.cumulative?.mc?.gross_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.cumulative?.total?.gross_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.hk?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.hk?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.gross_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.mc?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.mc?.gross_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.gross_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.gross_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.gross_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.total?.gross_profit_rate || 0) - prevCumulativeTotalGrossProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
@@ -2230,15 +2522,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.current_month?.mc?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.current_month?.total?.direct_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.current_month?.hk?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.hk?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.direct_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.mc?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.mc?.direct_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.direct_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.direct_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.total?.direct_profit_rate || 0) - prevMonthTotalDirectProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -2246,15 +2538,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.cumulative?.mc?.direct_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.cumulative?.total?.direct_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.hk?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.hk?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.mc?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.mc?.direct_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.direct_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.direct_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.total?.direct_profit_rate || 0) - prevCumulativeTotalDirectProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
@@ -2338,15 +2630,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.current_month?.mc?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.current_month?.total?.operating_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.current_month?.hk?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.hk?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.hk?.operating_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.mc?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.mc?.operating_profit_rate || 0) - (plData?.current_month?.prev_month?.mc?.operating_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.current_month?.total?.operating_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.current_month?.total?.operating_profit_rate || 0) - prevMonthTotalOperatingProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right border-r border-gray-300">-</td>
@@ -2354,15 +2646,15 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatRate(plData?.cumulative?.mc?.operating_profit_rate || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatRate(plData?.cumulative?.total?.operating_profit_rate || 0)}%</td>
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.hk?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.hk?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.hk?.operating_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.mc?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.mc?.operating_profit_rate || 0) - (plData?.cumulative?.prev_cumulative?.mc?.operating_profit_rate || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}%p</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.operating_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.operating_profit_rate || 0));
+                    const change = formatChangeRate((plData?.cumulative?.total?.operating_profit_rate || 0) - prevCumulativeTotalOperatingProfitRate);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}%p</td>;
                   })()}
                   <td className="p-2 text-right">-</td>
@@ -2378,7 +2670,7 @@ const HongKongCEODashboard = () => {
         {/* 월별 채널별 매출 추세 */}
         <div className="bg-white rounded-lg shadow-md p-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            <div className="w-2 h-20 rounded-full mr-2"></div>
             2025년 채널별 실판매출 추세 (1K HKD)
           </h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -3059,7 +3351,7 @@ const HongKongCEODashboard = () => {
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 flex items-center whitespace-nowrap">
-              <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
+              <div className="w-2 h-20 rounded-full mr-2"></div>
               2025년 아이템별 실판매출 추세 (1K HKD)
             </h3>
             
@@ -3331,7 +3623,7 @@ const HongKongCEODashboard = () => {
                           { key: '가방외', label: '👜 가방외' },
                         ].map((row) => (
                           <tr key={row.key}>
-                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">
+                            <td className="border border-gray-300 px-1 py-1 font-semibold">
                               {row.label}
                             </td>
                             {(() => {
@@ -3373,7 +3665,7 @@ const HongKongCEODashboard = () => {
                       </>
                     ) : (
                       <tr>
-                        <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">YOY</td>
+                        <td className="border border-gray-300 px-1 py-1 font-semibold">YOY</td>
                         {((dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[selectedItem] : undefined) || []).map((yoy: number, idx: number) => (
                           <td 
                             key={idx} 
@@ -3482,7 +3774,7 @@ const HongKongCEODashboard = () => {
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 flex items-center whitespace-nowrap">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              <div className="w-2 h-20 rounded-full mr-2"></div>
               2025년 월별 아이템별 재고 추세 (TAG, 1K HKD)
             </h3>
           </div>
@@ -3886,195 +4178,155 @@ const HongKongCEODashboard = () => {
             <h3 className="text-lg font-semibold text-gray-900">
               오프라인 매장별 현황 (실판V-, 25년 10월 기준)
             </h3>
-            <button
-              className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
-              onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
-            >
-              매장 상세 대시보드
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors"
+                onClick={() => setShowYoyTrend(true)}
+              >
+                YOY 추세
+              </button>
+              <button
+                className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
+                onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
+              >
+                매장효율성 분석
+              </button>
+            </div>
           </div>
           
           <div className="grid grid-cols-6 gap-3 w-full" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
             {/* 전체 매장 요약 */}
-            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 min-w-0">
-              <h4 className="text-sm font-bold text-gray-800 mb-3">전체 매장 요약</h4>
-              <div className="space-y-2 text-xs">
+            <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-4 border border-slate-600 min-w-0 shadow-lg">
+              <h4 className="text-base font-bold text-white mb-3">전체 매장 요약</h4>
+              <div className="space-y-3 text-xs">
+                {/* 매장 수 */}
                 <div>
-                  <div className="font-semibold text-gray-700">
+                  <div className="text-2xl font-bold text-white mb-1">
                     {totalStoreCurrent}개 매장
                   </div>
-                  <div className="text-[10px] text-gray-500">
+                  <div className="text-[10px] text-slate-300">
                     (전년 {totalStorePrevious}개)
                   </div>
                 </div>
+                
+                {/* 점당매출 */}
                 <div>
-                  <div className="text-gray-600">점당매출</div>
-                  <div className="font-bold text-gray-900">
+                  <div className="text-slate-300 text-[10px] mb-1">점당매출</div>
+                  <div className="font-bold text-white text-sm">
                     {formatNumber(totalSalesPerStore)}K
                   </div>
-                  <div className="text-blue-600">
+                  <div className="text-slate-300 text-[10px]">
                     (YOY {formatPercent(totalSalesPerStoreYoy)}% | 전년 {formatNumber(prevSalesPerStore)}K)
                   </div>
-                </div>
-                <div className="mt-2 pt-2 border-t border-gray-300">
-                  <button
-                    onClick={() => setExpandedSummary(prev => ({ ...prev, calculationBasis: !prev.calculationBasis }))}
-                    className="text-[10px] text-gray-600 hover:text-gray-800 font-semibold flex items-center w-full justify-between"
-                  >
-                    <span>Calculation Basis:</span>
-                    {expandedSummary.calculationBasis ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  {expandedSummary.calculationBasis && (
-                    <div className="text-[10px] text-gray-500 mt-1 space-y-0.5">
-                      <div>온라인/폐점 매장 제외</div>
-                      <div>(LCX, WTC 제외)</div>
-                      <div>정상운영 {totalStoreCurrent}개 매장 기준</div>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-3 pt-2 border-t border-gray-300">
-                  <div className="text-gray-600">전체 직접이익</div>
-                  <div className={`font-bold ${(storeStatusData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {Math.round(storeStatusData?.summary?.total_direct_profit || 0)}K HKD
+                  <div className="text-[9px] text-slate-400 mt-1">
+                    *온라인 종료매장·리뉴얼(LCX·WTC) 제외, 정상운영 {totalStoreCurrent}개 매장 기준
                   </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-300">
-                  <button
-                    onClick={() => setExpandedSummary(prev => ({ ...prev, hkDetails: !prev.hkDetails }))}
-                    className="text-gray-600 font-semibold text-xs flex items-center w-full justify-between mb-1"
-                  >
-                    <span>홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)</span>
-                    {expandedSummary.hkDetails ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  {expandedSummary.hkDetails && (
-                    <div className="space-y-1 text-[10px]">
-                      <div className="flex items-center gap-1">
-                        <span className="text-green-600">✓</span>
-                        <span>흑자 & 개선: {storeStatusData?.categories?.profit_improving?.count || 0}개</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-orange-600">▲</span>
-                        <span>흑자 & 악화: {storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-yellow-600">■</span>
-                        <span>적자 & 개선: {storeStatusData?.categories?.loss_improving?.count || 0}개</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-red-600">✗</span>
-                        <span>적자 & 악화: {storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
-                      </div>
+                
+                {/* 전체 직접이익 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="flex items-center justify-between">
+                    <div className="text-slate-300 text-[10px]">전체 직접이익</div>
+                    <div className={`font-bold text-sm ${(storeStatusData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {Math.round(storeStatusData?.summary?.total_direct_profit || 0)}K HKD
                     </div>
-                  )}
+                  </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-300">
-                  <button
-                    onClick={() => setExpandedSummary(prev => ({ ...prev, mcDetails: !prev.mcDetails }))}
-                    className="text-gray-600 font-semibold text-xs flex items-center w-full justify-between mb-1"
-                  >
-                    <span>마카오 매장 ({storeStatusData?.summary?.mc_stores || 0}개)</span>
-                    {expandedSummary.mcDetails ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  {expandedSummary.mcDetails && (
-                    <div className="space-y-1 text-[10px]">
-                      <div className="flex items-center gap-1">
-                        <span className="text-green-600">✓</span>
-                        <span>흑자: {(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
-                          return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
-                        })()}개</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-red-600">✗</span>
-                        <span>적자: {(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
-                          return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
-                        })()}개</span>
-                      </div>
+                
+                {/* 홍콩 오프라인 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="text-white font-semibold text-xs mb-2">
+                    홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-white text-sm">✓</span>
+                      <span className="text-white text-xs font-semibold">흑자 & 개선</span>
+                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
                     </div>
-                  )}
+                    <div className="bg-blue-700 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-orange-300 text-sm">▲</span>
+                      <span className="text-white text-xs font-semibold">흑자 & 악화</span>
+                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
+                    </div>
+                    <div className="bg-amber-700 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-blue-300 text-sm">↗</span>
+                      <span className="text-white text-xs font-semibold">적자 & 개선</span>
+                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.loss_improving?.count || 0}개</span>
+                    </div>
+                    <div className="bg-red-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-red-200 text-sm">↓</span>
+                      <span className="text-white text-xs font-semibold">적자 & 악화</span>
+                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
+                    </div>
+                    <div className="bg-slate-500 rounded px-2 py-1.5 flex items-center gap-1.5 col-span-2">
+                      <span className="text-white text-xs font-semibold">리뉴얼 중</span>
+                      <span className="text-white text-xs font-bold ml-auto">1개 (LCX)</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3 pt-2 border-t border-gray-300">
-                  <div className="text-gray-600 text-[10px]">최고YOY</div>
-                  <div className="font-bold text-green-600 text-xs">
+                
+                {/* 마카오 매장 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="text-white font-semibold text-xs mb-2">
+                    마카오 매장 ({storeStatusData?.summary?.mc_stores || 0}개)
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-white text-sm">✓</span>
+                      <span className="text-white text-xs font-semibold">흑자</span>
+                      <span className="text-white text-xs font-bold ml-auto">{(() => {
+                        const mcStores = storeStatusData?.mc_summary?.stores || [];
+                        return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
+                      })()}개</span>
+                    </div>
+                    <div className="bg-red-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <span className="text-blue-300 text-sm">↗</span>
+                      <span className="text-white text-xs font-semibold">적자 (Senado)</span>
+                      <span className="text-white text-xs font-bold ml-auto">{(() => {
+                        const mcStores = storeStatusData?.mc_summary?.stores || [];
+                        return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
+                      })()}개</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* YOY 성과 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="text-white text-[10px] mb-1">최고YOY</div>
+                  <div className="font-bold text-green-400 text-xs">
                     {(() => {
-                    if (activeHKStores.length === 0) return '-';
-                    const maxStore = activeHKStores.reduce((max: any, s: any) => s.yoy > max.yoy ? s : max, activeHKStores[0]);
+                      if (activeHKStores.length === 0) return '-';
+                      const maxStore = activeHKStores.reduce((max: any, s: any) => s.yoy > max.yoy ? s : max, activeHKStores[0]);
                       return `${maxStore.shop_nm} ${Math.round(maxStore.yoy)}%`;
                     })()}
                   </div>
-                </div>
-                <div className="mt-1">
-                  <div className="text-gray-600 text-[10px]">최저YOY</div>
-                  <div className="font-bold text-red-600 text-xs">
+                  <div className="text-white text-[10px] mt-2 mb-1">최저YOY</div>
+                  <div className="font-bold text-red-400 text-xs">
                     {(() => {
-                    if (activeHKStores.length === 0) return '-';
-                    const minStore = activeHKStores.reduce((min: any, s: any) => s.yoy < min.yoy ? s : min, activeHKStores[0]);
+                      if (activeHKStores.length === 0) return '-';
+                      const minStore = activeHKStores.reduce((min: any, s: any) => s.yoy < min.yoy ? s : min, activeHKStores[0]);
                       return `${minStore.shop_nm} ${Math.round(minStore.yoy)}%`;
                     })()}
                   </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-300">
-                  <button
-                    onClick={() => setExpandedSummary(prev => ({ ...prev, excludedStores: !prev.excludedStores }))}
-                    className="text-gray-600 font-semibold text-xs flex items-center w-full justify-between mb-1"
-                  >
-                    <span>분석 제외 매장 ({storeStatusData?.excluded_stores?.count || 0}개)</span>
-                    {expandedSummary.excludedStores ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  {expandedSummary.excludedStores && storeStatusData?.excluded_stores?.stores && (
-                    <div className="space-y-1 text-[10px] mt-1">
-                      {storeStatusData.excluded_stores.stores.map((store: any, idx: number) => (
-                        <div key={idx} className="flex items-start gap-1 bg-gray-100 rounded px-2 py-1">
-                          <span className="text-gray-500">○</span>
-                          <div className="flex-1">
-                            <div className="font-semibold text-gray-700">{store.shop_nm}</div>
-                            <div className="text-gray-500 text-[9px]">{store.exclusion_reason}</div>
-                            <div className="flex justify-between mt-0.5">
-                              <span className="text-gray-600">직접손익: {Math.round(store.current.direct_profit)}K</span>
-                              <span className="text-gray-600">YOY {Math.round(store.yoy)}%</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                
+                {/* 전략 인사이트 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-yellow-400 text-sm">💡</span>
+                    <span className="text-white font-semibold text-xs">전략 인사이트</span>
+                  </div>
+                  <div className="text-[10px] text-slate-200 space-y-1.5">
+                    <div>적자 {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개 매장 집중 관리 필요 (HK {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개, MC {(() => {
+                      const mcStores = storeStatusData?.mc_summary?.stores || [];
+                      return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
+                    })()}개), Yoho-NTP3-Time Sq 우선 개선 대상</div>
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 text-xs">▲</span>
+                      <span>BEP 달성 기준: 임차료+인건비율 45% 미만 유지 필요</span>
                     </div>
-                  )}
-                </div>
-                <div className="mt-3 pt-2 border-t border-gray-300">
-                  <button
-                    onClick={() => setExpandedSummary(prev => ({ ...prev, insights: !prev.insights }))}
-                    className="text-gray-600 font-semibold text-[10px] flex items-center w-full justify-between mb-1"
-                  >
-                    <span>전략 인사이트</span>
-                    {expandedSummary.insights ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  {expandedSummary.insights && (
-                    <div className="text-[10px] text-gray-600 space-y-1">
-                      <div>• 적자매장 {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개 집중 관리 필요</div>
-                      <div>• Yoho-NTP3 성장 모멘텀 활용한 흑자 전략 수립</div>
-                      <div>• BEP 목표: 임차료+인건비 비율 45% 이하 유지</div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -4145,24 +4397,22 @@ const HongKongCEODashboard = () => {
                         <ChevronRight className="w-4 h-4" />
                       )}
                     </button>
-                    {expandedStoreCategories.profit_improving.rentLabor && (
-                      <>
-                        <div className="text-[10px] text-green-600 mt-1">
-                          임차료율: {(() => {
-                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%, 인건비율: {(() => {
-                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%
-                        </div>
+                    {expandedStoreCategories.profit_improving.rentLabor && (() => {
+                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                      const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
+                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                      const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
+                      return (
+                        <>
+                          <div className="text-[10px] text-green-600 mt-1">
+                            임차료율: {rentRate}%, 인건비율: {laborRate}%
+                          </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
-                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const totalRatio = parseFloat(rentRatio) + parseFloat(laborRatio);
+                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
+                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
+                            const totalRatio = rentRatio + laborRatio;
                             let efficiency = '';
                             if (totalRatio < 35) efficiency = '우수';
                             else if (totalRatio < 45) efficiency = '효율적';
@@ -4170,14 +4420,15 @@ const HongKongCEODashboard = () => {
                             else efficiency = '비용 관리 필요';
                             return (
                               <div key={idx} className="text-[9px] text-green-600 flex justify-between">
-                                <span>{store.shop_nm}: {totalRatio}%</span>
+                                <span>{store.shop_nm}: {totalRatio.toFixed(1)}%</span>
                                 <span className={totalRatio < 45 ? 'text-green-700' : 'text-orange-600'}>({efficiency})</span>
                               </div>
                             );
                           })}
                         </div>
                       </>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="mt-2 pt-2 border-t border-green-300">
                     <div className="text-green-700 font-semibold text-[10px] mb-1">전략 인사이트</div>
@@ -4255,24 +4506,22 @@ const HongKongCEODashboard = () => {
                         <ChevronRight className="w-4 h-4" />
                       )}
                     </button>
-                    {expandedStoreCategories.profit_deteriorating.rentLabor && (
-                      <>
-                        <div className="text-[10px] text-blue-600 mt-1">
-                          임차료율: {(() => {
-                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%, 인건비율: {(() => {
-                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%
-                        </div>
+                    {expandedStoreCategories.profit_deteriorating.rentLabor && (() => {
+                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                      const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
+                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                      const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
+                      return (
+                        <>
+                          <div className="text-[10px] text-blue-600 mt-1">
+                            임차료율: {rentRate}%, 인건비율: {laborRate}%
+                          </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
-                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const totalRatio = parseFloat(rentRatio) + parseFloat(laborRatio);
+                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
+                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
+                            const totalRatio = rentRatio + laborRatio;
                             let efficiency = '';
                             if (totalRatio < 35) efficiency = '우수';
                             else if (totalRatio < 45) efficiency = '효율적';
@@ -4280,14 +4529,15 @@ const HongKongCEODashboard = () => {
                             else efficiency = '비용 관리 필요';
                             return (
                               <div key={idx} className="text-[9px] text-blue-600 flex justify-between">
-                                <span>{store.shop_nm}: {totalRatio}%</span>
+                                <span>{store.shop_nm}: {totalRatio.toFixed(1)}%</span>
                                 <span className={totalRatio < 45 ? 'text-blue-700' : 'text-orange-600'}>({efficiency})</span>
                               </div>
                             );
                           })}
                         </div>
                       </>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="mt-2 pt-2 border-t border-blue-300">
                     <div className="text-blue-700 font-semibold text-[10px] mb-1">전략 인사이트</div>
@@ -4365,38 +4615,37 @@ const HongKongCEODashboard = () => {
                         <ChevronRight className="w-4 h-4" />
                       )}
                     </button>
-                    {expandedStoreCategories.loss_improving.rentLabor && (
-                      <>
-                        <div className="text-[10px] text-yellow-600 mt-1">
-                          임차료율: {(() => {
-                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%, 인건비율: {(() => {
-                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%
-                        </div>
+                    {expandedStoreCategories.loss_improving.rentLabor && (() => {
+                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                      const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
+                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                      const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
+                      return (
+                        <>
+                          <div className="text-[10px] text-yellow-600 mt-1">
+                            임차료율: {rentRate}%, 인건비율: {laborRate}%
+                          </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.map((store: any, idx: number) => {
-                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const totalRatio = parseFloat(rentRatio) + parseFloat(laborRatio);
+                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
+                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
+                            const totalRatio = rentRatio + laborRatio;
                             let efficiency = '';
                             if (totalRatio < 60) efficiency = '매출 확대 시 개선 가능';
                             else if (totalRatio < 100) efficiency = '고비용 구조';
                             else efficiency = '특수 매장, 과재고 소진 목적';
                             return (
                               <div key={idx} className="text-[9px] text-yellow-600 flex justify-between">
-                                <span>{store.shop_nm}: {totalRatio}%</span>
+                                <span>{store.shop_nm}: {totalRatio.toFixed(1)}%</span>
                                 <span className="text-orange-600">({efficiency})</span>
                               </div>
                             );
                           })}
                         </div>
                       </>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="mt-2 pt-2 border-t border-yellow-300">
                     <div className="text-yellow-700 font-semibold text-[10px] mb-1">전략 인사이트</div>
@@ -4481,37 +4730,36 @@ const HongKongCEODashboard = () => {
                         <ChevronRight className="w-4 h-4" />
                       )}
                     </button>
-                    {expandedStoreCategories.loss_deteriorating.rentLabor && (
-                      <>
-                        <div className="text-[10px] text-red-600 mt-1">
-                          임차료율: {(() => {
-                            const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%, 인건비율: {(() => {
-                            const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
-                            const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%
-                        </div>
+                    {expandedStoreCategories.loss_deteriorating.rentLabor && (() => {
+                      const totalRent = cat.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                      const totalSales = cat.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                      const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
+                      const totalLabor = cat.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                      const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
+                      return (
+                        <>
+                          <div className="text-[10px] text-red-600 mt-1">
+                            임차료율: {rentRate}%, 인건비율: {laborRate}%
+                          </div>
                         <div className="mt-2 space-y-0.5">
                           {cat.stores.filter((s: any) => s.shop_cd !== 'M05').map((store: any, idx: number) => {
-                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const totalRatio = parseFloat(rentRatio) + parseFloat(laborRatio);
+                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
+                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
+                            const totalRatio = rentRatio + laborRatio;
                             let note = '';
                             if (totalRatio >= 40) note = '임차료율 40% 이상';
                             if (store.shop_cd === 'M05' || store.shop_cd === 'M12') note = '종료/리뉴얼';
                             return (
                               <div key={idx} className="text-[9px] text-red-600 flex justify-between">
-                                <span>{store.shop_nm}: {totalRatio}%</span>
+                                <span>{store.shop_nm}: {totalRatio.toFixed(1)}%</span>
                                 {note && <span className="text-orange-600">({note})</span>}
                               </div>
                             );
                           })}
                         </div>
                       </>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="mt-2 pt-2 border-t border-red-300">
                     <div className="text-red-700 font-semibold text-[10px] mb-1">전략 인사이트</div>
@@ -4591,33 +4839,32 @@ const HongKongCEODashboard = () => {
                         <ChevronRight className="w-4 h-4" />
                       )}
                     </button>
-                    {expandedStoreCategories.mc_summary.rentLabor && (
-                      <>
-                        <div className="text-[10px] text-purple-600 mt-1">
-                          임차료율: {(() => {
-                            const totalRent = mc.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
-                            const totalSales = mc.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%, 인건비율: {(() => {
-                            const totalLabor = mc.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
-                            const totalSales = mc.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
-                            return totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
-                          })()}%
-                        </div>
+                    {expandedStoreCategories.mc_summary.rentLabor && (() => {
+                      const totalRent = mc.stores.reduce((sum: number, s: any) => sum + (s.current.rent || 0), 0);
+                      const totalSales = mc.stores.reduce((sum: number, s: any) => sum + (s.current.net_sales || 0), 0);
+                      const rentRate = totalSales > 0 ? ((totalRent / totalSales) * 100).toFixed(1) : '0.0';
+                      const totalLabor = mc.stores.reduce((sum: number, s: any) => sum + (s.current.labor_cost || 0), 0);
+                      const laborRate = totalSales > 0 ? ((totalLabor / totalSales) * 100).toFixed(1) : '0.0';
+                      return (
+                        <>
+                          <div className="text-[10px] text-purple-600 mt-1">
+                            임차료율: {rentRate}%, 인건비율: {laborRate}%
+                          </div>
                         <div className="mt-2 space-y-0.5">
                           {mc.stores.map((store: any, idx: number) => {
-                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100).toFixed(1) : '0.0';
-                            const totalRatio = parseFloat(rentRatio) + parseFloat(laborRatio);
+                            const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
+                            const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
+                            const totalRatio = rentRatio + laborRatio;
                             return (
                               <div key={idx} className="text-[9px] text-purple-600 flex justify-between">
-                                <span>{store.shop_nm}: {totalRatio}%</span>
+                                <span>{store.shop_nm}: {totalRatio.toFixed(1)}%</span>
                               </div>
                             );
                           })}
                         </div>
                       </>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div className="mt-2 pt-2 border-t border-purple-300">
                     <div className="text-purple-700 font-semibold text-[10px] mb-1">전략 인사이트</div>
@@ -4636,7 +4883,7 @@ const HongKongCEODashboard = () => {
       <div className="mt-4 bg-white rounded-lg shadow-md p-4">
         <div className="flex items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+            <div className="w-2 h-20 rounded-full mr-2"></div>
             직접비 상세 (1K HKD)
           </h3>
         </div>
@@ -4762,7 +5009,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-cyan-600 mr-1">•</span>
@@ -4828,7 +5075,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-cyan-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-cyan-600 mr-1">•</span>
@@ -5035,7 +5282,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-amber-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-amber-600 mr-1">•</span>
@@ -5134,7 +5381,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-purple-600 mr-1">•</span>
@@ -5201,7 +5448,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-purple-600 mr-1">•</span>
@@ -5497,7 +5744,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-purple-600 mr-1">•</span>
@@ -5562,7 +5809,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-purple-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-purple-600 mr-1">•</span>
@@ -5646,7 +5893,7 @@ const HongKongCEODashboard = () => {
                     const opexRatioChange = currentOpexRatio - prevOpexRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-orange-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
@@ -5717,7 +5964,7 @@ const HongKongCEODashboard = () => {
                     const ratioChange = currentRatio - prevRatio;
 
                     return (
-                      <div className="mt-3 pt-3 border-t bg-orange-50 rounded p-2">
+                      <div className="mt-3 pt-3 border-t rounded p-2">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
@@ -5989,6 +6236,160 @@ const HongKongCEODashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* YOY 추세 모달 */}
+      {showYoyTrend && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+              <h2 className="text-lg font-semibold text-gray-900">매장별 2025년 YOY 추세</h2>
+              <button
+                onClick={() => setShowYoyTrend(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px]">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left p-2 font-semibold">매장명</th>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((m) => (
+                        <th key={m} className="text-center p-2 font-semibold">{m}월</th>
+                      ))}
+                      <th className="text-center p-2 font-semibold">추세</th>
+                      <th className="text-center p-2 font-semibold">AI 분석</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allHKStores.map((store) => {
+                      const monthlyData = (dashboardData as any)?.store_monthly_trends?.[store.shop_cd] || [];
+                      
+                      return (
+                        <tr key={store.shop_cd} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="p-2 font-medium">{store.shop_nm}</td>
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((month) => {
+                            const monthData = monthlyData.find((d: any) => d.month === month);
+                            const yoy = monthData?.yoy || 0;
+                            let colorClass = 'text-gray-400';
+                            if (yoy >= 100) colorClass = 'text-green-600 font-semibold';
+                            else if (yoy >= 90) colorClass = 'text-gray-600';
+                            else if (yoy > 0) colorClass = 'text-red-600';
+                            
+                            return (
+                              <td key={month} className={`text-center p-2 ${colorClass}`}>
+                                {yoy > 0 ? `${yoy}%` : '-'}
+                              </td>
+                            );
+                          })}
+                          <td className="text-center p-2">
+                            {(() => {
+                              const q3Data = monthlyData.filter((d: any) => [7, 8, 9].includes(d.month));
+                              const octData = monthlyData.find((d: any) => d.month === 10);
+                              if (q3Data.length === 0 || !octData) return '-';
+                              
+                              const q3Avg = q3Data.reduce((sum: number, d: any) => sum + d.yoy, 0) / q3Data.length;
+                              const trend = octData.yoy > q3Avg;
+                              
+                              return trend ? (
+                                <TrendingUp className="w-4 h-4 text-green-600 inline" />
+                              ) : (
+                                <TrendingDown className="w-4 h-4 text-red-600 inline" />
+                              );
+                            })()}
+                          </td>
+                          <td 
+                            className="text-center p-2 text-[10px] text-gray-700 cursor-pointer hover:bg-gray-100 relative"
+                            onClick={() => {
+                              const defaultAnalysis = (() => {
+                                const yoyArr = [1,2,3,4,5,6,7,8,9,10].map(m => {
+                                  const d = monthlyData.find((d: any) => d.month === m);
+                                  return d?.yoy ?? 0;
+                                });
+                                const validArr = yoyArr.filter(y => y > 0);
+                                if(validArr.length === 0) return '-';
+                                const min = Math.min(...validArr);
+                                const max = Math.max(...validArr);
+                                const first = validArr[0], last = validArr[validArr.length-1];
+                                let msg = [];
+                                if (last - first > 15) msg.push('연중 꾸준한 성장');
+                                if (first - last > 15) msg.push('상반기 대비 하락');
+                                if (max - min > 50) msg.push(`변동폭 큼(${min}~${max}%)`);
+                                if (validArr.every(y=>y>=100)) msg.push('100%↑ 지속 유지');
+                                if (!msg.length) {
+                                  msg.push('안정적');
+                                }
+                                return msg.join(', ');
+                              })();
+                              setEditingStoreCode(store.shop_cd);
+                              setEditingText(aiAnalysis[store.shop_cd] || defaultAnalysis);
+                            }}
+                            title="클릭하여 편집"
+                          >
+                            {editingStoreCode === store.shop_cd ? (
+                              <input
+                                type="text"
+                                value={editingText}
+                                onChange={(e) => setEditingText(e.target.value)}
+                                onBlur={() => {
+                                  const newAnalysis = { ...aiAnalysis };
+                                  if (editingText.trim()) {
+                                    newAnalysis[store.shop_cd] = editingText.trim();
+                                  } else {
+                                    delete newAnalysis[store.shop_cd];
+                                  }
+                                  setAiAnalysis(newAnalysis);
+                                  localStorage.setItem('hk_store_ai_analysis', JSON.stringify(newAnalysis));
+                                  setEditingStoreCode(null);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                  } else if (e.key === 'Escape') {
+                                    setEditingStoreCode(null);
+                                  }
+                                }}
+                                className="w-full px-2 py-1 text-[10px] border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                autoFocus
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              <span className="block">
+                                {aiAnalysis[store.shop_cd] || (() => {
+                                  const yoyArr = [1,2,3,4,5,6,7,8,9,10].map(m => {
+                                    const d = monthlyData.find((d: any) => d.month === m);
+                                    return d?.yoy ?? 0;
+                                  });
+                                  const validArr = yoyArr.filter(y => y > 0);
+                                  if(validArr.length === 0) return '-';
+                                  const min = Math.min(...validArr);
+                                  const max = Math.max(...validArr);
+                                  const first = validArr[0], last = validArr[validArr.length-1];
+                                  let msg = [];
+                                  if (last - first > 15) msg.push('연중 꾸준한 성장');
+                                  if (first - last > 15) msg.push('상반기 대비 하락');
+                                  if (max - min > 50) msg.push(`변동폭 큼(${min}~${max}%)`);
+                                  if (validArr.every(y=>y>=100)) msg.push('100%↑ 지속 유지');
+                                  if (!msg.length) {
+                                    msg.push('안정적');
+                                  }
+                                  return msg.join(', ');
+                                })()}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

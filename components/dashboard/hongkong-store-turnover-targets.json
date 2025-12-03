@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "description": "홍콩 마카오 매장별 고정임차료 및 턴오버 기준율",
+    "updated_at": "2025-12-03"
+  },
+  "store_turnover_targets": {
+    "M01": {
+      "fixed_rent": 512.342,
+      "turnover_rate": 0.15
+    },
+    "M02": {
+      "fixed_rent": 272.550,
+      "turnover_rate": 0.18
+    },
+    "M05": {
+      "fixed_rent": 285.950,
+      "turnover_rate": 0.18
+    },
+    "M07": {
+      "fixed_rent": 240.000,
+      "turnover_rate": 0.15
+    },
+    "M09": {
+      "fixed_rent": 142.200,
+      "turnover_rate": 0.13
+    },
+    "M10": {
+      "fixed_rent": 354.210,
+      "turnover_rate": 0.15
+    },
+    "M11": {
+      "fixed_rent": 164.000,
+      "turnover_rate": 0.13
+    },
+    "M13": {
+      "fixed_rent": 132.000,
+      "turnover_rate": 0.13
+    },
+    "M14": {
+      "fixed_rent": 384.320,
+      "turnover_rate": 0.18
+    },
+    "M15": {
+      "fixed_rent": 72.000,
+      "turnover_rate": 0.13
+    },
+    "M16": {
+      "fixed_rent": 198.800,
+      "turnover_rate": 0.18
+    },
+    "M17": {
+      "fixed_rent": 106.167,
+      "turnover_rate": 0.15
+    },
+    "M18": {
+      "fixed_rent": 363.210,
+      "turnover_rate": 0.15
+    },
+    "M19": {
+      "fixed_rent": 120.540,
+      "turnover_rate": 0.18
+    },
+    "M21": {
+      "fixed_rent": 134.810,
+      "turnover_rate": 0.18
+    },
+    "M22": {
+      "fixed_rent": 297.440,
+      "turnover_rate": 0.18
+    },
+    "X01": {
+      "fixed_rent": 717.587,
+      "turnover_rate": 0.15
+    }
+  }
+}
+
