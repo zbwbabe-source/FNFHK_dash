@@ -62,6 +62,14 @@ const HongKongCEODashboard = () => {
   });
   const [editingStoreCode, setEditingStoreCode] = useState<string | null>(null);
   const [editingText, setEditingText] = useState<string>('');
+  const [yoyTrendSummary, setYoyTrendSummary] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('hk_yoy_trend_summary');
+      return saved || '';
+    }
+    return '';
+  });
+  const [isEditingYoySummary, setIsEditingYoySummary] = useState(false);
 
   // ============================================================
   // 헬퍼 함수
@@ -6251,21 +6259,95 @@ const HongKongCEODashboard = () => {
               </button>
             </div>
             <div className="p-4">
+              {/* 전체 추세 분석 요약 */}
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="text-sm font-semibold text-gray-900">📊 YOY 추세 분석</h3>
+                  <button
+                    onClick={() => {
+                      if (isEditingYoySummary) {
+                        // 저장
+                        localStorage.setItem('hk_yoy_trend_summary', yoyTrendSummary);
+                      } else {
+                        // 편집 시작 - 기본 분석 텍스트 생성
+                        if (!yoyTrendSummary) {
+                          const octYoyData = allHKStores.map(store => {
+                            const monthlyData = (dashboardData as any)?.store_monthly_trends?.[store.shop_cd] || [];
+                            const octData = monthlyData.find((d: any) => d.month === 10);
+                            return { store: store.shop_nm, yoy: octData?.yoy || 0 };
+                          }).filter(d => d.yoy > 0);
+
+                          const avgYoy = octYoyData.length > 0 
+                            ? Math.round(octYoyData.reduce((sum, d) => sum + d.yoy, 0) / octYoyData.length)
+                            : 0;
+                          
+                          const above100 = octYoyData.filter(d => d.yoy >= 100).length;
+                          const below90 = octYoyData.filter(d => d.yoy < 90).length;
+                          const highestStore = octYoyData.reduce((max, d) => d.yoy > max.yoy ? d : max, { store: '', yoy: 0 });
+                          const lowestStore = octYoyData.reduce((min, d) => d.yoy < min.yoy && d.yoy > 0 ? d : min, { store: '', yoy: 999 });
+
+                          const defaultText = `10월 전체 평균 YOY ${avgYoy}%로, 목표 달성 매장(100% 이상) ${above100}개, 개선 필요 매장(90% 미만) ${below90}개입니다. 최고 성과 매장은 ${highestStore.store} (${highestStore.yoy}%), 개선이 시급한 매장은 ${lowestStore.store} (${lowestStore.yoy}%)입니다. ${avgYoy >= 100 ? '전반적으로 양호한 실적을 보이고 있습니다.' : '평균 YOY가 100% 미만으로, 전반적인 매출 개선 전략이 필요합니다.'}`;
+                          setYoyTrendSummary(defaultText);
+                        }
+                      }
+                      setIsEditingYoySummary(!isEditingYoySummary);
+                    }}
+                    className="px-2 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    {isEditingYoySummary ? '저장' : '수정'}
+                  </button>
+                </div>
+                <div className="text-xs text-gray-800 leading-relaxed">
+                  {isEditingYoySummary ? (
+                    <textarea
+                      value={yoyTrendSummary}
+                      onChange={(e) => setYoyTrendSummary(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded text-xs"
+                      rows={3}
+                      placeholder="YOY 추세에 대한 분석을 입력하세요..."
+                    />
+                  ) : (
+                    <div className="whitespace-pre-wrap">
+                      {yoyTrendSummary || (() => {
+                        // 기본 분석 표시
+                        const octYoyData = allHKStores.map(store => {
+                          const monthlyData = (dashboardData as any)?.store_monthly_trends?.[store.shop_cd] || [];
+                          const octData = monthlyData.find((d: any) => d.month === 10);
+                          return { store: store.shop_nm, yoy: octData?.yoy || 0 };
+                        }).filter(d => d.yoy > 0);
+
+                        const avgYoy = octYoyData.length > 0 
+                          ? Math.round(octYoyData.reduce((sum, d) => sum + d.yoy, 0) / octYoyData.length)
+                          : 0;
+                        
+                        const above100 = octYoyData.filter(d => d.yoy >= 100).length;
+                        const below90 = octYoyData.filter(d => d.yoy < 90).length;
+                        const highestStore = octYoyData.reduce((max, d) => d.yoy > max.yoy ? d : max, { store: '', yoy: 0 });
+                        const lowestStore = octYoyData.reduce((min, d) => d.yoy < min.yoy && d.yoy > 0 ? d : min, { store: '', yoy: 999 });
+
+                        return `10월 전체 평균 YOY ${avgYoy}%로, 목표 달성 매장(100% 이상) ${above100}개, 개선 필요 매장(90% 미만) ${below90}개입니다. 최고 성과 매장은 ${highestStore.store} (${highestStore.yoy}%), 개선이 시급한 매장은 ${lowestStore.store} (${lowestStore.yoy}%)입니다. ${avgYoy >= 100 ? '전반적으로 양호한 실적을 보이고 있습니다.' : '평균 YOY가 100% 미만으로, 전반적인 매출 개선 전략이 필요합니다.'}`;
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="overflow-x-auto">
                 <table className="w-full text-[10px]">
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left p-2 font-semibold">매장명</th>
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((m) => (
-                        <th key={m} className="text-center p-2 font-semibold">{m}월</th>
+                        <th key={m} className={`text-center p-2 font-semibold ${m === 10 ? 'bg-blue-100 border-t border-l border-r border-red-500' : ''}`}>{m}월</th>
                       ))}
                       <th className="text-center p-2 font-semibold">추세</th>
                       <th className="text-center p-2 font-semibold">AI 분석</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {allHKStores.map((store) => {
+                    {allHKStores.map((store, index) => {
                       const monthlyData = (dashboardData as any)?.store_monthly_trends?.[store.shop_cd] || [];
+                      const isLastRow = index === allHKStores.length - 1;
                       
                       return (
                         <tr key={store.shop_cd} className="border-b border-gray-100 hover:bg-gray-50">
@@ -6278,8 +6360,12 @@ const HongKongCEODashboard = () => {
                             else if (yoy >= 90) colorClass = 'text-gray-600';
                             else if (yoy > 0) colorClass = 'text-red-600';
                             
+                            const borderClass = month === 10 
+                              ? `bg-blue-100 border-l border-r border-red-500 ${isLastRow ? 'border-b border-red-500' : ''}`
+                              : '';
+                            
                             return (
-                              <td key={month} className={`text-center p-2 ${colorClass}`}>
+                              <td key={month} className={`text-center p-2 ${colorClass} ${borderClass}`}>
                                 {yoy > 0 ? `${yoy}%` : '-'}
                               </td>
                             );
