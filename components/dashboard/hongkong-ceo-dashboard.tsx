@@ -6671,15 +6671,15 @@ const HongKongCEODashboard = () => {
                             return sum + (item.모자?.stock_price || 0);
                           }, 0);
                           const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
-                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const change = weightedAvg - prevWeightedAvg;
                           const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
                           
                           return (
                             <div>
-                              <div>{weightedAvg.toFixed(1)}주</div>
+                              <div>{formatStockWeeks(weightedAvg)}주</div>
                               {prevWeightedAvg > 0 && (
                                 <div className="text-xs text-gray-600 mt-0.5">
-                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                  전년 {formatStockWeeks(prevWeightedAvg)}주
                                 </div>
                               )}
                               {changeText && (
@@ -6746,15 +6746,15 @@ const HongKongCEODashboard = () => {
                             return sum + (item.신발?.stock_price || 0);
                           }, 0);
                           const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
-                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const change = weightedAvg - prevWeightedAvg;
                           const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
                           
                           return (
                             <div>
-                              <div>{weightedAvg.toFixed(1)}주</div>
+                              <div>{formatStockWeeks(weightedAvg)}주</div>
                               {prevWeightedAvg > 0 && (
                                 <div className="text-xs text-gray-600 mt-0.5">
-                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                  전년 {formatStockWeeks(prevWeightedAvg)}주
                                 </div>
                               )}
                               {changeText && (
@@ -6821,15 +6821,15 @@ const HongKongCEODashboard = () => {
                             return sum + (item.가방외?.stock_price || 0);
                           }, 0);
                           const prevWeightedAvg = prevTotalWeight > 0 ? prevWeightedSum / prevTotalWeight : 0;
-                          const change = prevWeightedAvg > 0 ? weightedAvg - prevWeightedAvg : 0;
+                          const change = weightedAvg - prevWeightedAvg;
                           const changeText = prevWeightedAvg > 0 && change !== 0 ? (change > 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`) : '';
                           
                           return (
                             <div>
-                              <div>{weightedAvg.toFixed(1)}주</div>
+                              <div>{formatStockWeeks(weightedAvg)}주</div>
                               {prevWeightedAvg > 0 && (
                                 <div className="text-xs text-gray-600 mt-0.5">
-                                  전년 {prevWeightedAvg.toFixed(1)}주
+                                  전년 {formatStockWeeks(prevWeightedAvg)}주
                                 </div>
                               )}
                               {changeText && (
