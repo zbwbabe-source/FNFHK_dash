@@ -71,6 +71,41 @@ const HongKongCEODashboard = () => {
   });
   const [isEditingYoySummary, setIsEditingYoySummary] = useState(false);
   const [showStockWeeksModal, setShowStockWeeksModal] = useState(false);
+  const [showStagnantInventoryModal, setShowStagnantInventoryModal] = useState(false);
+  const [stagnantInventoryCriteria, setStagnantInventoryCriteria] = useState<'sales' | 'days'>('sales');
+  const [showPastSeasonDetailModal, setShowPastSeasonDetailModal] = useState(false);
+  const [stagnantModalView, setStagnantModalView] = useState<'detail' | 'stagnant'>('detail'); // 'detail' = 과시즌F 상세분석, 'stagnant' = 정체재고
+
+  // 정체재고 필터링 데이터 (useMemo로 메모이제이션)
+  const filteredStagnantInventory = useMemo(() => {
+    const stagnant24F_sales = (dashboardData as any)?.stagnant_inventory?.['24F'] || [];
+    const stagnant23F_sales = (dashboardData as any)?.stagnant_inventory?.['23F'] || [];
+    const stagnant22F_sales = (dashboardData as any)?.stagnant_inventory?.['22F~'] || [];
+    
+    if (stagnantInventoryCriteria === 'sales') {
+      return {
+        '24F': stagnant24F_sales,
+        '23F': stagnant23F_sales,
+        '22F~': stagnant22F_sales
+      };
+    } else {
+      // 재고일수 기준으로 필터링 (300일 이상 또는 판매가 0인 경우)
+      return {
+        '24F': stagnant24F_sales.filter((item: any) => 
+          (item.stock_days && item.stock_days >= 300) || 
+          (item.stock_days === null || item.stock_days === undefined)
+        ),
+        '23F': stagnant23F_sales.filter((item: any) => 
+          (item.stock_days && item.stock_days >= 300) || 
+          (item.stock_days === null || item.stock_days === undefined)
+        ),
+        '22F~': stagnant22F_sales.filter((item: any) => 
+          (item.stock_days && item.stock_days >= 300) || 
+          (item.stock_days === null || item.stock_days === undefined)
+        )
+      };
+    }
+  }, [stagnantInventoryCriteria]);
 
   // ============================================================
   // 헬퍼 함수
@@ -2233,6 +2268,16 @@ const HongKongCEODashboard = () => {
                   </div>
                 </>
               )}
+              
+              {/* 과시즌F 상세 버튼 */}
+              <div className="border-t pt-3 mt-3">
+                <button
+                  onClick={() => setShowStagnantInventoryModal(true)}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-semibold transition-colors"
+                >
+                  과시즌F 상세
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -7032,6 +7077,1342 @@ const HongKongCEODashboard = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 과시즌F 상세 모달 */}
+      {showStagnantInventoryModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowStagnantInventoryModal(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">과시즌F 상세 분석</h3>
+              <button
+                onClick={() => setShowStagnantInventoryModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {/* 뷰 전환 버튼 */}
+              <div className="mb-4 flex gap-2 items-center">
+                <button
+                  onClick={() => setStagnantModalView('detail')}
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                    stagnantModalView === 'detail'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  📋 과시즌F 상세분석
+                </button>
+                <button
+                  onClick={() => setStagnantModalView('stagnant')}
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                    stagnantModalView === 'stagnant'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  🚨 정체재고 분석
+                </button>
+                {stagnantModalView === 'stagnant' && (
+                  <div className="flex gap-2 ml-auto">
+                    <button
+                      onClick={() => setStagnantInventoryCriteria('sales')}
+                      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        stagnantInventoryCriteria === 'sales'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      📊 판매금액 기준
+                    </button>
+                    <button
+                      onClick={() => setStagnantInventoryCriteria('days')}
+                      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        stagnantInventoryCriteria === 'days'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      📅 재고일수 기준 (300일 이상)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* 정체재고 분석 뷰 */}
+              {stagnantModalView === 'stagnant' && (
+                <>
+              {/* 기준 설명 */}
+              <div className="mb-6 bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-500">
+                {stagnantInventoryCriteria === 'sales' ? (
+                  <p className="text-sm text-yellow-900">
+                    <span className="font-semibold">📊 분석 기준 (판매금액 - 실판 기준):</span> 과거 10개월간 실판 판매금액이 연차별 기준 미만인 Subcategory를 정체재고로 분류
+                    <br />
+                    <span className="text-xs mt-1 block">- 1년차 (24F): <span className="font-bold">100,000 HKD 미만</span> (25년 초에는 당시즌이었기 때문에 기준 2배 적용)</span>
+                    <span className="text-xs">- 2년차 (23F) 및 3년차 이상 (22F~): <span className="font-bold">50,000 HKD 미만</span></span>
+                    <br />
+                    <span className="text-xs mt-1 block text-blue-700">※ 재고일수는 택가 매출 기준으로 계산됩니다 (택가 재고 / 택가 매출 × 304일). 판매가 0인 경우 "-"로 표시됩니다.</span>
+                  </p>
+                ) : (
+                  <p className="text-sm text-yellow-900">
+                    <span className="font-semibold">📅 분석 기준 (재고일수 기준):</span> 재고일수가 <span className="font-bold">300일 이상</span>이거나 <span className="font-bold text-red-600">판매가 0인</span> Subcategory를 정체재고로 분류
+                    <br />
+                    <span className="text-xs mt-1 block text-blue-700">※ 재고일수는 택가 매출 기준으로 계산됩니다 (택가 재고 / 택가 매출 × 304일).</span>
+                    <span className="text-xs mt-1 block text-red-700">※ 판매가 0인 경우 재고일수를 계산할 수 없지만, 더 심각한 정체재고로 간주하여 포함됩니다.</span>
+                  </p>
+                )}
+                {(() => {
+                  const metadata = (dashboardData as any)?.metadata;
+                  if (!metadata) return null;
+                  const lastPeriod = metadata.last_period || '2510';
+                  const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                  const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                  
+                  // 10개월 기간 계산 (2501 ~ 2510 = 2025년 1월~10월)
+                  const startYear = lastYear;
+                  const startMonth = 1;
+                  const startPeriod = `${(startYear % 100).toString().padStart(2, '0')}${startMonth.toString().padStart(2, '0')}`;
+                  const periodLabel = `${startYear}년 ${startMonth}월 ~ ${lastYear}년 ${lastMonth}월`;
+                  
+                  // 정체재고 합계 계산 (택가 기준, HKD 단위)
+                  const totalStagnantStock = 
+                    (filteredStagnantInventory['24F'].reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0)) +
+                    (filteredStagnantInventory['23F'].reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0)) +
+                    (filteredStagnantInventory['22F~'].reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0));
+                  
+                  // 과시즌F 전체 재고 (택가 기준, HKD 단위)
+                  // pastSeasonFW.total.current는 이미 1K HKD 단위이므로 1000을 곱해서 HKD로 변환
+                  const totalPastSeasonFW = (pastSeasonFW?.total?.current || 0) * 1000;
+                  
+                  // 비중 계산
+                  const stagnantRatio = totalPastSeasonFW > 0 ? (totalStagnantStock / totalPastSeasonFW) * 100 : 0;
+                  
+                  return (
+                    <>
+                      <p className="text-xs text-yellow-800 mt-2">
+                        <span className="font-semibold">기간:</span> {periodLabel} (10개월, Period: {startPeriod} ~ {lastPeriod})
+                      </p>
+                      <p className="text-xs text-yellow-800 mt-2">
+                        <span className="font-semibold">정체재고 합계:</span> {formatNumber(Math.round(totalStagnantStock / 1000))}K ({formatPercent(stagnantRatio, 1)}%, 과시즌F 전체 대비, 택가 기준)
+                      </p>
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* 24F (1년차) */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-bold text-red-900 flex items-center">
+                    <span className="bg-red-100 px-3 py-1 rounded">24F (1년차)</span>
+                    <span className="ml-2 text-sm text-gray-600">
+                      총 {filteredStagnantInventory['24F'].length}개 항목
+                    </span>
+                  </h4>
+                  <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 border-b-2 border-gray-300">
+                        <th className="text-left p-2 font-semibold">순위</th>
+                        <th className="text-left p-2 font-semibold">Subcategory</th>
+                        <th className="text-left p-2 font-semibold">시즌</th>
+                        <th className="text-right p-2 font-semibold">택가 재고</th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '택가매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '실판매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                        <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStagnantInventory['24F'].map((item: any, idx: number) => (
+                        <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                          <td className="p-2">{idx + 1}</td>
+                          <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                          <td className="p-2">{item.season_code}</td>
+                          <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">
+                            {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                              <span className="text-gray-600">
+                                {formatPercent(item.discount_rate, 1)}%
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="p-2 text-right">
+                            {item.stock_days !== null && item.stock_days !== undefined ? (
+                              <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                {Math.round(item.stock_days || 0)}일
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                      </tr>
+                      ))}
+                      {filteredStagnantInventory['24F'].length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="p-4 text-center text-gray-500">정체재고 없음</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* 23F (2년차) */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-bold text-orange-900 flex items-center">
+                    <span className="bg-orange-100 px-3 py-1 rounded">23F (2년차)</span>
+                    <span className="ml-2 text-sm text-gray-600">
+                      총 {filteredStagnantInventory['23F'].length}개 항목
+                    </span>
+                  </h4>
+                  <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 border-b-2 border-gray-300">
+                        <th className="text-left p-2 font-semibold">순위</th>
+                        <th className="text-left p-2 font-semibold">Subcategory</th>
+                        <th className="text-left p-2 font-semibold">시즌</th>
+                        <th className="text-right p-2 font-semibold">택가 재고</th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '택가매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '실판매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                        <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStagnantInventory['23F'].map((item: any, idx: number) => (
+                        <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                          <td className="p-2">{idx + 1}</td>
+                          <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                          <td className="p-2">{item.season_code}</td>
+                          <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">
+                            {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                              <span className="text-gray-600">
+                                {formatPercent(item.discount_rate, 1)}%
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="p-2 text-right">
+                            {item.stock_days !== null && item.stock_days !== undefined ? (
+                              <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                {Math.round(item.stock_days || 0)}일
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                      </tr>
+                      ))}
+                      {filteredStagnantInventory['23F'].length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="p-4 text-center text-gray-500">정체재고 없음</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* 22F~ (3년차 이상) */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-bold text-gray-900 flex items-center">
+                    <span className="bg-gray-100 px-3 py-1 rounded">22F~ (3년차 이상)</span>
+                    <span className="ml-2 text-sm text-gray-600">
+                      총 {filteredStagnantInventory['22F~'].length}개 항목
+                    </span>
+                  </h4>
+                  <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 border-b-2 border-gray-300">
+                        <th className="text-left p-2 font-semibold">순위</th>
+                        <th className="text-left p-2 font-semibold">Subcategory</th>
+                        <th className="text-left p-2 font-semibold">시즌</th>
+                        <th className="text-right p-2 font-semibold">택가 재고</th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '택가매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">
+                          {(() => {
+                            const metadata = (dashboardData as any)?.metadata;
+                            if (!metadata) return '실판매출';
+                            const lastPeriod = metadata.last_period || '2510';
+                            const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                            const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                            
+                            // 10개월 기간 (2501 ~ 2510 = 2025년 1월~10월)
+                            return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                          })()}
+                        </th>
+                        <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                        <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStagnantInventory['22F~'].map((item: any, idx: number) => (
+                        <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                          <td className="p-2">{idx + 1}</td>
+                          <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                          <td className="p-2">{item.season_code}</td>
+                          <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">
+                            {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                              <span className="text-gray-600">
+                                {formatPercent(item.discount_rate, 1)}%
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="p-2 text-right">
+                            {item.stock_days !== null && item.stock_days !== undefined ? (
+                              <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                {Math.round(item.stock_days || 0)}일
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                      </tr>
+                      ))}
+                      {filteredStagnantInventory['22F~'].length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="p-4 text-center text-gray-500">정체재고 없음</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+                </>
+              )}
+
+              {/* 과시즌F 상세분석 뷰 */}
+              {stagnantModalView === 'detail' && (
+                <>
+              {/* 1년차 (24F) TOP 10 */}
+              {(() => {
+                const allItems24F = (dashboardData as any)?.all_past_season_inventory?.['24F'] || [];
+                const top10 = allItems24F.slice(0, 10);
+                const others = allItems24F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems24F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-red-900 flex items-center">
+                        <span className="bg-red-100 px-3 py-1 rounded">24F (1년차)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 2년차 (23F) TOP 10 */}
+              {(() => {
+                const allItems23F = (dashboardData as any)?.all_past_season_inventory?.['23F'] || [];
+                const top10 = allItems23F.slice(0, 10);
+                const others = allItems23F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems23F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-orange-900 flex items-center">
+                        <span className="bg-orange-100 px-3 py-1 rounded">23F (2년차)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 3년차 이상 (22F~) TOP 10 */}
+              {(() => {
+                const allItems22F = (dashboardData as any)?.all_past_season_inventory?.['22F~'] || [];
+                const top10 = allItems22F.slice(0, 10);
+                const others = allItems22F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems22F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-gray-900 flex items-center">
+                        <span className="bg-gray-100 px-3 py-1 rounded">22F~ (3년차 이상)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 과시즌F 상세분석 모달 */}
+      {showPastSeasonDetailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowPastSeasonDetailModal(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">과시즌F 상세분석 (택가 재고 기준)</h3>
+              <button
+                onClick={() => setShowPastSeasonDetailModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {/* 1년차 (24F) TOP 10 */}
+              {(() => {
+                const allItems24F = (dashboardData as any)?.all_past_season_inventory?.['24F'] || [];
+                const top10 = allItems24F.slice(0, 10);
+                const others = allItems24F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems24F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-red-900 flex items-center">
+                        <span className="bg-red-100 px-3 py-1 rounded">24F (1년차)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 2년차 (23F) TOP 10 */}
+              {(() => {
+                const allItems23F = (dashboardData as any)?.all_past_season_inventory?.['23F'] || [];
+                const top10 = allItems23F.slice(0, 10);
+                const others = allItems23F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems23F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-orange-900 flex items-center">
+                        <span className="bg-orange-100 px-3 py-1 rounded">23F (2년차)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 3년차 이상 (22F~) TOP 10 */}
+              {(() => {
+                const allItems22F = (dashboardData as any)?.all_past_season_inventory?.['22F~'] || [];
+                const top10 = allItems22F.slice(0, 10);
+                const others = allItems22F.slice(10);
+                
+                // 기타 합계 계산
+                const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                
+                // 전체 합계 계산
+                const allStockPrice = allItems22F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
+                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
+                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-md font-bold text-gray-900 flex items-center">
+                        <span className="bg-gray-100 px-3 py-1 rounded">22F~ (3년차 이상)</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          택가 재고 TOP 10
+                        </span>
+                      </h4>
+                      <span className="text-sm text-gray-600 font-semibold">Unit: 1K HKD</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b-2 border-gray-300">
+                            <th className="text-left p-2 font-semibold">순위</th>
+                            <th className="text-left p-2 font-semibold">Subcategory</th>
+                            <th className="text-left p-2 font-semibold">시즌</th>
+                            <th className="text-right p-2 font-semibold">택가 재고</th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '택가매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">
+                              {(() => {
+                                const metadata = (dashboardData as any)?.metadata;
+                                if (!metadata) return '실판매출';
+                                const lastPeriod = metadata.last_period || '2510';
+                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
+                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
+                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                              })()}
+                            </th>
+                            <th className="text-right p-2 font-semibold">할인율 (%)</th>
+                            <th className="text-right p-2 font-semibold">재고일수 (일)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {top10.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                              <td className="p-2">{idx + 1}</td>
+                              <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
+                              <td className="p-2">{item.season_code}</td>
+                              <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
+                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">
+                                {item.discount_rate !== null && item.discount_rate !== undefined ? (
+                                  <span className="text-gray-600">
+                                    {formatPercent(item.discount_rate, 1)}%
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right">
+                                {item.stock_days !== null && item.stock_days !== undefined ? (
+                                  <span className={(item.stock_days || 0) > 365 ? 'text-red-600 font-bold' : 'text-gray-600'}>
+                                    {Math.round(item.stock_days || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                          {others.length > 0 && (
+                            <tr className="bg-gray-50 border-t-2 border-gray-400">
+                              <td className="p-2"></td>
+                              <td className="p-2 font-semibold text-gray-700">기타 ({others.length}개)</td>
+                              <td className="p-2"></td>
+                              <td className="p-2 text-right font-bold text-gray-700">{formatNumber(Math.round(othersStockPrice / 1000))}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersGrossSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">{formatNumber(othersSales / 1000, 1)}</td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersDiscountRate !== null ? (
+                                  <span>{formatPercent(othersDiscountRate, 1)}%</span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="p-2 text-right text-gray-700">
+                                {othersStockDays !== null ? (
+                                  <span className={(othersStockDays || 0) > 365 ? 'text-red-600 font-bold' : ''}>
+                                    {Math.round(othersStockDays || 0)}일
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="bg-blue-50 border-t-2 border-blue-400 font-bold">
+                            <td className="p-2"></td>
+                            <td className="p-2 text-blue-900">합계</td>
+                            <td className="p-2"></td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(Math.round(allStockPrice / 1000))}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allGrossSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">{formatNumber(allSales / 1000, 1)}</td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allDiscountRate !== null ? (
+                                <span>{formatPercent(allDiscountRate, 1)}%</span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="p-2 text-right text-blue-900">
+                              {allStockDays !== null ? (
+                                <span className={(allStockDays || 0) > 365 ? 'text-red-600' : ''}>
+                                  {Math.round(allStockDays || 0)}일
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                          {top10.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-4 text-center text-gray-500">데이터 없음</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

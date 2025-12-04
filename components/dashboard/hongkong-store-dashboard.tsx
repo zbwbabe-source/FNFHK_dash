@@ -638,7 +638,7 @@ const HongKongStoreDashboard: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <span className="text-blue-600 text-sm">ℹ️</span>
-              <h3 className="text-xs font-semibold text-gray-800">턴오버 임차료 기준 매출이란?</h3>
+              <h3 className="text-xs font-semibold text-gray-800">턴오버 임차료 기준</h3>
             </div>
             {showTurnoverRentExplanation ? (
               <ChevronDown className="w-4 h-4 text-gray-600" />
@@ -649,11 +649,14 @@ const HongKongStoreDashboard: React.FC = () => {
           {showTurnoverRentExplanation && (
             <div className="px-3 pb-3">
               <p className="text-xs text-gray-600 leading-relaxed">
-                <span className="font-semibold">턴오버 임차료(Turnover Rent)</span>는 매장 매출액의 일정 비율을 임차료로 지불하는 계약 방식입니다. 
-                일반적으로 <span className="font-semibold text-blue-700">"고정 임차료 + 초과 매출의 일정 %"</span> 또는 
-                <span className="font-semibold text-blue-700">"매출의 일정 % 중 더 높은 금액"</span>으로 계산됩니다. 
-                턴오버 기준 100% 달성 시란, <span className="font-semibold text-green-700">현재 지불하는 고정 임차료가 매출의 몇 %에 해당하는 매출 수준</span>을 의미합니다. 
-                이 수준에 도달하면 임차료 부담이 줄어들어 수익성이 크게 개선됩니다.
+                <span className="font-semibold">턴오버 임차료(Turnover Rent)</span>는 매출의 일정 비율을 임차료로 지불하는 방식입니다.
+                <br /><br />
+                일반적으로 <span className="font-semibold text-blue-700">"기본임대료 + 초과 매출의 일정 %"</span> 또는 
+                <span className="font-semibold text-blue-700 underline">"매출의 일정 % 중 더 높은 금액(Max)"</span>으로 계산됩니다.
+                <br /><br />
+                따라서 턴오버 기준 100% 달성 시점은 현재 고정임대료가 매출의 일정 비율에 해당하는 매출 수준을 의미하며,
+                <br /><br />
+                이 매출에 도달하면 <span className="font-semibold text-green-700 underline">임차료 비중이 안정화(약 17-18%)되어 고정비 부담이 완화되고 수익성이 크게 개선</span>됩니다.
               </p>
             </div>
           )}

@@ -1833,6 +1833,233 @@ def generate_dashboard_data(csv_dir, output_file_path):
     total_discount_rate_change = total_discount_rate_current - total_discount_rate_previous
     
     # ============================================================
+    # 과시즌 정체재고 분석
+    # ============================================================
+    print("과시즌 정체재고 분석 중...")
+    
+    # 과거 10개월 Period 계산 (25년 1~10월)
+    recent_10m_periods = sorted([p for p in periods if p <= last_period and p >= f"{last_year % 100:02d}01"])[:10]
+    print(f"  - 10개월 기간: {recent_10m_periods[0] if recent_10m_periods else 'N/A'} ~ {recent_10m_periods[-1] if recent_10m_periods else 'N/A'}")
+    
+    # Subcategory별 과거 10개월 실판 판매금액 집계 (정체재고 판단용 - 모든 과시즌 합계)
+    subcategory_10m_sales = defaultdict(float)
+    # Subcategory별 시즌별 과거 10개월 실판 판매금액 집계 (표시용 - 시즌별 구분)
+    subcategory_season_10m_sales = defaultdict(lambda: defaultdict(float))
+    # Subcategory별 시즌별 과거 10개월 택가 판매금액 집계 (회전율 계산용 - 시즌별 구분)
+    subcategory_season_10m_gross_sales = defaultdict(lambda: defaultdict(float))
+    for period in recent_10m_periods:
+        period_data = [row for row in data 
+                      if row['Period'] == period 
+                      and row['Brand'] == 'MLB'
+                      and row['Season_Code'].endswith('F')]  # 과시즌 FW만
+        for row in period_data:
+            subcat_code = row.get('Subcategory_Code', '').strip()
+            season_code = row.get('Season_Code', '').strip()
+            if subcat_code:
+                net_sales = float(row.get('Net_Sales', 0) or 0)
+                gross_sales = float(row.get('Gross_Sales', 0) or 0)
+                subcategory_10m_sales[subcat_code] += net_sales  # 정체재고 판단용 (모든 과시즌 합계)
+                # 시즌별 구분 (표시용)
+                if season_code:
+                    subcategory_season_10m_sales[subcat_code][season_code] += net_sales
+                    subcategory_season_10m_gross_sales[subcat_code][season_code] += gross_sales
+    
+    # 현재 시점의 Subcategory별 택가 재고금액 집계 (과시즌 FW만)
+    subcategory_stock = defaultdict(lambda: {
+        'subcategory_code': '',
+        'subcategory_name': '',
+        'season_code': '',
+        'stock_price': 0,
+        'sales_10m': 0,  # 실판 매출
+        'gross_sales_10m': 0,  # 택가 매출
+    })
+    
+    for row in current_data:
+        season_code = row['Season_Code']
+        # 과시즌 FW만
+        if season_code.endswith('F') and len(season_code) >= 2:
+            try:
+                season_year = int(season_code[:2])
+                # 과시즌만 (24F 이하)
+                if season_year < last_year % 100:
+                    subcat_code = row.get('Subcategory_Code', '').strip()
+                    subcat_name = row.get('Subcategory', '').strip()
+                    if subcat_code:
+                        stock_price = float(row.get('Stock_Price', 0) or 0)
+                        sales_10m_all = subcategory_10m_sales.get(subcat_code, 0)  # 실판 매출 (정체재고 판단용 - 모든 과시즌 합계)
+                        # 해당 시즌의 실판 매출과 택가 매출 (표시용)
+                        sales_10m = subcategory_season_10m_sales.get(subcat_code, {}).get(season_code, 0)
+                        gross_sales_10m = subcategory_season_10m_gross_sales.get(subcat_code, {}).get(season_code, 0)
+                        
+                        # 연차별 정체재고 기준 (실판 기준 - 모든 과시즌 합계 사용)
+                        # 1년차 (24F): 100,000 HKD 미만 (당시즌이었기 때문에 기준을 2배로)
+                        # 2년차 (23F) 및 3년차 이상 (22F~): 50,000 HKD 미만
+                        threshold = 100000 if season_year == 24 else 50000
+                        
+                        # 조건: 실판 판매금액 < 기준값 (모든 과시즌 합계 기준)
+                        if sales_10m_all < threshold and stock_price > 0:
+                            key = f"{subcat_code}_{season_code}"
+                            subcategory_stock[key]['subcategory_code'] = subcat_code
+                            subcategory_stock[key]['subcategory_name'] = subcat_name
+                            subcategory_stock[key]['season_code'] = season_code
+                            subcategory_stock[key]['stock_price'] += stock_price
+                            subcategory_stock[key]['sales_10m'] = sales_10m  # 해당 시즌의 실판 매출
+                            subcategory_stock[key]['gross_sales_10m'] = gross_sales_10m  # 해당 시즌의 택가 매출
+            except ValueError:
+                continue
+    
+    # 시즌별로 분류 (24F, 23F, 22F~)
+    stagnant_inventory = {
+        '24F': [],
+        '23F': [],
+        '22F~': []
+    }
+    
+    for key, item in subcategory_stock.items():
+        season_code = item['season_code']
+        if len(season_code) >= 2:
+            try:
+                season_year = int(season_code[:2])
+                # 재고일수 = (택가 재고 / 택가 매출) × 304일 (10개월: 1월~10월)
+                # 판매가 0이면 None으로 표시 (UI에서 "-"로 표시)
+                if item['gross_sales_10m'] > 0 and item['stock_price'] > 0:
+                    stock_days = (item['stock_price'] / item['gross_sales_10m']) * 304
+                else:
+                    stock_days = None
+                
+                # 할인율 = (1 - 실판매출 / 택가매출) × 100
+                # 택가매출이 0이면 None으로 표시
+                if item['gross_sales_10m'] > 0:
+                    discount_rate = (1 - item['sales_10m'] / item['gross_sales_10m']) * 100
+                else:
+                    discount_rate = None
+                
+                stagnant_item = {
+                    'subcategory_code': item['subcategory_code'],
+                    'subcategory_name': item['subcategory_name'],
+                    'season_code': season_code,
+                    'stock_price': round(item['stock_price'], 0),  # HKD (택가 재고)
+                    'sales_10m': round(item['sales_10m'], 0),  # HKD (실판 매출)
+                    'gross_sales_10m': round(item['gross_sales_10m'], 0),  # HKD (택가 매출)
+                    'discount_rate': round(discount_rate, 1) if discount_rate is not None else None,  # 할인율 (%)
+                    'stock_days': round(stock_days, 0) if stock_days is not None else None,  # 재고일수 (10개월 기준)
+                }
+                
+                if season_year == 24:
+                    stagnant_inventory['24F'].append(stagnant_item)
+                elif season_year == 23:
+                    stagnant_inventory['23F'].append(stagnant_item)
+                else:
+                    stagnant_inventory['22F~'].append(stagnant_item)
+            except ValueError:
+                continue
+    
+    # 재고금액 많은 순으로 정렬
+    for season_key in stagnant_inventory:
+        stagnant_inventory[season_key].sort(key=lambda x: x['stock_price'], reverse=True)
+    
+    print(f"  - 24F 정체재고: {len(stagnant_inventory['24F'])}개")
+    print(f"  - 23F 정체재고: {len(stagnant_inventory['23F'])}개")
+    print(f"  - 22F~ 정체재고: {len(stagnant_inventory['22F~'])}개")
+    
+    # ============================================================
+    # 전체 과시즌F 재고 분석 (시즌별 전체 데이터)
+    # ============================================================
+    print("전체 과시즌F 재고 데이터 생성 중...")
+    
+    # 전체 과시즌F 재고 (정체재고 기준 없음, 모든 과시즌F 포함)
+    all_past_season_inventory = defaultdict(lambda: {
+        'subcategory_code': '',
+        'subcategory_name': '',
+        'season_code': '',
+        'stock_price': 0,
+        'sales_10m': 0,  # 실판 매출
+        'gross_sales_10m': 0,  # 택가 매출
+        'discount_rate': None,
+        'stock_days': None,
+    })
+    
+    for row in current_data:
+        season_code = row['Season_Code']
+        # 과시즌 FW만
+        if season_code.endswith('F') and len(season_code) >= 2:
+            try:
+                season_year = int(season_code[:2])
+                # 과시즌만 (24F 이하)
+                if season_year < last_year % 100:
+                    subcat_code = row.get('Subcategory_Code', '').strip()
+                    subcat_name = row.get('Subcategory', '').strip()
+                    if subcat_code:
+                        stock_price = float(row.get('Stock_Price', 0) or 0)
+                        
+                        if stock_price > 0:
+                            key = f"{subcat_code}_{season_code}"
+                            
+                            # 초기화
+                            if all_past_season_inventory[key]['subcategory_code'] == '':
+                                all_past_season_inventory[key]['subcategory_code'] = subcat_code
+                                all_past_season_inventory[key]['subcategory_name'] = subcat_name
+                                all_past_season_inventory[key]['season_code'] = season_code
+                            
+                            # 재고금액 누적
+                            all_past_season_inventory[key]['stock_price'] += stock_price
+                            
+                            # 매출 정보는 subcategory+season 조합이므로 마지막에 한번만 설정
+                            # 해당 시즌의 실판 매출과 택가 매출
+                            sales_10m = subcategory_season_10m_sales.get(subcat_code, {}).get(season_code, 0)
+                            gross_sales_10m = subcategory_season_10m_gross_sales.get(subcat_code, {}).get(season_code, 0)
+                            all_past_season_inventory[key]['sales_10m'] = sales_10m
+                            all_past_season_inventory[key]['gross_sales_10m'] = gross_sales_10m
+            except ValueError:
+                continue
+    
+    # 재고일수와 할인율 계산 (모든 항목에 대해)
+    for key, item in all_past_season_inventory.items():
+        gross_sales_10m = item['gross_sales_10m']
+        sales_10m = item['sales_10m']
+        stock_price = item['stock_price']
+        
+        # 할인율 계산
+        if gross_sales_10m > 0:
+            discount_rate = ((gross_sales_10m - sales_10m) / gross_sales_10m) * 100
+            item['discount_rate'] = discount_rate
+        else:
+            item['discount_rate'] = None
+        
+        # 재고일수 계산
+        if gross_sales_10m > 0 and stock_price > 0:
+            stock_days = (stock_price / gross_sales_10m) * 304
+            item['stock_days'] = stock_days
+        else:
+            item['stock_days'] = None
+    
+    # 시즌별로 분류 (24F, 23F, 22F~)
+    all_past_season_by_year = {
+        '24F': [],
+        '23F': [],
+        '22F~': []
+    }
+    
+    for key, item in all_past_season_inventory.items():
+        season_code = item['season_code']
+        if len(season_code) >= 2:
+            try:
+                season_year = int(season_code[:2])
+                if season_year == (last_year % 100) - 1:  # 24F
+                    all_past_season_by_year['24F'].append(item)
+                elif season_year == (last_year % 100) - 2:  # 23F
+                    all_past_season_by_year['23F'].append(item)
+                else:  # 22F~
+                    all_past_season_by_year['22F~'].append(item)
+            except ValueError:
+                continue
+    
+    # 재고금액 많은 순으로 정렬
+    for season_key in all_past_season_by_year:
+        all_past_season_by_year[season_key].sort(key=lambda x: x['stock_price'], reverse=True)
+        print(f"  - {season_key} 전체 재고: {len(all_past_season_by_year[season_key])}개")
+    
+    # ============================================================
     # 매장 상세 대시보드용 추가 집계
     # ============================================================
     print("매장 상세 대시보드용 데이터 생성 중...")
@@ -1982,6 +2209,13 @@ def generate_dashboard_data(csv_dir, output_file_path):
         item_store_top5[subcat_code] = store_list
     
     # 결과 정리
+    # prev_period가 올바르게 계산되었는지 확인 및 수정
+    # 2510의 전년 동월은 2410이어야 함 (2025년 10월 -> 2024년 10월)
+    # 전년 동월 = (last_year - 1)년 last_month월
+    prev_period_correct = f"{(last_year - 1) % 100:02d}{last_month:02d}"
+    if prev_period != prev_period_correct:
+        prev_period = prev_period_correct
+    
     result = {
         'metadata': {
             'last_period': last_period,
@@ -2129,6 +2363,8 @@ def generate_dashboard_data(csv_dir, output_file_path):
                 '1year_subcategory': dict(past_season_fw_1year_subcat),
             },
         },
+        'stagnant_inventory': stagnant_inventory,
+        'all_past_season_inventory': all_past_season_by_year,
         'trend_data': [trend_data[p] for p in sorted(trend_data.keys())],
         'monthly_channel_data': [monthly_channel_data[p] for p in sorted(monthly_channel_data.keys())],
         'monthly_channel_yoy': dict(monthly_channel_yoy),
