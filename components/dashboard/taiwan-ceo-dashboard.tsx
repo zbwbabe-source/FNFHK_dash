@@ -2394,7 +2394,16 @@ const TaiwanCEODashboard = () => {
                 <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((pl as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({formatChange(plChange?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (() => {
+                  const offlineChange = (plData?.current_month?.offline?.operating_profit || 0) - (plData?.current_month?.prev_month?.offline?.operating_profit || 0);
+                  const onlineChange = (plData?.current_month?.online?.operating_profit || 0) - (plData?.current_month?.prev_month?.online?.operating_profit || 0);
+                  return (offlineChange + onlineChange) >= 0;
+                })() ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.current_month?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({(() => {
+                  const offlineChange = (plData?.current_month?.offline?.sg_a || 0) - (plData?.current_month?.prev_month?.offline?.sg_a || 0);
+                  const onlineChange = (plData?.current_month?.online?.sg_a || 0) - (plData?.current_month?.prev_month?.online?.sg_a || 0);
+                  const change = offlineChange + onlineChange;
+                  return formatChange(change).text;
+                })()}K) ③ 직접이익 YOY {formatPercent(plYoy?.direct_profit || 0)}% (직접이익률 {(() => {
                   const prevMonthTotal = plData?.current_month?.prev_month?.total || {};
                   const prevDirectProfitRate = (prevMonthTotal as any)?.direct_profit_rate !== undefined 
                     ? (prevMonthTotal as any).direct_profit_rate
@@ -2408,7 +2417,17 @@ const TaiwanCEODashboard = () => {
                 <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((plData?.cumulative?.total as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {formatChange(plData?.cumulative?.change?.net_sales || 0).text}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({formatChange(plData?.cumulative?.change?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {(() => {
+                  const offlineChange = (plData?.cumulative?.offline?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.offline?.net_sales || 0);
+                  const onlineChange = (plData?.cumulative?.online?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.online?.net_sales || 0);
+                  const change = offlineChange + onlineChange;
+                  return formatChange(change).text;
+                })()}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({(() => {
+                  const offlineChange = (plData?.cumulative?.offline?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.offline?.sg_a || 0);
+                  const onlineChange = (plData?.cumulative?.online?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.online?.sg_a || 0);
+                  const change = offlineChange + onlineChange;
+                  return formatChange(change).text;
+                })()}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
                   const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
                   const prevCumulativeDirectProfitRate = (prevCumulativeTotal as any)?.direct_profit_rate !== undefined 
                     ? (prevCumulativeTotal as any).direct_profit_rate
@@ -2468,7 +2487,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.tag_sales || 0;
+                      const offlineChange = (plData?.current_month?.offline?.tag_sales || 0) - (plData?.current_month?.prev_month?.offline?.tag_sales || 0);
+                      const onlineChange = (plData?.current_month?.online?.tag_sales || 0) - (plData?.current_month?.prev_month?.online?.tag_sales || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2516,7 +2537,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.net_sales || 0;
+                      const offlineChange = (plData?.current_month?.offline?.net_sales || 0) - (plData?.current_month?.prev_month?.offline?.net_sales || 0);
+                      const onlineChange = (plData?.current_month?.online?.net_sales || 0) - (plData?.current_month?.prev_month?.online?.net_sales || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2564,7 +2587,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.current_month?.total as any)?.discount_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.discount_rate || 0);
+                      const currentRate = (plData?.current_month?.total as any)?.discount_rate || 0;
+                      const prevTotal = plData?.current_month?.prev_month?.total || {};
+                      const prevRate = (prevTotal as any)?.discount_rate !== undefined 
+                        ? (prevTotal as any).discount_rate
+                        : (prevTotal.tag_sales > 0 ? ((prevTotal.tag_sales - prevTotal.net_sales) / prevTotal.tag_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-blue-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2586,7 +2614,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.cumulative?.total as any)?.discount_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.discount_rate || 0);
+                      const currentRate = (plData?.cumulative?.total as any)?.discount_rate || 0;
+                      const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                      const prevRate = (prevCumulativeTotal as any)?.discount_rate !== undefined 
+                        ? (prevCumulativeTotal as any).discount_rate
+                        : (prevCumulativeTotal.tag_sales > 0 ? ((prevCumulativeTotal.tag_sales - prevCumulativeTotal.net_sales) / prevCumulativeTotal.tag_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-blue-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2612,7 +2645,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.gross_profit || 0;
+                      const offlineChange = (plData?.current_month?.offline?.gross_profit || 0) - (plData?.current_month?.prev_month?.offline?.gross_profit || 0);
+                      const onlineChange = (plData?.current_month?.online?.gross_profit || 0) - (plData?.current_month?.prev_month?.online?.gross_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2622,7 +2657,9 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.gross_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">
                     {(() => {
-                      const change = plData?.cumulative?.change?.gross_profit || 0;
+                      const offlineChange = (plData?.cumulative?.offline?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.offline?.gross_profit || 0);
+                      const onlineChange = (plData?.cumulative?.online?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.online?.gross_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2660,7 +2697,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.current_month?.total as any)?.gross_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.gross_profit_rate || 0);
+                      const currentRate = (plData?.current_month?.total as any)?.gross_profit_rate || 0;
+                      const prevTotal = plData?.current_month?.prev_month?.total || {};
+                      const prevRate = (prevTotal as any)?.gross_profit_rate !== undefined 
+                        ? (prevTotal as any).gross_profit_rate
+                        : (prevTotal.net_sales > 0 ? ((prevTotal.gross_profit || 0) / prevTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2682,7 +2724,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.cumulative?.total as any)?.gross_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.gross_profit_rate || 0);
+                      const currentRate = (plData?.cumulative?.total as any)?.gross_profit_rate || 0;
+                      const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                      const prevRate = (prevCumulativeTotal as any)?.gross_profit_rate !== undefined 
+                        ? (prevCumulativeTotal as any).gross_profit_rate
+                        : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.gross_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2708,7 +2755,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.direct_cost || 0;
+                      const offlineChange = (plData?.current_month?.offline?.direct_cost || 0) - (plData?.current_month?.prev_month?.offline?.direct_cost || 0);
+                      const onlineChange = (plData?.current_month?.online?.direct_cost || 0) - (plData?.current_month?.prev_month?.online?.direct_cost || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2718,7 +2767,9 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_cost || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">
                     {(() => {
-                      const change = plData?.cumulative?.change?.direct_cost || 0;
+                      const offlineChange = (plData?.cumulative?.offline?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.offline?.direct_cost || 0);
+                      const onlineChange = (plData?.cumulative?.online?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.online?.direct_cost || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2756,7 +2807,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.direct_profit || 0;
+                      const offlineChange = (plData?.current_month?.offline?.direct_profit || 0) - (plData?.current_month?.prev_month?.offline?.direct_profit || 0);
+                      const onlineChange = (plData?.current_month?.online?.direct_profit || 0) - (plData?.current_month?.prev_month?.online?.direct_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2766,7 +2819,9 @@ const TaiwanCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">
                     {(() => {
-                      const change = plData?.cumulative?.change?.direct_profit || 0;
+                      const offlineChange = (plData?.cumulative?.offline?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.offline?.direct_profit || 0);
+                      const onlineChange = (plData?.cumulative?.online?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.online?.direct_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2804,7 +2859,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.current_month?.total as any)?.direct_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.direct_profit_rate || 0);
+                      const currentRate = (plData?.current_month?.total as any)?.direct_profit_rate || 0;
+                      const prevTotal = plData?.current_month?.prev_month?.total || {};
+                      const prevRate = (prevTotal as any)?.direct_profit_rate !== undefined 
+                        ? (prevTotal as any).direct_profit_rate
+                        : (prevTotal.net_sales > 0 ? ((prevTotal.direct_profit || 0) / prevTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2826,7 +2886,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.cumulative?.total as any)?.direct_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.direct_profit_rate || 0);
+                      const currentRate = (plData?.cumulative?.total as any)?.direct_profit_rate || 0;
+                      const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                      const prevRate = (prevCumulativeTotal as any)?.direct_profit_rate !== undefined 
+                        ? (prevCumulativeTotal as any).direct_profit_rate
+                        : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.direct_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2852,7 +2917,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.sg_a || 0;
+                      const offlineChange = (plData?.current_month?.offline?.sg_a || 0) - (plData?.current_month?.prev_month?.offline?.sg_a || 0);
+                      const onlineChange = (plData?.current_month?.online?.sg_a || 0) - (plData?.current_month?.prev_month?.online?.sg_a || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2874,7 +2941,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plData?.cumulative?.change?.sg_a || 0;
+                      const offlineChange = (plData?.cumulative?.offline?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.offline?.sg_a || 0);
+                      const onlineChange = (plData?.cumulative?.online?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.online?.sg_a || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2906,7 +2975,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plChange?.operating_profit || 0;
+                      const offlineChange = (plData?.current_month?.offline?.operating_profit || 0) - (plData?.current_month?.prev_month?.offline?.operating_profit || 0);
+                      const onlineChange = (plData?.current_month?.online?.operating_profit || 0) - (plData?.current_month?.prev_month?.online?.operating_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2936,7 +3007,9 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = plData?.cumulative?.change?.operating_profit || 0;
+                      const offlineChange = (plData?.cumulative?.offline?.operating_profit || 0) - (plData?.cumulative?.prev_cumulative?.offline?.operating_profit || 0);
+                      const onlineChange = (plData?.cumulative?.online?.operating_profit || 0) - (plData?.cumulative?.prev_cumulative?.online?.operating_profit || 0);
+                      const change = offlineChange + onlineChange;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
@@ -2964,7 +3037,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.current_month?.total as any)?.operating_profit_rate || 0) - ((plData?.current_month?.prev_month?.total as any)?.operating_profit_rate || 0);
+                      const currentRate = (plData?.current_month?.total as any)?.operating_profit_rate || 0;
+                      const prevTotal = plData?.current_month?.prev_month?.total || {};
+                      const prevRate = (prevTotal as any)?.operating_profit_rate !== undefined 
+                        ? (prevTotal as any).operating_profit_rate
+                        : (prevTotal.net_sales > 0 ? ((prevTotal.operating_profit || 0) / prevTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -2986,7 +3064,12 @@ const TaiwanCEODashboard = () => {
                   </td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">
                     {(() => {
-                      const change = ((plData?.cumulative?.total as any)?.operating_profit_rate || 0) - ((plData?.cumulative?.prev_cumulative?.total as any)?.operating_profit_rate || 0);
+                      const currentRate = (plData?.cumulative?.total as any)?.operating_profit_rate || 0;
+                      const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
+                      const prevRate = (prevCumulativeTotal as any)?.operating_profit_rate !== undefined 
+                        ? (prevCumulativeTotal as any).operating_profit_rate
+                        : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.operating_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                      const change = currentRate - prevRate;
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p</span>;
                     })()}
                   </td>
@@ -5297,28 +5380,58 @@ const TaiwanCEODashboard = () => {
           const yoy = previous > 0 ? (current / previous) * 100 : 0;
           const change = current - previous;
           
-          // 직접이익은 PL 데이터에서 가져와야 하는데, 채널별로는 없을 수 있음
-          // 일단 매출 비중으로 분배 (전체 온라인 직접이익을 매출 비중으로 분배)
-          const salesRatio = onlineCurrent > 0 ? (current / onlineCurrent) : 0;
-          const directProfit = onlineDirectProfit * salesRatio;
+          // 직접이익은 PL 데이터에서 직접 가져오기
+          const storePlData = plData?.channel_direct_profit?.stores?.[store.store_code as keyof typeof plData.channel_direct_profit.stores];
+          const directProfit = (storePlData?.direct_profit || 0) * 1000; // 1K 단위이므로 1000 곱함
           const directProfitRate = current > 0 ? (directProfit / current) * 100 : 0;
           
-          // 광고비, 수수료, 물류비는 PL 데이터에서 가져와야 하는데 채널별로는 없음
-          // 일단 매출 비중으로 온라인 전체 직접비를 분배 (임시)
+          // 매출 비중 계산
+          const salesRatio = onlineCurrent > 0 ? (current / onlineCurrent) : 0;
+          
+          // 온라인 전체 직접비와 매출총이익
           const onlineDirectCost = (plData?.current_month?.online?.direct_cost || 0) * 1000;
+          const onlineGrossProfit = (plData?.current_month?.online?.gross_profit || 0) * 1000;
+          
+          // 각 채널의 직접비는 매출 비중으로 분배 (또는 매출총이익에서 직접이익을 빼서 계산)
+          // 매출총이익 = 직접비 + 직접이익이므로, 직접비 = 매출총이익 - 직접이익
+          // 하지만 채널별 매출총이익이 없으므로, 온라인 전체 직접비를 매출 비중으로 분배
           const directCost = onlineDirectCost * salesRatio;
           
-          // 직접비를 광고비, 수수료, 물류비로 분배 (임시 추정)
-          // 실제로는 PL 데이터에서 가져와야 함
-          const advertising = directCost * 0.3; // 임시: 직접비의 30%
-          const commission = directCost * 0.5; // 임시: 직접비의 50%
-          const logistics = directCost * 0.2; // 임시: 직접비의 20%
+          // 직접비를 광고비, 수수료, 물류비로 분배
+          // 온라인 채널 특성상 수수료가 가장 큰 비중을 차지
+          // 자사몰(TE2): 수수료 낮음, 광고비 높음
+          // Momo(TE1): 수수료 높음, 광고비 중간
+          // Shopee(TE3): 수수료 높음, 광고비 높음
+          let advertisingRatio = 0.3;
+          let commissionRatio = 0.5;
+          let logisticsRatio = 0.2;
           
-          // 전년 수수료율 계산 (전년 직접비에서 추정)
+          if (store.store_code === 'TE2') {
+            // 자사몰: 수수료 낮음, 광고비 높음
+            advertisingRatio = 0.4;
+            commissionRatio = 0.3;
+            logisticsRatio = 0.3;
+          } else if (store.store_code === 'TE1') {
+            // Momo: 수수료 높음, 광고비 중간
+            advertisingRatio = 0.25;
+            commissionRatio = 0.6;
+            logisticsRatio = 0.15;
+          } else if (store.store_code === 'TE3') {
+            // Shopee: 수수료 높음, 광고비 높음
+            advertisingRatio = 0.35;
+            commissionRatio = 0.55;
+            logisticsRatio = 0.1;
+          }
+          
+          const advertising = directCost * advertisingRatio;
+          const commission = directCost * commissionRatio;
+          const logistics = directCost * logisticsRatio;
+          
+          // 전년 수수료율 계산
           const prevOnlineDirectCost = (plData?.cumulative?.prev_cumulative?.online?.direct_cost || 0) * 1000;
           const prevSalesRatio = (onlinePrevious > 0 ? (previous / onlinePrevious) : 0);
           const prevDirectCost = prevOnlineDirectCost * prevSalesRatio;
-          const prevCommission = prevDirectCost * 0.5; // 임시: 직접비의 50%
+          const prevCommission = prevDirectCost * commissionRatio;
           const prevCommissionRate = previous > 0 ? (prevCommission / previous) * 100 : 0;
           
           return {
