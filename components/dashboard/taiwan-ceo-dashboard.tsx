@@ -5261,6 +5261,404 @@ const TaiwanCEODashboard = () => {
         </div>
       </div>
 
+      {/* 온라인 채널별 현황 */}
+      {(() => {
+        // 온라인 채널 데이터 추출
+        const onlineStores = allTWStores.filter((store: any) => store.channel === 'Online' && store.current?.net_sales > 0);
+        
+        // TE1: Momo, TE2: 자사몰, TE3: Shopee
+        const momoStore = onlineStores.find((s: any) => s.store_code === 'TE1');
+        const ownMallStore = onlineStores.find((s: any) => s.store_code === 'TE2');
+        const shopeeStore = onlineStores.find((s: any) => s.store_code === 'TE3');
+        
+        // 온라인 전체 데이터
+        const onlineTotal = countryChannel?.TW_Online || {};
+        const onlineCurrent = onlineTotal.current?.net_sales || 0;
+        const onlinePrevious = onlineTotal.previous?.net_sales || 0;
+        const onlineYoy = onlineTotal.yoy || 0;
+        const onlineChange = onlineCurrent - onlinePrevious;
+        
+        // 전체 매출 대비 온라인 비중 계산
+        const totalCurrent = (dashboardData?.sales_summary?.total_net_sales || 0) * 1000; // 1K 단위이므로 1000 곱함
+        const totalPrevious = totalCurrent / (1 + (dashboardData?.sales_summary?.total_yoy || 0) / 100);
+        const onlineRatioCurrent = totalCurrent > 0 ? (onlineCurrent / totalCurrent) * 100 : 0;
+        const onlineRatioPrevious = totalPrevious > 0 ? (onlinePrevious / totalPrevious) * 100 : 0;
+        const onlineRatioChange = onlineRatioCurrent - onlineRatioPrevious;
+        
+        // 온라인 직접이익 (PL 데이터)
+        const onlineDirectProfit = (plData?.current_month?.online?.direct_profit || 0) * 1000; // 1K 단위이므로 1000 곱함
+        const onlineDirectProfitRate = onlineCurrent > 0 ? (onlineDirectProfit / onlineCurrent) * 100 : 0;
+        
+        // 각 채널별 데이터 계산
+        const calculateChannelData = (store: any) => {
+          if (!store) return null;
+          const current = store.current?.net_sales || 0;
+          const previous = store.previous?.net_sales || 0;
+          const yoy = previous > 0 ? (current / previous) * 100 : 0;
+          const change = current - previous;
+          
+          // 직접이익은 PL 데이터에서 가져와야 하는데, 채널별로는 없을 수 있음
+          // 일단 매출 비중으로 분배 (전체 온라인 직접이익을 매출 비중으로 분배)
+          const salesRatio = onlineCurrent > 0 ? (current / onlineCurrent) : 0;
+          const directProfit = onlineDirectProfit * salesRatio;
+          const directProfitRate = current > 0 ? (directProfit / current) * 100 : 0;
+          
+          // 광고비, 수수료, 물류비는 PL 데이터에서 가져와야 하는데 채널별로는 없음
+          // 일단 매출 비중으로 온라인 전체 직접비를 분배 (임시)
+          const onlineDirectCost = (plData?.current_month?.online?.direct_cost || 0) * 1000;
+          const directCost = onlineDirectCost * salesRatio;
+          
+          // 직접비를 광고비, 수수료, 물류비로 분배 (임시 추정)
+          // 실제로는 PL 데이터에서 가져와야 함
+          const advertising = directCost * 0.3; // 임시: 직접비의 30%
+          const commission = directCost * 0.5; // 임시: 직접비의 50%
+          const logistics = directCost * 0.2; // 임시: 직접비의 20%
+          
+          // 전년 수수료율 계산 (전년 직접비에서 추정)
+          const prevOnlineDirectCost = (plData?.cumulative?.prev_cumulative?.online?.direct_cost || 0) * 1000;
+          const prevSalesRatio = (onlinePrevious > 0 ? (previous / onlinePrevious) : 0);
+          const prevDirectCost = prevOnlineDirectCost * prevSalesRatio;
+          const prevCommission = prevDirectCost * 0.5; // 임시: 직접비의 50%
+          const prevCommissionRate = previous > 0 ? (prevCommission / previous) * 100 : 0;
+          
+          return {
+            store_code: store.store_code,
+            store_name: store.store_name,
+            current,
+            previous,
+            yoy,
+            change,
+            directProfit,
+            directProfitRate,
+            advertising,
+            commission,
+            logistics,
+            prevCommissionRate
+          };
+        };
+        
+        const momoData = calculateChannelData(momoStore);
+        const ownMallData = calculateChannelData(ownMallStore);
+        const shopeeData = calculateChannelData(shopeeStore);
+        
+        return (
+          <div className="mb-4">
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  온라인 채널별 현황 (실판V-, 25년 10월 기준, 1K HKD)
+                </h3>
+              </div>
+              
+              <div className="grid grid-cols-5 gap-4">
+                {/* 온라인 채널 요약 */}
+                <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg shadow-md p-4 border-l-4 border-cyan-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-cyan-800">온라인 채널 요약</div>
+                  </div>
+                  
+                  <div className="text-2xl font-bold mb-2 text-cyan-900">{onlineStores.length}개 채널</div>
+                  <div className="text-xs mb-2 text-cyan-700">실판매출 YOY {formatYoy(onlineYoy)}%</div>
+                  
+                  <div className="border-t pt-3 space-y-1.5 border-cyan-300 mb-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cyan-700">당월 매출</span>
+                      <span className="text-xs font-semibold text-cyan-900">{formatNumber(onlineCurrent / 1000, 0)}K</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cyan-700">전년 매출</span>
+                      <span className="text-xs font-semibold text-cyan-700">{formatNumber(onlinePrevious / 1000, 0)}K</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cyan-700">증가액</span>
+                      <span className={`text-xs font-semibold ${onlineChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {onlineChange >= 0 ? '+' : ''}{formatNumber(onlineChange / 1000, 0)}K
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-3 border-cyan-300 mb-3">
+                    <div className="text-xs text-cyan-700 mb-2 font-semibold">전체 매출 대비 온라인 비중</div>
+                    <div className="space-y-1.5">
+                      <div className="bg-cyan-200 px-2 py-2 rounded">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-cyan-800">당월 (25년 10월)</span>
+                          <span className="text-sm font-bold text-cyan-900">{formatPercent(onlineRatioCurrent, 1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-cyan-800">전년 (24년 10월)</span>
+                          <span className="text-xs font-semibold text-cyan-700">{formatPercent(onlineRatioPrevious, 1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-1 pt-1 border-t border-cyan-300">
+                          <span className="text-xs text-cyan-800">비중 변화</span>
+                          <span className={`text-sm font-bold ${onlineRatioChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {onlineRatioChange >= 0 ? '+' : ''}{formatPercent(onlineRatioChange, 1)}%p {onlineRatioChange >= 0 ? '↑' : '↓'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-3 border-cyan-300 mb-3">
+                    <div className="text-xs text-cyan-700 mb-2 font-semibold">채널별 직접이익</div>
+                    <div className="space-y-1.5">
+                      {ownMallData && (
+                        <div className="flex justify-between items-center bg-cyan-200 px-2 py-1 rounded">
+                          <span className="text-xs text-cyan-800">자사몰</span>
+                          <span className="text-xs font-semibold text-cyan-900">
+                            {formatNumber(ownMallData.directProfit / 1000, 0)}K ({formatPercent(ownMallData.directProfitRate, 1)}%)
+                          </span>
+                        </div>
+                      )}
+                      {momoData && (
+                        <div className="flex justify-between items-center bg-cyan-200 px-2 py-1 rounded">
+                          <span className="text-xs text-cyan-800">Momo</span>
+                          <span className="text-xs font-semibold text-cyan-900">
+                            {formatNumber(momoData.directProfit / 1000, 0)}K ({formatPercent(momoData.directProfitRate, 1)}%)
+                          </span>
+                        </div>
+                      )}
+                      {shopeeData && (
+                        <div className="flex justify-between items-center bg-cyan-200 px-2 py-1 rounded">
+                          <span className="text-xs text-cyan-800">Shopee</span>
+                          <span className="text-xs font-semibold text-cyan-900">
+                            {formatNumber(shopeeData.directProfit / 1000, 0)}K ({formatPercent(shopeeData.directProfitRate, 1)}%)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-3 border-cyan-300">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cyan-700">전체 직접이익</span>
+                      <span className="text-xs font-semibold text-green-600">
+                        {formatNumber(onlineDirectProfit / 1000, 0)}K ({formatPercent(onlineDirectProfitRate, 1)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 자사몰 */}
+                {ownMallData && (
+                  <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-500">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold text-gray-700">자사몰</div>
+                      <div className="text-xs font-bold px-2 py-1 rounded bg-green-100 text-green-700">
+                        최고수익
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-green-50 rounded-lg p-2 border border-green-200">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-bold text-green-800">실매출</span>
+                          <span className="text-lg font-bold text-green-700">{formatNumber(ownMallData.current / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-green-600">
+                          YOY {formatYoy(ownMallData.yoy)}% | 전년 대비 {ownMallData.change >= 0 ? '+' : ''}{formatNumber(ownMallData.change / 1000, 0)}K
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">광고비</span>
+                          <span className="font-semibold">{formatNumber(ownMallData.advertising / 1000, 1)}K ({formatPercent((ownMallData.advertising / ownMallData.current) * 100, 1)}%)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">수수료</span>
+                          <span className="font-semibold">{formatNumber(ownMallData.commission / 1000, 1)}K ({formatPercent((ownMallData.commission / ownMallData.current) * 100, 1)}%)</span>
+                        </div>
+                        {ownMallData.prevCommissionRate > 0 && (
+                          <div className="flex justify-between text-xs text-gray-500 italic">
+                            <span>└ 전년 수수료율</span>
+                            <span>{formatPercent(ownMallData.prevCommissionRate, 1)}%</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">물류비</span>
+                          <span className="font-semibold">{formatNumber(ownMallData.logistics / 1000, 1)}K ({formatPercent((ownMallData.logistics / ownMallData.current) * 100, 1)}%)</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-green-100 rounded-lg p-2 border border-green-300">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-green-900">직접이익</span>
+                          <span className="text-lg font-bold text-green-800">{formatNumber(ownMallData.directProfit / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-green-700 mt-1">
+                          직접이익률 {formatPercent(ownMallData.directProfitRate, 1)}% (최고)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Momo */}
+                {momoData && (
+                  <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold text-gray-700">Momo</div>
+                      <div className="text-xs font-bold px-2 py-1 rounded bg-blue-100 text-blue-700">
+                        안정채널
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-blue-50 rounded-lg p-2 border border-blue-200">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-bold text-blue-800">실매출</span>
+                          <span className="text-lg font-bold text-blue-700">{formatNumber(momoData.current / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          YOY {formatYoy(momoData.yoy)}% | 전년 대비 {momoData.change >= 0 ? '+' : ''}{formatNumber(momoData.change / 1000, 0)}K
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">광고비</span>
+                          <span className="font-semibold">{formatNumber(momoData.advertising / 1000, 1)}K ({formatPercent((momoData.advertising / momoData.current) * 100, 1)}%)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">수수료</span>
+                          <span className="font-semibold text-orange-600">{formatNumber(momoData.commission / 1000, 1)}K ({formatPercent((momoData.commission / momoData.current) * 100, 1)}%)</span>
+                        </div>
+                        {momoData.prevCommissionRate > 0 && (
+                          <div className="flex justify-between text-xs text-gray-500 italic">
+                            <span>└ 전년 수수료율</span>
+                            <span>{formatPercent(momoData.prevCommissionRate, 1)}%</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">물류비</span>
+                          <span className="font-semibold">{formatNumber(momoData.logistics / 1000, 1)}K ({formatPercent((momoData.logistics / momoData.current) * 100, 1)}%)</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-100 rounded-lg p-2 border border-blue-300">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-blue-900">직접이익</span>
+                          <span className="text-lg font-bold text-blue-800">{formatNumber(momoData.directProfit / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-blue-700 mt-1">
+                          직접이익률 {formatPercent(momoData.directProfitRate, 1)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Shopee */}
+                {shopeeData && (
+                  <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold text-gray-700">Shopee</div>
+                      <div className="text-xs font-bold px-2 py-1 rounded bg-purple-100 text-purple-700">
+                        고성장
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-purple-50 rounded-lg p-2 border border-purple-200">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-bold text-purple-800">실매출</span>
+                          <span className="text-lg font-bold text-purple-700">{formatNumber(shopeeData.current / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-purple-600">
+                          YOY {formatYoy(shopeeData.yoy)}% | 전년 대비 {shopeeData.change >= 0 ? '+' : ''}{formatNumber(shopeeData.change / 1000, 0)}K
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">광고비</span>
+                          <span className="font-semibold text-orange-600">{formatNumber(shopeeData.advertising / 1000, 1)}K ({formatPercent((shopeeData.advertising / shopeeData.current) * 100, 1)}%)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">수수료</span>
+                          <span className="font-semibold">{formatNumber(shopeeData.commission / 1000, 1)}K ({formatPercent((shopeeData.commission / shopeeData.current) * 100, 1)}%)</span>
+                        </div>
+                        {shopeeData.prevCommissionRate > 0 && (
+                          <div className="flex justify-between text-xs text-gray-500 italic">
+                            <span>└ 전년 수수료율</span>
+                            <span>{formatPercent(shopeeData.prevCommissionRate, 1)}%</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">물류비</span>
+                          <span className="font-semibold">{formatNumber(shopeeData.logistics / 1000, 1)}K ({formatPercent((shopeeData.logistics / shopeeData.current) * 100, 1)}%)</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-purple-100 rounded-lg p-2 border border-purple-300">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-purple-900">직접이익</span>
+                          <span className="text-lg font-bold text-purple-800">{formatNumber(shopeeData.directProfit / 1000, 0)}K</span>
+                        </div>
+                        <div className="text-xs text-purple-700 mt-1">
+                          직접이익률 {formatPercent(shopeeData.directProfitRate, 1)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 채널 인사이트 */}
+                <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg shadow-md p-4 border-l-4 border-indigo-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-indigo-800">채널 인사이트</div>
+                    <div className="text-xs font-bold px-2 py-1 rounded bg-indigo-200 text-indigo-700">
+                      전략 포인트
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <div className="text-xs font-bold text-green-700 mb-1.5">✓ 강점</div>
+                      <div className="space-y-1 text-indigo-700">
+                        {ownMallData && (
+                          <div>자사몰 고수익 ({formatPercent(ownMallData.directProfitRate, 1)}%)</div>
+                        )}
+                        <div>전채널 YOY {formatYoy(Math.min(ownMallData?.yoy || 0, momoData?.yoy || 0, shopeeData?.yoy || 0))}~{formatYoy(Math.max(ownMallData?.yoy || 0, momoData?.yoy || 0, shopeeData?.yoy || 0))}%</div>
+                        <div>온라인 비중 {formatPercent(onlineRatioCurrent, 1)}%</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-xs font-bold text-orange-700 mb-1.5">▲ 관리 포인트</div>
+                      <div className="space-y-1 text-indigo-700">
+                        {shopeeData && (shopeeData.advertising / shopeeData.current) * 100 > 10 && (
+                          <div>Shopee 광고비 {formatPercent((shopeeData.advertising / shopeeData.current) * 100, 1)}%</div>
+                        )}
+                        {momoData && (momoData.commission / momoData.current) * 100 > 10 && (
+                          <div>Momo 수수료 {formatPercent((momoData.commission / momoData.current) * 100, 1)}%</div>
+                        )}
+                        {(() => {
+                          const avgLogistics = ((ownMallData?.logistics || 0) + (momoData?.logistics || 0) + (shopeeData?.logistics || 0)) / 
+                                             ((ownMallData?.current || 0) + (momoData?.current || 0) + (shopeeData?.current || 0)) * 100;
+                          return avgLogistics > 0 && (
+                            <div>물류비 평균 {formatPercent(avgLogistics, 1)}%</div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-xs font-bold text-blue-700 mb-1.5">전략 방향</div>
+                      <div className="space-y-1 text-indigo-700">
+                        <div>자사몰 확대 집중</div>
+                        <div>광고효율 개선</div>
+                        <div>채널별 최적화</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 직접비 상세 (오프라인 매장별 현황 아래) */}
       <div className="mt-4 bg-white rounded-lg shadow-md p-4">

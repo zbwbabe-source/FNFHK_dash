@@ -2316,11 +2316,23 @@ const HongKongCEODashboard = () => {
                 <strong>누적:</strong> 영업손실 {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                적자 지속: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {formatChange(plData?.cumulative?.change?.net_sales || 0).text}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({formatChange(plData?.cumulative?.change?.sg_a || 0).text}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
-                  const prevCumulativeTotal = plData?.cumulative?.prev_cumulative?.total || {};
-                  const prevCumulativeDirectProfitRate = (prevCumulativeTotal as any)?.direct_profit_rate !== undefined 
-                    ? (prevCumulativeTotal as any).direct_profit_rate
-                    : (prevCumulativeTotal.net_sales > 0 ? ((prevCumulativeTotal.direct_profit || 0) / prevCumulativeTotal.net_sales) * 100 : 0);
+                적자 지속: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {formatChange((() => {
+                  // HK + MC 합계로 계산 (1K HKD 단위로 변환)
+                  const currentNetSales = (plData?.cumulative?.hk?.net_sales || 0) + (plData?.cumulative?.mc?.net_sales || 0);
+                  const prevNetSales = (plData?.cumulative?.prev_cumulative?.hk?.net_sales || 0) + (plData?.cumulative?.prev_cumulative?.mc?.net_sales || 0);
+                  return (currentNetSales - prevNetSales) / 1000; // 1K HKD 단위
+                })()).text}K) ② 영업비 YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({formatChange((() => {
+                  // HK + MC 합계로 계산 (1K HKD 단위로 변환)
+                  const currentSgA = (plData?.cumulative?.hk?.sg_a || 0) + (plData?.cumulative?.mc?.sg_a || 0);
+                  const prevSgA = (plData?.cumulative?.prev_cumulative?.hk?.sg_a || 0) + (plData?.cumulative?.prev_cumulative?.mc?.sg_a || 0);
+                  return (currentSgA - prevSgA) / 1000; // 1K HKD 단위
+                })()).text}K) ③ 직접이익 YOY {formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}% (직접이익률 {(() => {
+                  // HK + MC 합계로 계산
+                  const prevCumulativeHK = plData?.cumulative?.prev_cumulative?.hk || {};
+                  const prevCumulativeMC = plData?.cumulative?.prev_cumulative?.mc || {};
+                  const prevNetSales = (prevCumulativeHK.net_sales || 0) + (prevCumulativeMC.net_sales || 0);
+                  const prevDirectProfit = (prevCumulativeHK.direct_profit || 0) + (prevCumulativeMC.direct_profit || 0);
+                  const prevCumulativeDirectProfitRate = prevNetSales > 0 ? (prevDirectProfit / prevNetSales) * 100 : 0;
                   return formatPercent(prevCumulativeDirectProfitRate, 1);
                 })()}% → {formatPercent(plData?.cumulative?.total?.direct_profit_rate || 0, 1)}%)
               </p>
@@ -2379,7 +2391,8 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.mc?.tag_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.tag_sales || 0)}</td>
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.tag_sales || 0);
+                    // HK 전년비 직접 계산
+                    const change = formatChange((plData?.cumulative?.hk?.tag_sales || 0) - (plData?.cumulative?.prev_cumulative?.hk?.tag_sales || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
@@ -2387,7 +2400,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.tag_sales || 0) - (plData?.cumulative?.prev_cumulative?.total?.tag_sales || 0));
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.tag_sales || 0) - (plData?.cumulative?.prev_cumulative?.hk?.tag_sales || 0);
+                    const mcChange = (plData?.cumulative?.mc?.tag_sales || 0) - (plData?.cumulative?.prev_cumulative?.mc?.tag_sales || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.tag_sales || 0)}%</td>
@@ -2415,7 +2431,8 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.mc?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.net_sales || 0)}</td>
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.net_sales || 0);
+                    // HK 전년비 직접 계산
+                    const change = formatChange((plData?.cumulative?.hk?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.hk?.net_sales || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
@@ -2423,7 +2440,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.total?.net_sales || 0));
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.hk?.net_sales || 0);
+                    const mcChange = (plData?.cumulative?.mc?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.mc?.net_sales || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.net_sales || 0)}%</td>
@@ -2523,7 +2543,8 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.mc?.gross_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.gross_profit || 0)}</td>
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.gross_profit || 0);
+                    // HK 전년비 직접 계산
+                    const change = formatChange((plData?.cumulative?.hk?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.hk?.gross_profit || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
@@ -2531,7 +2552,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.total?.gross_profit || 0));
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.hk?.gross_profit || 0);
+                    const mcChange = (plData?.cumulative?.mc?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.mc?.gross_profit || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.gross_profit || 0)}%</td>
@@ -2595,7 +2619,8 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.mc?.direct_cost || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_cost || 0)}</td>
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.direct_cost || 0);
+                    // HK 전년비 직접 계산
+                    const change = formatChange((plData?.cumulative?.hk?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_cost || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
@@ -2603,7 +2628,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.total?.direct_cost || 0));
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_cost || 0);
+                    const mcChange = (plData?.cumulative?.mc?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.mc?.direct_cost || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.direct_cost || 0)}%</td>
@@ -2631,7 +2659,8 @@ const HongKongCEODashboard = () => {
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.mc?.direct_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_profit || 0)}</td>
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.direct_profit || 0);
+                    // HK 전년비 직접 계산
+                    const change = formatChange((plData?.cumulative?.hk?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_profit || 0));
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
@@ -2639,7 +2668,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange((plData?.cumulative?.total?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.total?.direct_profit || 0));
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.hk?.direct_profit || 0);
+                    const mcChange = (plData?.cumulative?.mc?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.mc?.direct_profit || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.direct_profit || 0)}%</td>
@@ -2711,7 +2743,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.sg_a || 0);
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.hk?.sg_a || 0);
+                    const mcChange = (plData?.cumulative?.mc?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.mc?.sg_a || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right">{formatYoy(plData?.cumulative?.yoy?.sg_a || 0)}%</td>
@@ -2747,7 +2782,10 @@ const HongKongCEODashboard = () => {
                     return <td className={`p-2 text-right border-r border-gray-300 ${change.className}`}>{change.text}</td>;
                   })()}
                   {(() => {
-                    const change = formatChange(plData?.cumulative?.change?.operating_profit || 0);
+                    // 합계 전년비: HK + MC 직접 계산
+                    const hkChange = (plData?.cumulative?.hk?.operating_profit || 0) - (plData?.cumulative?.prev_cumulative?.hk?.operating_profit || 0);
+                    const mcChange = (plData?.cumulative?.mc?.operating_profit || 0) - (plData?.cumulative?.prev_cumulative?.mc?.operating_profit || 0);
+                    const change = formatChange(hkChange + mcChange);
                     return <td className={`p-2 text-right border-r border-gray-300 font-semibold ${change.className}`}>{change.text}</td>;
                   })()}
                   <td className="p-2 text-right text-red-600">적자전환</td>
