@@ -1,16 +1,8 @@
 'use client';
 
-'use client';
-
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-
-// JSON 데이터를 lazy import로 처리
-let hongkongDashboardData: any = null;
-let taiwanDashboardData: any = null;
-let hongkongPlData: any = null;
-let taiwanPlData: any = null;
 
 export default function Home() {
   const [hkData, setHkData] = useState<any>(null);
@@ -18,40 +10,114 @@ export default function Home() {
   const [hkPlData, setHkPlData] = useState<any>(null);
   const [twPlData, setTwPlData] = useState<any>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('2510'); // 기본값: 25년 10월
+  const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDetail, setShowHkmcDetail] = useState(false);
   const [showTwDetail, setShowTwDetail] = useState(false);
 
+  // Period별 데이터 로드
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
       try {
-        if (!hongkongDashboardData) {
-          const hkModule = await import('@/components/dashboard/hongkong-dashboard-data.json');
-          hongkongDashboardData = hkModule.default || hkModule;
+        // Period별 파일명 생성
+        const hkDashboardPath = `/dashboard/hongkong-dashboard-data-${selectedPeriod}.json`;
+        const twDashboardPath = `/dashboard/taiwan-dashboard-data-${selectedPeriod}.json`;
+        const hkPlPath = `/dashboard/hongkong-pl-data.json`; // PL 데이터는 period별 파일 없음
+        const twPlPath = `/dashboard/taiwan-pl-data.json`; // PL 데이터는 period별 파일 없음
+
+        // Period별 파일 로드 시도, 없으면 기본 파일 사용
+        const loadWithFallback = async (periodPath: string, defaultPath: string) => {
+          try {
+            const res = await fetch(periodPath);
+            if (res.ok) {
+              return await res.json();
+            }
+          } catch (e) {
+            console.warn(`Period 파일 로드 실패 (${periodPath}), 기본 파일 사용`);
+          }
+          // 기본 파일 로드
+          const defaultRes = await fetch(defaultPath);
+          if (defaultRes.ok) {
+            return await defaultRes.json();
+          }
+          throw new Error(`파일을 찾을 수 없습니다: ${defaultPath}`);
+        };
+
+        // 모든 데이터 병렬 로드
+        const [hkDashboard, twDashboard, hkPl, twPl] = await Promise.all([
+          loadWithFallback(hkDashboardPath, '/dashboard/hongkong-dashboard-data.json'),
+          loadWithFallback(twDashboardPath, '/dashboard/taiwan-dashboard-data.json'),
+          fetch(hkPlPath).then(r => r.json()),
+          fetch(twPlPath).then(r => r.json())
+        ]);
+
+        // ending_inventory는 components 폴더에서 import
+        let hkDefaultData = null;
+        let twDefaultData = null;
+        try {
+          const [hkModule, twModule] = await Promise.all([
+            import('@/components/dashboard/hongkong-dashboard-data.json'),
+            import('@/components/dashboard/taiwan-dashboard-data.json')
+          ]);
+          hkDefaultData = hkModule.default || hkModule;
+          twDefaultData = twModule.default || twModule;
+        } catch (e) {
+          console.warn('Components 폴더에서 ending_inventory 로드 실패:', e);
         }
-        if (!taiwanDashboardData) {
-          const twModule = await import('@/components/dashboard/taiwan-dashboard-data.json');
-          taiwanDashboardData = twModule.default || twModule;
+
+        // 디버깅: 로드된 데이터 확인
+        console.log('Period별 파일 로드 결과:', {
+          hkDashboard: !!hkDashboard,
+          hkHasEndingInventory: !!hkDashboard?.ending_inventory,
+          hkDefaultData: !!hkDefaultData,
+          hkDefaultHasEndingInventory: !!hkDefaultData?.ending_inventory,
+          hkDefaultEndingInventory: hkDefaultData?.ending_inventory?.total
+        });
+
+        // period별 파일에 ending_inventory가 없으면 기본 파일에서 가져오기
+        if (hkDashboard && !hkDashboard.ending_inventory && hkDefaultData?.ending_inventory) {
+          console.log('홍콩 ending_inventory 병합:', hkDefaultData.ending_inventory);
+          hkDashboard.ending_inventory = hkDefaultData.ending_inventory;
         }
-        if (!hongkongPlData) {
-          const hkPlModule = await import('@/components/dashboard/hongkong-pl-data.json');
-          hongkongPlData = hkPlModule.default || hkPlModule;
+        if (twDashboard && !twDashboard.ending_inventory && twDefaultData?.ending_inventory) {
+          console.log('대만 ending_inventory 병합:', twDefaultData.ending_inventory);
+          twDashboard.ending_inventory = twDefaultData.ending_inventory;
         }
-        if (!taiwanPlData) {
-          const twPlModule = await import('@/components/dashboard/taiwan-pl-data.json');
-          taiwanPlData = twPlModule.default || twPlModule;
-        }
-        
-        setHkData(hongkongDashboardData);
-        setTwData(taiwanDashboardData);
-        setHkPlData(hongkongPlData);
-        setTwPlData(taiwanPlData);
+
+        console.log('홍콩 데이터 로드 완료:', {
+          hasEndingInventory: !!hkDashboard?.ending_inventory,
+          endingInventoryTotal: hkDashboard?.ending_inventory?.total
+        });
+
+        setHkData(hkDashboard);
+        setTwData(twDashboard);
+        setHkPlData(hkPl);
+        setTwPlData(twPl);
       } catch (e) {
         console.error('데이터 로드 오류:', e);
+        // 에러 발생 시 components 폴더에서 동적 import 시도
+        try {
+          const [hkModule, twModule, hkPlModule, twPlModule] = await Promise.all([
+            import('@/components/dashboard/hongkong-dashboard-data.json'),
+            import('@/components/dashboard/taiwan-dashboard-data.json'),
+            import('@/components/dashboard/hongkong-pl-data.json'),
+            import('@/components/dashboard/taiwan-pl-data.json')
+          ]);
+          
+          setHkData(hkModule.default || hkModule);
+          setTwData(twModule.default || twModule);
+          setHkPlData(hkPlModule.default || hkPlModule);
+          setTwPlData(twPlModule.default || twPlModule);
+        } catch (fallbackError) {
+          console.error('기본 데이터 로드 오류:', fallbackError);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
     
     loadData();
-  }, []);
+  }, [selectedPeriod]);
 
   const formatPercent = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(Number(num))) return '0';
@@ -113,11 +179,18 @@ export default function Home() {
   const periodLabel = `${selectedYear}년 ${selectedMonth}월`;
 
   // 데이터 로드 확인
-  if (!hkData || !twData || !hkPlData || !twPlData) {
+  if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl font-semibold text-gray-600">데이터를 불러오는 중...</div>
+          <div className="text-xl font-semibold text-gray-600 mb-2">
+            {isLoading ? '데이터를 불러오는 중...' : '데이터를 불러올 수 없습니다'}
+          </div>
+          {isLoading && (
+            <div className="mt-4">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -167,6 +240,14 @@ export default function Home() {
   const hkStockCurrent = hkData?.ending_inventory?.total?.current || 0;
   const hkStockPrevious = hkData?.ending_inventory?.total?.previous || 0;
   const hkStockYoy = hkStockPrevious > 0 ? (hkStockCurrent / hkStockPrevious) * 100 : 0;
+  
+  // 디버깅: 재고 데이터 확인
+  console.log('홍콩 재고 데이터:', {
+    hkStockCurrent,
+    hkStockPrevious,
+    hkStockYoy,
+    rawData: hkData?.ending_inventory
+  });
 
   // 대만 PL 데이터
   const twPlCurrent = twPlData?.current_month?.total;
