@@ -590,13 +590,13 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                     <p>
                       • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔)
                       {storePortfolioAnalysis.inefficientAvg && (
-                        <> - 평당매출 {formatDecimal(storePortfolioAnalysis.inefficientAvg.avgSalesPerPyeong)}K</>
+                        <> - 평당매출 <span className="font-bold text-red-600">{formatDecimal(storePortfolioAnalysis.inefficientAvg.avgSalesPerPyeong)}K</span></>
                       )}
                     </p>
                     <p>
                       • <strong className="text-green-600">우수 입지 확보</strong>: {storePortfolioAnalysis.newStores.length}개 신규 오픈
                       {storePortfolioAnalysis.newAvg && (
-                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K)</>
+                        <> (평균 평당매출 <span className="font-bold text-green-600">{formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K</span>)</>
                       )}
                     </p>
                     <p>
