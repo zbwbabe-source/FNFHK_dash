@@ -93,8 +93,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     const plStores = (plData as any)?.channel_direct_profit?.stores || {};
     const storeAreas = (storeAreasData as any)?.store_areas || {};
 
-    // 누적 일수 계산 (1월~10월 = 304일)
-    const cumulativeDays = 304;
+    // 현재 월 일수 (10월 = 31일)
+    // 참고: channel_direct_profit.stores는 월별 데이터이므로 월별 일수로 나눔
+    const currentMonthDays = 31;
 
     // REGION_ORDER 상수 순서대로 명시적으로 생성
     const data = REGION_ORDER.map((region, index) => {
@@ -159,9 +160,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       const laborCostPerPyeong = totalArea > 0 ? totalLaborCost / totalArea : 0;
       const laborCostPerPyeongPrev = totalAreaPrev > 0 ? totalLaborCostPrev / totalAreaPrev : 0;
       
-      // 일평균 평당매출 (누적 기준)
-      const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
-      const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+      // 일평균 평당매출 (월별 기준)
+      const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
+      const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
 
       // YOY 계산
       const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
@@ -212,7 +213,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
     const closedStores: any[] = [];
     const newStores: any[] = [];
-    const cumulativeDays = 304;
+    const currentMonthDays = 31;
 
     Object.keys(plStores).forEach((storeCode: string) => {
       if (storeCode.startsWith('TE')) return; // 온라인 제외
@@ -227,12 +228,12 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       const netSales = plStore.net_sales || 0;
       const netSalesPrev = plStore.net_sales_prev || 0;
 
-      // 폐점 매장: 전년 매출 있고, 금년 매출 없음
-      if (netSalesPrev > 0 && netSales === 0) {
+      // 비효율 매장: T15 (Xindian)만 분석
+      if (storeCode === 'T15' && netSalesPrev > 0 && netSales === 0) {
         const salesPerPyeongPrev = netSalesPrev / area;
         const directProfitPrev = plStore.direct_profit_prev || 0;
         const directProfitPerPyeongPrev = directProfitPrev / area;
-        const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+        const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
 
         closedStores.push({
           storeCode,
@@ -252,7 +253,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         const salesPerPyeong = netSales / area;
         const directProfit = plStore.direct_profit || 0;
         const directProfitPerPyeong = directProfit / area;
-        const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+        const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
 
         newStores.push({
           storeCode,
@@ -326,7 +327,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
         const netSalesPrev = plStore.net_sales_prev || 0;
         const city = locationInfo.city || 'Unknown';
-        const cumulativeDays = 304;
+        const currentMonthDays = 31;
         
         // 금년 데이터
         const salesPerPyeong = netSales / area;
@@ -336,7 +337,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         const rentPerPyeong = rent / area;
         const laborCost = plStore.labor_cost || 0;
         const laborCostPerPyeong = laborCost / area;
-        const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+        const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
 
         // 전년 데이터
         const salesPerPyeongPrev = netSalesPrev > 0 ? netSalesPrev / area : 0;
@@ -346,10 +347,13 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         const rentPerPyeongPrev = netSalesPrev > 0 ? rentPrev / area : 0;
         const laborCostPrev = plStore.labor_cost_prev || 0;
         const laborCostPerPyeongPrev = netSalesPrev > 0 ? laborCostPrev / area : 0;
-        const dailySalesPerPyeongPrev = netSalesPrev > 0 ? (salesPerPyeongPrev * 1000) / cumulativeDays : 0;
+        const dailySalesPerPyeongPrev = netSalesPrev > 0 ? (salesPerPyeongPrev * 1000) / currentMonthDays : 0;
         
         // YOY 계산
+        // 평당매출 YOY
         const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
+        // 실판매출 YOY
+        const netSalesYoy = netSalesPrev > 0 ? ((netSales - netSalesPrev) / netSalesPrev) * 100 : 0;
 
         // 도시별로 그룹화
         if (!result[region][city]) {
@@ -386,7 +390,8 @@ const TaiwanRegionalAnalysis: React.FC = () => {
           laborCostPerPyeongPrev,
           dailySalesPerPyeong,
           dailySalesPerPyeongPrev,
-          yoy,
+          yoy, // 평당매출 YOY
+          netSalesYoy, // 실판매출 YOY (검증용: 면적이 동일하면 yoy와 같아야 함)
         };
 
         result[region][city].stores.push(storeData);
@@ -467,7 +472,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
   // 전체 합계 계산 (전년 대비)
   const totalSummary = useMemo(() => {
-    const cumulativeDays = 304;
+    const currentMonthDays = 31;
     
     const total = regionalData.reduce((acc, region) => {
       return {
@@ -507,8 +512,8 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     const rentPerPyeongPrev = total.total_area_prev > 0 ? total.total_rent_prev / total.total_area_prev : 0;
     const laborCostPerPyeong = total.total_area > 0 ? total.total_labor_cost / total.total_area : 0;
     const laborCostPerPyeongPrev = total.total_area_prev > 0 ? total.total_labor_cost_prev / total.total_area_prev : 0;
-    const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
-    const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+    const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
+    const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
     const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
 
     return {
@@ -560,8 +565,8 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
                 const avgSalesPerPyeongPrev = totalPrev.area > 0 ? totalPrev.sales / totalPrev.area : 0;
                 const avgSalesPerPyeongCurr = totalCurr.area > 0 ? totalCurr.sales / totalCurr.area : 0;
-                const avgDailySalesPrev = (avgSalesPerPyeongPrev * 1000) / 304;
-                const avgDailySalesCurr = (avgSalesPerPyeongCurr * 1000) / 304;
+                const avgDailySalesPrev = (avgSalesPerPyeongPrev * 1000) / 31;
+                const avgDailySalesCurr = (avgSalesPerPyeongCurr * 1000) / 31;
                 const yoy = avgSalesPerPyeongPrev > 0 ? ((avgSalesPerPyeongCurr - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100 : 0;
                 const profitRatePrev = totalPrev.sales > 0 ? (totalPrev.profit / totalPrev.sales) * 100 : 0;
                 const profitRateCurr = totalCurr.sales > 0 ? (totalCurr.profit / totalCurr.sales) * 100 : 0;
@@ -569,10 +574,10 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 return (
                   <>
                     <p>
-                      • <strong className="text-red-600">비효율 매장 정리</strong>: {storePortfolioAnalysis.closedStores.length}개 폐점
+                      • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔)
                       {storePortfolioAnalysis.closedAvg && (
-                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.closedAvg.avgSalesPerPyeong)}K, 
-                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.closedAvg.avgSalesPerPyeong - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100)}%)</>
+                        <> - 평당매출 {formatDecimal(storePortfolioAnalysis.closedAvg.avgSalesPerPyeong)}K, 
+                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.closedAvg.avgSalesPerPyeong - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100)}%</>
                       )}
                     </p>
                     <p>
@@ -596,10 +601,10 @@ const TaiwanRegionalAnalysis: React.FC = () => {
               })()}
             </div>
 
-            {/* 폐점 매장 상세 */}
+            {/* 비효율 매장 상세 */}
             {storePortfolioAnalysis.closedStores.length > 0 && (
               <div className="space-y-2 pt-3 border-t border-purple-200">
-                <p className="font-semibold text-gray-800">🔴 폐점 매장 ({storePortfolioAnalysis.closedStores.length}개)</p>
+                <p className="font-semibold text-gray-800">🔴 비효율 매장 (T15 Xindian)</p>
                 {storePortfolioAnalysis.closedStores.map((store: any) => (
                   <p key={store.storeCode} className="text-xs">
                     • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
@@ -755,18 +760,18 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                       {isExpanded && Object.keys(stores).map((city) => {
                         const cityData = stores[city];
                         const cityStores = cityData.stores || [];
-                        const cumulativeDays = 304;
+                        const currentMonthDays = 31;
                         
                         // 도시별 금년 데이터
                         const citySalesPerPyeong = cityData.total_area > 0 ? cityData.total_sales / cityData.total_area : 0;
                         const cityDirectProfitPerPyeong = cityData.total_area > 0 ? cityData.total_direct_profit / cityData.total_area : 0;
                         const cityRentPerPyeong = cityData.total_area > 0 ? cityData.total_rent / cityData.total_area : 0;
                         const cityLaborCostPerPyeong = cityData.total_area > 0 ? cityData.total_labor_cost / cityData.total_area : 0;
-                        const cityDailySalesPerPyeong = (citySalesPerPyeong * 1000) / cumulativeDays;
+                        const cityDailySalesPerPyeong = (citySalesPerPyeong * 1000) / currentMonthDays;
                         
                         // 도시별 전년 데이터
                         const citySalesPerPyeongPrev = cityData.total_area_prev > 0 ? cityData.total_sales_prev / cityData.total_area_prev : 0;
-                        const cityDailySalesPerPyeongPrev = citySalesPerPyeongPrev > 0 ? (citySalesPerPyeongPrev * 1000) / cumulativeDays : 0;
+                        const cityDailySalesPerPyeongPrev = citySalesPerPyeongPrev > 0 ? (citySalesPerPyeongPrev * 1000) / currentMonthDays : 0;
                         
                         // 도시별 YOY
                         const cityYoy = citySalesPerPyeongPrev > 0 ? ((citySalesPerPyeong - citySalesPerPyeongPrev) / citySalesPerPyeongPrev) * 100 : 0;
