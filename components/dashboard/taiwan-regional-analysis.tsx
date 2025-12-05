@@ -1207,42 +1207,40 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {/* 인구밀도 정보 */}
-            <div className="mt-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">📍 지역별 인구 정보</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                <div className="bg-white rounded p-2 border-l-4 border-blue-500">
-                  <div className="font-semibold text-blue-600 mb-1">북부 지역</div>
-                  <div className="text-gray-700">
-                    <div>인구: 약 890만명</div>
-                    <div>인구밀도: 최고</div>
-                    <div className="text-gray-600 mt-1">• 신베이: 400만명</div>
-                    <div className="text-gray-600">• 타오위안: 230만명</div>
-                    <div className="text-gray-600">• 타이베이: 260만명</div>
-                  </div>
+
+            {/* 인구수/인구밀도 분석 */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">📍 지역별 인구수/인구밀도 분석</h3>
+              <div className="space-y-3 text-xs text-gray-700">
+                <div className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-500">
+                  <p className="font-semibold text-blue-700 mb-2">북부 지역 (인구 약 890만명, 인구밀도 최고)</p>
+                  <p className="text-gray-700">
+                    대만 최대 인구 밀집 지역으로 <span className="font-semibold text-green-600">매장 밀도가 상대적으로 낮음</span>. 
+                    신베이(400만명), 타오위안(230만명) 등 인구 대비 매장 수 부족 지역에 
+                    <span className="font-semibold">전략적 입점 검토</span> 권장. 
+                    기존 고수익 매장(라라포트 난강, 원동 반치아오) 운영 노하우를 저성과 매장에 전파하여 평균 매출 상향 평준화 집중
+                  </p>
                 </div>
-                <div className="bg-white rounded p-2 border-l-4 border-green-500">
-                  <div className="font-semibold text-green-600 mb-1">중부 지역</div>
-                  <div className="text-gray-700">
-                    <div>인구: 약 280만명</div>
-                    <div>인구밀도: 중간</div>
-                    <div className="text-gray-600 mt-1">• 타이중: 280만명</div>
-                  </div>
+                <div className="bg-orange-50 rounded-lg p-3 border-l-4 border-orange-500">
+                  <p className="font-semibold text-orange-700 mb-2">남부 지역 (인구 약 465만명)</p>
+                  <p className="text-gray-700">
+                    평당직접이익이 가장 높고 인구 규모도 충분하여 <span className="font-semibold text-green-600">신규 매장 확장 최우선 검토</span>. 
+                    가오슝(277만명) 중심으로 대형 쇼핑몰 입점 전략 지속 추진. 
+                    한신아레나, TS Mall 등 성공 사례를 바탕으로 추가 입점 기회 모색
+                  </p>
                 </div>
-                <div className="bg-white rounded p-2 border-l-4 border-orange-500">
-                  <div className="font-semibold text-orange-600 mb-1">남부 지역</div>
-                  <div className="text-gray-700">
-                    <div>인구: 약 465만명</div>
-                    <div>인구밀도: 중간</div>
-                    <div className="text-gray-600 mt-1">• 가오슝: 277만명</div>
-                    <div className="text-gray-600">• 타이난: 188만명</div>
-                  </div>
+                <div className="bg-green-50 rounded-lg p-3 border-l-4 border-green-500">
+                  <p className="font-semibold text-green-700 mb-2">중부 지역 (인구 약 280만명)</p>
+                  <p className="text-gray-700">
+                    인구 대비 매장 수가 적절하나, 타이중(280만명) 상권 성장세를 고려하여 
+                    <span className="font-semibold text-blue-600">선택적 추가 입점 기회 모색</span> (백화점, 아울렛 위주). 
+                    인구 밀도 대비 현재 매장 효율성이 양호하므로 신중한 입점 검토 필요
+                  </p>
                 </div>
+                <p className="text-xs text-gray-600 mt-2 italic">
+                  ※ 인구 밀도와 평당직접이익을 종합 고려 시, 북부 지역의 인구 대비 매장 확장 잠재력이 가장 높음
+                </p>
               </div>
-              <p className="text-xs text-gray-600 mt-3 pt-2 border-t border-blue-200">
-                ※ 인구 밀도와 평당직접이익을 종합 고려 시, 북부 지역의 인구 대비 매장 확장 잠재력이 가장 높음
-              </p>
             </div>
           </div>
         )}
