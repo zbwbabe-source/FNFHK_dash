@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-01T10:02:50.766483"
+    "generated_at": "2025-12-05T22:06:42.309106"
   },
   "current_month": {
     "total": {
@@ -654,9 +654,10 @@
     "travel": 25.74,
     "sg_a": 424.02,
     "operating_profit": -594.5133059827327,
+    "cumulative_operating_profit": -5681.846589961829,
     "store_count": {
       "online": 2,
-      "offline": 5
+      "offline": 3
     }
   }
 }

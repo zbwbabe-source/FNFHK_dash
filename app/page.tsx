@@ -15,6 +15,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDetail, setShowHkmcDetail] = useState(false);
   const [showTwDetail, setShowTwDetail] = useState(false);
+  const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
+  const [showTwDiscovery, setShowTwDiscovery] = useState(false);
 
   // Period별 데이터 로드
   useEffect(() => {
@@ -49,8 +51,8 @@ export default function Home() {
         const [hkDashboard, twDashboard, hkPl, twPl] = await Promise.all([
           loadWithFallback(hkDashboardPath, '/dashboard/hongkong-dashboard-data.json'),
           loadWithFallback(twDashboardPath, '/dashboard/taiwan-dashboard-data.json'),
-          fetch(hkPlPath).then(r => r.json()),
-          fetch(twPlPath).then(r => r.json())
+          fetch(hkPlPath + '?t=' + Date.now()).then(r => r.json()),
+          fetch(twPlPath + '?t=' + Date.now()).then(r => r.json())
         ]);
 
         // ending_inventory는 components 폴더에서 import
@@ -200,18 +202,94 @@ export default function Home() {
   const currentMonthDays = getDaysInMonth(parseInt(selectedYear), selectedMonth);
   const cumulativeDays = getCumulativeDays(parseInt(selectedYear), selectedMonth);
 
-  // 홍콩/마카오 오프라인 매장 총 면적 계산 (온라인 제외)
-  const hkmcOfflineTotalArea = useMemo(() => {
+  // 매장 코드로 홍콩/마카오 판단
+  const isHongKongOrMacauStore = (storeCode: string): boolean => {
+    return storeCode.startsWith('M');
+  };
+  
+  // 홍콩만 판단 (마카오 제외)
+  const isHongKongOnlyStore = (storeCode: string): boolean => {
+    return storeCode.startsWith('M') && !storeCode.startsWith('MC');
+  };
+
+  // 홍콩 오프라인 매장 총 면적 계산 (평당매출 계산용, 마카오 제외)
+  const hkOfflineTotalArea = useMemo(() => {
     if (!hkData?.store_summary) return 0;
-    const storeAreas = hkStoreAreas.store_areas || {};
+    const storeAreas = hkStoreAreas?.store_areas || {};
     let totalArea = 0;
+    const storesWithArea: string[] = [];
+    const storesWithoutArea: string[] = [];
+
     Object.keys(hkData.store_summary).forEach(storeCode => {
       const store = hkData.store_summary[storeCode];
-      // 온라인 제외, 오프라인만 (Retail, Outlet)
-      if (store.channel !== 'Online' && store.current?.net_sales > 0) {
-        totalArea += (storeAreas as Record<string, number>)[storeCode] || 0;
+      // 홍콩만, MLB 브랜드만, 온라인 제외, 오프라인만 (Retail, Outlet)
+      if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.current?.net_sales > 0) {
+        const area = (storeAreas as Record<string, number>)[storeCode] || 0;
+        if (area > 0) {
+          totalArea += area;
+          storesWithArea.push(storeCode);
+        } else {
+          storesWithoutArea.push(storeCode);
+        }
       }
     });
+    
+    // 디버깅: 면적 계산 확인 (항상 출력)
+    const allStores = Object.keys(hkData.store_summary);
+    const offlineStores = allStores.filter(code => {
+      const store = hkData.store_summary[code];
+      return store.brand === 'MLB' && isHongKongOrMacauStore(code) && store.channel !== 'Online' && store.current?.net_sales > 0;
+    });
+    
+    // 디버깅: 샘플 매장 데이터 확인
+    const sampleStores = allStores.slice(0, 10).map(code => {
+      const store = hkData.store_summary[code];
+      const isHKOnly = isHongKongOnlyStore(code);
+      const matches = store.brand === 'MLB' && isHKOnly && store.channel !== 'Online' && store.current?.net_sales > 0;
+      return {
+        code,
+        isHKOnly: isHKOnly,
+        brand: store.brand,
+        channel: store.channel,
+        netSales: store.current?.net_sales || 0,
+        matches: matches,
+        reason: !store.brand || store.brand !== 'MLB' ? 'brand' : 
+                !isHKOnly ? 'macau_or_online' : 
+                store.channel === 'Online' ? 'online' : 
+                !store.current?.net_sales ? 'no_sales' : 'ok'
+      };
+    });
+    
+    const storeDetails = offlineStores.map(code => {
+      const store = hkData.store_summary[code];
+      const area = (storeAreas as Record<string, number>)[code] || 0;
+      return {
+        code,
+        isHKOnly: isHongKongOnlyStore(code),
+        channel: store.channel,
+        netSales: store.current?.net_sales,
+        area
+      };
+    });
+    
+    console.log('=== 홍콩 오프라인 면적 계산 (평당매출용, 마카오 제외) ===');
+    console.log('전체 매장 수:', allStores.length, '개');
+    console.log('샘플 매장 데이터 (처음 10개):', JSON.stringify(sampleStores, null, 2));
+    console.log('총 면적:', totalArea, '평');
+    console.log('면적 있는 매장:', storesWithArea.length, '개', storesWithArea);
+    console.log('면적 없는 매장:', storesWithoutArea.length, '개', storesWithoutArea);
+    console.log('홍콩 오프라인 매장 목록:', offlineStores);
+    console.log('면적 데이터 키:', Object.keys(storeAreas));
+    console.log('매장별 상세:', storeDetails);
+    console.log('=====================================');
+    
+    if (totalArea === 0 || totalArea < 10) {
+      console.error('⚠️⚠️⚠️ 면적 계산 경고: 면적이 0이거나 너무 작습니다! ⚠️⚠️⚠️');
+      console.error('총 면적:', totalArea, '평');
+      console.error('면적 있는 매장:', storesWithArea);
+      console.error('면적 없는 매장:', storesWithoutArea);
+    }
+    
     return totalArea;
   }, [hkData]);
 
@@ -230,40 +308,174 @@ export default function Home() {
     return totalArea;
   }, [twData]);
 
-  // 홍콩/마카오 누적 오프라인 매출 계산 (온라인 제외)
-  // PL 데이터의 cumulative.offline.net_sales 사용 (실제 계산된 값)
-  // 없으면 fallback으로 전체 누적에서 온라인 비율 제거
-  const hkmcOfflineCumulative = useMemo(() => {
-    // cumulative.offline이 있으면 사용
-    if (hkPlData?.cumulative?.offline?.net_sales) {
-      return hkPlData.cumulative.offline.net_sales;
-    }
-    // 없으면 fallback: 전체 누적에서 온라인 비율 제거
-    const hkCumulative = hkPlData?.cumulative?.hk?.net_sales || 0;
-    const mcCumulative = hkPlData?.cumulative?.mc?.net_sales || 0;
-    const totalCumulative = hkCumulative + mcCumulative;
-    // 당월 데이터가 있으면 온라인 비율로 추정, 없으면 전체 누적 반환
-    if (hkData?.country_channel_summary) {
-      const hkRetail = hkData.country_channel_summary.HK_Retail;
-      const hkOutlet = hkData.country_channel_summary.HK_Outlet;
-      const hkOnline = hkData.country_channel_summary.HK_Online;
-      const moRetail = hkData.country_channel_summary.MO_Retail;
-      const moOutlet = hkData.country_channel_summary.MO_Outlet;
-      const hkOfflineCurrent = (hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0);
-      const hkOnlineCurrent = hkOnline?.current?.net_sales || 0;
-      const mcCurrent = (moRetail?.current?.net_sales || 0) + (moOutlet?.current?.net_sales || 0);
-      const hkmcTotalCurrent = hkOfflineCurrent + hkOnlineCurrent + mcCurrent;
-      const hkOnlineRatio = hkmcTotalCurrent > 0 ? hkOnlineCurrent / hkmcTotalCurrent : 0;
-      return totalCumulative * (1 - hkOnlineRatio);
-    }
-    return totalCumulative;
-  }, [hkPlData, hkData]);
-
   // 대만 누적 오프라인 매출 계산 (온라인 제외)
   // PL 데이터에 cumulative.offline.net_sales가 있음!
   const twOfflineCumulative = useMemo(() => {
     return twPlData?.cumulative?.offline?.net_sales || 0;
   }, [twPlData]);
+
+  // 홍콩+마카오 오프라인 매출 (MLB 브랜드만, 실판매출용)
+  // store_summary에서 MLB 브랜드만 필터링하여 계산
+  const hkOfflineCurrent = useMemo(() => {
+    if (!hkData?.store_summary) {
+      console.log('⚠️ hkData.store_summary가 없습니다');
+      return 0;
+    }
+    let total = 0;
+    let count = 0;
+    const debugStores: any[] = [];
+    let debugCount = 0;
+    Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
+      const isHKOrMC = isHongKongOrMacauStore(code);
+      const isMatch = store.brand === 'MLB' && isHKOrMC && store.channel !== 'Online' && store.current?.net_sales;
+      // 디버깅: 샘플 매장 확인 (처음 10개)
+      if (debugCount < 10) {
+        debugStores.push({
+          code,
+          isHKOrMC: isHKOrMC,
+          brand: store.brand,
+          channel: store.channel,
+          netSales: store.current?.net_sales || 0,
+          matches: isMatch,
+          reason: !store.brand || store.brand !== 'MLB' ? 'brand' : 
+                  !isHKOrMC ? 'not_hk_mc' : 
+                  store.channel === 'Online' ? 'online' : 
+                  !store.current?.net_sales ? 'no_sales' : 'ok'
+        });
+        debugCount++;
+      }
+      if (isMatch) {
+        total += store.current.net_sales;
+        count++;
+      }
+    });
+    console.log('홍콩/마카오 오프라인 매출 계산 (실판매출용):', { total: total / 1000, count, unit: 'K HKD', sampleStores: debugStores });
+    return total;
+  }, [hkData]);
+
+  const hkOfflinePrevious = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
+      if (store.brand === 'MLB' && isHongKongOrMacauStore(code) && store.channel !== 'Online' && store.previous?.net_sales) {
+        total += store.previous.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
+
+  const hkOfflineYoy = hkOfflinePrevious > 0 ? (hkOfflineCurrent / hkOfflinePrevious) * 100 : 0;
+
+  // 홍콩만 온라인 (MLB 브랜드만, 마카오 제외)
+  const hkOnlineCurrent = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
+      if (store.brand === 'MLB' && isHongKongOrMacauStore(code) && store.channel === 'Online' && store.current?.net_sales) {
+        total += store.current.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
+
+  const hkOnlinePrevious = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
+      if (store.brand === 'MLB' && isHongKongOrMacauStore(code) && store.channel === 'Online' && store.previous?.net_sales) {
+        total += store.previous.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
+
+  const hkOnlineYoy = hkOnlinePrevious > 0 ? (hkOnlineCurrent / hkOnlinePrevious) * 100 : 0;
+
+  // 마카오 (MLB 브랜드만, Retail + Outlet)
+  const mcCurrent = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.values(hkData.store_summary).forEach((store: any) => {
+      if (store.brand === 'MLB' && store.country === 'MC' && store.channel !== 'Online' && store.current?.net_sales) {
+        total += store.current.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
+
+  const mcPrevious = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.values(hkData.store_summary).forEach((store: any) => {
+      if (store.brand === 'MLB' && store.country === 'MC' && store.channel !== 'Online' && store.previous?.net_sales) {
+        total += store.previous.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
+
+  const mcYoy = mcPrevious > 0 ? (mcCurrent / mcPrevious) * 100 : 0;
+
+  // 홍콩마카오법인 합계 (PL 데이터 사용, 이미 K HKD 단위)
+  const hkmcTotalCurrent = ((hkPlData?.current_month?.hk?.net_sales || 0) + (hkPlData?.current_month?.mc?.net_sales || 0)); // K HKD 단위
+  const hkmcTotalPrevious = ((hkPlData?.prev_month?.hk?.net_sales || 0) + (hkPlData?.prev_month?.mc?.net_sales || 0)); // 전년 동월
+  const hkmcTotalYoy = hkmcTotalPrevious > 0 ? (hkmcTotalCurrent / hkmcTotalPrevious) * 100 : 0;
+  
+
+  // 홍콩만 누적 오프라인 매출 계산 (마카오 제외)
+  // PL 데이터의 cumulative.offline.net_sales 직접 사용 (이미 오프라인만 집계됨, 홍콩만)
+  const hkOfflineCumulative = useMemo(() => {
+    return hkPlData?.cumulative?.offline?.net_sales || 0;
+  }, [hkPlData]);
+
+  // 홍콩 PL 데이터
+  const hkPlCurrent = hkPlData?.current_month?.total;
+  const hkPlCumulative = hkPlData?.cumulative?.total;
+  const hkPlPrevMonth = hkPlData?.current_month?.prev_month?.total;
+  const hkPlPrevCumulative = hkPlData?.cumulative?.prev_cumulative?.total;
+  
+  // 홍콩 누적 YOY 계산
+  const hkCumulativeNetSales = hkPlCumulative?.net_sales || 0;
+  const hkPrevCumulativeNetSales = hkPlPrevCumulative?.net_sales || 0;
+  const hkCumulativeYoy = hkPrevCumulativeNetSales > 0 
+    ? (hkCumulativeNetSales / hkPrevCumulativeNetSales) * 100 
+    : 0;
+
+  // 홍콩 재고 데이터 (전체 기말재고)
+  const hkStockCurrent = hkData?.ending_inventory?.total?.current || 0;
+  const hkStockPrevious = hkData?.ending_inventory?.total?.previous || 0;
+  const hkStockYoy = hkStockPrevious > 0 ? (hkStockCurrent / hkStockPrevious) * 100 : 0;
+
+  // 대만 PL 데이터
+  const twPlCurrent = twPlData?.current_month?.total;
+  const twPlCumulative = twPlData?.cumulative?.total;
+  const twPlPrevCumulative = twPlData?.cumulative?.prev_cumulative?.total;
+  
+  // 대만 누적 YOY 계산
+  const twCumulativeNetSales = twPlCumulative?.net_sales || 0;
+  const twPrevCumulativeNetSales = twPlPrevCumulative?.net_sales || 0;
+  const twCumulativeYoy = twPrevCumulativeNetSales > 0 
+    ? (twCumulativeNetSales / twPrevCumulativeNetSales) * 100 
+    : 0;
+
+  // 대만 재고 데이터
+  const twStockCurrent = twData?.ending_inventory?.total?.current || 0;
+  const twStockPrevious = twData?.ending_inventory?.total?.previous || 0;
+  const twStockYoy = twStockPrevious > 0 ? (twStockCurrent / twStockPrevious) * 100 : 0;
+
+  // 평당매출 계산용: 홍콩만 오프라인 매출 (마카오 제외)
+  const hkOnlyOfflineCurrent = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    let total = 0;
+    Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
+      // M으로 시작하고 MC로 시작하지 않으면 홍콩
+      const isHKOnly = code.startsWith('M') && !code.startsWith('MC');
+      if (store.brand === 'MLB' && isHKOnly && store.channel !== 'Online' && store.current?.net_sales) {
+        total += store.current.net_sales;
+      }
+    });
+    return total;
+  }, [hkData]);
 
   // 데이터 로드 확인
   if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
@@ -283,50 +495,13 @@ export default function Home() {
     );
   }
 
-  // 홍콩 YOY 계산 (net_sales 기준)
-  const hkRetail = hkData?.country_channel_summary?.HK_Retail;
-  const hkOutlet = hkData?.country_channel_summary?.HK_Outlet;
-  const hkOnline = hkData?.country_channel_summary?.HK_Online;
-  const moRetail = hkData?.country_channel_summary?.MO_Retail;
-  const moOutlet = hkData?.country_channel_summary?.MO_Outlet;
-
-  // 홍콩 오프라인 (Retail + Outlet)
-  const hkOfflineCurrent = (hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0);
-  const hkOfflinePrevious = (hkRetail?.previous?.net_sales || 0) + (hkOutlet?.previous?.net_sales || 0);
-  const hkOfflineYoy = hkOfflinePrevious > 0 ? (hkOfflineCurrent / hkOfflinePrevious) * 100 : 0;
-
-  // 홍콩 온라인
-  const hkOnlineCurrent = hkOnline?.current?.net_sales || 0;
-  const hkOnlinePrevious = hkOnline?.previous?.net_sales || 0;
-  const hkOnlineYoy = hkOnlinePrevious > 0 ? (hkOnlineCurrent / hkOnlinePrevious) * 100 : 0;
-
-  // 마카오 (Retail + Outlet)
-  const mcCurrent = (moRetail?.current?.net_sales || 0) + (moOutlet?.current?.net_sales || 0);
-  const mcPrevious = (moRetail?.previous?.net_sales || 0) + (moOutlet?.previous?.net_sales || 0);
-  const mcYoy = mcPrevious > 0 ? (mcCurrent / mcPrevious) * 100 : 0;
-
-  // 홍콩마카오법인 합계
-  const hkmcTotalCurrent = hkOfflineCurrent + hkOnlineCurrent + mcCurrent;
-  const hkmcTotalPrevious = hkOfflinePrevious + hkOnlinePrevious + mcPrevious;
-  const hkmcTotalYoy = hkmcTotalPrevious > 0 ? (hkmcTotalCurrent / hkmcTotalPrevious) * 100 : 0;
-
-  // 홍콩 PL 데이터
-  const hkPlCurrent = hkPlData?.current_month?.total;
-  const hkPlCumulative = hkPlData?.cumulative?.total;
-  const hkPlPrevMonth = hkPlData?.current_month?.prev_month?.total;
-  const hkPlPrevCumulative = hkPlData?.cumulative?.prev_cumulative?.total;
-  
-  // 홍콩 누적 YOY 계산
-  const hkCumulativeNetSales = hkPlCumulative?.net_sales || 0;
-  const hkPrevCumulativeNetSales = hkPlPrevCumulative?.net_sales || 0;
-  const hkCumulativeYoy = hkPrevCumulativeNetSales > 0 
-    ? (hkCumulativeNetSales / hkPrevCumulativeNetSales) * 100 
-    : 0;
-
-  // 홍콩 재고 데이터 (전체 기말재고)
-  const hkStockCurrent = hkData?.ending_inventory?.total?.current || 0;
-  const hkStockPrevious = hkData?.ending_inventory?.total?.previous || 0;
-  const hkStockYoy = hkStockPrevious > 0 ? (hkStockCurrent / hkStockPrevious) * 100 : 0;
+  // 디버깅: PL 데이터 확인
+  console.log('=== 홍콩 PL 데이터 확인 ===');
+  console.log('당월 영업이익:', hkPlCurrent?.operating_profit, 'K HKD');
+  console.log('누적 영업이익:', hkPlCumulative?.operating_profit, 'K HKD');
+  console.log('당월 매출:', hkPlCurrent?.net_sales, 'K HKD');
+  console.log('누적 매출:', hkPlCumulative?.net_sales, 'K HKD');
+  console.log('========================');
   
   // 디버깅: 재고 데이터 확인
   console.log('홍콩 재고 데이터:', {
@@ -336,22 +511,13 @@ export default function Home() {
     rawData: hkData?.ending_inventory
   });
 
-  // 대만 PL 데이터
-  const twPlCurrent = twPlData?.current_month?.total;
-  const twPlCumulative = twPlData?.cumulative?.total;
-  const twPlPrevCumulative = twPlData?.cumulative?.prev_cumulative?.total;
-  
-  // 대만 누적 YOY 계산
-  const twCumulativeNetSales = twPlCumulative?.net_sales || 0;
-  const twPrevCumulativeNetSales = twPlPrevCumulative?.net_sales || 0;
-  const twCumulativeYoy = twPrevCumulativeNetSales > 0 
-    ? (twCumulativeNetSales / twPrevCumulativeNetSales) * 100 
-    : 0;
-
-  // 대만 재고 데이터
-  const twStockCurrent = twData?.ending_inventory?.total?.current || 0;
-  const twStockPrevious = twData?.ending_inventory?.total?.previous || 0;
-  const twStockYoy = twStockPrevious > 0 ? (twStockCurrent / twStockPrevious) * 100 : 0;
+  // 디버깅: 대만 PL 데이터 확인
+  console.log('=== 대만 PL 데이터 확인 ===');
+  console.log('당월 영업이익:', twPlCurrent?.operating_profit, 'K HKD');
+  console.log('누적 영업이익:', twPlCumulative?.operating_profit, 'K HKD');
+  console.log('당월 매출:', twPlCurrent?.net_sales, 'K HKD');
+  console.log('누적 매출:', twPlCumulative?.net_sales, 'K HKD');
+  console.log('========================');
 
   // 대만 YOY 계산
   const twRetail = twData?.country_channel_summary?.TW_Retail;
@@ -373,19 +539,50 @@ export default function Home() {
   const twTotalPrevious = twOfflinePrevious + twOnlinePrevious;
   const twTotalYoy = twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0;
 
-  // 홍콩/마카오 평당매출 계산 (당월, 누적)
-  // hkOfflineCurrent, mcCurrent는 1K HKD 단위이므로, 평당매출도 1K HKD/평 단위
-  const hkmcSalesPerPyeongCurrent = hkmcOfflineTotalArea > 0 ? (hkOfflineCurrent + mcCurrent) / hkmcOfflineTotalArea : 0;
-  const hkmcSalesPerPyeongCumulative = hkmcOfflineTotalArea > 0 ? hkmcOfflineCumulative / hkmcOfflineTotalArea : 0;
-  // 평당매출/1일 계산: 평당매출(1K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
-  const hkmcDailySalesPerPyeongCurrent = currentMonthDays > 0 ? (hkmcSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
-  const hkmcDailySalesPerPyeongCumulative = cumulativeDays > 0 ? (hkmcSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 1월부터 해당 월까지 누적 일수 기준
+  // 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인)
+  // hkOnlyOfflineCurrent는 HKD 단위이므로, K HKD로 변환(1000으로 나누기) 후 평당매출 계산
+  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? (hkOnlyOfflineCurrent / 1000) / hkOfflineTotalArea : 0; // K HKD/평 단위
+  // hkOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
+  // 누적 평균 면적 (PL 데이터에서 월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩만)
+  const hkCumulativeAvgArea = hkPlData?.cumulative?.offline?.average_area || hkOfflineTotalArea; // 누적 평균 면적, 없으면 당월 면적 사용
+  // 누적 평당매출 계산: 누적 매출을 누적 평균 면적로 나눔
+  const hkSalesPerPyeongCumulative = hkCumulativeAvgArea > 0 ? hkOfflineCumulative / hkCumulativeAvgArea : 0; // 누적 평당매출 (K HKD/평 단위)
+  // 평당매출/1일 계산: 평당매출(K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
+  const hkDailySalesPerPyeongCurrent = currentMonthDays > 0 && hkSalesPerPyeongCurrent > 0 ? (hkSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
+  const hkDailySalesPerPyeongCumulative = cumulativeDays > 0 && hkSalesPerPyeongCumulative > 0 ? (hkSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 누적 일수로 나누기
+  
+  // 디버깅: 평당매출 계산 확인 (면적: 홍콩만, 매출: 홍콩만 오프라인)
+  console.log('=== 홍콩 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인, 마카오 제외) ===');
+  console.log('[당월]');
+  console.log('홍콩만 오프라인 매출 (마카오 제외):', hkOnlyOfflineCurrent.toLocaleString(), 'HKD =', (hkOnlyOfflineCurrent / 1000).toFixed(2), 'K HKD');
+  console.log('홍콩 오프라인 면적:', hkOfflineTotalArea, '평');
+  console.log('평당매출:', hkSalesPerPyeongCurrent.toFixed(2), 'K HKD/평');
+  console.log('당월 일수:', currentMonthDays, '일');
+  console.log('1일 평당매출:', hkDailySalesPerPyeongCurrent.toFixed(1), 'HKD/평/일');
+  console.log('계산식: (' + hkOfflineCurrent.toLocaleString() + ' / 1000) / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
+  console.log('일평균 계산식: (' + hkSalesPerPyeongCurrent.toFixed(2) + ' * 1000) / ' + currentMonthDays + ' = ' + hkDailySalesPerPyeongCurrent.toFixed(1) + ' HKD/평/일');
+    console.log('[누적]');
+    console.log('누적 오프라인 매출:', hkOfflineCumulative.toFixed(2), 'K HKD (PL 데이터, 이미 K HKD 단위)');
+    console.log('당월 오프라인 면적:', hkOfflineTotalArea, '평');
+    console.log('누적 평균 면적:', hkCumulativeAvgArea.toFixed(2), '평 (월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩만)');
+    console.log('평당매출:', hkSalesPerPyeongCumulative.toFixed(2), 'K HKD/평');
+    console.log('누적 일수:', cumulativeDays, '일');
+    console.log('1일 평당매출:', hkDailySalesPerPyeongCumulative.toFixed(1), 'HKD/평/일');
+    console.log('계산식: ' + hkOfflineCumulative.toFixed(2) + ' / ' + hkCumulativeAvgArea.toFixed(2) + ' = ' + hkSalesPerPyeongCumulative.toFixed(2) + ' K HKD/평');
+    console.log('일평균 계산식: (' + hkSalesPerPyeongCumulative.toFixed(2) + ' * 1000) / ' + cumulativeDays + ' = ' + hkDailySalesPerPyeongCumulative.toFixed(1) + ' HKD/평/일');
+  console.log('=====================================');
+  
+  if (hkDailySalesPerPyeongCurrent > 100000) {
+    console.error('⚠️⚠️⚠️ 1일 평당매출이 비정상적으로 큽니다! ⚠️⚠️⚠️');
+    console.error('면적이 제대로 계산되지 않았을 가능성이 있습니다.');
+  }
 
   // 대만 평당매출 계산 (당월, 누적)
-  // twOfflineCurrent는 1K HKD 단위이므로, 평당매출도 1K HKD/평 단위
-  const twSalesPerPyeongCurrent = twOfflineTotalArea > 0 ? twOfflineCurrent / twOfflineTotalArea : 0;
-  const twSalesPerPyeongCumulative = twOfflineTotalArea > 0 ? twOfflineCumulative / twOfflineTotalArea : 0;
-  // 평당매출/1일 계산: 평당매출(1K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
+  // twOfflineCurrent는 HKD 단위이므로, K HKD로 변환(1000으로 나누기) 후 평당매출 계산
+  const twSalesPerPyeongCurrent = twOfflineTotalArea > 0 ? (twOfflineCurrent / 1000) / twOfflineTotalArea : 0; // K HKD/평 단위
+  // twOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
+  const twSalesPerPyeongCumulative = twOfflineTotalArea > 0 ? twOfflineCumulative / twOfflineTotalArea : 0; // K HKD/평 단위
+  // 평당매출/1일 계산: 평당매출(K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
   const twDailySalesPerPyeongCurrent = currentMonthDays > 0 ? (twSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
   const twDailySalesPerPyeongCumulative = cumulativeDays > 0 ? (twSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 1월부터 해당 월까지 누적 일수 기준
 
@@ -460,7 +657,7 @@ export default function Home() {
 
               {/* 제목 */}
               <h3 className="text-2xl font-bold text-gray-900 mb-1">홍콩마카오법인</h3>
-              <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약</p>
+              <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약 (MLB 기준)</p>
               
               {/* 주요 지표 배지 */}
               <div className="flex gap-3 mb-6">
@@ -492,7 +689,7 @@ export default function Home() {
                     <div>
                       <div className="text-xs text-gray-600 mb-1">당월</div>
                       <div className="text-xl font-bold text-gray-900">
-                        {formatNumber(hkmcTotalCurrent)}
+                        {formatPlNumber(hkmcTotalCurrent)}
                       </div>
                       <div className={`text-xs font-semibold ${
                         hkmcTotalYoy >= 100 ? 'text-green-600' : 'text-red-600'
@@ -500,7 +697,8 @@ export default function Home() {
                         YOY {formatPercent(hkmcTotalYoy)}%
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        평당매출/1일: {formatHKD(hkmcDailySalesPerPyeongCurrent)} HKD
+                        평당매출/1일: {formatHKD(hkDailySalesPerPyeongCurrent)} HKD
+                        <span className="text-gray-400 ml-1">(마카오 및 온라인 제외)</span>
                       </div>
                     </div>
                     <div>
@@ -512,7 +710,8 @@ export default function Home() {
                         YOY {formatPercent(hkCumulativeYoy)}%
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        평당매출/1일: {formatHKD(hkmcDailySalesPerPyeongCumulative)} HKD
+                        평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
+                        <span className="text-gray-400 ml-1">(마카오 및 온라인 제외)</span>
                       </div>
                     </div>
                   </div>
@@ -565,6 +764,73 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* 디스커버리 실적 */}
+                {hkPlData?.discovery && (
+                  <div className="bg-gradient-to-r from-orange-50 to-transparent rounded-xl p-4 border border-orange-100">
+                    <button
+                      onClick={() => setShowHkmcDiscovery(!showHkmcDiscovery)}
+                      className="flex items-center justify-between w-full mb-2"
+                    >
+                      <div className="text-sm font-semibold text-orange-900">🔍 디스커버리 실적</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-gray-500">1K HKD</div>
+                        {showHkmcDiscovery ? (
+                          <ChevronDown size={16} className="text-orange-600" />
+                        ) : (
+                          <ChevronRight size={16} className="text-orange-600" />
+                        )}
+                      </div>
+                    </button>
+                    
+                    {showHkmcDiscovery && (
+                      <>
+                        {/* 매장수 */}
+                        <div className="mb-3 pb-2 border-b border-orange-200">
+                          <div className="text-xs text-gray-600 mb-1">매장수</div>
+                          <div className="flex gap-2 text-xs">
+                            <span className="text-gray-700">오프라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.offline || 0}개</span></span>
+                            <span className="text-gray-700">온라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.online || 0}개</span></span>
+                          </div>
+                        </div>
+
+                        {/* 실판매출 */}
+                        <div className="mb-3">
+                          <div className="text-xs text-gray-600 mb-1">💰 실판매출</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
+                          </div>
+                        </div>
+
+                        {/* 영업이익 */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <div className="text-xs text-gray-600 mb-1">당월</div>
+                            <div className={`text-xl font-bold ${
+                              (hkPlData?.discovery?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatPlNumber(hkPlData?.discovery?.operating_profit || 0)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {(hkPlData?.discovery?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-600 mb-1">누적</div>
+                            <div className={`text-xl font-bold ${
+                              (hkPlData?.discovery?.cumulative_operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatPlNumber(hkPlData?.discovery?.cumulative_operating_profit || 0)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {(hkPlData?.discovery?.cumulative_operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* 상세보기 토글 */}
@@ -661,7 +927,7 @@ export default function Home() {
 
               {/* 제목 */}
               <h3 className="text-2xl font-bold text-gray-900 mb-1">대만법인</h3>
-              <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약</p>
+              <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약 (MLB 기준)</p>
               
               {/* 주요 지표 배지 */}
               <div className="flex gap-3 mb-6">
@@ -702,6 +968,7 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
+                        <span className="text-gray-400 ml-1">(온라인 제외)</span>
                       </div>
                     </div>
                     <div>
@@ -714,6 +981,7 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
+                        <span className="text-gray-400 ml-1">(온라인 제외)</span>
                       </div>
                     </div>
                   </div>
@@ -766,6 +1034,73 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* 디스커버리 실적 */}
+                {twPlData?.discovery && (
+                  <div className="bg-gradient-to-r from-orange-50 to-transparent rounded-xl p-4 border border-orange-100">
+                    <button
+                      onClick={() => setShowTwDiscovery(!showTwDiscovery)}
+                      className="flex items-center justify-between w-full mb-2"
+                    >
+                      <div className="text-sm font-semibold text-orange-900">🔍 디스커버리 실적</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-gray-500">1K HKD</div>
+                        {showTwDiscovery ? (
+                          <ChevronDown size={16} className="text-orange-600" />
+                        ) : (
+                          <ChevronRight size={16} className="text-orange-600" />
+                        )}
+                      </div>
+                    </button>
+                    
+                    {showTwDiscovery && (
+                      <>
+                        {/* 매장수 */}
+                        <div className="mb-3 pb-2 border-b border-orange-200">
+                          <div className="text-xs text-gray-600 mb-1">매장수</div>
+                          <div className="flex gap-2 text-xs">
+                            <span className="text-gray-700">오프라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.offline || 0}개</span></span>
+                            <span className="text-gray-700">온라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.online || 0}개</span></span>
+                          </div>
+                        </div>
+
+                        {/* 실판매출 */}
+                        <div className="mb-3">
+                          <div className="text-xs text-gray-600 mb-1">💰 실판매출</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
+                          </div>
+                        </div>
+
+                        {/* 영업이익 */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <div className="text-xs text-gray-600 mb-1">당월</div>
+                            <div className={`text-xl font-bold ${
+                              (twPlData?.discovery?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatPlNumber(twPlData?.discovery?.operating_profit || 0)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {(twPlData?.discovery?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-600 mb-1">누적</div>
+                            <div className={`text-xl font-bold ${
+                              (twPlData?.discovery?.cumulative_operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatPlNumber(twPlData?.discovery?.cumulative_operating_profit || 0)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {(twPlData?.discovery?.cumulative_operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* 상세보기 토글 */}

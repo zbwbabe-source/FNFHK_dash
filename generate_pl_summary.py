@@ -24,11 +24,15 @@ OUTLET_CODES = {'M07', 'M13', 'M15', 'M21'}
 ONLINE_MLB_CODES = {'HE1', 'HE2'}
 ONLINE_DX_CODES = {'XE1'}
 
+def is_discovery_online(store_code):
+    """Discovery 온라인 (XE로 시작)"""
+    return store_code.startswith('XE')
+
 def get_store_channel(store_code):
     """Store Code를 기반으로 채널 반환"""
     if store_code in OUTLET_CODES:
         return 'Outlet'
-    elif store_code in ONLINE_MLB_CODES or store_code in ONLINE_DX_CODES:
+    elif store_code in ONLINE_MLB_CODES or store_code in ONLINE_DX_CODES or is_discovery_online(store_code):
         return 'Online'
     else:
         return 'Retail'
@@ -261,9 +265,9 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         for key in set(list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
             cumulative_mc[key] += period_data_mc_retail[key] + period_data_mc_outlet[key]
         
-        # 누적 오프라인 (홍콩+마카오 리테일+아울렛, 온라인 제외)
-        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys()) + list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
-            cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key] + period_data_mc_retail[key] + period_data_mc_outlet[key]
+        # 누적 오프라인 (홍콩만 리테일+아울렛, 온라인 제외, 마카오 제외)
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys())):
+            cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key]
         
         # 합계
         for key in set(list(cumulative_hk.keys()) + list(cumulative_mc.keys())):
@@ -283,9 +287,9 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         for key in set(list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
             prev_cumulative_mc[key] += period_data_mc_retail[key] + period_data_mc_outlet[key]
         
-        # 전년 누적 오프라인 (홍콩+마카오 리테일+아울렛, 온라인 제외)
-        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys()) + list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
-            prev_cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key] + period_data_mc_retail[key] + period_data_mc_outlet[key]
+        # 전년 누적 오프라인 (홍콩만 리테일+아울렛, 온라인 제외, 마카오 제외)
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys())):
+            prev_cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key]
         
         # 전년 합계
         for key in set(list(prev_cumulative_hk.keys()) + list(prev_cumulative_mc.keys())):
@@ -511,6 +515,10 @@ def main(target_period_short=None):
     # 디스커버리 데이터 읽기 (참고용)
     discovery_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='X', include_office=False)
     print(f"디스커버리 데이터: {len(discovery_data):,}건")
+    
+    # 누적 기간 계산 (디스커버리 누적 계산에 사용)
+    latest_year, latest_month = parse_period(latest_period_full)
+    cumulative_periods = [f"{latest_year}{m:02d}" for m in range(1, latest_month + 1)]
     
     # MLB 영업비 계산 (M99 오피스의 판매관리비)
     mlb_sg_a = get_mlb_sg_a(pl_data_with_office, latest_period_full)
@@ -876,7 +884,24 @@ def main(target_period_short=None):
     print(f"{'  - 영업비':<25} {sg_a:>15,.0f} {sg_a_yoy:>9.0f}% {sg_a_change:>14,.0f}")
     print(f"{'= 영업이익 (' + f'{op_profit_rate:.1f}%)':<25} {op_profit:>15,.0f} {'적자악화':>9} {op_profit_change:>14,.0f}")
     
-    # 디스커버리 참고 데이터
+    # 디스커버리 참고 데이터 (당월)
+    discovery_current = None
+    discovery_tag = 0
+    discovery_net = 0
+    discovery_discount_rate = 0
+    discovery_direct_cost = 0
+    discovery_direct_profit = 0
+    discovery_marketing = 0
+    discovery_travel = 0
+    discovery_sg_a = 0
+    discovery_op_profit = 0
+    online_count = 0
+    offline_count = 0
+    
+    # 디스커버리 누적 데이터
+    discovery_cumulative = defaultdict(float)
+    discovery_cumulative_op_profit = 0
+    
     if discovery_data:
         print(f"\n참고: 디스커버리 실적 (1K HKD)")
         discovery_current = aggregate_pl_by_period(discovery_data, latest_period_full)
@@ -891,14 +916,40 @@ def main(target_period_short=None):
         discovery_sg_a = 424.02  # 사용자 제공값
         discovery_op_profit = discovery_direct_profit - discovery_sg_a
         
-        # 매장 수 확인
+        # 매장 수 확인 (25년 10월 기준, 매출이 있는 매장만)
         discovery_stores = set()
         for row in discovery_data:
-            if row['PERIOD'] == latest_period_full and row['ACCOUNT_NM'] == '실매출액':
-                discovery_stores.add((row['CNTRY_CD'], row['SHOP_CD'], row.get('CHANNEL', 'Unknown')))
+            if (row['PERIOD'] == latest_period_full and 
+                row['ACCOUNT_NM'] == '실매출액' and
+                float(row.get('VALUE', 0) or 0) != 0 and
+                row['SHOP_CD'].strip() not in ['M99']):  # 오피스 제외
+                store_code = row['SHOP_CD'].strip()
+                # 매장 코드 패턴으로 채널 구분
+                channel = get_store_channel(store_code)
+                discovery_stores.add((row['CNTRY_CD'], store_code, channel))
         
         online_count = sum(1 for _, _, ch in discovery_stores if ch == 'Online')
         offline_count = sum(1 for _, _, ch in discovery_stores if ch in ['Retail', 'Outlet'])
+        
+        # 디스커버리 누적 계산 (실제 영업한 기간만)
+        # 디스커버리가 실제로 영업한 기간 확인
+        discovery_periods = set()
+        for row in discovery_data:
+            if row.get('ACCOUNT_NM', '').strip() == '실매출액' and float(row.get('VALUE', 0) or 0) != 0:
+                discovery_periods.add(row['PERIOD'])
+        
+        # 누적 기간과 실제 영업 기간의 교집합만 계산
+        actual_discovery_periods = [p for p in cumulative_periods if p in discovery_periods]
+        
+        for period in actual_discovery_periods:
+            period_discovery = aggregate_pl_by_period(discovery_data, period)
+            for key in period_discovery.keys():
+                discovery_cumulative[key] += period_discovery[key]
+        
+        # 누적 영업이익 계산 (실제 영업한 월수만큼만 영업비 계산)
+        discovery_cumulative_direct_profit = discovery_cumulative['매출총이익'] - discovery_cumulative['직접비_합계']
+        discovery_cumulative_sg_a = discovery_sg_a * len(actual_discovery_periods)  # 실제 영업한 월수만큼만
+        discovery_cumulative_op_profit = discovery_cumulative_direct_profit - discovery_cumulative_sg_a
         
         print(f"온라인{online_count}개, 오프라인{offline_count}개 (10/1 영업개시)")
         print(f"실판매출: {discovery_net:,.0f} (할인율 {discovery_discount_rate:.1f}%)")
@@ -907,6 +958,7 @@ def main(target_period_short=None):
         print(f"  - 마케팅비: {discovery_marketing:,.0f}")
         print(f"  - 여비교통비: {discovery_travel:,.0f}")
         print(f"영업손실: {discovery_op_profit:,.0f}")
+        print(f"\n누적 영업손실: {discovery_cumulative_op_profit:,.0f}")
     
     # 누적 데이터 계산
     current_month_hk = pl_summary['current_month']['hk']
@@ -1000,7 +1052,27 @@ def main(target_period_short=None):
     hk_op_profit_rate_prev = (hk_op_profit_prev / hk_net_sales_prev * 100) if hk_net_sales_prev > 0 else 0
     mc_op_profit_rate_prev = (mc_op_profit_prev / mc_net_sales_prev * 100) if mc_net_sales_prev > 0 else 0
     
-    # 누적 오프라인 지표 계산
+    # 누적 오프라인 지표 계산 (직접 계산)
+    cumulative_offline = defaultdict(float)
+    prev_cumulative_offline = defaultdict(float)
+    
+    latest_year, latest_month = parse_period(latest_period_full)
+    prev_year, prev_month = parse_period(prev_period_full)
+    cumulative_periods = [f"{latest_year}{m:02d}" for m in range(1, latest_month + 1)]
+    prev_cumulative_periods = [f"{prev_year}{m:02d}" for m in range(1, prev_month + 1)]
+    
+    for period in cumulative_periods:
+        period_data_hk_retail = aggregate_pl_by_period(pl_data, period, 'HK', 'Retail')
+        period_data_hk_outlet = aggregate_pl_by_period(pl_data, period, 'HK', 'Outlet')
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys())):
+            cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key]
+    
+    for period in prev_cumulative_periods:
+        period_data_hk_retail = aggregate_pl_by_period(pl_data, period, 'HK', 'Retail')
+        period_data_hk_outlet = aggregate_pl_by_period(pl_data, period, 'HK', 'Outlet')
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys())):
+            prev_cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key]
+    
     cum_offline_tag_sales = cumulative_offline.get('TAG', 0)
     cum_offline_net_sales = cumulative_offline.get('실판', 0)
     cum_offline_discount_rate = ((cum_offline_tag_sales - cum_offline_net_sales) / cum_offline_tag_sales * 100) if cum_offline_tag_sales > 0 else 0
@@ -1015,6 +1087,42 @@ def main(target_period_short=None):
     cum_offline_sg_a = (cum_sg_a * (cum_offline_net_sales / cum_net_sales)) if cum_net_sales > 0 else 0
     cum_offline_op_profit = cum_offline_direct_profit - cum_offline_sg_a
     cum_offline_op_profit_rate = (cum_offline_op_profit / cum_offline_net_sales * 100) if cum_offline_net_sales > 0 else 0
+    
+    # 누적 기간의 월별 면적 계산 (월별 면적 합계를 모두 더한 후 월수로 나눔)
+    # 면적 데이터 로드
+    store_areas = {}
+    try:
+        with open('components/dashboard/hongkong-store-areas.json', 'r', encoding='utf-8') as f:
+            area_data = json.load(f)
+            store_areas = area_data.get('store_areas', {})
+    except:
+        print("⚠️ 면적 데이터 파일을 읽을 수 없습니다. 기본값 0 사용")
+    
+    # 월별 면적 합계 계산 (홍콩만, 마카오 제외)
+    monthly_areas = []
+    for period in cumulative_periods:
+        # 해당 월에 실제 영업한 매장 목록 (실매출액이 있는 매장, MLB 브랜드, 오프라인, 홍콩만)
+        active_stores = set()
+        for row in pl_data:
+            if (row['PERIOD'] == period and
+                row['BRD_CD'] == 'M' and  # MLB만
+                row['CNTRY_CD'] == 'HK' and  # 홍콩만 (마카오 제외)
+                row['SHOP_CD'] != 'M99' and  # 오피스 제외
+                row.get('CHANNEL') in ['Retail', 'Outlet']):  # 오프라인만
+                account_nm = row['ACCOUNT_NM'].strip()
+                account_cd = row['ACCOUNT_CD'].strip()
+                value = float(row['VALUE'] or 0)
+                # 실매출액이 있는 매장만
+                if ((account_nm == '실매출액' or account_cd == 'ACT_SALE_AMT') and value > 0):
+                    active_stores.add(row['SHOP_CD'])
+        
+        # 해당 월의 면적 합계 (홍콩만)
+        month_area = sum(store_areas.get(store_code, 0) for store_code in active_stores)
+        if month_area > 0:
+            monthly_areas.append(month_area)
+    
+    # 누적 평균 면적 = 월별 면적 합계를 모두 더한 후 월수로 나눔 (홍콩만)
+    cum_avg_offline_area = sum(monthly_areas) / len(monthly_areas) if monthly_areas else 0
     
     # 전년 누적 오프라인 지표 계산
     prev_cum_offline_tag_sales = prev_cumulative_offline.get('TAG', 0)
@@ -1108,47 +1216,6 @@ def main(target_period_short=None):
                 'operating_profit_rate': op_profit_rate,
                 'expense_detail': expense_detail,
             },
-            'prev_month': {
-                'hk': {
-                    'tag_sales': prev_month_hk['TAG'],
-                    'net_sales': prev_month_hk['실판'],
-                    'discount_rate': pl_summary['metrics']['hk']['할인율_전년'],
-                    'cogs_rate': pl_summary['metrics']['hk']['원가율_전년'],
-                    'gross_profit': prev_month_hk['매출총이익'],
-                    'gross_profit_rate': pl_summary['metrics']['hk']['매출총이익률_전년'],
-                    'direct_cost': prev_month_hk['직접비_합계'],
-                    'direct_profit': prev_month_hk['직접이익'],
-                    'direct_profit_rate': pl_summary['metrics']['hk']['직접이익율_전년'],
-                    'sg_a': hk_sg_a_prev,
-                    'operating_profit': hk_op_profit_prev,
-                    'operating_profit_rate': hk_op_profit_rate_prev,
-                },
-                'mc': {
-                    'tag_sales': prev_month_mc['TAG'],
-                    'net_sales': prev_month_mc['실판'],
-                    'discount_rate': pl_summary['metrics']['mc']['할인율_전년'],
-                    'cogs_rate': pl_summary['metrics']['mc']['원가율_전년'],
-                    'gross_profit': prev_month_mc['매출총이익'],
-                    'gross_profit_rate': pl_summary['metrics']['mc']['매출총이익률_전년'],
-                    'direct_cost': prev_month_mc['직접비_합계'],
-                    'direct_profit': prev_month_mc['직접이익'],
-                    'direct_profit_rate': pl_summary['metrics']['mc']['직접이익율_전년'],
-                    'sg_a': mc_sg_a_prev,
-                    'operating_profit': mc_op_profit_prev,
-                    'operating_profit_rate': mc_op_profit_rate_prev,
-                },
-                'total': {
-                    'tag_sales': tag_sales_prev,
-                    'net_sales': net_sales_prev,
-                    'cogs': cogs_prev,
-                    'gross_profit': gross_profit_prev,
-                    'direct_cost': direct_cost_prev,
-                    'direct_profit': direct_profit_prev,
-                    'sg_a': sg_a_prev,
-                    'operating_profit': op_profit_prev,
-                    'expense_detail': expense_detail_prev,
-                }
-            },
             'yoy': {
                 'tag_sales': tag_sales_yoy,
                 'discount': discount_yoy,
@@ -1239,6 +1306,7 @@ def main(target_period_short=None):
                 'sg_a': cum_offline_sg_a,
                 'operating_profit': cum_offline_op_profit,
                 'operating_profit_rate': cum_offline_op_profit_rate,
+                'average_area': cum_avg_offline_area,  # 누적 기간의 평균 면적
             },
             'prev_cumulative': {
                 'hk': {
@@ -1323,6 +1391,47 @@ def main(target_period_short=None):
                 'operating_profit': cum_op_profit_change,
             }
         },
+        'prev_month': {
+            'hk': {
+                'tag_sales': prev_month_hk['TAG'],
+                'net_sales': prev_month_hk['실판'],
+                'discount_rate': pl_summary['metrics']['hk']['할인율_전년'],
+                'cogs_rate': pl_summary['metrics']['hk']['원가율_전년'],
+                'gross_profit': prev_month_hk['매출총이익'],
+                'gross_profit_rate': pl_summary['metrics']['hk']['매출총이익률_전년'],
+                'direct_cost': prev_month_hk['직접비_합계'],
+                'direct_profit': prev_month_hk['직접이익'],
+                'direct_profit_rate': pl_summary['metrics']['hk']['직접이익율_전년'],
+                'sg_a': hk_sg_a_prev,
+                'operating_profit': hk_op_profit_prev,
+                'operating_profit_rate': hk_op_profit_rate_prev,
+            },
+            'mc': {
+                'tag_sales': prev_month_mc['TAG'],
+                'net_sales': prev_month_mc['실판'],
+                'discount_rate': pl_summary['metrics']['mc']['할인율_전년'],
+                'cogs_rate': pl_summary['metrics']['mc']['원가율_전년'],
+                'gross_profit': prev_month_mc['매출총이익'],
+                'gross_profit_rate': pl_summary['metrics']['mc']['매출총이익률_전년'],
+                'direct_cost': prev_month_mc['직접비_합계'],
+                'direct_profit': prev_month_mc['직접이익'],
+                'direct_profit_rate': pl_summary['metrics']['mc']['직접이익율_전년'],
+                'sg_a': mc_sg_a_prev,
+                'operating_profit': mc_op_profit_prev,
+                'operating_profit_rate': mc_op_profit_rate_prev,
+            },
+            'total': {
+                'tag_sales': tag_sales_prev,
+                'net_sales': net_sales_prev,
+                'cogs': cogs_prev,
+                'gross_profit': gross_profit_prev,
+                'direct_cost': direct_cost_prev,
+                'direct_profit': direct_profit_prev,
+                'sg_a': sg_a_prev,
+                'operating_profit': op_profit_prev,
+                'expense_detail': expense_detail_prev,
+            }
+        },
         'channel_direct_profit': {
             'hk_offline': {
                 'direct_profit': hk_offline_direct_profit,
@@ -1355,6 +1464,7 @@ def main(target_period_short=None):
             'travel': discovery_travel if discovery_data else 0,
             'sg_a': discovery_sg_a if discovery_data else 0,
             'operating_profit': discovery_op_profit if discovery_data else 0,
+            'cumulative_operating_profit': discovery_cumulative_op_profit if discovery_data else 0,
             'store_count': {
                 'online': online_count if discovery_data else 0,
                 'offline': offline_count if discovery_data else 0
