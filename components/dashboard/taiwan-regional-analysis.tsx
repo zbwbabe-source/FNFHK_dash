@@ -745,13 +745,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                                 📍 {city}
                               </td>
                               <td className="p-2 text-right text-xs">{cityStores.length}개</td>
-                              <td className="p-2 text-right text-xs font-semibold">{formatNumber(cityData.total_sales)}</td>
-                              <td className="p-2 text-right text-xs">{formatDecimal(cityData.total_area, 0)}</td>
-                              <td className={`p-2 text-right text-xs font-semibold ${cityData.total_direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {formatNumber(cityData.total_direct_profit)}
-                              </td>
                               <td className="p-2 text-right text-xs font-semibold">{formatDecimal(citySalesPerPyeong)}</td>
-                              <td className="p-2 text-right text-xs font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(citySalesPerPyeong * 1000 / 31)}</td>
+                              <td className="p-2 text-right text-xs font-semibold border-l-2 border-r-2 border-red-500">{formatNumber((citySalesPerPyeong * 1000) / 304)}</td>
+                              <td className="p-2 text-right text-xs">-</td>
                               <td className={`p-2 text-right text-xs font-semibold ${cityDirectProfitPerPyeong >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {formatDecimal(cityDirectProfitPerPyeong)}
                               </td>
@@ -762,20 +758,16 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                             {/* 매장별 행 */}
                             {!cityOnlyMode && showStoresMode && cityStores.map((store: any) => (
                               <tr key={store.storeCode} className="border-b border-gray-200 hover:bg-gray-50">
-                                <td className="p-2 pl-10 text-gray-600">{store.storeName}</td>
-                                <td className="p-2 text-right text-gray-400">-</td>
-                                <td className="p-2 text-right">{formatNumber(store.netSales)}</td>
-                                <td className="p-2 text-right">{formatDecimal(store.area, 0)}</td>
-                                <td className={`p-2 text-right ${store.directProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {formatNumber(store.directProfit)}
-                                </td>
-                                <td className="p-2 text-right">{formatDecimal(store.salesPerPyeong)}</td>
-                                <td className="p-2 text-right border-l-2 border-r-2 border-red-500">{formatNumber(store.salesPerPyeong * 1000 / 31)}</td>
-                                <td className={`p-2 text-right ${store.directProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <td className="p-2 pl-10 text-gray-600 text-xs">{store.storeName}</td>
+                                <td className="p-2 text-right text-gray-400 text-xs">-</td>
+                                <td className="p-2 text-right text-xs">{formatDecimal(store.salesPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs border-l-2 border-r-2 border-red-500">{formatNumber((store.salesPerPyeong * 1000) / 304)}</td>
+                                <td className="p-2 text-right text-xs">-</td>
+                                <td className={`p-2 text-right text-xs ${store.directProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {formatDecimal(store.directProfitPerPyeong)}
                                 </td>
-                                <td className="p-2 text-right">{formatDecimal(store.rentPerPyeong)}</td>
-                                <td className="p-2 text-right">{formatDecimal(store.laborCostPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs">{formatDecimal(store.rentPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs">{formatDecimal(store.laborCostPerPyeong)}</td>
                               </tr>
                             ))}
                           </React.Fragment>
