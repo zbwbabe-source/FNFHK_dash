@@ -11,16 +11,28 @@ interface RegionalData {
   region: string;
   region_kr: string;
   store_count: number;
+  store_count_prev: number;
   total_sales: number;
+  total_sales_prev: number;
   total_area: number;
+  total_area_prev: number;
   total_direct_profit: number;
+  total_direct_profit_prev: number;
   total_rent: number;
+  total_rent_prev: number;
   total_labor_cost: number;
+  total_labor_cost_prev: number;
   sales_per_pyeong: number;
+  sales_per_pyeong_prev: number;
   direct_profit_per_pyeong: number;
+  direct_profit_per_pyeong_prev: number;
   rent_per_pyeong: number;
+  rent_per_pyeong_prev: number;
   labor_cost_per_pyeong: number;
-  efficiency_score: number;
+  labor_cost_per_pyeong_prev: number;
+  daily_sales_per_pyeong: number;
+  daily_sales_per_pyeong_prev: number;
+  yoy: number;
 }
 
 // 지역 순서를 상수로 정의 (북부 -> 중부 -> 남부)
@@ -74,24 +86,36 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     return num.toFixed(decimals);
   };
 
-  // 지역별 데이터 계산
+  // 지역별 데이터 계산 (전년 대비)
   const regionalData: RegionalData[] = useMemo(() => {
     const storeLocations = (storeLocationsData as any).store_locations;
     const regionSummary = (storeLocationsData as any).region_summary || {};
     const plStores = (plData as any)?.channel_direct_profit?.stores || {};
     const storeAreas = (storeAreasData as any)?.store_areas || {};
 
+    // 누적 일수 계산 (1월~10월 = 304일)
+    const cumulativeDays = 304;
+
     // REGION_ORDER 상수 순서대로 명시적으로 생성
     const data = REGION_ORDER.map((region, index) => {
       const regionData = regionSummary[region] || {};
       const storeCodes = regionData.store_codes || [];
       
+      // 금년 (2510) 데이터
       let totalSales = 0;
       let totalArea = 0;
       let totalDirectProfit = 0;
       let totalRent = 0;
       let totalLaborCost = 0;
       let activeStoreCount = 0;
+
+      // 전년 (2410) 데이터 (폐점 매장 포함)
+      let totalSalesPrev = 0;
+      let totalAreaPrev = 0;
+      let totalDirectProfitPrev = 0;
+      let totalRentPrev = 0;
+      let totalLaborCostPrev = 0;
+      let activeStoreCountPrev = 0;
 
       storeCodes.forEach((storeCode: string) => {
         // 온라인 제외
@@ -103,46 +127,170 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         if (!plStore || area === 0) return;
         
         const netSales = plStore.net_sales || 0;
-        if (netSales === 0) return; // 폐점 매장 제외
+        const netSalesPrev = plStore.net_sales_prev || 0;
 
-        totalSales += netSales;
-        totalArea += area;
-        totalDirectProfit += plStore.direct_profit || 0;
-        totalRent += plStore.rent || 0;
-        totalLaborCost += plStore.labor_cost || 0;
-        activeStoreCount++;
+        // 금년 데이터 (영업중인 매장만)
+        if (netSales > 0) {
+          totalSales += netSales;
+          totalArea += area;
+          totalDirectProfit += plStore.direct_profit || 0;
+          totalRent += plStore.rent || 0;
+          totalLaborCost += plStore.labor_cost || 0;
+          activeStoreCount++;
+        }
+
+        // 전년 데이터 (폐점 매장 포함)
+        if (netSalesPrev > 0) {
+          totalSalesPrev += netSalesPrev;
+          totalAreaPrev += area;
+          totalDirectProfitPrev += plStore.direct_profit_prev || 0;
+          totalRentPrev += plStore.rent_prev || 0;
+          totalLaborCostPrev += plStore.labor_cost_prev || 0;
+          activeStoreCountPrev++;
+        }
       });
 
       const salesPerPyeong = totalArea > 0 ? totalSales / totalArea : 0;
+      const salesPerPyeongPrev = totalAreaPrev > 0 ? totalSalesPrev / totalAreaPrev : 0;
       const directProfitPerPyeong = totalArea > 0 ? totalDirectProfit / totalArea : 0;
+      const directProfitPerPyeongPrev = totalAreaPrev > 0 ? totalDirectProfitPrev / totalAreaPrev : 0;
       const rentPerPyeong = totalArea > 0 ? totalRent / totalArea : 0;
+      const rentPerPyeongPrev = totalAreaPrev > 0 ? totalRentPrev / totalAreaPrev : 0;
       const laborCostPerPyeong = totalArea > 0 ? totalLaborCost / totalArea : 0;
-      const efficiencyScore = totalSales > 0 ? (totalDirectProfit / totalSales) * 100 : 0;
+      const laborCostPerPyeongPrev = totalAreaPrev > 0 ? totalLaborCostPrev / totalAreaPrev : 0;
+      
+      // 일평균 평당매출 (누적 기준)
+      const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+      const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+
+      // YOY 계산
+      const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
 
       return {
         region,
         region_kr: region,
         store_count: activeStoreCount,
+        store_count_prev: activeStoreCountPrev,
         total_sales: totalSales,
+        total_sales_prev: totalSalesPrev,
         total_area: totalArea,
+        total_area_prev: totalAreaPrev,
         total_direct_profit: totalDirectProfit,
+        total_direct_profit_prev: totalDirectProfitPrev,
         total_rent: totalRent,
+        total_rent_prev: totalRentPrev,
         total_labor_cost: totalLaborCost,
+        total_labor_cost_prev: totalLaborCostPrev,
         sales_per_pyeong: salesPerPyeong,
+        sales_per_pyeong_prev: salesPerPyeongPrev,
         direct_profit_per_pyeong: directProfitPerPyeong,
+        direct_profit_per_pyeong_prev: directProfitPerPyeongPrev,
         rent_per_pyeong: rentPerPyeong,
+        rent_per_pyeong_prev: rentPerPyeongPrev,
         labor_cost_per_pyeong: laborCostPerPyeong,
-        efficiency_score: efficiencyScore,
-        _order: index, // 순서 보장을 위한 인덱스
+        labor_cost_per_pyeong_prev: laborCostPerPyeongPrev,
+        daily_sales_per_pyeong: dailySalesPerPyeong,
+        daily_sales_per_pyeong_prev: dailySalesPerPyeongPrev,
+        yoy: yoy,
+        _order: index,
       };
     });
 
-    // REGION_ORDER 순서대로 이미 생성되었지만, 확실히 보장하기 위해 정렬
     return data.sort((a, b) => {
       const orderA = REGION_ORDER_MAP[a.region_kr] ?? 999;
       const orderB = REGION_ORDER_MAP[b.region_kr] ?? 999;
       return orderA - orderB;
     });
+  }, []);
+
+  // 폐점 및 신규 매장 분석
+  const storePortfolioAnalysis = useMemo(() => {
+    const plStores = (plData as any)?.channel_direct_profit?.stores || {};
+    const storeAreas = (storeAreasData as any)?.store_areas || {};
+    const storeLocations = (storeLocationsData as any).store_locations;
+    const storeSummary = (dashboardData as any)?.store_summary || {};
+
+    const closedStores: any[] = [];
+    const newStores: any[] = [];
+    const cumulativeDays = 304;
+
+    Object.keys(plStores).forEach((storeCode: string) => {
+      if (storeCode.startsWith('TE')) return; // 온라인 제외
+
+      const plStore = plStores[storeCode];
+      const area = storeAreas[storeCode] || 0;
+      const locationInfo = storeLocations[storeCode];
+      const storeInfo = storeSummary[storeCode];
+      
+      if (!plStore || area === 0) return;
+
+      const netSales = plStore.net_sales || 0;
+      const netSalesPrev = plStore.net_sales_prev || 0;
+
+      // 폐점 매장: 전년 매출 있고, 금년 매출 없음
+      if (netSalesPrev > 0 && netSales === 0) {
+        const salesPerPyeongPrev = netSalesPrev / area;
+        const directProfitPrev = plStore.direct_profit_prev || 0;
+        const directProfitPerPyeongPrev = directProfitPrev / area;
+        const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+
+        closedStores.push({
+          storeCode,
+          storeName: locationInfo?.store_name || storeCode,
+          area,
+          region: locationInfo?.region || '',
+          netSalesPrev,
+          salesPerPyeongPrev,
+          directProfitPrev,
+          directProfitPerPyeongPrev,
+          dailySalesPerPyeongPrev,
+        });
+      }
+
+      // 신규 매장: 전년 매출 없고, 금년 매출 있음
+      if (netSalesPrev === 0 && netSales > 0) {
+        const salesPerPyeong = netSales / area;
+        const directProfit = plStore.direct_profit || 0;
+        const directProfitPerPyeong = directProfit / area;
+        const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+
+        newStores.push({
+          storeCode,
+          storeName: locationInfo?.store_name || storeCode,
+          area,
+          region: locationInfo?.region || '',
+          netSales,
+          salesPerPyeong,
+          directProfit,
+          directProfitPerPyeong,
+          dailySalesPerPyeong,
+        });
+      }
+    });
+
+    // 평균 계산
+    const closedAvg = closedStores.length > 0 ? {
+      avgSalesPerPyeong: closedStores.reduce((sum, s) => sum + s.salesPerPyeongPrev, 0) / closedStores.length,
+      avgDirectProfitPerPyeong: closedStores.reduce((sum, s) => sum + s.directProfitPerPyeongPrev, 0) / closedStores.length,
+      avgDailySalesPerPyeong: closedStores.reduce((sum, s) => sum + s.dailySalesPerPyeongPrev, 0) / closedStores.length,
+      totalSales: closedStores.reduce((sum, s) => sum + s.netSalesPrev, 0),
+      totalArea: closedStores.reduce((sum, s) => sum + s.area, 0),
+    } : null;
+
+    const newAvg = newStores.length > 0 ? {
+      avgSalesPerPyeong: newStores.reduce((sum, s) => sum + s.salesPerPyeong, 0) / newStores.length,
+      avgDirectProfitPerPyeong: newStores.reduce((sum, s) => sum + s.directProfitPerPyeong, 0) / newStores.length,
+      avgDailySalesPerPyeong: newStores.reduce((sum, s) => sum + s.dailySalesPerPyeong, 0) / newStores.length,
+      totalSales: newStores.reduce((sum, s) => sum + s.netSales, 0),
+      totalArea: newStores.reduce((sum, s) => sum + s.area, 0),
+    } : null;
+
+    return {
+      closedStores,
+      newStores,
+      closedAvg,
+      newAvg,
+    };
   }, []);
 
   // 지역별 매장 데이터 (도시별로 그룹화)
@@ -281,37 +429,65 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     return markers;
   }, []);
 
-  // 전체 합계 계산
+  // 전체 합계 계산 (전년 대비)
   const totalSummary = useMemo(() => {
+    const cumulativeDays = 304;
+    
     const total = regionalData.reduce((acc, region) => {
       return {
         store_count: acc.store_count + region.store_count,
+        store_count_prev: acc.store_count_prev + region.store_count_prev,
         total_sales: acc.total_sales + region.total_sales,
+        total_sales_prev: acc.total_sales_prev + region.total_sales_prev,
         total_area: acc.total_area + region.total_area,
+        total_area_prev: acc.total_area_prev + region.total_area_prev,
         total_direct_profit: acc.total_direct_profit + region.total_direct_profit,
+        total_direct_profit_prev: acc.total_direct_profit_prev + region.total_direct_profit_prev,
         total_rent: acc.total_rent + region.total_rent,
+        total_rent_prev: acc.total_rent_prev + region.total_rent_prev,
         total_labor_cost: acc.total_labor_cost + region.total_labor_cost,
+        total_labor_cost_prev: acc.total_labor_cost_prev + region.total_labor_cost_prev,
       };
     }, {
       store_count: 0,
+      store_count_prev: 0,
       total_sales: 0,
+      total_sales_prev: 0,
       total_area: 0,
+      total_area_prev: 0,
       total_direct_profit: 0,
+      total_direct_profit_prev: 0,
       total_rent: 0,
+      total_rent_prev: 0,
       total_labor_cost: 0,
+      total_labor_cost_prev: 0,
     });
 
     const salesPerPyeong = total.total_area > 0 ? total.total_sales / total.total_area : 0;
+    const salesPerPyeongPrev = total.total_area_prev > 0 ? total.total_sales_prev / total.total_area_prev : 0;
     const directProfitPerPyeong = total.total_area > 0 ? total.total_direct_profit / total.total_area : 0;
+    const directProfitPerPyeongPrev = total.total_area_prev > 0 ? total.total_direct_profit_prev / total.total_area_prev : 0;
     const rentPerPyeong = total.total_area > 0 ? total.total_rent / total.total_area : 0;
+    const rentPerPyeongPrev = total.total_area_prev > 0 ? total.total_rent_prev / total.total_area_prev : 0;
     const laborCostPerPyeong = total.total_area > 0 ? total.total_labor_cost / total.total_area : 0;
+    const laborCostPerPyeongPrev = total.total_area_prev > 0 ? total.total_labor_cost_prev / total.total_area_prev : 0;
+    const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+    const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
+    const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
 
     return {
       ...total,
       sales_per_pyeong: salesPerPyeong,
+      sales_per_pyeong_prev: salesPerPyeongPrev,
       direct_profit_per_pyeong: directProfitPerPyeong,
+      direct_profit_per_pyeong_prev: directProfitPerPyeongPrev,
       rent_per_pyeong: rentPerPyeong,
+      rent_per_pyeong_prev: rentPerPyeongPrev,
       labor_cost_per_pyeong: laborCostPerPyeong,
+      labor_cost_per_pyeong_prev: laborCostPerPyeongPrev,
+      daily_sales_per_pyeong: dailySalesPerPyeong,
+      daily_sales_per_pyeong_prev: dailySalesPerPyeongPrev,
+      yoy: yoy,
     };
   }, [regionalData]);
 
@@ -320,58 +496,116 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-6 shadow-lg">
-          <h1 className="text-3xl font-bold mb-2">대만법인 지역별 분석 (2510 기준)</h1>
-          <p className="text-blue-100">Taiwan Regional Analysis - 지역별 효율성 비교 (단위: 1K HKD)</p>
+          <h1 className="text-3xl font-bold mb-2">대만법인 지역별 분석 (전년 대비)</h1>
+          <p className="text-blue-100">Taiwan Regional Analysis - 2410 vs 2510 (누적 기준, 단위: 1K HKD)</p>
         </div>
 
-        {/* AI 인사이트 */}
+        {/* 매장 포트폴리오 변화 분석 */}
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border-l-4 border-purple-500">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">💡 지역별 분석 인사이트</h3>
-          <div className="space-y-3 text-sm text-gray-700">
-            {/* 지역별 현황 */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">💡 매장 포트폴리오 최적화 분석</h3>
+          <div className="space-y-4 text-sm text-gray-700">
+            {/* 핵심 성과 */}
             <div className="space-y-2">
-              <p className="font-semibold text-gray-800">📍 지역별 현황</p>
-              {REGION_ORDER.map(regionName => {
-                const region = regionalData.find(r => r.region_kr === regionName);
-                if (!region) return null;
-                const dailySales = Math.round(region.sales_per_pyeong * 1000 / 31);
+              <p className="font-semibold text-gray-800">📊 핵심 성과</p>
+              {(() => {
+                const totalPrev = regionalData.reduce((acc, r) => ({
+                  count: acc.count + r.store_count_prev,
+                  sales: acc.sales + r.total_sales_prev,
+                  area: acc.area + r.total_area_prev,
+                  profit: acc.profit + r.total_direct_profit_prev,
+                }), { count: 0, sales: 0, area: 0, profit: 0 });
+                
+                const totalCurr = regionalData.reduce((acc, r) => ({
+                  count: acc.count + r.store_count,
+                  sales: acc.sales + r.total_sales,
+                  area: acc.area + r.total_area,
+                  profit: acc.profit + r.total_direct_profit,
+                }), { count: 0, sales: 0, area: 0, profit: 0 });
+
+                const avgSalesPerPyeongPrev = totalPrev.area > 0 ? totalPrev.sales / totalPrev.area : 0;
+                const avgSalesPerPyeongCurr = totalCurr.area > 0 ? totalCurr.sales / totalCurr.area : 0;
+                const avgDailySalesPrev = (avgSalesPerPyeongPrev * 1000) / 304;
+                const avgDailySalesCurr = (avgSalesPerPyeongCurr * 1000) / 304;
+                const yoy = avgSalesPerPyeongPrev > 0 ? ((avgSalesPerPyeongCurr - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100 : 0;
+                const profitRatePrev = totalPrev.sales > 0 ? (totalPrev.profit / totalPrev.sales) * 100 : 0;
+                const profitRateCurr = totalCurr.sales > 0 ? (totalCurr.profit / totalCurr.sales) * 100 : 0;
+
                 return (
-                  <p key={region.region_kr}>
-                    • <strong className={
-                      region.region_kr === '남부' ? 'text-orange-600' : 
-                      region.region_kr === '북부' ? 'text-blue-600' : 'text-green-600'
-                    }>{region.region_kr}</strong>: {region.store_count}개 매장, 
-                    1일 평당매출 {formatNumber(dailySales)} HKD, 
-                    평당직접이익 {formatDecimal(region.direct_profit_per_pyeong)}K HKD
-                  </p>
+                  <>
+                    <p>
+                      • <strong className="text-red-600">비효율 매장 정리</strong>: {storePortfolioAnalysis.closedStores.length}개 폐점
+                      {storePortfolioAnalysis.closedAvg && (
+                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.closedAvg.avgSalesPerPyeong)}K, 
+                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.closedAvg.avgSalesPerPyeong - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100)}%)</>
+                      )}
+                    </p>
+                    <p>
+                      • <strong className="text-green-600">우수 입지 확보</strong>: {storePortfolioAnalysis.newStores.length}개 신규 오픈
+                      {storePortfolioAnalysis.newAvg && (
+                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K, 
+                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.newAvg.avgSalesPerPyeong - avgSalesPerPyeongCurr) / avgSalesPerPyeongCurr) * 100)}%)</>
+                      )}
+                    </p>
+                    <p>
+                      • <strong className="text-blue-600">매장 효율 개선</strong>: 매장수 {totalPrev.count}개 → {totalCurr.count}개 ({totalCurr.count - totalPrev.count}개), 
+                      평당매출 <span className="font-semibold text-green-600">{yoy >= 0 ? '+' : ''}{formatDecimal(yoy)}%</span> 증가
+                    </p>
+                    <p>
+                      • <strong className="text-purple-600">일평균 평당매출</strong>: {formatNumber(avgDailySalesPrev)} HKD → {formatNumber(avgDailySalesCurr)} HKD 
+                      (<span className="font-semibold text-green-600">{yoy >= 0 ? '+' : ''}{formatNumber(avgDailySalesCurr - avgDailySalesPrev)} HKD, 
+                      {yoy >= 0 ? '+' : ''}{formatDecimal(yoy)}%</span>)
+                    </p>
+                  </>
                 );
-              })}
+              })()}
             </div>
-            
-            {/* 영업 인사이트 */}
+
+            {/* 폐점 매장 상세 */}
+            {storePortfolioAnalysis.closedStores.length > 0 && (
+              <div className="space-y-2 pt-3 border-t border-purple-200">
+                <p className="font-semibold text-gray-800">🔴 폐점 매장 ({storePortfolioAnalysis.closedStores.length}개)</p>
+                {storePortfolioAnalysis.closedStores.map((store: any) => (
+                  <p key={store.storeCode} className="text-xs">
+                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
+                    평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
+                    직접이익 {formatDecimal(store.directProfitPrev)}K, 
+                    일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* 신규 매장 상세 */}
+            {storePortfolioAnalysis.newStores.length > 0 && (
+              <div className="space-y-2 pt-3 border-t border-purple-200">
+                <p className="font-semibold text-gray-800">🟢 신규 오픈 매장 ({storePortfolioAnalysis.newStores.length}개)</p>
+                {storePortfolioAnalysis.newStores.map((store: any) => (
+                  <p key={store.storeCode} className="text-xs">
+                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
+                    평당매출 {formatDecimal(store.salesPerPyeong)}K, 
+                    직접이익 {formatDecimal(store.directProfit)}K, 
+                    일평균 {formatNumber(store.dailySalesPerPyeong)} HKD/평
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* 전략 제언 */}
             <div className="space-y-2 pt-3 border-t border-purple-200">
-              <p className="font-semibold text-gray-800">💼 영업 전략 제언 (인구수/인구밀도 고려)</p>
+              <p className="font-semibold text-gray-800">🎯 향후 전략 제언</p>
               <p>
-                • <strong className="text-blue-600">북부 지역</strong> (인구 약 890만명, 인구밀도 최고): 
-                대만 최대 인구 밀집 지역으로 <span className="font-semibold text-green-600">매장 밀도가 상대적으로 낮음</span>. 
-                신베이(400만명), 타오위안(230만명) 등 인구 대비 매장 수 부족 지역에 
-                <span className="font-semibold">전략적 입점 검토</span> 권장. 
-                기존 고수익 매장(라라포트 난강, 원동 반치아오) 운영 노하우를 저성과 매장에 전파하여 평균 매출 상향 평준화 집중
+                • <strong className="text-green-600">포트폴리오 최적화 지속</strong>: 
+                저효율 매장 정리와 우수 입지 확보 전략이 효과적으로 작동하고 있음. 
+                평당매출 기준 하위 20% 매장에 대한 지속적인 모니터링 및 개선/철수 검토 필요
               </p>
               <p>
-                • <strong className="text-orange-600">남부 지역</strong> (인구 약 465만명): 
-                평당직접이익이 가장 높고 인구 규모도 충분하여 <span className="font-semibold text-green-600">신규 매장 확장 최우선 검토</span>. 
-                가오슝(277만명) 중심으로 대형 쇼핑몰 입점 전략 지속 추진. 
-                한신아레나, TS Mall 등 성공 사례를 바탕으로 추가 입점 기회 모색
+                • <strong className="text-blue-600">신규 입점 기준 강화</strong>: 
+                신규 매장의 높은 평당매출은 입지 선정의 중요성을 입증. 
+                향후 신규 입점 시 대형 쇼핑몰 및 인구 밀집 지역 중심으로 선택과 집중 전략 지속
               </p>
               <p>
-                • <strong className="text-green-600">중부 지역</strong> (인구 약 280만명): 
-                인구 대비 매장 수가 적절하나, 타이중(280만명) 상권 성장세를 고려하여 
-                <span className="font-semibold text-blue-600">선택적 추가 입점 기회 모색</span> (백화점, 아울렛 위주). 
-                인구 밀도 대비 현재 매장 효율성이 양호하므로 신중한 입점 검토 필요
-              </p>
-              <p className="text-xs text-gray-600 mt-2">
-                ※ 인구 밀도와 평당직접이익을 종합 고려 시, 북부 지역의 인구 대비 매장 확장 잠재력이 가장 높음
+                • <strong className="text-orange-600">지역별 차별화 전략</strong>: 
+                남부(고수익), 북부(고성장 잠재력), 중부(안정적 운영) 특성에 맞춘 차별화된 매장 운영 및 확장 전략 수립
               </p>
             </div>
           </div>
@@ -430,13 +664,11 @@ const TaiwanRegionalAnalysis: React.FC = () => {
               <table className="min-w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-200 border-b-2 border-gray-400">
-                    <th className="p-2 text-left font-semibold">매장명</th>
+                    <th className="p-2 text-left font-semibold">구분</th>
                     <th className="p-2 text-right font-semibold">매장수</th>
-                    <th className="p-2 text-right font-semibold">실판매출</th>
-                    <th className="p-2 text-right font-semibold">면적<br/>(평)</th>
-                    <th className="p-2 text-right font-semibold">직접이익</th>
                     <th className="p-2 text-right font-semibold">평당매출<br/>(K/평)</th>
                     <th className="p-2 text-right font-semibold border-l-2 border-r-2 border-t-2 border-red-500">1일 평당매출<br/>(HKD/평)</th>
+                    <th className="p-2 text-right font-semibold">YOY<br/>(%)</th>
                     <th className="p-2 text-right font-semibold">평당직접이익<br/>(K/평)</th>
                     <th className="p-2 text-right font-semibold">평당임차료<br/>(K/평)</th>
                     <th className="p-2 text-right font-semibold">평당인건비<br/>(K/평)</th>
@@ -455,9 +687,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
                   return (
                     <React.Fragment key={region.region_kr}>
-                      {/* 지역 합계 행 */}
+                      {/* 지역 금년 행 */}
                       <tr 
-                        className="border-b-2 border-gray-400 bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                        className="border-b border-gray-300 bg-gray-100 hover:bg-gray-200 cursor-pointer"
                         onClick={() => toggleRegion(region.region_kr)}
                       >
                         <td className="p-2 font-semibold" style={{ color: getRegionColor(region.region_kr) }}>
@@ -467,22 +699,33 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                             ) : (
                               <ChevronRight className="w-4 h-4" />
                             )}
-                            <span>{region.region_kr}</span>
+                            <span>{region.region_kr} (2510)</span>
                           </div>
                         </td>
                         <td className="p-2 text-right">{region.store_count}개</td>
-                        <td className="p-2 text-right font-semibold">{formatNumber(region.total_sales)}</td>
-                        <td className="p-2 text-right">{formatDecimal(region.total_area, 0)}</td>
-                        <td className={`p-2 text-right font-semibold ${region.total_direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatNumber(region.total_direct_profit)}
-                        </td>
                         <td className="p-2 text-right font-semibold">{formatDecimal(region.sales_per_pyeong)}</td>
-                        <td className="p-2 text-right font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(region.sales_per_pyeong * 1000 / 31)}</td>
+                        <td className="p-2 text-right font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(region.daily_sales_per_pyeong)}</td>
+                        <td className={`p-2 text-right font-semibold ${region.yoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {region.yoy >= 0 ? '+' : ''}{formatDecimal(region.yoy, 1)}%
+                        </td>
                         <td className={`p-2 text-right font-semibold ${region.direct_profit_per_pyeong >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatDecimal(region.direct_profit_per_pyeong)}
                         </td>
                         <td className="p-2 text-right">{formatDecimal(region.rent_per_pyeong)}</td>
                         <td className="p-2 text-right">{formatDecimal(region.labor_cost_per_pyeong)}</td>
+                      </tr>
+                      {/* 지역 전년 행 */}
+                      <tr className="border-b-2 border-gray-400 bg-gray-50 text-gray-600">
+                        <td className="p-2 pl-10 text-sm">
+                          └ {region.region_kr} (2410)
+                        </td>
+                        <td className="p-2 text-right">{region.store_count_prev}개</td>
+                        <td className="p-2 text-right">{formatDecimal(region.sales_per_pyeong_prev)}</td>
+                        <td className="p-2 text-right border-l-2 border-r-2 border-red-500">{formatNumber(region.daily_sales_per_pyeong_prev)}</td>
+                        <td className="p-2 text-right">-</td>
+                        <td className="p-2 text-right">{formatDecimal(region.direct_profit_per_pyeong_prev)}</td>
+                        <td className="p-2 text-right">{formatDecimal(region.rent_per_pyeong_prev)}</td>
+                        <td className="p-2 text-right">{formatDecimal(region.labor_cost_per_pyeong_prev)}</td>
                       </tr>
 
                       {/* 도시별/매장별 행 */}
@@ -542,22 +785,31 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                   );
                 })}
                 
-                {/* 전체 합계 행 */}
+                {/* 전체 합계 금년 행 */}
                 <tr className="border-t-4 border-gray-600 bg-gray-800 text-white">
-                  <td className="p-2 font-bold">전체 합계</td>
+                  <td className="p-2 font-bold">전체 합계 (2510)</td>
                   <td className="p-2 text-right font-bold">{totalSummary.store_count}개</td>
-                  <td className="p-2 text-right font-bold">{formatNumber(totalSummary.total_sales)}</td>
-                  <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.total_area, 0)}</td>
-                  <td className={`p-2 text-right font-bold ${totalSummary.total_direct_profit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                    {formatNumber(totalSummary.total_direct_profit)}
-                  </td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.sales_per_pyeong)}</td>
-                  <td className="p-2 text-right font-bold border-l-2 border-r-2 border-b-2 border-red-500">{formatNumber(totalSummary.sales_per_pyeong * 1000 / 31)}</td>
+                  <td className="p-2 text-right font-bold border-l-2 border-r-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong)}</td>
+                  <td className={`p-2 text-right font-bold ${totalSummary.yoy >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                    {totalSummary.yoy >= 0 ? '+' : ''}{formatDecimal(totalSummary.yoy, 1)}%
+                  </td>
                   <td className={`p-2 text-right font-bold ${totalSummary.direct_profit_per_pyeong >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                     {formatDecimal(totalSummary.direct_profit_per_pyeong)}
                   </td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.rent_per_pyeong)}</td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.labor_cost_per_pyeong)}</td>
+                </tr>
+                {/* 전체 합계 전년 행 */}
+                <tr className="bg-gray-700 text-gray-300">
+                  <td className="p-2 pl-10 font-semibold">└ 전체 합계 (2410)</td>
+                  <td className="p-2 text-right font-semibold">{totalSummary.store_count_prev}개</td>
+                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.sales_per_pyeong_prev)}</td>
+                  <td className="p-2 text-right font-semibold border-l-2 border-r-2 border-b-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong_prev)}</td>
+                  <td className="p-2 text-right">-</td>
+                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.direct_profit_per_pyeong_prev)}</td>
+                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.rent_per_pyeong_prev)}</td>
+                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.labor_cost_per_pyeong_prev)}</td>
                 </tr>
               </tbody>
             </table>
