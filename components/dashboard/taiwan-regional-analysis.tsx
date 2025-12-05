@@ -324,7 +324,11 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         const netSales = plStore.net_sales || 0;
         if (netSales === 0) return; // 폐점 제외
 
+        const netSalesPrev = plStore.net_sales_prev || 0;
         const city = locationInfo.city || 'Unknown';
+        const cumulativeDays = 304;
+        
+        // 금년 데이터
         const salesPerPyeong = netSales / area;
         const directProfit = plStore.direct_profit || 0;
         const directProfitPerPyeong = directProfit / area;
@@ -332,16 +336,35 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         const rentPerPyeong = rent / area;
         const laborCost = plStore.labor_cost || 0;
         const laborCostPerPyeong = laborCost / area;
+        const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+
+        // 전년 데이터
+        const salesPerPyeongPrev = netSalesPrev > 0 ? netSalesPrev / area : 0;
+        const directProfitPrev = plStore.direct_profit_prev || 0;
+        const directProfitPerPyeongPrev = netSalesPrev > 0 ? directProfitPrev / area : 0;
+        const rentPrev = plStore.rent_prev || 0;
+        const rentPerPyeongPrev = netSalesPrev > 0 ? rentPrev / area : 0;
+        const laborCostPrev = plStore.labor_cost_prev || 0;
+        const laborCostPerPyeongPrev = netSalesPrev > 0 ? laborCostPrev / area : 0;
+        const dailySalesPerPyeongPrev = netSalesPrev > 0 ? (salesPerPyeongPrev * 1000) / cumulativeDays : 0;
+        
+        // YOY 계산
+        const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
 
         // 도시별로 그룹화
         if (!result[region][city]) {
           result[region][city] = {
             stores: [],
             total_sales: 0,
+            total_sales_prev: 0,
             total_area: 0,
+            total_area_prev: 0,
             total_direct_profit: 0,
+            total_direct_profit_prev: 0,
             total_rent: 0,
+            total_rent_prev: 0,
             total_labor_cost: 0,
+            total_labor_cost_prev: 0,
           };
         }
 
@@ -350,20 +373,33 @@ const TaiwanRegionalAnalysis: React.FC = () => {
           storeName: storeInfo?.store_name || storeCode,
           city,
           netSales,
+          netSalesPrev,
           area,
           salesPerPyeong,
+          salesPerPyeongPrev,
           directProfit,
           directProfitPerPyeong,
+          directProfitPerPyeongPrev,
           rentPerPyeong,
+          rentPerPyeongPrev,
           laborCostPerPyeong,
+          laborCostPerPyeongPrev,
+          dailySalesPerPyeong,
+          dailySalesPerPyeongPrev,
+          yoy,
         };
 
         result[region][city].stores.push(storeData);
         result[region][city].total_sales += netSales;
+        result[region][city].total_sales_prev += netSalesPrev;
         result[region][city].total_area += area;
+        result[region][city].total_area_prev += area; // 면적은 동일
         result[region][city].total_direct_profit += directProfit;
+        result[region][city].total_direct_profit_prev += directProfitPrev;
         result[region][city].total_rent += rent;
+        result[region][city].total_rent_prev += rentPrev;
         result[region][city].total_labor_cost += laborCost;
+        result[region][city].total_labor_cost_prev += laborCostPrev;
       });
 
       // 각 도시의 매장을 평당매출 기준 내림차순 정렬
@@ -732,10 +768,21 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                       {isExpanded && Object.keys(stores).map((city) => {
                         const cityData = stores[city];
                         const cityStores = cityData.stores || [];
+                        const cumulativeDays = 304;
+                        
+                        // 도시별 금년 데이터
                         const citySalesPerPyeong = cityData.total_area > 0 ? cityData.total_sales / cityData.total_area : 0;
                         const cityDirectProfitPerPyeong = cityData.total_area > 0 ? cityData.total_direct_profit / cityData.total_area : 0;
                         const cityRentPerPyeong = cityData.total_area > 0 ? cityData.total_rent / cityData.total_area : 0;
                         const cityLaborCostPerPyeong = cityData.total_area > 0 ? cityData.total_labor_cost / cityData.total_area : 0;
+                        const cityDailySalesPerPyeong = (citySalesPerPyeong * 1000) / cumulativeDays;
+                        
+                        // 도시별 전년 데이터
+                        const citySalesPerPyeongPrev = cityData.total_area_prev > 0 ? cityData.total_sales_prev / cityData.total_area_prev : 0;
+                        const cityDailySalesPerPyeongPrev = citySalesPerPyeongPrev > 0 ? (citySalesPerPyeongPrev * 1000) / cumulativeDays : 0;
+                        
+                        // 도시별 YOY
+                        const cityYoy = citySalesPerPyeongPrev > 0 ? ((citySalesPerPyeong - citySalesPerPyeongPrev) / citySalesPerPyeongPrev) * 100 : 0;
                         
                         return (
                           <React.Fragment key={city}>
@@ -746,8 +793,10 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                               </td>
                               <td className="p-2 text-right text-xs">{cityStores.length}개</td>
                               <td className="p-2 text-right text-xs font-semibold">{formatDecimal(citySalesPerPyeong)}</td>
-                              <td className="p-2 text-right text-xs font-semibold border-l-2 border-r-2 border-red-500">{formatNumber((citySalesPerPyeong * 1000) / 304)}</td>
-                              <td className="p-2 text-right text-xs">-</td>
+                              <td className="p-2 text-right text-xs font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(cityDailySalesPerPyeong)}</td>
+                              <td className={`p-2 text-right text-xs font-semibold ${cityYoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cityYoy !== 0 ? (cityYoy >= 0 ? '+' : '') + formatDecimal(cityYoy, 1) + '%' : '-'}
+                              </td>
                               <td className={`p-2 text-right text-xs font-semibold ${cityDirectProfitPerPyeong >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {formatDecimal(cityDirectProfitPerPyeong)}
                               </td>
@@ -761,8 +810,10 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                                 <td className="p-2 pl-10 text-gray-600 text-xs">{store.storeName}</td>
                                 <td className="p-2 text-right text-gray-400 text-xs">-</td>
                                 <td className="p-2 text-right text-xs">{formatDecimal(store.salesPerPyeong)}</td>
-                                <td className="p-2 text-right text-xs border-l-2 border-r-2 border-red-500">{formatNumber((store.salesPerPyeong * 1000) / 304)}</td>
-                                <td className="p-2 text-right text-xs">-</td>
+                                <td className="p-2 text-right text-xs border-l-2 border-r-2 border-red-500">{formatNumber(store.dailySalesPerPyeong)}</td>
+                                <td className={`p-2 text-right text-xs ${store.yoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {store.yoy !== 0 ? (store.yoy >= 0 ? '+' : '') + formatDecimal(store.yoy, 1) + '%' : '-'}
+                                </td>
                                 <td className={`p-2 text-right text-xs ${store.directProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {formatDecimal(store.directProfitPerPyeong)}
                                 </td>
