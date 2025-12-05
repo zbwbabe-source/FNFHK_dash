@@ -554,7 +554,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-6 shadow-lg">
           <h1 className="text-3xl font-bold mb-2">대만법인 지역별 분석 (전년 대비)</h1>
-          <p className="text-blue-100">Taiwan Regional Analysis - 2410 vs 2510 (누적 기준, 단위: 1K HKD)</p>
+          <p className="text-blue-100">2410 vs 2510 (누적 기준, 단위: 1K HKD)</p>
         </div>
 
         {/* 매장 포트폴리오 변화 분석 */}
@@ -590,7 +590,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 return (
                   <>
                     <p>
-                      • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔, 신 타이베이)
+                      • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (신디엔)
                       {storePortfolioAnalysis.inefficientAvg && (
                         <> - 평당매출 <span className="font-bold text-red-600">{formatDecimal(storePortfolioAnalysis.inefficientAvg.avgSalesPerPyeong)}K</span></>
                       )}
@@ -758,7 +758,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  {showStoresMode ? '매장별 접기' : '매장별'}
+                  매장별
                 </button>
               </div>
             </div>
