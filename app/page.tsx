@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import hkStoreAreas from '@/components/dashboard/hongkong-store-areas.json';
+import twStoreAreas from '@/components/dashboard/taiwan-store-areas.json';
 
 export default function Home() {
   const [hkData, setHkData] = useState<any>(null);
@@ -178,6 +180,91 @@ export default function Home() {
   const selectedMonth = parseInt(selectedPeriod.substring(2, 4));
   const periodLabel = `${selectedYear}년 ${selectedMonth}월`;
 
+  // 해당 월의 일수 계산
+  const getDaysInMonth = (year: number, month: number) => {
+    // 20XX 형식의 년도를 2000 + XX로 변환
+    const fullYear = 2000 + year;
+    return new Date(fullYear, month, 0).getDate();
+  };
+
+  // 누적 일수 계산 (1월부터 해당 월까지)
+  const getCumulativeDays = (year: number, month: number) => {
+    const fullYear = 2000 + year;
+    let totalDays = 0;
+    for (let m = 1; m <= month; m++) {
+      totalDays += new Date(fullYear, m, 0).getDate();
+    }
+    return totalDays;
+  };
+
+  const currentMonthDays = getDaysInMonth(parseInt(selectedYear), selectedMonth);
+  const cumulativeDays = getCumulativeDays(parseInt(selectedYear), selectedMonth);
+
+  // 홍콩/마카오 오프라인 매장 총 면적 계산 (온라인 제외)
+  const hkmcOfflineTotalArea = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    const storeAreas = hkStoreAreas.store_areas || {};
+    let totalArea = 0;
+    Object.keys(hkData.store_summary).forEach(storeCode => {
+      const store = hkData.store_summary[storeCode];
+      // 온라인 제외, 오프라인만 (Retail, Outlet)
+      if (store.channel !== 'Online' && store.current?.net_sales > 0) {
+        totalArea += (storeAreas as Record<string, number>)[storeCode] || 0;
+      }
+    });
+    return totalArea;
+  }, [hkData]);
+
+  // 대만 오프라인 매장 총 면적 계산 (온라인 제외)
+  const twOfflineTotalArea = useMemo(() => {
+    if (!twData?.store_summary) return 0;
+    const storeAreas = twStoreAreas.store_areas || {};
+    let totalArea = 0;
+    Object.keys(twData.store_summary).forEach(storeCode => {
+      const store = twData.store_summary[storeCode];
+      // 온라인 제외 (TE로 시작하는 매장 제외), 오프라인만
+      if (!storeCode.startsWith('TE') && store.current?.net_sales > 0) {
+        totalArea += (storeAreas as Record<string, number>)[storeCode] || 0;
+      }
+    });
+    return totalArea;
+  }, [twData]);
+
+  // 홍콩/마카오 누적 오프라인 매출 계산 (온라인 제외)
+  // PL 데이터의 cumulative.offline.net_sales 사용 (실제 계산된 값)
+  // 없으면 fallback으로 전체 누적에서 온라인 비율 제거
+  const hkmcOfflineCumulative = useMemo(() => {
+    // cumulative.offline이 있으면 사용
+    if (hkPlData?.cumulative?.offline?.net_sales) {
+      return hkPlData.cumulative.offline.net_sales;
+    }
+    // 없으면 fallback: 전체 누적에서 온라인 비율 제거
+    const hkCumulative = hkPlData?.cumulative?.hk?.net_sales || 0;
+    const mcCumulative = hkPlData?.cumulative?.mc?.net_sales || 0;
+    const totalCumulative = hkCumulative + mcCumulative;
+    // 당월 데이터가 있으면 온라인 비율로 추정, 없으면 전체 누적 반환
+    if (hkData?.country_channel_summary) {
+      const hkRetail = hkData.country_channel_summary.HK_Retail;
+      const hkOutlet = hkData.country_channel_summary.HK_Outlet;
+      const hkOnline = hkData.country_channel_summary.HK_Online;
+      const moRetail = hkData.country_channel_summary.MO_Retail;
+      const moOutlet = hkData.country_channel_summary.MO_Outlet;
+      const hkOfflineCurrent = (hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0);
+      const hkOnlineCurrent = hkOnline?.current?.net_sales || 0;
+      const mcCurrent = (moRetail?.current?.net_sales || 0) + (moOutlet?.current?.net_sales || 0);
+      const hkmcTotalCurrent = hkOfflineCurrent + hkOnlineCurrent + mcCurrent;
+      const hkOnlineRatio = hkmcTotalCurrent > 0 ? hkOnlineCurrent / hkmcTotalCurrent : 0;
+      return totalCumulative * (1 - hkOnlineRatio);
+    }
+    return totalCumulative;
+  }, [hkPlData, hkData]);
+
+  // 대만 누적 오프라인 매출 계산 (온라인 제외)
+  // PL 데이터에 cumulative.offline.net_sales가 있음!
+  const twOfflineCumulative = useMemo(() => {
+    return twPlData?.cumulative?.offline?.net_sales || 0;
+  }, [twPlData]);
+
   // 데이터 로드 확인
   if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
     return (
@@ -286,6 +373,30 @@ export default function Home() {
   const twTotalPrevious = twOfflinePrevious + twOnlinePrevious;
   const twTotalYoy = twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0;
 
+  // 홍콩/마카오 평당매출 계산 (당월, 누적)
+  // hkOfflineCurrent, mcCurrent는 1K HKD 단위이므로, 평당매출도 1K HKD/평 단위
+  const hkmcSalesPerPyeongCurrent = hkmcOfflineTotalArea > 0 ? (hkOfflineCurrent + mcCurrent) / hkmcOfflineTotalArea : 0;
+  const hkmcSalesPerPyeongCumulative = hkmcOfflineTotalArea > 0 ? hkmcOfflineCumulative / hkmcOfflineTotalArea : 0;
+  // 평당매출/1일 계산: 평당매출(1K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
+  const hkmcDailySalesPerPyeongCurrent = currentMonthDays > 0 ? (hkmcSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
+  const hkmcDailySalesPerPyeongCumulative = cumulativeDays > 0 ? (hkmcSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 1월부터 해당 월까지 누적 일수 기준
+
+  // 대만 평당매출 계산 (당월, 누적)
+  // twOfflineCurrent는 1K HKD 단위이므로, 평당매출도 1K HKD/평 단위
+  const twSalesPerPyeongCurrent = twOfflineTotalArea > 0 ? twOfflineCurrent / twOfflineTotalArea : 0;
+  const twSalesPerPyeongCumulative = twOfflineTotalArea > 0 ? twOfflineCumulative / twOfflineTotalArea : 0;
+  // 평당매출/1일 계산: 평당매출(1K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
+  const twDailySalesPerPyeongCurrent = currentMonthDays > 0 ? (twSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
+  const twDailySalesPerPyeongCumulative = cumulativeDays > 0 ? (twSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 1월부터 해당 월까지 누적 일수 기준
+
+  // HKD 포맷 함수 (소수점 1자리)
+  const formatHKD = (num: number) => {
+    if (num === undefined || num === null || isNaN(Number(num))) return '0';
+    const value = Number(num);
+    if (!isFinite(value)) return '0';
+    return value.toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* 메인 컨텐츠 */}
@@ -388,6 +499,9 @@ export default function Home() {
                       }`}>
                         YOY {formatPercent(hkmcTotalYoy)}%
                       </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        평당매출/1일: {formatHKD(hkmcDailySalesPerPyeongCurrent)} HKD
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-gray-600 mb-1">누적</div>
@@ -396,6 +510,9 @@ export default function Home() {
                       </div>
                       <div className="text-xs font-semibold text-green-600">
                         YOY {formatPercent(hkCumulativeYoy)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        평당매출/1일: {formatHKD(hkmcDailySalesPerPyeongCumulative)} HKD
                       </div>
                     </div>
                   </div>
@@ -583,6 +700,9 @@ export default function Home() {
                       }`}>
                         YOY {formatPercent(twTotalYoy)}%
                       </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-gray-600 mb-1">누적</div>
@@ -591,6 +711,9 @@ export default function Home() {
                       </div>
                       <div className="text-xs font-semibold text-green-600">
                         YOY {formatPercent(twCumulativeYoy)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
                       </div>
                     </div>
                   </div>

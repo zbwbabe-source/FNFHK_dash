@@ -243,6 +243,10 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
     prev_cumulative_mc = defaultdict(float)
     prev_cumulative_total = defaultdict(float)
     
+    # 누적 오프라인 데이터 (온라인 제외) - 초기화
+    cumulative_offline = defaultdict(float)
+    prev_cumulative_offline = defaultdict(float)
+    
     for period in cumulative_periods:
         # 홍콩 누적 (리테일+아울렛+온라인)
         period_data_hk_retail = aggregate_pl_by_period(pl_data, period, 'HK', 'Retail')
@@ -256,6 +260,10 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         period_data_mc_outlet = aggregate_pl_by_period(pl_data, period, 'MC', 'Outlet')
         for key in set(list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
             cumulative_mc[key] += period_data_mc_retail[key] + period_data_mc_outlet[key]
+        
+        # 누적 오프라인 (홍콩+마카오 리테일+아울렛, 온라인 제외)
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys()) + list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
+            cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key] + period_data_mc_retail[key] + period_data_mc_outlet[key]
         
         # 합계
         for key in set(list(cumulative_hk.keys()) + list(cumulative_mc.keys())):
@@ -274,6 +282,10 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         period_data_mc_outlet = aggregate_pl_by_period(pl_data, period, 'MC', 'Outlet')
         for key in set(list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
             prev_cumulative_mc[key] += period_data_mc_retail[key] + period_data_mc_outlet[key]
+        
+        # 전년 누적 오프라인 (홍콩+마카오 리테일+아울렛, 온라인 제외)
+        for key in set(list(period_data_hk_retail.keys()) + list(period_data_hk_outlet.keys()) + list(period_data_mc_retail.keys()) + list(period_data_mc_outlet.keys())):
+            prev_cumulative_offline[key] += period_data_hk_retail[key] + period_data_hk_outlet[key] + period_data_mc_retail[key] + period_data_mc_outlet[key]
         
         # 전년 합계
         for key in set(list(prev_cumulative_hk.keys()) + list(prev_cumulative_mc.keys())):
@@ -988,6 +1000,37 @@ def main(target_period_short=None):
     hk_op_profit_rate_prev = (hk_op_profit_prev / hk_net_sales_prev * 100) if hk_net_sales_prev > 0 else 0
     mc_op_profit_rate_prev = (mc_op_profit_prev / mc_net_sales_prev * 100) if mc_net_sales_prev > 0 else 0
     
+    # 누적 오프라인 지표 계산
+    cum_offline_tag_sales = cumulative_offline.get('TAG', 0)
+    cum_offline_net_sales = cumulative_offline.get('실판', 0)
+    cum_offline_discount_rate = ((cum_offline_tag_sales - cum_offline_net_sales) / cum_offline_tag_sales * 100) if cum_offline_tag_sales > 0 else 0
+    cum_offline_cogs = cumulative_offline.get('매출원가', 0)
+    cum_offline_cogs_rate = (cum_offline_cogs / cum_offline_tag_sales * 100) if cum_offline_tag_sales > 0 else 0
+    cum_offline_gross_profit = cumulative_offline.get('매출총이익', 0)
+    cum_offline_gross_profit_rate = (cum_offline_gross_profit / cum_offline_net_sales * 100) if cum_offline_net_sales > 0 else 0
+    cum_offline_direct_cost = cumulative_offline.get('직접비_합계', 0)
+    cum_offline_direct_profit = cumulative_offline.get('직접이익', 0)
+    cum_offline_direct_profit_rate = (cum_offline_direct_profit / cum_offline_net_sales * 100) if cum_offline_net_sales > 0 else 0
+    # 누적 오프라인 영업비는 오프라인 매출 비율로 분배
+    cum_offline_sg_a = (cum_sg_a * (cum_offline_net_sales / cum_net_sales)) if cum_net_sales > 0 else 0
+    cum_offline_op_profit = cum_offline_direct_profit - cum_offline_sg_a
+    cum_offline_op_profit_rate = (cum_offline_op_profit / cum_offline_net_sales * 100) if cum_offline_net_sales > 0 else 0
+    
+    # 전년 누적 오프라인 지표 계산
+    prev_cum_offline_tag_sales = prev_cumulative_offline.get('TAG', 0)
+    prev_cum_offline_net_sales = prev_cumulative_offline.get('실판', 0)
+    prev_cum_offline_discount_rate = ((prev_cum_offline_tag_sales - prev_cum_offline_net_sales) / prev_cum_offline_tag_sales * 100) if prev_cum_offline_tag_sales > 0 else 0
+    prev_cum_offline_cogs = prev_cumulative_offline.get('매출원가', 0)
+    prev_cum_offline_cogs_rate = (prev_cum_offline_cogs / prev_cum_offline_tag_sales * 100) if prev_cum_offline_tag_sales > 0 else 0
+    prev_cum_offline_gross_profit = prev_cumulative_offline.get('매출총이익', 0)
+    prev_cum_offline_gross_profit_rate = (prev_cum_offline_gross_profit / prev_cum_offline_net_sales * 100) if prev_cum_offline_net_sales > 0 else 0
+    prev_cum_offline_direct_cost = prev_cumulative_offline.get('직접비_합계', 0)
+    prev_cum_offline_direct_profit = prev_cumulative_offline.get('직접이익', 0)
+    prev_cum_offline_direct_profit_rate = (prev_cum_offline_direct_profit / prev_cum_offline_net_sales * 100) if prev_cum_offline_net_sales > 0 else 0
+    prev_cum_offline_sg_a = (cum_sg_a_prev * (prev_cum_offline_net_sales / cum_net_sales_prev)) if cum_net_sales_prev > 0 else 0
+    prev_cum_offline_op_profit = prev_cum_offline_direct_profit - prev_cum_offline_sg_a
+    prev_cum_offline_op_profit_rate = (prev_cum_offline_op_profit / prev_cum_offline_net_sales * 100) if prev_cum_offline_net_sales > 0 else 0
+    
     # 누적
     hk_cum_net_sales = cumulative_hk['실판']
     mc_cum_net_sales = cumulative_mc['실판']
@@ -1182,6 +1225,21 @@ def main(target_period_short=None):
                     'other_detail': cum_expense_detail['other_detail']
                 },
             },
+            'offline': {
+                'tag_sales': cum_offline_tag_sales,
+                'net_sales': cum_offline_net_sales,
+                'discount_rate': cum_offline_discount_rate,
+                'cogs': cum_offline_cogs,
+                'cogs_rate': cum_offline_cogs_rate,
+                'gross_profit': cum_offline_gross_profit,
+                'gross_profit_rate': cum_offline_gross_profit_rate,
+                'direct_cost': cum_offline_direct_cost,
+                'direct_profit': cum_offline_direct_profit,
+                'direct_profit_rate': cum_offline_direct_profit_rate,
+                'sg_a': cum_offline_sg_a,
+                'operating_profit': cum_offline_op_profit,
+                'operating_profit_rate': cum_offline_op_profit_rate,
+            },
             'prev_cumulative': {
                 'hk': {
                     'tag_sales': prev_cumulative_hk['TAG'],
@@ -1229,6 +1287,21 @@ def main(target_period_short=None):
                         'other': cum_expense_detail_prev.get('other', 0),
                         'other_detail': cum_expense_detail_prev.get('other_detail', {})
                     },
+                },
+                'offline': {
+                    'tag_sales': prev_cum_offline_tag_sales,
+                    'net_sales': prev_cum_offline_net_sales,
+                    'discount_rate': prev_cum_offline_discount_rate,
+                    'cogs': prev_cum_offline_cogs,
+                    'cogs_rate': prev_cum_offline_cogs_rate,
+                    'gross_profit': prev_cum_offline_gross_profit,
+                    'gross_profit_rate': prev_cum_offline_gross_profit_rate,
+                    'direct_cost': prev_cum_offline_direct_cost,
+                    'direct_profit': prev_cum_offline_direct_profit,
+                    'direct_profit_rate': prev_cum_offline_direct_profit_rate,
+                    'sg_a': prev_cum_offline_sg_a,
+                    'operating_profit': prev_cum_offline_op_profit,
+                    'operating_profit_rate': prev_cum_offline_op_profit_rate,
                 }
             },
             'yoy': {
