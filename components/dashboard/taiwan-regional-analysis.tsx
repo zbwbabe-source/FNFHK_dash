@@ -735,7 +735,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                             ) : (
                               <ChevronRight className="w-4 h-4" />
                             )}
-                            <span>{region.region_kr} (2510)</span>
+                            <span>{region.region_kr}</span>
                           </div>
                         </td>
                         <td className="p-2 text-right">{region.store_count}개</td>
@@ -749,19 +749,6 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                         </td>
                         <td className="p-2 text-right">{formatDecimal(region.rent_per_pyeong)}</td>
                         <td className="p-2 text-right">{formatDecimal(region.labor_cost_per_pyeong)}</td>
-                      </tr>
-                      {/* 지역 전년 행 */}
-                      <tr className="border-b-2 border-gray-400 bg-gray-50 text-gray-600">
-                        <td className="p-2 pl-10 text-sm">
-                          └ {region.region_kr} (2410)
-                        </td>
-                        <td className="p-2 text-right">{region.store_count_prev}개</td>
-                        <td className="p-2 text-right">{formatDecimal(region.sales_per_pyeong_prev)}</td>
-                        <td className="p-2 text-right border-l-2 border-r-2 border-red-500">{formatNumber(region.daily_sales_per_pyeong_prev)}</td>
-                        <td className="p-2 text-right">-</td>
-                        <td className="p-2 text-right">{formatDecimal(region.direct_profit_per_pyeong_prev)}</td>
-                        <td className="p-2 text-right">{formatDecimal(region.rent_per_pyeong_prev)}</td>
-                        <td className="p-2 text-right">{formatDecimal(region.labor_cost_per_pyeong_prev)}</td>
                       </tr>
 
                       {/* 도시별/매장별 행 */}
@@ -830,7 +817,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 
                 {/* 전체 합계 금년 행 */}
                 <tr className="border-t-4 border-gray-600 bg-gray-800 text-white">
-                  <td className="p-2 font-bold">전체 합계 (2510)</td>
+                  <td className="p-2 font-bold">전체 합계</td>
                   <td className="p-2 text-right font-bold">{totalSummary.store_count}개</td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.sales_per_pyeong)}</td>
                   <td className="p-2 text-right font-bold border-l-2 border-r-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong)}</td>
@@ -842,17 +829,6 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                   </td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.rent_per_pyeong)}</td>
                   <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.labor_cost_per_pyeong)}</td>
-                </tr>
-                {/* 전체 합계 전년 행 */}
-                <tr className="bg-gray-700 text-gray-300">
-                  <td className="p-2 pl-10 font-semibold">└ 전체 합계 (2410)</td>
-                  <td className="p-2 text-right font-semibold">{totalSummary.store_count_prev}개</td>
-                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.sales_per_pyeong_prev)}</td>
-                  <td className="p-2 text-right font-semibold border-l-2 border-r-2 border-b-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong_prev)}</td>
-                  <td className="p-2 text-right">-</td>
-                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.direct_profit_per_pyeong_prev)}</td>
-                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.rent_per_pyeong_prev)}</td>
-                  <td className="p-2 text-right font-semibold">{formatDecimal(totalSummary.labor_cost_per_pyeong_prev)}</td>
                 </tr>
               </tbody>
             </table>
