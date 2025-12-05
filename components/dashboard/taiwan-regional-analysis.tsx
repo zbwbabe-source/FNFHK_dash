@@ -721,6 +721,32 @@ const TaiwanRegionalAnalysis: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
+                    // 현재 모두 펼쳐져 있는지 확인
+                    const allRegionsExpanded = REGION_ORDER.every(region => expandedRegions.has(region));
+                    const isAllExpanded = allRegionsExpanded && showStoresMode && !cityOnlyMode;
+                    
+                    if (isAllExpanded) {
+                      // 모두 접기
+                      setExpandedRegions(new Set());
+                      setShowStoresMode(false);
+                      setCityOnlyMode(false);
+                    } else {
+                      // 모두 펼치기
+                      setExpandedRegions(new Set(REGION_ORDER));
+                      setShowStoresMode(true);
+                      setCityOnlyMode(false);
+                    }
+                  }}
+                  className="px-2 py-1 text-xs font-medium rounded transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                >
+                  {(() => {
+                    const allRegionsExpanded = REGION_ORDER.every(region => expandedRegions.has(region));
+                    const isAllExpanded = allRegionsExpanded && showStoresMode && !cityOnlyMode;
+                    return isAllExpanded ? '모두 접기' : '모두 펼치기';
+                  })()}
+                </button>
+                <button
+                  onClick={() => {
                     if (cityOnlyMode) {
                       // 도시별 모드 해제 → 지역 접기
                       setCityOnlyMode(false);
@@ -805,16 +831,16 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                           </div>
                         </td>
                         <td className="p-2 text-right">{region.store_count}개</td>
-                        <td className="p-2 text-right font-semibold">{formatDecimal(region.sales_per_pyeong)}</td>
-                        <td className="p-2 text-right font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(region.daily_sales_per_pyeong)}</td>
+                        <td className="p-2 text-right font-semibold text-green-600">{formatDecimal(region.sales_per_pyeong)}</td>
+                        <td className="p-2 text-right font-semibold text-green-600 border-l-2 border-r-2 border-red-500">{formatNumber(region.daily_sales_per_pyeong)}</td>
                         <td className={`p-2 text-right font-semibold ${region.yoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {region.yoy >= 0 ? '+' : ''}{formatDecimal(region.yoy, 1)}%
                         </td>
                         <td className={`p-2 text-right font-semibold ${region.direct_profit_per_pyeong >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatDecimal(region.direct_profit_per_pyeong)}
                         </td>
-                        <td className="p-2 text-right">{formatDecimal(region.rent_per_pyeong)}</td>
-                        <td className="p-2 text-right">{formatDecimal(region.labor_cost_per_pyeong)}</td>
+                        <td className="p-2 text-right text-red-600">{formatDecimal(region.rent_per_pyeong)}</td>
+                        <td className="p-2 text-right text-red-600">{formatDecimal(region.labor_cost_per_pyeong)}</td>
                       </tr>
 
                       {/* 도시별/매장별 행 */}
@@ -845,16 +871,16 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                                 📍 {city}
                               </td>
                               <td className="p-2 text-right text-xs">{cityStores.length}개</td>
-                              <td className="p-2 text-right text-xs font-semibold">{formatDecimal(citySalesPerPyeong)}</td>
-                              <td className="p-2 text-right text-xs font-semibold border-l-2 border-r-2 border-red-500">{formatNumber(cityDailySalesPerPyeong)}</td>
+                              <td className="p-2 text-right text-xs font-semibold text-green-600">{formatDecimal(citySalesPerPyeong)}</td>
+                              <td className="p-2 text-right text-xs font-semibold text-green-600 border-l-2 border-r-2 border-red-500">{formatNumber(cityDailySalesPerPyeong)}</td>
                               <td className={`p-2 text-right text-xs font-semibold ${cityYoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {cityYoy !== 0 ? (cityYoy >= 0 ? '+' : '') + formatDecimal(cityYoy, 1) + '%' : '-'}
                               </td>
                               <td className={`p-2 text-right text-xs font-semibold ${cityDirectProfitPerPyeong >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {formatDecimal(cityDirectProfitPerPyeong)}
                               </td>
-                              <td className="p-2 text-right text-xs">{formatDecimal(cityRentPerPyeong)}</td>
-                              <td className="p-2 text-right text-xs">{formatDecimal(cityLaborCostPerPyeong)}</td>
+                              <td className="p-2 text-right text-xs text-red-600">{formatDecimal(cityRentPerPyeong)}</td>
+                              <td className="p-2 text-right text-xs text-red-600">{formatDecimal(cityLaborCostPerPyeong)}</td>
                             </tr>
                             
                             {/* 매장별 행 */}
@@ -862,16 +888,16 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                               <tr key={store.storeCode} className="border-b border-gray-200 hover:bg-gray-50">
                                 <td className="p-2 pl-10 text-gray-600 text-xs">{store.storeName}</td>
                                 <td className="p-2 text-right text-gray-400 text-xs">-</td>
-                                <td className="p-2 text-right text-xs">{formatDecimal(store.salesPerPyeong)}</td>
-                                <td className="p-2 text-right text-xs border-l-2 border-r-2 border-red-500">{formatNumber(store.dailySalesPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs text-green-600">{formatDecimal(store.salesPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs text-green-600 border-l-2 border-r-2 border-red-500">{formatNumber(store.dailySalesPerPyeong)}</td>
                                 <td className={`p-2 text-right text-xs ${store.yoy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {store.yoy !== 0 ? (store.yoy >= 0 ? '+' : '') + formatDecimal(store.yoy, 1) + '%' : '-'}
                                 </td>
                                 <td className={`p-2 text-right text-xs ${store.directProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {formatDecimal(store.directProfitPerPyeong)}
                                 </td>
-                                <td className="p-2 text-right text-xs">{formatDecimal(store.rentPerPyeong)}</td>
-                                <td className="p-2 text-right text-xs">{formatDecimal(store.laborCostPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs text-red-600">{formatDecimal(store.rentPerPyeong)}</td>
+                                <td className="p-2 text-right text-xs text-red-600">{formatDecimal(store.laborCostPerPyeong)}</td>
                               </tr>
                             ))}
                           </React.Fragment>
@@ -885,16 +911,16 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 <tr className="border-t-4 border-gray-600 bg-gray-800 text-white">
                   <td className="p-2 font-bold">전체 합계</td>
                   <td className="p-2 text-right font-bold">{totalSummary.store_count}개</td>
-                  <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.sales_per_pyeong)}</td>
-                  <td className="p-2 text-right font-bold border-l-2 border-r-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong)}</td>
+                  <td className="p-2 text-right font-bold text-green-300">{formatDecimal(totalSummary.sales_per_pyeong)}</td>
+                  <td className="p-2 text-right font-bold text-green-300 border-l-2 border-r-2 border-red-500">{formatNumber(totalSummary.daily_sales_per_pyeong)}</td>
                   <td className={`p-2 text-right font-bold ${totalSummary.yoy >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                     {totalSummary.yoy >= 0 ? '+' : ''}{formatDecimal(totalSummary.yoy, 1)}%
                   </td>
                   <td className={`p-2 text-right font-bold ${totalSummary.direct_profit_per_pyeong >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                     {formatDecimal(totalSummary.direct_profit_per_pyeong)}
                   </td>
-                  <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.rent_per_pyeong)}</td>
-                  <td className="p-2 text-right font-bold">{formatDecimal(totalSummary.labor_cost_per_pyeong)}</td>
+                  <td className="p-2 text-right font-bold text-red-300">{formatDecimal(totalSummary.rent_per_pyeong)}</td>
+                  <td className="p-2 text-right font-bold text-red-300">{formatDecimal(totalSummary.labor_cost_per_pyeong)}</td>
                 </tr>
               </tbody>
             </table>
