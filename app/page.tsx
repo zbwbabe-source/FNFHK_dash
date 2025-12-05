@@ -323,9 +323,12 @@ export default function Home() {
         </div>
 
         {/* 대시보드 선택 카드 */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* 1. 홍콩마카오법인 카드 - 브랜드 스타일 */}
-          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+        <div className="grid grid-cols-4 gap-4 mb-8">
+          {/* 법인 섹션 */}
+          <div className="col-span-2 bg-blue-100 rounded-2xl p-4">
+            <div className="grid grid-cols-2 gap-4">
+              {/* 1. 홍콩마카오법인 카드 - 브랜드 스타일 */}
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -517,10 +520,10 @@ export default function Home() {
                 전체 대시보드 보기
               </Link>
             </div>
-          </div>
+              </div>
 
-          {/* 2. 대만법인 카드 - 브랜드 스타일 */}
-          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              {/* 2. 대만법인 카드 - 브랜드 스타일 */}
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -699,10 +702,15 @@ export default function Home() {
                 전체 대시보드 보기
               </Link>
             </div>
+              </div>
+            </div>
           </div>
 
-          {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
-          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+          {/* 기타 섹션 */}
+          <div className="col-span-2 bg-green-100 rounded-2xl p-4">
+            <div className="grid grid-cols-2 gap-4">
+              {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 */}
               <div className="flex items-start justify-between mb-4">
@@ -740,10 +748,10 @@ export default function Home() {
                 전체 대시보드 보기
               </Link>
             </div>
-          </div>
+              </div>
 
-          {/* 4. 2026년 계획 */}
-          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              {/* 4. 2026년 계획 */}
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 */}
               <div className="flex items-start justify-between mb-4">
@@ -780,6 +788,8 @@ export default function Home() {
               >
                 전체 대시보드 보기
               </Link>
+            </div>
+              </div>
             </div>
           </div>
         </div>

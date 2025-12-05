@@ -4975,6 +4975,20 @@ const TaiwanCEODashboard = () => {
             <h3 className="text-lg font-semibold text-gray-900">
               오프라인 매장별 현황 (실판V-, 25년 10월 기준)
             </h3>
+            <div className="flex items-center gap-2">
+              <button
+                className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
+                onClick={() => window.open('/taiwan/stores-dashboard', '_blank')}
+              >
+                매장효율성 분석
+              </button>
+              <button
+                className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors"
+                onClick={() => window.open('/taiwan/regional-analysis', '_blank')}
+              >
+                지역별 분석
+              </button>
+            </div>
           </div>
           
           <div className="grid grid-cols-4 gap-4 w-full">

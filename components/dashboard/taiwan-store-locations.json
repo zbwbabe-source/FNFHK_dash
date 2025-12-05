@@ -1,0 +1,304 @@
+{
+  "metadata": {
+    "description": "대만 매장 위치 정보",
+    "updated_at": "2025-12-05",
+    "notes": "매장별 상세 주소 및 지역 정보"
+  },
+  "store_locations": {
+    "T08": {
+      "store_code": "T08",
+      "store_name": "한신아레나",
+      "area_pyeong": 37,
+      "address": "81363 대만 Kaohsiung City, Zuoying District, Bo-ai 2nd Rd, 777號3F",
+      "city": "Kaohsiung City",
+      "district": "Zuoying District",
+      "region": "남부",
+      "latitude": 22.6773,
+      "longitude": 120.3014
+    },
+    "T03": {
+      "store_code": "T03",
+      "store_name": "Taipei 101",
+      "area_pyeong": 19.4,
+      "address": "No. 7, Section 5, Xinyi Rd, Xinyi District, Taipei City, 대만 110",
+      "city": "Taipei City",
+      "district": "Xinyi District",
+      "region": "북부",
+      "latitude": 25.0340,
+      "longitude": 121.5645
+    },
+    "T12": {
+      "store_code": "T12",
+      "store_name": "TAIMALL",
+      "area_pyeong": 26,
+      "address": "No. 112, Section 1, Nankan Rd, Luzhu District, Taoyuan City, 대만 338",
+      "city": "Taoyuan City",
+      "district": "Luzhu District",
+      "region": "북부",
+      "latitude": 25.0478,
+      "longitude": 121.2168
+    },
+    "T06": {
+      "store_code": "T06",
+      "store_name": "중우백화점",
+      "area_pyeong": 26,
+      "address": "40446 대만 Taichung City, North District, Section 3, Sanmin Rd, 161號B棟3F",
+      "city": "Taichung City",
+      "district": "North District",
+      "region": "중부",
+      "latitude": 24.1477,
+      "longitude": 120.6736
+    },
+    "T11": {
+      "store_code": "T11",
+      "store_name": "TS Mall",
+      "area_pyeong": 31,
+      "address": "3F, No. 366號, Section 1, Zhonghua E Rd, East District, Tainan City, 대만 701041",
+      "city": "Tainan City",
+      "district": "East District",
+      "region": "남부",
+      "latitude": 22.9908,
+      "longitude": 120.2133
+    },
+    "T10": {
+      "store_code": "T10",
+      "store_name": "원동 반치아오",
+      "area_pyeong": 24,
+      "address": "22041 대만 New Taipei City, Banqiao District, Xinzhan Rd, 28號2樓",
+      "city": "New Taipei City",
+      "district": "Banqiao District",
+      "region": "북부",
+      "latitude": 25.0141,
+      "longitude": 121.4650
+    },
+    "T18": {
+      "store_code": "T18",
+      "store_name": "라라포트 타이충",
+      "area_pyeong": 40,
+      "address": "No. 600號, Jinde Rd, East District, Taichung City, 대만 40154",
+      "city": "Taichung City",
+      "district": "East District",
+      "region": "중부",
+      "latitude": 24.1378,
+      "longitude": 120.6965
+    },
+    "T17": {
+      "store_code": "T17",
+      "store_name": "라라포트 난강",
+      "area_pyeong": 47,
+      "address": "No. 131號, Jingmao 2nd Rd, Nangang District, Taipei City, 대만 115",
+      "city": "Taipei City",
+      "district": "Nangang District",
+      "region": "북부",
+      "latitude": 25.0544,
+      "longitude": 121.6159
+    },
+    "T02": {
+      "store_code": "T02",
+      "store_name": "난징3",
+      "area_pyeong": 23,
+      "address": "104002 대만 Taipei City, Zhongshan District, Nanjing W Rd, 15號3樓",
+      "city": "Taipei City",
+      "district": "Zhongshan District",
+      "region": "북부",
+      "latitude": 25.0522,
+      "longitude": 121.5230
+    },
+    "T14": {
+      "store_code": "T14",
+      "store_name": "Metrowalk",
+      "area_pyeong": 48,
+      "address": "No. 501號, Section 2, Zhongyuan Rd, Zhongli District, Taoyuan City, 대만 320",
+      "city": "Taoyuan City",
+      "district": "Zhongli District",
+      "region": "북부",
+      "latitude": 24.9650,
+      "longitude": 121.2151
+    },
+    "T01": {
+      "store_code": "T01",
+      "store_name": "종샤오(1호점)",
+      "area_pyeong": 75.34,
+      "address": "No. 148-5, Section 4, Zhongxiao E Rd, Da'an District, Taipei City, 대만 106",
+      "city": "Taipei City",
+      "district": "Da'an District",
+      "region": "북부",
+      "latitude": 25.0421,
+      "longitude": 121.5435
+    },
+    "T13": {
+      "store_code": "T13",
+      "store_name": "SKM Tainan",
+      "area_pyeong": 50,
+      "address": "700 대만 Tainan City, West Central District, Section 1, Ximen Rd, 658號4樓",
+      "city": "Tainan City",
+      "district": "West Central District",
+      "region": "남부",
+      "latitude": 22.9928,
+      "longitude": 120.2020
+    },
+    "T16": {
+      "store_code": "T16",
+      "store_name": "Sogo大遠",
+      "area_pyeong": 37,
+      "address": "106 대만 Taipei City, Da'an District, Section 4, Zhongxiao E Rd, 45號5樓",
+      "city": "Taipei City",
+      "district": "Da'an District",
+      "region": "북부",
+      "latitude": 25.0418,
+      "longitude": 121.5442
+    },
+    "T09": {
+      "store_code": "T09",
+      "store_name": "성품서적 타이중",
+      "area_pyeong": 27,
+      "address": "403 대만 Taichung City, West District, Gongyi Rd, 68號2樓",
+      "city": "Taichung City",
+      "district": "West District",
+      "region": "중부",
+      "latitude": 24.1419,
+      "longitude": 120.6628
+    },
+    "T07": {
+      "store_code": "T07",
+      "store_name": "신주 빅시티",
+      "area_pyeong": 39,
+      "address": "300194 대만 Hsinchu City, East District, Zhongyang Rd, 229號1樓",
+      "city": "Hsinchu City",
+      "district": "East District",
+      "region": "북부",
+      "latitude": 24.8015,
+      "longitude": 120.9908
+    },
+    "T04": {
+      "store_code": "T04",
+      "store_name": "A11 (MLB)",
+      "area_pyeong": 31.16,
+      "address": "No. 11, Songshou Rd, Xinyi District, Taipei City, 대만 110",
+      "city": "Taipei City",
+      "district": "Xinyi District",
+      "region": "북부",
+      "latitude": 25.0338,
+      "longitude": 121.5650
+    },
+    "T15": {
+      "store_code": "T15",
+      "store_name": "신다이",
+      "area_pyeong": 27,
+      "address": "231 대만 New Taipei City, Xindian District, Section 3, Zhongxing Rd, 70號4樓",
+      "city": "New Taipei City",
+      "district": "Xindian District",
+      "region": "북부",
+      "latitude": 24.9574,
+      "longitude": 121.5414
+    },
+    "TU3": {
+      "store_code": "TU3",
+      "store_name": "글로리아(아)",
+      "area_pyeong": 49,
+      "address": "No. 189號, Chunde Rd, Zhongli District, Taoyuan City, 대만 320",
+      "city": "Taoyuan City",
+      "district": "Zhongli District",
+      "region": "북부",
+      "latitude": 24.9655,
+      "longitude": 121.2160
+    },
+    "TU1": {
+      "store_code": "TU1",
+      "store_name": "미쯔이 타이중(아)",
+      "area_pyeong": 26.1,
+      "address": "435 대만 Taichung City, Wuqi District, Section 10, Taiwan Blvd, 168號11600櫃",
+      "city": "Taichung City",
+      "district": "Wuqi District",
+      "region": "중부",
+      "latitude": 24.2542,
+      "longitude": 120.5706
+    },
+    "TU2": {
+      "store_code": "TU2",
+      "store_name": "미쯔이 린커우(아)",
+      "area_pyeong": 24.4,
+      "address": "244 대만 New Taipei City, Linkou District, Section 1, Wenhuasan Rd, 356號1樓(10183",
+      "city": "New Taipei City",
+      "district": "Linkou District",
+      "region": "북부",
+      "latitude": 25.0816,
+      "longitude": 121.3541
+    }
+  },
+  "region_summary": {
+    "북부": {
+      "region_name": "북부",
+      "cities": ["Taipei City", "New Taipei City", "Taoyuan City", "Hsinchu City"],
+      "city_names_kr": ["타이베이", "신베이", "타오위안", "신주"],
+      "store_codes": ["T01", "T02", "T03", "T04", "T07", "T10", "T12", "T14", "T15", "T16", "T17", "TU2", "TU3"],
+      "store_count": 13
+    },
+    "중부": {
+      "region_name": "중부",
+      "cities": ["Taichung City"],
+      "city_names_kr": ["타이중"],
+      "store_codes": ["T06", "T09", "T18", "TU1"],
+      "store_count": 4
+    },
+    "남부": {
+      "region_name": "남부",
+      "cities": ["Tainan City", "Kaohsiung City"],
+      "city_names_kr": ["타이난", "가오슝"],
+      "store_codes": ["T08", "T11", "T13"],
+      "store_count": 3
+    }
+  },
+  "city_summary": {
+    "Taipei City": {
+      "city_name": "Taipei City",
+      "city_name_kr": "타이베이",
+      "region": "북부",
+      "store_codes": ["T01", "T02", "T03", "T04", "T16", "T17"],
+      "store_count": 6
+    },
+    "New Taipei City": {
+      "city_name": "New Taipei City",
+      "city_name_kr": "신베이",
+      "region": "북부",
+      "store_codes": ["T10", "T15", "TU2"],
+      "store_count": 3
+    },
+    "Taoyuan City": {
+      "city_name": "Taoyuan City",
+      "city_name_kr": "타오위안",
+      "region": "북부",
+      "store_codes": ["T12", "T14", "TU3"],
+      "store_count": 3
+    },
+    "Hsinchu City": {
+      "city_name": "Hsinchu City",
+      "city_name_kr": "신주",
+      "region": "북부",
+      "store_codes": ["T07"],
+      "store_count": 1
+    },
+    "Taichung City": {
+      "city_name": "Taichung City",
+      "city_name_kr": "타이중",
+      "region": "중부",
+      "store_codes": ["T06", "T09", "T18", "TU1"],
+      "store_count": 4
+    },
+    "Tainan City": {
+      "city_name": "Tainan City",
+      "city_name_kr": "타이난",
+      "region": "남부",
+      "store_codes": ["T11", "T13"],
+      "store_count": 2
+    },
+    "Kaohsiung City": {
+      "city_name": "Kaohsiung City",
+      "city_name_kr": "가오슝",
+      "region": "남부",
+      "store_codes": ["T08"],
+      "store_count": 1
+    }
+  }
+}
+

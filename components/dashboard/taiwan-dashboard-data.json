@@ -51,7 +51,7 @@
   "store_summary": {
     "T01": {
       "store_code": "T01",
-      "store_name": "T01 MLB忠孝旗艦店",
+      "store_name": "종샤오(1호점)",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -75,7 +75,7 @@
     },
     "T02": {
       "store_code": "T02",
-      "store_name": "T02 新光三越南西3",
+      "store_name": "난징3",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -99,7 +99,7 @@
     },
     "T03": {
       "store_code": "T03",
-      "store_name": "T03 TAIPEI 101",
+      "store_name": "Taipei 101",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -123,7 +123,7 @@
     },
     "T04": {
       "store_code": "T04",
-      "store_name": "T04 新光三越A11",
+      "store_name": "A11 (MLB)",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -171,7 +171,7 @@
     },
     "T06": {
       "store_code": "T06",
-      "store_name": "T06 台中中友百貨",
+      "store_name": "중우백화점",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -195,7 +195,7 @@
     },
     "T07": {
       "store_code": "T07",
-      "store_name": "T07 新竹巨城",
+      "store_name": "신주 빅시티",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -219,7 +219,7 @@
     },
     "T08": {
       "store_code": "T08",
-      "store_name": "T08 HANSHIN ARENA",
+      "store_name": "한신아레나",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -243,7 +243,7 @@
     },
     "T09": {
       "store_code": "T09",
-      "store_name": "T09 Taichung Eslite",
+      "store_name": "성품서적 타이중",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -267,7 +267,7 @@
     },
     "T10": {
       "store_code": "T10",
-      "store_name": "T10 Banqiao Megacity",
+      "store_name": "원동 반치아오",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -291,7 +291,7 @@
     },
     "T11": {
       "store_code": "T11",
-      "store_name": "T11 Nanfang TS MALL",
+      "store_name": "TS Mall",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -315,7 +315,7 @@
     },
     "T12": {
       "store_code": "T12",
-      "store_name": "T12 TAIMALL",
+      "store_name": "TAIMALL",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -339,7 +339,7 @@
     },
     "T13": {
       "store_code": "T13",
-      "store_name": "T13 SKM TAINAN",
+      "store_name": "SKM Tainan",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -363,7 +363,7 @@
     },
     "T14": {
       "store_code": "T14",
-      "store_name": "T14 Metrowalk",
+      "store_name": "Metrowalk",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -387,7 +387,7 @@
     },
     "T15": {
       "store_code": "T15",
-      "store_name": "T15 Xindian Yulong City",
+      "store_name": "신다이",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -411,7 +411,7 @@
     },
     "T16": {
       "store_code": "T16",
-      "store_name": "T16 ZhongXiao SOGO",
+      "store_name": "Sogo大遠",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -435,7 +435,7 @@
     },
     "T17": {
       "store_code": "T17",
-      "store_name": "T17 LALAPORT Nangang",
+      "store_name": "라라포트 난강",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -459,7 +459,7 @@
     },
     "T18": {
       "store_code": "T18",
-      "store_name": "T18 LALAPORT Taichung",
+      "store_name": "라라포트 타이충",
       "category": "MLB 리테일",
       "brand": "MLB",
       "channel": "Retail",
@@ -603,7 +603,7 @@
     },
     "TU1": {
       "store_code": "TU1",
-      "store_name": "TU1 Mitsui Outlet Taichung",
+      "store_name": "미쯔이 타이중(아)",
       "category": "MLB 아울렛",
       "brand": "MLB",
       "channel": "Outlet",
@@ -627,7 +627,7 @@
     },
     "TU2": {
       "store_code": "TU2",
-      "store_name": "TU2 Mitsui Outlet Park Linkou",
+      "store_name": "미쯔이 린커우(아)",
       "category": "MLB 아울렛",
       "brand": "MLB",
       "channel": "Outlet",
@@ -651,7 +651,7 @@
     },
     "TU3": {
       "store_code": "TU3",
-      "store_name": "TU3 Gloria Outlet",
+      "store_name": "글로리아(아)",
       "category": "MLB 아울렛",
       "brand": "MLB",
       "channel": "Outlet",
