@@ -211,7 +211,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     const storeLocations = (storeLocationsData as any).store_locations;
     const storeSummary = (dashboardData as any)?.store_summary || {};
 
-    const closedStores: any[] = [];
+    const allClosedStores: any[] = []; // 모든 폐점 매장
+    const inefficientStores: any[] = []; // 비효율 매장 (T15만)
+    const reviewStores: any[] = []; // 재계약 검토중 (T04, T07, T09)
     const newStores: any[] = [];
     const currentMonthDays = 31;
 
@@ -228,14 +230,14 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       const netSales = plStore.net_sales || 0;
       const netSalesPrev = plStore.net_sales_prev || 0;
 
-      // 비효율 매장: T15 (Xindian)만 분석
-      if (storeCode === 'T15' && netSalesPrev > 0 && netSales === 0) {
+      // 폐점 매장: 전년 매출 있고, 금년 매출 없음
+      if (netSalesPrev > 0 && netSales === 0) {
         const salesPerPyeongPrev = netSalesPrev / area;
         const directProfitPrev = plStore.direct_profit_prev || 0;
         const directProfitPerPyeongPrev = directProfitPrev / area;
         const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
 
-        closedStores.push({
+        const storeData = {
           storeCode,
           storeName: locationInfo?.store_name || storeCode,
           area,
@@ -245,7 +247,17 @@ const TaiwanRegionalAnalysis: React.FC = () => {
           directProfitPrev,
           directProfitPerPyeongPrev,
           dailySalesPerPyeongPrev,
-        });
+        };
+
+        allClosedStores.push(storeData);
+
+        // 비효율 매장: T15만
+        if (storeCode === 'T15') {
+          inefficientStores.push(storeData);
+        } else {
+          // 나머지는 재계약 검토중
+          reviewStores.push(storeData);
+        }
       }
 
       // 신규 매장: 전년 매출 없고, 금년 매출 있음
@@ -269,13 +281,13 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       }
     });
 
-    // 평균 계산
-    const closedAvg = closedStores.length > 0 ? {
-      avgSalesPerPyeong: closedStores.reduce((sum, s) => sum + s.salesPerPyeongPrev, 0) / closedStores.length,
-      avgDirectProfitPerPyeong: closedStores.reduce((sum, s) => sum + s.directProfitPerPyeongPrev, 0) / closedStores.length,
-      avgDailySalesPerPyeong: closedStores.reduce((sum, s) => sum + s.dailySalesPerPyeongPrev, 0) / closedStores.length,
-      totalSales: closedStores.reduce((sum, s) => sum + s.netSalesPrev, 0),
-      totalArea: closedStores.reduce((sum, s) => sum + s.area, 0),
+    // 비효율 매장 평균 계산 (T15만)
+    const inefficientAvg = inefficientStores.length > 0 ? {
+      avgSalesPerPyeong: inefficientStores.reduce((sum, s) => sum + s.salesPerPyeongPrev, 0) / inefficientStores.length,
+      avgDirectProfitPerPyeong: inefficientStores.reduce((sum, s) => sum + s.directProfitPerPyeongPrev, 0) / inefficientStores.length,
+      avgDailySalesPerPyeong: inefficientStores.reduce((sum, s) => sum + s.dailySalesPerPyeongPrev, 0) / inefficientStores.length,
+      totalSales: inefficientStores.reduce((sum, s) => sum + s.netSalesPrev, 0),
+      totalArea: inefficientStores.reduce((sum, s) => sum + s.area, 0),
     } : null;
 
     const newAvg = newStores.length > 0 ? {
@@ -287,9 +299,11 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     } : null;
 
     return {
-      closedStores,
+      allClosedStores, // 모든 폐점 매장
+      inefficientStores, // 비효율 매장 (T15만)
+      reviewStores, // 재계약 검토중
       newStores,
-      closedAvg,
+      inefficientAvg, // 비효율 매장 평균
       newAvg,
     };
   }, []);
@@ -575,16 +589,14 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                   <>
                     <p>
                       • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔)
-                      {storePortfolioAnalysis.closedAvg && (
-                        <> - 평당매출 {formatDecimal(storePortfolioAnalysis.closedAvg.avgSalesPerPyeong)}K, 
-                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.closedAvg.avgSalesPerPyeong - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100)}%</>
+                      {storePortfolioAnalysis.inefficientAvg && (
+                        <> - 평당매출 {formatDecimal(storePortfolioAnalysis.inefficientAvg.avgSalesPerPyeong)}K</>
                       )}
                     </p>
                     <p>
                       • <strong className="text-green-600">우수 입지 확보</strong>: {storePortfolioAnalysis.newStores.length}개 신규 오픈
                       {storePortfolioAnalysis.newAvg && (
-                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K, 
-                        전체 평균 대비 {formatDecimal(((storePortfolioAnalysis.newAvg.avgSalesPerPyeong - avgSalesPerPyeongCurr) / avgSalesPerPyeongCurr) * 100)}%)</>
+                        <> (평균 평당매출 {formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K)</>
                       )}
                     </p>
                     <p>
@@ -601,13 +613,23 @@ const TaiwanRegionalAnalysis: React.FC = () => {
               })()}
             </div>
 
-            {/* 비효율 매장 상세 */}
-            {storePortfolioAnalysis.closedStores.length > 0 && (
+            {/* 폐점 매장 상세 */}
+            {storePortfolioAnalysis.allClosedStores.length > 0 && (
               <div className="space-y-2 pt-3 border-t border-purple-200">
-                <p className="font-semibold text-gray-800">🔴 비효율 매장 (T15 Xindian)</p>
-                {storePortfolioAnalysis.closedStores.map((store: any) => (
+                <p className="font-semibold text-gray-800">🔴 폐점 매장 ({storePortfolioAnalysis.allClosedStores.length}개)</p>
+                {/* 비효율 매장 (T15) */}
+                {storePortfolioAnalysis.inefficientStores.map((store: any) => (
                   <p key={store.storeCode} className="text-xs">
-                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
+                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 비효율 매장: 
+                    평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
+                    직접이익 {formatDecimal(store.directProfitPrev)}K, 
+                    일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
+                  </p>
+                ))}
+                {/* 재계약 검토중 매장 */}
+                {storePortfolioAnalysis.reviewStores.map((store: any) => (
+                  <p key={store.storeCode} className="text-xs">
+                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 추후 재계약 검토중: 
                     평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
                     직접이익 {formatDecimal(store.directProfitPrev)}K, 
                     일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
