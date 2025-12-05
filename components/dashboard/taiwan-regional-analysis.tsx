@@ -1,18 +1,11 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import plData from './taiwan-pl-data.json';
 import storeAreasData from './taiwan-store-areas.json';
 import dashboardData from './taiwan-dashboard-data.json';
 import storeLocationsData from './taiwan-store-locations.json';
-
-// Leaflet을 동적으로 import (SSR 방지)
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const CircleMarker = dynamic(() => import('react-leaflet').then(mod => mod.CircleMarker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 interface RegionalData {
   region: string;
