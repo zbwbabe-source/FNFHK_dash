@@ -49,6 +49,8 @@ const TaiwanRegionalAnalysis: React.FC = () => {
   const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
   const [cityOnlyMode, setCityOnlyMode] = useState(false);
   const [showStoresMode, setShowStoresMode] = useState(false);
+  const [showClosedStores, setShowClosedStores] = useState(false);
+  const [showNewStores, setShowNewStores] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -588,7 +590,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 return (
                   <>
                     <p>
-                      • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔)
+                      • <strong className="text-red-600">비효율 매장 정리</strong>: T15 (Xindian, 신디엔, 신 타이베이)
                       {storePortfolioAnalysis.inefficientAvg && (
                         <> - 평당매출 <span className="font-bold text-red-600">{formatDecimal(storePortfolioAnalysis.inefficientAvg.avgSalesPerPyeong)}K</span></>
                       )}
@@ -598,10 +600,6 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                       {storePortfolioAnalysis.newAvg && (
                         <> (평균 평당매출 <span className="font-bold text-green-600">{formatDecimal(storePortfolioAnalysis.newAvg.avgSalesPerPyeong)}K</span>)</>
                       )}
-                    </p>
-                    <p>
-                      • <strong className="text-blue-600">매장 효율 개선</strong>: 매장수 {totalPrev.count}개 → {totalCurr.count}개 ({totalCurr.count - totalPrev.count}개), 
-                      평당매출 <span className="font-semibold text-green-600">{yoy >= 0 ? '+' : ''}{formatDecimal(yoy)}%</span> 증가
                     </p>
                     <p>
                       • <strong className="text-purple-600">일평균 평당매출</strong>: {formatNumber(avgDailySalesPrev)} HKD → {formatNumber(avgDailySalesCurr)} HKD 
@@ -616,40 +614,68 @@ const TaiwanRegionalAnalysis: React.FC = () => {
             {/* 폐점 매장 상세 */}
             {storePortfolioAnalysis.allClosedStores.length > 0 && (
               <div className="space-y-2 pt-3 border-t border-purple-200">
-                <p className="font-semibold text-gray-800">🔴 폐점 매장 ({storePortfolioAnalysis.allClosedStores.length}개)</p>
-                {/* 비효율 매장 (T15) */}
-                {storePortfolioAnalysis.inefficientStores.map((store: any) => (
-                  <p key={store.storeCode} className="text-xs">
-                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 비효율 매장: 
-                    평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
-                    직접이익 {formatDecimal(store.directProfitPrev)}K, 
-                    일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
-                  </p>
-                ))}
-                {/* 재계약 검토중 매장 */}
-                {storePortfolioAnalysis.reviewStores.map((store: any) => (
-                  <p key={store.storeCode} className="text-xs">
-                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 추후 재계약 검토중: 
-                    평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
-                    직접이익 {formatDecimal(store.directProfitPrev)}K, 
-                    일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
-                  </p>
-                ))}
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:text-gray-600"
+                  onClick={() => setShowClosedStores(!showClosedStores)}
+                >
+                  {showClosedStores ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                  <p className="font-semibold text-gray-800">🔴 폐점 매장 ({storePortfolioAnalysis.allClosedStores.length}개)</p>
+                </div>
+                {showClosedStores && (
+                  <>
+                    {/* 비효율 매장 (T15) */}
+                    {storePortfolioAnalysis.inefficientStores.map((store: any) => (
+                      <p key={store.storeCode} className="text-xs pl-6">
+                        • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 비효율 매장: 
+                        평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
+                        직접이익 {formatDecimal(store.directProfitPrev)}K, 
+                        일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
+                      </p>
+                    ))}
+                    {/* 재계약 검토중 매장 */}
+                    {storePortfolioAnalysis.reviewStores.map((store: any) => (
+                      <p key={store.storeCode} className="text-xs pl-6">
+                        • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}) - 추후 재계약 검토중: 
+                        평당매출 {formatDecimal(store.salesPerPyeongPrev)}K, 
+                        직접이익 {formatDecimal(store.directProfitPrev)}K, 
+                        일평균 {formatNumber(store.dailySalesPerPyeongPrev)} HKD/평
+                      </p>
+                    ))}
+                  </>
+                )}
               </div>
             )}
 
             {/* 신규 매장 상세 */}
             {storePortfolioAnalysis.newStores.length > 0 && (
               <div className="space-y-2 pt-3 border-t border-purple-200">
-                <p className="font-semibold text-gray-800">🟢 신규 오픈 매장 ({storePortfolioAnalysis.newStores.length}개)</p>
-                {storePortfolioAnalysis.newStores.map((store: any) => (
-                  <p key={store.storeCode} className="text-xs">
-                    • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
-                    평당매출 {formatDecimal(store.salesPerPyeong)}K, 
-                    직접이익 {formatDecimal(store.directProfit)}K, 
-                    일평균 {formatNumber(store.dailySalesPerPyeong)} HKD/평
-                  </p>
-                ))}
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:text-gray-600"
+                  onClick={() => setShowNewStores(!showNewStores)}
+                >
+                  {showNewStores ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                  <p className="font-semibold text-gray-800">🟢 신규 오픈 매장 ({storePortfolioAnalysis.newStores.length}개)</p>
+                </div>
+                {showNewStores && (
+                  <>
+                    {storePortfolioAnalysis.newStores.map((store: any) => (
+                      <p key={store.storeCode} className="text-xs pl-6">
+                        • <strong>{store.storeName}</strong> ({store.storeCode}, {store.region}): 
+                        평당매출 {formatDecimal(store.salesPerPyeong)}K, 
+                        직접이익 {formatDecimal(store.directProfit)}K, 
+                        일평균 {formatNumber(store.dailySalesPerPyeong)} HKD/평
+                      </p>
+                    ))}
+                  </>
+                )}
               </div>
             )}
 
