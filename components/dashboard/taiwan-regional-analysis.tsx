@@ -1207,6 +1207,43 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+            {/* 인구밀도 정보 */}
+            <div className="mt-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">📍 지역별 인구 정보</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div className="bg-white rounded p-2 border-l-4 border-blue-500">
+                  <div className="font-semibold text-blue-600 mb-1">북부 지역</div>
+                  <div className="text-gray-700">
+                    <div>인구: 약 890만명</div>
+                    <div>인구밀도: 최고</div>
+                    <div className="text-gray-600 mt-1">• 신베이: 400만명</div>
+                    <div className="text-gray-600">• 타오위안: 230만명</div>
+                    <div className="text-gray-600">• 타이베이: 260만명</div>
+                  </div>
+                </div>
+                <div className="bg-white rounded p-2 border-l-4 border-green-500">
+                  <div className="font-semibold text-green-600 mb-1">중부 지역</div>
+                  <div className="text-gray-700">
+                    <div>인구: 약 280만명</div>
+                    <div>인구밀도: 중간</div>
+                    <div className="text-gray-600 mt-1">• 타이중: 280만명</div>
+                  </div>
+                </div>
+                <div className="bg-white rounded p-2 border-l-4 border-orange-500">
+                  <div className="font-semibold text-orange-600 mb-1">남부 지역</div>
+                  <div className="text-gray-700">
+                    <div>인구: 약 465만명</div>
+                    <div>인구밀도: 중간</div>
+                    <div className="text-gray-600 mt-1">• 가오슝: 277만명</div>
+                    <div className="text-gray-600">• 타이난: 188만명</div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mt-3 pt-2 border-t border-blue-200">
+                ※ 인구 밀도와 평당직접이익을 종합 고려 시, 북부 지역의 인구 대비 매장 확장 잠재력이 가장 높음
+              </p>
+            </div>
           </div>
         )}
 
