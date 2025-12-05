@@ -350,25 +350,28 @@ const TaiwanRegionalAnalysis: React.FC = () => {
             
             {/* 영업 인사이트 */}
             <div className="space-y-2 pt-3 border-t border-purple-200">
-              <p className="font-semibold text-gray-800">💼 영업 전략 제언</p>
+              <p className="font-semibold text-gray-800">💼 영업 전략 제언 (인구수/인구밀도 고려)</p>
               <p>
-                • <strong className="text-orange-600">남부 지역</strong>: 
-                평당직접이익이 가장 높아 <span className="font-semibold text-green-600">신규 매장 확장 최우선 검토 권장</span>. 
-                한신아레나, TS Mall 등 대형 쇼핑몰 입점 전략 지속 추진
+                • <strong className="text-blue-600">북부 지역</strong> (인구 약 890만명, 인구밀도 최고): 
+                대만 최대 인구 밀집 지역으로 <span className="font-semibold text-green-600">매장 밀도가 상대적으로 낮음</span>. 
+                신베이(400만명), 타오위안(230만명) 등 인구 대비 매장 수 부족 지역에 
+                <span className="font-semibold">전략적 입점 검토</span> 권장. 
+                기존 고수익 매장(라라포트 난강, 원동 반치아오) 운영 노하우를 저성과 매장에 전파하여 평균 매출 상향 평준화 집중
               </p>
               <p>
-                • <strong className="text-blue-600">북부 지역</strong>: 
-                매장 수가 가장 많지만(10개) 평당이익률 개선 필요. 
-                고수익 매장(라라포트 난강, 원동 반치아오) 운영 노하우를 저성과 매장에 전파하여 
-                <span className="font-semibold">평균 매출 상향 평준화</span> 집중
+                • <strong className="text-orange-600">남부 지역</strong> (인구 약 465만명): 
+                평당직접이익이 가장 높고 인구 규모도 충분하여 <span className="font-semibold text-green-600">신규 매장 확장 최우선 검토</span>. 
+                가오슝(277만명) 중심으로 대형 쇼핑몰 입점 전략 지속 추진. 
+                한신아레나, TS Mall 등 성공 사례를 바탕으로 추가 입점 기회 모색
               </p>
               <p>
-                • <strong className="text-green-600">중부 지역</strong>: 
-                매장 수 대비 양호한 평당매출. 타이중 상권 성장세를 고려하여 
-                <span className="font-semibold text-blue-600">추가 입점 기회 모색</span> (백화점, 아울렛 위주)
+                • <strong className="text-green-600">중부 지역</strong> (인구 약 280만명): 
+                인구 대비 매장 수가 적절하나, 타이중(280만명) 상권 성장세를 고려하여 
+                <span className="font-semibold text-blue-600">선택적 추가 입점 기회 모색</span> (백화점, 아울렛 위주). 
+                인구 밀도 대비 현재 매장 효율성이 양호하므로 신중한 입점 검토 필요
               </p>
               <p className="text-xs text-gray-600 mt-2">
-                ※ 1일 평당매출 500 HKD 이상 매장 위주로 추가 투자 및 확장 검토 권장
+                ※ 인구 밀도와 평당직접이익을 종합 고려 시, 북부 지역의 인구 대비 매장 확장 잠재력이 가장 높음
               </p>
             </div>
           </div>
@@ -573,73 +576,155 @@ const TaiwanRegionalAnalysis: React.FC = () => {
               {/* 지도 - SVG 도식화 */}
               <div className="lg:col-span-3" style={{ height: '700px' }}>
                 <svg viewBox="0 0 500 700" className="w-full h-full bg-blue-50 rounded-lg">
-                  {/* 대만 섬 형태 (실제 모양에 가깝게) */}
-                  <path
-                    d="M 250,50 
-                       C 265,57 280,72 288,95
-                       L 302,140
-                       C 310,180 318,220 318,260
-                       L 325,330
-                       C 328,385 325,440 320,495
-                       L 315,550
-                       C 310,590 300,630 285,660
-                       L 270,685
-                       C 255,698 240,702 225,700
-                       L 210,695
-                       C 195,688 183,673 177,655
-                       L 170,625
-                       C 163,590 158,550 156,510
-                       L 154,455
-                       C 152,405 154,355 160,305
-                       L 168,250
-                       C 174,205 183,160 195,120
-                       L 210,85
-                       C 220,67 235,55 250,50 Z"
+                  {/* 대만 지도 (직사각형) */}
+                  <rect
+                    x="100"
+                    y="50"
+                    width="300"
+                    height="600"
                     fill="#e5e7eb"
                     stroke="#9ca3af"
                     strokeWidth="3"
+                    rx="10"
                   />
                   
                   {/* 지역 구분선 */}
-                  <line x1="168" y1="250" x2="325" y2="250" stroke="#6b7280" strokeWidth="3" strokeDasharray="8,8" />
-                  <line x1="154" y1="455" x2="320" y2="455" stroke="#6b7280" strokeWidth="3" strokeDasharray="8,8" />
+                  <line x1="100" y1="250" x2="400" y2="250" stroke="#6b7280" strokeWidth="3" strokeDasharray="8,8" />
+                  <line x1="100" y1="450" x2="400" y2="450" stroke="#6b7280" strokeWidth="3" strokeDasharray="8,8" />
                   
                   {/* 지역 배경 영역 */}
-                  <path d="M 250,50 C 265,57 280,72 288,95 L 302,140 C 310,180 318,220 318,250 L 168,250 C 174,205 183,160 195,120 L 210,85 C 220,67 235,55 250,50 Z" 
-                    fill="#3B82F6" opacity="0.2" />
-                  <path d="M 168,250 L 325,250 L 325,330 C 328,385 325,440 320,455 L 154,455 C 152,405 154,355 160,305 L 168,250 Z" 
-                    fill="#10B981" opacity="0.2" />
-                  <path d="M 154,455 L 320,455 L 315,550 C 310,590 300,630 285,660 L 270,685 C 255,698 240,702 225,700 L 210,695 C 195,688 183,673 177,655 L 170,625 C 163,590 158,550 156,510 L 154,455 Z" 
-                    fill="#F59E0B" opacity="0.2" />
+                  <rect x="100" y="50" width="300" height="200" fill="#3B82F6" opacity="0.2" rx="10" />
+                  <rect x="100" y="250" width="300" height="200" fill="#10B981" opacity="0.2" />
+                  <rect x="100" y="450" width="300" height="200" fill="#F59E0B" opacity="0.2" rx="10" />
                   
-                  {/* 지역 레이블 */}
-                  <text x="250" y="140" textAnchor="middle" className="text-2xl font-bold" fill="#3B82F6">
-                    북부 (10개)
+                  {/* 지역 레이블 (왼쪽) */}
+                  <text x="50" y="150" textAnchor="middle" className="text-2xl font-bold" fill="#3B82F6" fontSize="24">
+                    북부
                   </text>
-                  <text x="250" y="355" textAnchor="middle" className="text-2xl font-bold" fill="#10B981">
-                    중부 (3개)
+                  <text x="50" y="350" textAnchor="middle" className="text-2xl font-bold" fill="#10B981" fontSize="24">
+                    중부
                   </text>
-                  <text x="250" y="575" textAnchor="middle" className="text-2xl font-bold" fill="#F59E0B">
-                    남부 (3개)
+                  <text x="50" y="550" textAnchor="middle" className="text-2xl font-bold" fill="#F59E0B" fontSize="24">
+                    남부
                   </text>
+                  
+                  {/* 도시별 구분선 및 레이블 */}
+                  {REGION_ORDER.map(regionName => {
+                    const region = regionalData.find(r => r.region_kr === regionName);
+                    if (!region) return null;
+                    const stores = regionalStores[regionName] || {};
+                    const cities = Object.keys(stores);
+                    
+                    const regionTop = regionName === '북부' ? 50 : regionName === '중부' ? 250 : 450;
+                    const regionBottom = regionName === '북부' ? 250 : regionName === '중부' ? 450 : 650;
+                    const regionHeight = regionBottom - regionTop;
+                    
+                    // 도시별로 영역 나누기
+                    let currentY = regionTop;
+                    return cities.map((city, cityIdx) => {
+                      const cityData = stores[city];
+                      const cityStores = cityData.stores || [];
+                      const cityHeight = (cityStores.length / region.store_count) * regionHeight;
+                      const cityCenterY = currentY + cityHeight / 2;
+                      
+                      const elements = [];
+                      
+                      // 도시 구분선 (첫 번째 도시가 아닐 때)
+                      if (cityIdx > 0) {
+                        elements.push(
+                          <line
+                            key={`${regionName}-${city}-line`}
+                            x1="100"
+                            y1={currentY}
+                            x2="400"
+                            y2={currentY}
+                            stroke="#9ca3af"
+                            strokeWidth="1"
+                            strokeDasharray="4,4"
+                            opacity="0.5"
+                          />
+                        );
+                      }
+                      
+                      // 도시 레이블 (오른쪽만)
+                      elements.push(
+                        <text
+                          key={`${regionName}-${city}-label-right`}
+                          x="410"
+                          y={cityCenterY + 5}
+                          textAnchor="start"
+                          className="text-sm font-semibold"
+                          fill={getRegionColor(regionName)}
+                          fontSize="12"
+                        >
+                          {city} ({cityStores.length})
+                        </text>
+                      );
+                      
+                      currentY += cityHeight;
+                      return <React.Fragment key={`${regionName}-${city}`}>{elements}</React.Fragment>;
+                    });
+                  })}
                   
                   {/* 매장 마커 */}
                   {storeMarkers.map((marker, idx) => {
-                    // 지역별 Y 위치와 분산
-                    const regionY = marker.region === '북부' ? 150 : marker.region === '중부' ? 355 : 575;
-                    const regionHeight = marker.region === '북부' ? 90 : marker.region === '중부' ? 95 : 110;
+                    // 매장이 속한 도시 찾기
+                    const regionName = marker.region; // 이미 한글("북부", "중부", "남부")
+                    const stores = regionalStores[regionName] || {};
+                    const cities = Object.keys(stores);
                     
-                    // 매장을 원형으로 배치
-                    const storesInRegion = storeMarkers.filter(m => m.region === marker.region);
-                    const indexInRegion = storesInRegion.findIndex(m => m.storeCode === marker.storeCode);
-                    const totalInRegion = storesInRegion.length;
+                    let cityName = '';
+                    let cityStores: any[] = [];
+                    for (const city of cities) {
+                      const cityData = stores[city];
+                      if (cityData.stores.find((s: any) => s.storeCode === marker.storeCode)) {
+                        cityName = city;
+                        cityStores = cityData.stores || [];
+                        break;
+                      }
+                    }
                     
-                    const angle = (indexInRegion / totalInRegion) * Math.PI * 2 - Math.PI / 2;
-                    const radiusX = marker.region === '북부' ? 70 : marker.region === '중부' ? 75 : 65;
-                    const radiusY = regionHeight * 0.6;
+                    if (!cityName) return null;
                     
-                    const x = 250 + radiusX * Math.cos(angle);
-                    const y = regionY + radiusY * Math.sin(angle);
+                    // 지역별 Y 위치 범위
+                    const regionTop = regionName === '북부' ? 50 : regionName === '중부' ? 250 : 450;
+                    const regionBottom = regionName === '북부' ? 250 : regionName === '중부' ? 450 : 650;
+                    const regionHeight = regionBottom - regionTop;
+                    
+                    // 도시별 영역 계산
+                    const region = regionalData.find(r => r.region_kr === regionName);
+                    if (!region) return null;
+                    
+                    let currentY = regionTop;
+                    let cityTop = regionTop;
+                    let cityBottom = regionTop;
+                    for (const city of cities) {
+                      const cityData = stores[city];
+                      const cityStoreList = cityData.stores || [];
+                      const cityHeight = (cityStoreList.length / region.store_count) * regionHeight;
+                      cityBottom = currentY + cityHeight;
+                      
+                      if (city === cityName) {
+                        cityTop = currentY;
+                        break;
+                      }
+                      currentY += cityHeight;
+                    }
+                    
+                    const cityCenterY = (cityTop + cityBottom) / 2;
+                    const cityHeight = cityBottom - cityTop;
+                    
+                    // 같은 도시 내 매장 인덱스
+                    const indexInCity = cityStores.findIndex((s: any) => s.storeCode === marker.storeCode);
+                    const totalInCity = cityStores.length;
+                    
+                    // X축: 좌우로 분산 (100~400 범위)
+                    const xSpacing = 300 / (totalInCity + 1);
+                    const x = 100 + xSpacing * (indexInCity + 1);
+                    
+                    // Y축: 도시 영역 내에서 약간 분산
+                    const yOffset = (indexInCity % 2 === 0 ? -1 : 1) * (cityHeight * 0.15) * Math.floor(indexInCity / 2);
+                    const y = cityCenterY + yOffset;
                     
                     // 마커 크기 (평당매출 비례)
                     const size = Math.max(10, Math.min(30, marker.salesPerPyeong * 1.2));
@@ -795,24 +880,6 @@ const TaiwanRegionalAnalysis: React.FC = () => {
                     })}
                   </div>
 
-                  {/* 범례 */}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h4 className="text-xs font-semibold text-gray-700 mb-2">범례</h4>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3B82F6' }}></div>
-                        <span className="text-gray-600">북부</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }}></div>
-                        <span className="text-gray-600">중부</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }}></div>
-                        <span className="text-gray-600">남부</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
