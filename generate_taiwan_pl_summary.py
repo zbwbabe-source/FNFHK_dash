@@ -1098,49 +1098,6 @@ def main(target_period_short=None):
                 'operating_profit': (current_tw_online.get('매출총이익', 0) - current_tw_online.get('직접비_합계', 0)) - (sg_a * current_tw_online.get('실판', 0) / net_sales) if net_sales > 0 else 0,
                 'operating_profit_rate': ((current_tw_online.get('매출총이익', 0) - current_tw_online.get('직접비_합계', 0) - (sg_a * current_tw_online.get('실판', 0) / net_sales)) / current_tw_online.get('실판', 1) * 100) if current_tw_online.get('실판', 0) > 0 and net_sales > 0 else 0,
             },
-            'prev_month': {
-                'total': {
-                    'tag_sales': tag_sales_prev,
-                    'net_sales': net_sales_prev,
-                    'cogs': cogs_prev,
-                    'gross_profit': gross_profit_prev,
-                    'direct_cost': direct_cost_prev,
-                    'direct_profit': direct_profit_prev,
-                    'sg_a': sg_a_prev,
-                    'operating_profit': op_profit_prev,
-                    'expense_detail': expense_detail_prev,
-                },
-                'offline': {
-                    'tag_sales': prev_tw_offline.get('TAG', 0),
-                    'net_sales': prev_tw_offline.get('실판', 0),
-                    'discount_rate': ((prev_tw_offline.get('TAG', 0) - prev_tw_offline.get('실판', 0)) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
-                    'cogs': prev_tw_offline.get('매출원가', 0),
-                    'cogs_rate': (prev_tw_offline.get('매출원가', 0) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
-                    'gross_profit': prev_tw_offline.get('매출총이익', 0),
-                    'gross_profit_rate': (prev_tw_offline.get('매출총이익', 0) / prev_tw_offline.get('실판', 1) * 100) if prev_tw_offline.get('실판', 0) > 0 else 0,
-                    'direct_cost': prev_tw_offline.get('직접비_합계', 0),
-                    'direct_profit': prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0),
-                    'direct_profit_rate': (prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0)) / prev_tw_offline.get('실판', 1) * 100 if prev_tw_offline.get('실판', 0) > 0 else 0,
-                    'sg_a': (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
-                    'operating_profit': (prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0)) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
-                    'operating_profit_rate': ((prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev)) / prev_tw_offline.get('실판', 1) * 100) if prev_tw_offline.get('실판', 0) > 0 and net_sales_prev > 0 else 0,
-                },
-                'online': {
-                    'tag_sales': prev_tw_online.get('TAG', 0),
-                    'net_sales': prev_tw_online.get('실판', 0),
-                    'discount_rate': ((prev_tw_online.get('TAG', 0) - prev_tw_online.get('실판', 0)) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
-                    'cogs': prev_tw_online.get('매출원가', 0),
-                    'cogs_rate': (prev_tw_online.get('매출원가', 0) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
-                    'gross_profit': prev_tw_online.get('매출총이익', 0),
-                    'gross_profit_rate': (prev_tw_online.get('매출총이익', 0) / prev_tw_online.get('실판', 1) * 100) if prev_tw_online.get('실판', 0) > 0 else 0,
-                    'direct_cost': prev_tw_online.get('직접비_합계', 0),
-                    'direct_profit': prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0),
-                    'direct_profit_rate': (prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0)) / prev_tw_online.get('실판', 1) * 100 if prev_tw_online.get('실판', 0) > 0 else 0,
-                    'sg_a': (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
-                    'operating_profit': (prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0)) - (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
-                    'operating_profit_rate': ((prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0) - (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev)) / prev_tw_online.get('실판', 1) * 100) if prev_tw_online.get('실판', 0) > 0 and net_sales_prev > 0 else 0,
-                }
-            },
             'yoy': {
                 'tag_sales': tag_sales_yoy,
                 'discount': discount_yoy,
@@ -1322,7 +1279,50 @@ def main(target_period_short=None):
                 'online': online_count if discovery_data else 0,
                 'offline': offline_count if discovery_data else 0
             }
-        } if discovery_data else None
+        } if discovery_data else None,
+        'prev_month': {
+            'total': {
+                'tag_sales': tag_sales_prev,
+                'net_sales': net_sales_prev,
+                'cogs': cogs_prev,
+                'gross_profit': gross_profit_prev,
+                'direct_cost': direct_cost_prev,
+                'direct_profit': direct_profit_prev,
+                'sg_a': sg_a_prev,
+                'operating_profit': op_profit_prev,
+                'expense_detail': expense_detail_prev,
+            },
+            'offline': {
+                'tag_sales': prev_tw_offline.get('TAG', 0),
+                'net_sales': prev_tw_offline.get('실판', 0),
+                'discount_rate': ((prev_tw_offline.get('TAG', 0) - prev_tw_offline.get('실판', 0)) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
+                'cogs': prev_tw_offline.get('매출원가', 0),
+                'cogs_rate': (prev_tw_offline.get('매출원가', 0) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
+                'gross_profit': prev_tw_offline.get('매출총이익', 0),
+                'gross_profit_rate': (prev_tw_offline.get('매출총이익', 0) / prev_tw_offline.get('실판', 1) * 100) if prev_tw_offline.get('실판', 0) > 0 else 0,
+                'direct_cost': prev_tw_offline.get('직접비_합계', 0),
+                'direct_profit': prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0),
+                'direct_profit_rate': (prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0)) / prev_tw_offline.get('실판', 1) * 100 if prev_tw_offline.get('실판', 0) > 0 else 0,
+                'sg_a': (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
+                'operating_profit': (prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0)) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
+                'operating_profit_rate': ((prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev)) / prev_tw_offline.get('실판', 1) * 100) if prev_tw_offline.get('실판', 0) > 0 and net_sales_prev > 0 else 0,
+            },
+            'online': {
+                'tag_sales': prev_tw_online.get('TAG', 0),
+                'net_sales': prev_tw_online.get('실판', 0),
+                'discount_rate': ((prev_tw_online.get('TAG', 0) - prev_tw_online.get('실판', 0)) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
+                'cogs': prev_tw_online.get('매출원가', 0),
+                'cogs_rate': (prev_tw_online.get('매출원가', 0) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
+                'gross_profit': prev_tw_online.get('매출총이익', 0),
+                'gross_profit_rate': (prev_tw_online.get('매출총이익', 0) / prev_tw_online.get('실판', 1) * 100) if prev_tw_online.get('실판', 0) > 0 else 0,
+                'direct_cost': prev_tw_online.get('직접비_합계', 0),
+                'direct_profit': prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0),
+                'direct_profit_rate': (prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0)) / prev_tw_online.get('실판', 1) * 100 if prev_tw_online.get('실판', 0) > 0 else 0,
+                'sg_a': (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
+                'operating_profit': (prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0)) - (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
+                'operating_profit_rate': ((prev_tw_online.get('매출총이익', 0) - prev_tw_online.get('직접비_합계', 0) - (sg_a_prev * prev_tw_online.get('실판', 0) / net_sales_prev)) / prev_tw_online.get('실판', 1) * 100) if prev_tw_online.get('실판', 0) > 0 and net_sales_prev > 0 else 0,
+            }
+        }
     }
     
     # JSON 파일 저장

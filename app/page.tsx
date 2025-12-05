@@ -431,7 +431,7 @@ export default function Home() {
   // 홍콩 PL 데이터
   const hkPlCurrent = hkPlData?.current_month?.total;
   const hkPlCumulative = hkPlData?.cumulative?.total;
-  const hkPlPrevMonth = hkPlData?.current_month?.prev_month?.total;
+  const hkPlPrevMonth = hkPlData?.prev_month?.total;
   const hkPlPrevCumulative = hkPlData?.cumulative?.prev_cumulative?.total;
   
   // 홍콩 누적 YOY 계산
