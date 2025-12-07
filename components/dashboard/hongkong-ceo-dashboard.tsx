@@ -825,6 +825,109 @@ const HongKongCEODashboard = () => {
               </div>
             </div>
 
+            {/* 할인율 카드 */}
+            <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-purple-500 hover:shadow-xl transition-shadow min-h-[400px]">
+              <div className="flex items-center mb-3">
+                <span className="text-2xl mr-2">🏷️</span>
+                <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
+              </div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">
+                {formatPercent(pl?.discount_rate || 0, 1)}%
+              </div>
+              <div className="text-sm font-semibold mb-3">
+                <span className="text-gray-600">전년 {formatPercent(prevMonthDiscountRate, 1)}%</span> | 
+                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - prevMonthDiscountRate, 1)}%p</span>
+              </div>
+              
+              {/* 할인 상세보기 */}
+              <div className="border-t pt-3">
+                <button 
+                  onClick={() => setShowDiscountDetail(!showDiscountDetail)}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
+                >
+                  <span>채널별 할인율</span>
+                  {showDiscountDetail ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {showDiscountDetail && (
+                <div className="mt-3 pt-3 border-t space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">HK (홍콩)</span>
+                    <span className="font-semibold text-purple-600">
+                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.hk?.discount_rate || 0) - prevMonthHKDiscountRate, 1)}%p)</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pl-3">
+                    <span className="text-gray-600">- Retail</span>
+                    <span className="font-semibold">
+                      {formatPercent(hkRetail?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkRetail?.previous?.discount_rate || 0, 1)}%)</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pl-3">
+                    <span className="text-gray-600">- Outlet</span>
+                    <span className="font-semibold">
+                      {formatPercent(hkOutlet?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkOutlet?.previous?.discount_rate || 0, 1)}%)</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pl-3">
+                    <span className="text-gray-600">- Online</span>
+                    <span className="font-semibold">
+                      {formatPercent(hkOnline?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(hkOnline?.previous?.discount_rate || 0, 1)}%)</span>
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between text-xs font-semibold mt-3 pt-2 border-t">
+                    <span className="text-gray-700">MC (마카오)</span>
+                    <span className="text-purple-600">
+                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.mc?.discount_rate || 0) - prevMonthMCDiscountRate, 1)}%p)</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pl-3">
+                    <span className="text-gray-600">- Retail</span>
+                    <span className="font-semibold">
+                      {formatPercent(mcRetail?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(mcRetail?.previous?.discount_rate || 0, 1)}%)</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pl-3">
+                    <span className="text-gray-600">- Outlet</span>
+                    <span className="font-semibold">
+                      {formatPercent(mcOutlet?.current?.discount_rate || 0, 1)}%
+                      <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
+                    </span>
+                  </div>
+                  
+                  {/* 할인 금액 */}
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">할인 금액 (1K HKD)</div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600">당월 할인</span>
+                      <span className="font-semibold text-purple-600">
+                        {formatNumber(pl?.discount || 0)}K
+                        <span className="text-green-600"> (YOY {formatPercent(plYoy?.discount || 0)}%)</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600">누적 할인</span>
+                      <span className="font-semibold text-purple-600">
+                        {formatNumber((plData?.cumulative?.total as any)?.discount || 0)}K
+                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate, 1)}%p)</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* 영업이익 카드 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-orange-500 hover:shadow-xl transition-shadow min-h-[400px]">
               <div className="flex items-center mb-3">
@@ -1556,109 +1659,6 @@ const HongKongCEODashboard = () => {
                     </div>
                   )}
                 </>
-              )}
-            </div>
-
-            {/* 할인율 카드 */}
-            <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-purple-500 hover:shadow-xl transition-shadow min-h-[400px]">
-              <div className="flex items-center mb-3">
-                <span className="text-2xl mr-2">🏷️</span>
-                <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
-              </div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {formatPercent(pl?.discount_rate || 0, 1)}%
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(prevMonthDiscountRate, 1)}%</span> | 
-                <span className="text-green-600"> 전년비 {formatPercent((pl?.discount_rate || 0) - prevMonthDiscountRate, 1)}%p</span>
-              </div>
-              
-              {/* 할인 상세보기 */}
-              <div className="border-t pt-3">
-                <button 
-                  onClick={() => setShowDiscountDetail(!showDiscountDetail)}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
-                >
-                  <span>채널별 할인율</span>
-                  {showDiscountDetail ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-              {showDiscountDetail && (
-                <div className="mt-3 pt-3 border-t space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">HK (홍콩)</span>
-                    <span className="font-semibold text-purple-600">
-                      {formatPercent(plData?.current_month?.hk?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.hk?.discount_rate || 0) - prevMonthHKDiscountRate, 1)}%p)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
-                    <span className="font-semibold">
-                      {formatPercent(hkRetail?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkRetail?.previous?.discount_rate || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
-                    <span className="font-semibold">
-                      {formatPercent(hkOutlet?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkOutlet?.previous?.discount_rate || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Online</span>
-                    <span className="font-semibold">
-                      {formatPercent(hkOnline?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkOnline?.previous?.discount_rate || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs font-semibold mt-3 pt-2 border-t">
-                    <span className="text-gray-700">MC (마카오)</span>
-                    <span className="text-purple-600">
-                      {formatPercent(plData?.current_month?.mc?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.current_month?.mc?.discount_rate || 0) - prevMonthMCDiscountRate, 1)}%p)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
-                    <span className="font-semibold">
-                      {formatPercent(mcRetail?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(mcRetail?.previous?.discount_rate || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
-                    <span className="font-semibold">
-                      {formatPercent(mcOutlet?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  
-                  {/* 할인 금액 */}
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">할인 금액 (1K HKD)</div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">당월 할인</span>
-                      <span className="font-semibold text-purple-600">
-                        {formatNumber(pl?.discount || 0)}K
-                        <span className="text-green-600"> (YOY {formatPercent(plYoy?.discount || 0)}%)</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">누적 할인</span>
-                      <span className="font-semibold text-purple-600">
-                        {formatNumber((plData?.cumulative?.total as any)?.discount || 0)}K
-                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate, 1)}%p)</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
               )}
             </div>
 
