@@ -57,3 +57,7 @@ Write-Host "✅ 동기화 완료!" -ForegroundColor Green
 Write-Host "로컬과 원격이 최신 상태입니다." -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Cyan
 
+
+
+
+

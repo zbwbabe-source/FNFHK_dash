@@ -449,6 +449,7 @@ export default function Home() {
   // 대만 PL 데이터
   const twPlCurrent = twPlData?.current_month?.total;
   const twPlCumulative = twPlData?.cumulative?.total;
+  const twPlPrevMonth = twPlData?.prev_month?.total;
   const twPlPrevCumulative = twPlData?.cumulative?.prev_cumulative?.total;
   
   // 대만 누적 YOY 계산
@@ -476,6 +477,58 @@ export default function Home() {
     });
     return total;
   }, [hkData]);
+
+  // 홍콩 할인율 계산: 1 - (실판매출 / 택매출)
+  const hkDiscountRateCurrent = useMemo(() => {
+    const pl = hkPlData?.current_month?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - pl.net_sales) / pl.tag_sales) * 100;
+  }, [hkPlData]);
+
+  const hkDiscountRateCumulative = useMemo(() => {
+    const pl = hkPlData?.cumulative?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - pl.net_sales) / pl.tag_sales) * 100;
+  }, [hkPlData]);
+
+  // 홍콩 전년 할인율 계산
+  const hkDiscountRatePrevMonth = useMemo(() => {
+    const pl = hkPlData?.prev_month?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - pl.net_sales) / pl.tag_sales) * 100;
+  }, [hkPlData]);
+
+  const hkDiscountRatePrevCumulative = useMemo(() => {
+    const pl = hkPlData?.cumulative?.prev_cumulative?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - pl.net_sales) / pl.tag_sales) * 100;
+  }, [hkPlData]);
+
+  // 대만 할인율 계산: 1 - (실판매출 * 1.05 / 택매출)
+  const twDiscountRateCurrent = useMemo(() => {
+    const pl = twPlData?.current_month?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
+  }, [twPlData]);
+
+  const twDiscountRateCumulative = useMemo(() => {
+    const pl = twPlData?.cumulative?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
+  }, [twPlData]);
+
+  // 대만 전년 할인율 계산
+  const twDiscountRatePrevMonth = useMemo(() => {
+    const pl = twPlData?.prev_month?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
+  }, [twPlData]);
+
+  const twDiscountRatePrevCumulative = useMemo(() => {
+    const pl = twPlData?.cumulative?.prev_cumulative?.total;
+    if (!pl || !pl.tag_sales || pl.tag_sales === 0) return 0;
+    return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
+  }, [twPlData]);
 
   // 데이터 로드 확인
   if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
@@ -597,9 +650,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      {/* 원래 값: max-w-7xl px-6 py-8, mb-8 */}
+      <main className="max-w-[1920px] mx-auto px-8 py-4">
         {/* 히어로 섹션 */}
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-4xl font-bold text-gray-900 leading-tight mb-1">
@@ -660,13 +714,19 @@ export default function Home() {
               <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약 (MLB 기준)</p>
               
               {/* 주요 지표 배지 */}
-              <div className="flex gap-3 mb-6">
+              <div className="flex gap-2 mb-3">
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg px-3 py-2">
                   <span className="text-xs text-gray-600">매출 </span>
                   <span className={`text-lg font-bold ${
                     hkmcTotalYoy >= 100 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {formatPercent(hkmcTotalYoy)}%
+                  </span>
+                </div>
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg px-3 py-2">
+                  <span className="text-xs text-gray-600">할인율 </span>
+                  <span className="text-lg font-bold text-amber-700">
+                    {hkDiscountRateCurrent.toFixed(1)}%
                   </span>
                 </div>
                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg px-3 py-2">
@@ -718,8 +778,47 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* 할인율 */}
+                <div className="bg-gradient-to-r from-amber-50 to-transparent rounded-xl p-3 border border-amber-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-amber-900">🏷️ 할인율</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">당월</div>
+                      <div className="text-xl font-bold text-gray-900">
+                        {hkDiscountRateCurrent.toFixed(1)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {hkDiscountRatePrevMonth.toFixed(1)}% |
+                        <span className={`ml-1 font-semibold ${
+                          (hkDiscountRateCurrent - hkDiscountRatePrevMonth) >= 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {(hkDiscountRateCurrent - hkDiscountRatePrevMonth) >= 0 ? '+' : ''}
+                          {(hkDiscountRateCurrent - hkDiscountRatePrevMonth).toFixed(1)}%p
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">누적</div>
+                      <div className="text-xl font-bold text-gray-900">
+                        {hkDiscountRateCumulative.toFixed(1)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {hkDiscountRatePrevCumulative.toFixed(1)}% |
+                        <span className={`ml-1 font-semibold ${
+                          (hkDiscountRateCumulative - hkDiscountRatePrevCumulative) >= 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {(hkDiscountRateCumulative - hkDiscountRatePrevCumulative) >= 0 ? '+' : ''}
+                          {(hkDiscountRateCumulative - hkDiscountRatePrevCumulative).toFixed(1)}%p
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 영업이익 */}
-                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-4 border border-red-100">
+                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-3 border border-red-100">
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-sm font-semibold text-red-900">📉 영업이익</div>
                     <div className="text-xs text-gray-500">1K HKD</div>
@@ -735,6 +834,15 @@ export default function Home() {
                       <div className="text-xs text-gray-500">
                         {(hkPlCurrent?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
                       </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {formatPlNumber(hkPlPrevMonth?.operating_profit || 0)} |
+                        <span className={`ml-1 font-semibold ${
+                          ((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? '+' : '△'}
+                          {formatPlNumber(Math.abs((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)))}
+                        </span>
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-gray-600 mb-1">누적</div>
@@ -745,6 +853,15 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(hkPlCumulative?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {formatPlNumber(hkPlPrevCumulative?.operating_profit || 0)} |
+                        <span className={`ml-1 font-semibold ${
+                          ((hkPlCumulative?.operating_profit || 0) - (hkPlPrevCumulative?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {((hkPlCumulative?.operating_profit || 0) - (hkPlPrevCumulative?.operating_profit || 0)) >= 0 ? '+' : '△'}
+                          {formatPlNumber(Math.abs((hkPlCumulative?.operating_profit || 0) - (hkPlPrevCumulative?.operating_profit || 0)))}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -931,13 +1048,19 @@ export default function Home() {
               <p className="text-sm text-gray-500 mb-4">{selectedMonth}월 실적 요약 (MLB 기준)</p>
               
               {/* 주요 지표 배지 */}
-              <div className="flex gap-3 mb-6">
+              <div className="flex gap-2 mb-3">
                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg px-3 py-2">
                   <span className="text-xs text-gray-600">매출 </span>
                   <span className={`text-lg font-bold ${
                     twTotalYoy >= 100 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {formatPercent(twTotalYoy)}%
+                  </span>
+                </div>
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg px-3 py-2">
+                  <span className="text-xs text-gray-600">할인율 </span>
+                  <span className="text-lg font-bold text-amber-700">
+                    {twDiscountRateCurrent.toFixed(1)}%
                   </span>
                 </div>
                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg px-3 py-2">
@@ -989,8 +1112,47 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* 할인율 */}
+                <div className="bg-gradient-to-r from-amber-50 to-transparent rounded-xl p-3 border border-amber-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-amber-900">🏷️ 할인율</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">당월</div>
+                      <div className="text-xl font-bold text-gray-900">
+                        {twDiscountRateCurrent.toFixed(1)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {twDiscountRatePrevMonth.toFixed(1)}% |
+                        <span className={`ml-1 font-semibold ${
+                          (twDiscountRateCurrent - twDiscountRatePrevMonth) >= 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {(twDiscountRateCurrent - twDiscountRatePrevMonth) >= 0 ? '+' : ''}
+                          {(twDiscountRateCurrent - twDiscountRatePrevMonth).toFixed(1)}%p
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">누적</div>
+                      <div className="text-xl font-bold text-gray-900">
+                        {twDiscountRateCumulative.toFixed(1)}%
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {twDiscountRatePrevCumulative.toFixed(1)}% |
+                        <span className={`ml-1 font-semibold ${
+                          (twDiscountRateCumulative - twDiscountRatePrevCumulative) >= 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {(twDiscountRateCumulative - twDiscountRatePrevCumulative) >= 0 ? '+' : ''}
+                          {(twDiscountRateCumulative - twDiscountRatePrevCumulative).toFixed(1)}%p
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 영업이익 */}
-                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100">
+                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-3 border border-green-100">
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-sm font-semibold text-green-900">📈 영업이익</div>
                     <div className="text-xs text-gray-500">1K HKD</div>
@@ -1006,6 +1168,15 @@ export default function Home() {
                       <div className="text-xs text-gray-500">
                         {(twPlCurrent?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
                       </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {formatPlNumber(twPlPrevMonth?.operating_profit || 0)} |
+                        <span className={`ml-1 font-semibold ${
+                          ((twPlCurrent?.operating_profit || 0) - (twPlPrevMonth?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {((twPlCurrent?.operating_profit || 0) - (twPlPrevMonth?.operating_profit || 0)) >= 0 ? '+' : '△'}
+                          {formatPlNumber(Math.abs((twPlCurrent?.operating_profit || 0) - (twPlPrevMonth?.operating_profit || 0)))}
+                        </span>
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-gray-600 mb-1">누적</div>
@@ -1016,6 +1187,15 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(twPlCumulative?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        전년 {formatPlNumber(twPlPrevCumulative?.operating_profit || 0)} |
+                        <span className={`ml-1 font-semibold ${
+                          ((twPlCumulative?.operating_profit || 0) - (twPlPrevCumulative?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {((twPlCumulative?.operating_profit || 0) - (twPlPrevCumulative?.operating_profit || 0)) >= 0 ? '+' : '△'}
+                          {formatPlNumber(Math.abs((twPlCumulative?.operating_profit || 0) - (twPlPrevCumulative?.operating_profit || 0)))}
+                        </span>
                       </div>
                     </div>
                   </div>
