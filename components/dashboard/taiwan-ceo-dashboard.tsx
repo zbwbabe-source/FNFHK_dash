@@ -64,7 +64,9 @@ const TaiwanCEODashboard = () => {
     const newState = !showSalesDetail;
     setShowSalesDetail(newState);
     setShowProfitDetail(newState);
+    setShowItemProfitDetail(newState);
     setShowExpenseDetail(newState);
+    setShowDiscountDetail(newState);
     setShowStoreDetail(newState);
     setShowSeasonSalesDetail(newState);
     setShowAccInventoryDetail(newState);
