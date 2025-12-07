@@ -698,7 +698,6 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(hkDailySalesPerPyeongCurrent)} HKD
-                        <span className="text-gray-400 ml-1">(마카오 및 온라인 제외)</span>
                       </div>
                     </div>
                     <div>
@@ -711,9 +710,11 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
-                        <span className="text-gray-400 ml-1">(마카오 및 온라인 제외)</span>
                       </div>
                     </div>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-blue-100">
+                    *평당매출: 마카오 및 온라인 제외
                   </div>
                 </div>
 
@@ -968,7 +969,6 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
-                        <span className="text-gray-400 ml-1">(온라인 제외)</span>
                       </div>
                     </div>
                     <div>
@@ -981,9 +981,11 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
-                        <span className="text-gray-400 ml-1">(온라인 제외)</span>
                       </div>
                     </div>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-purple-100">
+                    *평당매출: 온라인 제외
                   </div>
                 </div>
 
