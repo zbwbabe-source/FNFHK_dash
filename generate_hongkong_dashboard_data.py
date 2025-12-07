@@ -448,7 +448,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     print(f"  - 추세 데이터 포인트: {len(trend_data)}")
 
 if __name__ == '__main__':
-    csv_file = '../Dashboard_Raw_Data/24012510 홍콩재고수불.csv'
+    csv_file = '../Dashboard_Raw_Data/홍콩재고수불.csv'
     output_file = 'components/dashboard/hongkong-dashboard-data.json'
     generate_dashboard_data(csv_file, output_file)
 

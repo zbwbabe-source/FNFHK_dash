@@ -14,7 +14,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # CSV 파일 읽기
 print("📂 CSV 파일 읽는 중...")
-df = pd.read_csv('../Dashboard_Raw_Data/24012510 홍콩재고수불.csv', encoding='utf-8')
+df = pd.read_csv('../Dashboard_Raw_Data/홍콩재고수불.csv', encoding='utf-8')
 
 print(f"✅ 총 {len(df):,}개 행 로드됨")
 print(f"📊 컬럼: {list(df.columns)}")

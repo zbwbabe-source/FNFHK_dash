@@ -11,7 +11,7 @@ print("홍콩 대시보드 데이터 생성 시작...")
 print("=" * 80)
 
 # CSV 로드
-csv_path = '../Dashboard_Raw_Data/24012510 홍콩재고수불.csv'
+csv_path = '../Dashboard_Raw_Data/홍콩재고수불.csv'
 print(f"CSV 로드 중: {csv_path}")
 df = pd.read_csv(csv_path)
 print(f"{len(df):,}개 레코드 로드 완료\n")

@@ -548,15 +548,15 @@ def main(target_period_short=None):
     
     # 손익 데이터 읽기 (MLB만, 오피스 제외)
     print("\n손익 데이터 읽는 중...")
-    pl_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='M', include_office=False)
+    pl_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")
     
     # 영업이익 계산용 데이터 (MLB + M99 오피스)
-    pl_data_with_office = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='M', include_office=True)
+    pl_data_with_office = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='M', include_office=True)
     print(f"오피스 포함 MLB 데이터: {len(pl_data_with_office):,}건")
     
     # 디스커버리 데이터 읽기 (참고용)
-    discovery_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database (1).csv', brand_filter='X', include_office=False)
+    discovery_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='X', include_office=False)
     print(f"디스커버리 데이터: {len(discovery_data):,}건")
     
     # MLB 영업비 계산 (T99 오피스의 판매관리비)
