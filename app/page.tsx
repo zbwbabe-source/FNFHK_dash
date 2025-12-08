@@ -13,8 +13,6 @@ export default function Home() {
   const [twPlData, setTwPlData] = useState<any>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('2510'); // 기본값: 25년 10월
   const [isLoading, setIsLoading] = useState(true);
-  const [showHkmcDetail, setShowHkmcDetail] = useState(false);
-  const [showTwDetail, setShowTwDetail] = useState(false);
   const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
   const [showTwDiscovery, setShowTwDiscovery] = useState(false);
 
@@ -530,6 +528,19 @@ export default function Home() {
     return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
   }, [twPlData]);
 
+  // 재고일수 계산: (기말재고 / 누적 택매출) × 누적 일수
+  const hkInventoryDays = useMemo(() => {
+    const tagSales = hkPlCumulative?.tag_sales || 0;
+    if (!hkStockCurrent || !tagSales || tagSales === 0) return 0;
+    return (hkStockCurrent / tagSales) * cumulativeDays;
+  }, [hkStockCurrent, hkPlCumulative, cumulativeDays]);
+
+  const twInventoryDays = useMemo(() => {
+    const tagSales = twPlCumulative?.tag_sales || 0;
+    if (!twStockCurrent || !tagSales || tagSales === 0) return 0;
+    return (twStockCurrent / tagSales) * cumulativeDays;
+  }, [twStockCurrent, twPlCumulative, cumulativeDays]);
+
   // 데이터 로드 확인
   if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
     return (
@@ -873,12 +884,22 @@ export default function Home() {
                     <div className="text-sm font-semibold text-purple-900">📦 기말재고</div>
                     <div className="text-xs text-gray-500">Tag 기준 (1K HKD)</div>
                   </div>
-                  <div className="flex items-end justify-between">
+                  <div className="flex items-end justify-between mb-2">
                     <div className="text-2xl font-bold text-gray-900">
                       {formatPlNumber(hkStockCurrent)}
                     </div>
                     <div className="text-sm font-semibold text-purple-600">
                       YOY {formatPercent(hkStockYoy)}%
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-purple-100">
+                    <div className="text-xs text-gray-600">재고일수 (누적 Tag매출)</div>
+                    <div className={`text-sm font-semibold ${
+                      hkInventoryDays < 180 ? 'text-green-600' : 
+                      hkInventoryDays < 365 ? 'text-amber-600' : 
+                      'text-red-600'
+                    }`}>
+                      {Math.round(hkInventoryDays)}일
                     </div>
                   </div>
                 </div>
@@ -951,64 +972,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* 상세보기 토글 */}
-              <div className="border-t border-gray-200 pt-4 mb-4">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowHkmcDetail(!showHkmcDetail);
-                  }}
-                  className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
-                >
-                  <span>채널별 상세보기</span>
-                  {showHkmcDetail ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-                
-                {showHkmcDetail && (
-                  <div className="mt-3 space-y-2 pl-4 border-l-2 border-blue-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">HK 오프라인</span>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 mr-2">
-                          {formatNumber(hkOfflineCurrent)}K
-                        </span>
-                        <span className={`text-xs font-bold ${
-                          hkOfflineYoy >= 100 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {formatPercent(hkOfflineYoy)}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">HK 온라인</span>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 mr-2">
-                          {formatNumber(hkOnlineCurrent)}K
-                        </span>
-                        <span className={`text-xs font-bold ${
-                          hkOnlineYoy >= 100 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {formatPercent(hkOnlineYoy)}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">마카오</span>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 mr-2">
-                          {formatNumber(mcCurrent)}K
-                        </span>
-                        <span className={`text-xs font-bold ${
-                          mcYoy >= 100 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {formatPercent(mcYoy)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* 대시보드 버튼 */}
               <Link
@@ -1207,12 +1170,22 @@ export default function Home() {
                     <div className="text-sm font-semibold text-purple-900">📦 기말재고</div>
                     <div className="text-xs text-gray-500">Tag 기준 (1K HKD)</div>
                   </div>
-                  <div className="flex items-end justify-between">
+                  <div className="flex items-end justify-between mb-2">
                     <div className="text-2xl font-bold text-gray-900">
                       {formatPlNumber(twStockCurrent)}
                     </div>
                     <div className="text-sm font-semibold text-purple-600">
                       YOY {formatPercent(twStockYoy)}%
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-purple-100">
+                    <div className="text-xs text-gray-600">재고일수 (누적 Tag매출)</div>
+                    <div className={`text-sm font-semibold ${
+                      twInventoryDays < 180 ? 'text-green-600' : 
+                      twInventoryDays < 365 ? 'text-amber-600' : 
+                      'text-red-600'
+                    }`}>
+                      {Math.round(twInventoryDays)}일
                     </div>
                   </div>
                 </div>
@@ -1285,51 +1258,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* 상세보기 토글 */}
-              <div className="border-t border-gray-200 pt-4 mb-4">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowTwDetail(!showTwDetail);
-                  }}
-                  className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 hover:text-purple-600 transition-colors"
-                >
-                  <span>채널별 상세보기</span>
-                  {showTwDetail ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-                
-                {showTwDetail && (
-                  <div className="mt-3 space-y-2 pl-4 border-l-2 border-purple-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">대만 오프라인</span>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 mr-2">
-                          {formatNumber(twOfflineCurrent)}K
-                        </span>
-                        <span className={`text-xs font-bold ${
-                          twOfflineYoy >= 100 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {formatPercent(twOfflineYoy)}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">대만 온라인</span>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 mr-2">
-                          {formatNumber(twOnlineCurrent)}K
-                        </span>
-                        <span className={`text-xs font-bold ${
-                          twOnlineYoy >= 100 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {formatPercent(twOnlineYoy)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* 대시보드 버튼 */}
               <Link
