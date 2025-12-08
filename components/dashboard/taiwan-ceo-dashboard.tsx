@@ -26,7 +26,7 @@ const TaiwanCEODashboard = () => {
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
-  const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(false);
+  const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(true);
   const [showYear1Detail, setShowYear1Detail] = useState(false);
   const [showYear2Detail, setShowYear2Detail] = useState(false);
   const [showYear1OthersDetail, setShowYear1OthersDetail] = useState(false);
@@ -72,6 +72,7 @@ const TaiwanCEODashboard = () => {
     setShowAccInventoryDetail(newState);
     setShowEndInventoryDetail(newState);
     setShowPastSeasonDetail(newState);
+    setShowCurrentSeasonDetail(newState);
   };
 
   const toggleActionItem = (index: string) => {
