@@ -14,18 +14,18 @@ const TaiwanCEODashboard = () => {
   // ============================================================
   // STATE 관리 - 상세보기 토글 상태
   // ============================================================
-  const [showSalesDetail, setShowSalesDetail] = useState(false);
-  const [showProfitDetail, setShowProfitDetail] = useState(false);
-  const [showItemProfitDetail, setShowItemProfitDetail] = useState(false);
-  const [showExpenseDetail, setShowExpenseDetail] = useState(false);
+  const [showSalesDetail, setShowSalesDetail] = useState(true);
+  const [showProfitDetail, setShowProfitDetail] = useState(true);
+  const [showItemProfitDetail, setShowItemProfitDetail] = useState(true);
+  const [showExpenseDetail, setShowExpenseDetail] = useState(true);
   const [showOtherDetail, setShowOtherDetail] = useState(false);  // 당월 기타 상세
   const [showOtherDetailCumulative, setShowOtherDetailCumulative] = useState(false);  // 누적 기타 상세
-  const [showDiscountDetail, setShowDiscountDetail] = useState(false);
-  const [showStoreDetail, setShowStoreDetail] = useState(false);
-  const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(false);
-  const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(false);
-  const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(false);
-  const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(false);
+  const [showDiscountDetail, setShowDiscountDetail] = useState(true);
+  const [showStoreDetail, setShowStoreDetail] = useState(true);
+  const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
+  const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
+  const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
+  const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
   const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(false);
   const [showYear1Detail, setShowYear1Detail] = useState(false);
   const [showYear2Detail, setShowYear2Detail] = useState(false);

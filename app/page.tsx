@@ -528,19 +528,6 @@ export default function Home() {
     return ((pl.tag_sales - (pl.net_sales * 1.05)) / pl.tag_sales) * 100;
   }, [twPlData]);
 
-  // 재고일수 계산: (기말재고 / 누적 택매출) × 누적 일수
-  const hkInventoryDays = useMemo(() => {
-    const tagSales = hkPlCumulative?.tag_sales || 0;
-    if (!hkStockCurrent || !tagSales || tagSales === 0) return 0;
-    return (hkStockCurrent / tagSales) * cumulativeDays;
-  }, [hkStockCurrent, hkPlCumulative, cumulativeDays]);
-
-  const twInventoryDays = useMemo(() => {
-    const tagSales = twPlCumulative?.tag_sales || 0;
-    if (!twStockCurrent || !tagSales || tagSales === 0) return 0;
-    return (twStockCurrent / tagSales) * cumulativeDays;
-  }, [twStockCurrent, twPlCumulative, cumulativeDays]);
-
   // 데이터 로드 확인
   if (isLoading || !hkData || !twData || !hkPlData || !twPlData) {
     return (
@@ -884,22 +871,12 @@ export default function Home() {
                     <div className="text-sm font-semibold text-purple-900">📦 기말재고</div>
                     <div className="text-xs text-gray-500">Tag 기준 (1K HKD)</div>
                   </div>
-                  <div className="flex items-end justify-between mb-2">
+                  <div className="flex items-end justify-between">
                     <div className="text-2xl font-bold text-gray-900">
                       {formatPlNumber(hkStockCurrent)}
                     </div>
                     <div className="text-sm font-semibold text-purple-600">
                       YOY {formatPercent(hkStockYoy)}%
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-purple-100">
-                    <div className="text-xs text-gray-600">재고일수 (누적 Tag매출)</div>
-                    <div className={`text-sm font-semibold ${
-                      hkInventoryDays < 180 ? 'text-green-600' : 
-                      hkInventoryDays < 365 ? 'text-amber-600' : 
-                      'text-red-600'
-                    }`}>
-                      {Math.round(hkInventoryDays)}일
                     </div>
                   </div>
                 </div>
@@ -1170,22 +1147,12 @@ export default function Home() {
                     <div className="text-sm font-semibold text-purple-900">📦 기말재고</div>
                     <div className="text-xs text-gray-500">Tag 기준 (1K HKD)</div>
                   </div>
-                  <div className="flex items-end justify-between mb-2">
+                  <div className="flex items-end justify-between">
                     <div className="text-2xl font-bold text-gray-900">
                       {formatPlNumber(twStockCurrent)}
                     </div>
                     <div className="text-sm font-semibold text-purple-600">
                       YOY {formatPercent(twStockYoy)}%
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-purple-100">
-                    <div className="text-xs text-gray-600">재고일수 (누적 Tag매출)</div>
-                    <div className={`text-sm font-semibold ${
-                      twInventoryDays < 180 ? 'text-green-600' : 
-                      twInventoryDays < 365 ? 'text-amber-600' : 
-                      'text-red-600'
-                    }`}>
-                      {Math.round(twInventoryDays)}일
                     </div>
                   </div>
                 </div>
