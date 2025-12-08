@@ -4995,30 +4995,35 @@ const TaiwanCEODashboard = () => {
           
           <div className="grid grid-cols-4 gap-4 w-full">
             {/* 전체 매장 요약 */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-w-0">
-              <h4 className="text-sm font-bold text-gray-800 mb-3">오프라인 매장 요약</h4>
+            <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-4 border border-slate-600 min-w-0 shadow-lg">
+              <h4 className="text-base font-bold text-white mb-3">오프라인 매장 요약</h4>
               <div className="space-y-3 text-xs">
+                {/* 매장 수 */}
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                  <div className="text-2xl font-bold text-white mb-1">
                     {totalStoreCurrent}개 매장
                   </div>
-                  <div className="text-xs text-gray-600 mb-2">
+                  <div className="text-xs text-slate-300 mb-2">
                     실판매출 YOY {formatYoy(totalSalesPerStoreYoy)}%
                   </div>
-                  <div className="text-[10px] text-gray-400 italic mb-3">
+                  <div className="text-[10px] text-slate-400 italic">
                     * 종료매장·온라인 제외
-                </div>
-                  </div>
-                <div className="border-t pt-3 space-y-1.5 border-gray-300 mb-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">전체 직접이익</span>
-                    <span className={`text-xs font-semibold ${(plData?.channel_direct_profit?.total?.direct_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatNumber(plData?.channel_direct_profit?.total?.direct_profit || 0)}K HKD
-                    </span>
                   </div>
                 </div>
-                <div className="border-t pt-3 border-gray-300 mb-3">
-                  <div className="text-xs text-gray-600 mb-2 font-semibold">채널별 구분</div>
+
+                {/* 전체 직접이익 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="flex items-center justify-between">
+                    <div className="text-slate-300 text-[10px]">전체 직접이익</div>
+                    <div className={`font-bold text-sm ${(plData?.channel_direct_profit?.total?.direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {formatNumber(plData?.channel_direct_profit?.total?.direct_profit || 0)}K HKD
+                    </div>
+                  </div>
+                </div>
+
+                {/* 채널별 구분 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="text-white font-semibold text-xs mb-2">채널별 구분</div>
                   <div className="space-y-1.5">
                     {(() => {
                       const retailStores = activeTWStores.filter((s: any) => s.channel === 'Retail');
@@ -5033,46 +5038,50 @@ const TaiwanCEODashboard = () => {
                       const outletProfit = outletStores.reduce((sum: number, s: any) => sum + (s.direct_profit || 0), 0);
                       return (
                         <>
-                          <div className="flex justify-between items-center bg-gray-100 px-2 py-1 rounded">
-                            <span className="text-xs text-gray-700">리테일</span>
-                            <span className="text-xs font-semibold text-gray-700">
+                          <div className="bg-blue-700 rounded px-2 py-1.5 flex items-center gap-1.5">
+                            <span className="text-white text-xs font-semibold">리테일</span>
+                            <span className="text-white text-xs font-bold ml-auto">
                               {retailStores.length}개 | YOY {formatYoy(retailYoy)}% | {retailProfit >= 0 ? '+' : ''}{formatNumber(retailProfit)}K
                             </span>
-                  </div>
-                          <div className="flex justify-between items-center bg-gray-100 px-2 py-1 rounded">
-                            <span className="text-xs text-gray-700">아울렛</span>
-                            <span className={`text-xs font-semibold ${outletProfit >= 0 ? 'text-gray-700' : 'text-red-600'}`}>
+                          </div>
+                          <div className={`rounded px-2 py-1.5 flex items-center gap-1.5 ${outletProfit >= 0 ? 'bg-blue-700' : 'bg-red-600'}`}>
+                            <span className="text-white text-xs font-semibold">아울렛</span>
+                            <span className="text-white text-xs font-bold ml-auto">
                               {outletStores.length}개 | YOY {formatYoy(outletYoy)}% | {outletProfit >= 0 ? '+' : ''}{formatNumber(outletProfit)}K
                             </span>
-                </div>
+                          </div>
                         </>
                       );
                     })()}
                   </div>
                 </div>
-                <div className="border-t pt-3 border-gray-300">
-                  <div className="text-xs text-gray-600 mb-2 font-semibold">수익성별 매장 수</div>
-                  <div className="space-y-1.5">
-            {(() => {
+
+                {/* 수익성별 매장 수 */}
+                <div className="pt-2 border-t border-slate-600">
+                  <div className="text-white font-semibold text-xs mb-2">수익성별 매장 수</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(() => {
                       const profitableCount = activeTWStores.filter((s: any) => (s.direct_profit || 0) > 0).length;
                       const unprofitableCount = activeTWStores.filter((s: any) => (s.direct_profit || 0) < 0).length;
-              return (
+                      return (
                         <>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600">흑자매장</span>
-                            <span className="text-xs font-semibold text-green-600">{profitableCount}개</span>
-                        </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600">적자매장</span>
-                            <span className="text-xs font-semibold text-red-600">{unprofitableCount}개</span>
-                        </div>
-                      </>
-              );
-            })()}
-                    </div>
-                    </div>
+                          <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                            <span className="text-white text-sm">✓</span>
+                            <span className="text-white text-xs font-semibold">흑자매장</span>
+                            <span className="text-white text-xs font-bold ml-auto">{profitableCount}개</span>
+                          </div>
+                          <div className="bg-red-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                            <span className="text-red-200 text-sm">↓</span>
+                            <span className="text-white text-xs font-semibold">적자매장</span>
+                            <span className="text-white text-xs font-bold ml-auto">{unprofitableCount}개</span>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
-                  </div>
+                </div>
+              </div>
+            </div>
             
             {/* 대형 흑자매장 */}
             {(() => {
@@ -5443,8 +5452,8 @@ const TaiwanCEODashboard = () => {
           const commission = directCost * commissionRatio;
           const logistics = directCost * logisticsRatio;
           
-          // 전년 수수료율 계산
-          const prevOnlineDirectCost = (plData?.cumulative?.prev_cumulative?.online?.direct_cost || 0) * 1000;
+          // 전년 수수료율 계산 (전년 해당 월 데이터 사용)
+          const prevOnlineDirectCost = (plData?.prev_month?.online?.direct_cost || 0) * 1000;
           const prevSalesRatio = (onlinePrevious > 0 ? (previous / onlinePrevious) : 0);
           const prevDirectCost = prevOnlineDirectCost * prevSalesRatio;
           const prevCommission = prevDirectCost * commissionRatio;
