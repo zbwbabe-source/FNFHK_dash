@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-05T23:44:59.989123"
+    "generated_at": "2025-12-09T21:39:24.970242"
   },
   "current_month": {
     "hk": {
@@ -374,13 +374,13 @@
   "discovery": {
     "net_sales": 408.25809000000004,
     "discount_rate": 9.735326892038291,
-    "direct_cost": 1385.3208200000004,
-    "direct_profit": -1122.1580377414866,
+    "direct_cost": 1385.32082,
+    "direct_profit": -1122.1580377414862,
     "marketing": 240.0,
-    "travel": 25.74,
-    "sg_a": 424.02,
-    "operating_profit": -1546.1780377414866,
-    "cumulative_operating_profit": -1546.1780377414866,
+    "travel": 0,
+    "sg_a": 265.74,
+    "operating_profit": -1387.8980377414862,
+    "cumulative_operating_profit": -1387.8980377414862,
     "store_count": {
       "online": 1,
       "offline": 1

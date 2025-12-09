@@ -4,7 +4,6 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import plData from './taiwan-pl-data.json';
 import storeAreasData from './taiwan-store-areas.json';
-import dashboardData from './taiwan-dashboard-data.json';
 
 type StoreCategoryKey = 'large_profit' | 'small_medium_profit' | 'loss';
 
@@ -31,10 +30,45 @@ const CATEGORY_LABEL: Record<StoreCategoryKey, string> = {
   loss: '적자매장',
 };
 
-const TaiwanStoreDashboard: React.FC = () => {
+interface TaiwanStoreDashboardProps {
+  period?: string;
+}
+
+const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2511' }) => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['large_profit', 'small_medium_profit', 'loss']));
   const [editingAiAnalysis, setEditingAiAnalysis] = useState<boolean>(false);
   const [aiAnalysisText, setAiAnalysisText] = useState<string>('');
+  
+  // 동적 데이터 로드
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/dashboard/taiwan-dashboard-data-${period}.json`);
+        if (!response.ok) {
+          throw new Error(`Failed to load data for period ${period}`);
+        }
+        const data = await response.json();
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // 폴백: 기본 데이터 로드 시도
+        try {
+          const fallbackResponse = await fetch('/dashboard/taiwan-dashboard-data.json');
+          const fallbackData = await fallbackResponse.json();
+          setDashboardData(fallbackData);
+        } catch (fallbackError) {
+          console.error('Error loading fallback data:', fallbackError);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [period]);
 
   // 페이지 타이틀 설정
   useEffect(() => {
@@ -225,12 +259,29 @@ const TaiwanStoreDashboard: React.FC = () => {
   const defaultAiText = `평당매출이 ${formatNumber(stats.breakEvenThreshold)} HKD/평 이상이어야 흑자 전환 가능성이 높습니다. 현재 흑자 매장(${stats.profitStoresCount}개)의 평균 평당매출은 ${formatNumber(stats.avgProfitSalesPerPyeong)} HKD/평입니다.`;
   const displayAiText = aiAnalysisText || defaultAiText;
 
+  // 로딩 중 표시
+  if (isLoading || !dashboardData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Period 표시를 위한 포맷팅
+  const periodYear = period.substring(0, 2);
+  const periodMonth = period.substring(2, 4);
+  const periodLabel = `${periodYear}년 ${periodMonth}월`;
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg p-6 shadow-lg">
-          <h1 className="text-3xl font-bold mb-2">대만법인 매장효율성 분석 (25년 10월, 2510)</h1>
+          <h1 className="text-3xl font-bold mb-2">대만법인 매장효율성 분석 ({periodLabel}, {period})</h1>
           <p className="text-purple-100">Taiwan Store Efficiency Analysis - 평당매출 중심 분석 (단위: 1K HKD)</p>
         </div>
 

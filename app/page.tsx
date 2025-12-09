@@ -11,7 +11,7 @@ export default function Home() {
   const [twData, setTwData] = useState<any>(null);
   const [hkPlData, setHkPlData] = useState<any>(null);
   const [twPlData, setTwPlData] = useState<any>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('2510'); // 기본값: 25년 10월
+  const [selectedPeriod, setSelectedPeriod] = useState('2511'); // 기본값: 25년 11월
   const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
   const [showTwDiscovery, setShowTwDiscovery] = useState(false);
@@ -24,8 +24,10 @@ export default function Home() {
         // Period별 파일명 생성
         const hkDashboardPath = `/dashboard/hongkong-dashboard-data-${selectedPeriod}.json`;
         const twDashboardPath = `/dashboard/taiwan-dashboard-data-${selectedPeriod}.json`;
-        const hkPlPath = `/dashboard/hongkong-pl-data.json`; // PL 데이터는 period별 파일 없음
-        const twPlPath = `/dashboard/taiwan-pl-data.json`; // PL 데이터는 period별 파일 없음
+        
+        // PL 데이터도 동일한 period 사용
+        const hkPlPath = `/dashboard/hongkong-pl-data-${selectedPeriod}.json`;
+        const twPlPath = `/dashboard/taiwan-pl-data-${selectedPeriod}.json`;
 
         // Period별 파일 로드 시도, 없으면 기본 파일 사용
         const loadWithFallback = async (periodPath: string, defaultPath: string) => {
@@ -49,8 +51,8 @@ export default function Home() {
         const [hkDashboard, twDashboard, hkPl, twPl] = await Promise.all([
           loadWithFallback(hkDashboardPath, '/dashboard/hongkong-dashboard-data.json'),
           loadWithFallback(twDashboardPath, '/dashboard/taiwan-dashboard-data.json'),
-          fetch(hkPlPath + '?t=' + Date.now()).then(r => r.json()),
-          fetch(twPlPath + '?t=' + Date.now()).then(r => r.json())
+          loadWithFallback(hkPlPath, '/dashboard/hongkong-pl-data.json'),
+          loadWithFallback(twPlPath, '/dashboard/taiwan-pl-data.json')
         ]);
 
         // ending_inventory는 components 폴더에서 import
@@ -952,7 +954,7 @@ export default function Home() {
 
               {/* 대시보드 버튼 */}
               <Link
-                href="/hongkong"
+                href={`/hongkong?period=${selectedPeriod}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
@@ -1228,7 +1230,7 @@ export default function Home() {
 
               {/* 대시보드 버튼 */}
               <Link
-                href="/taiwan"
+                href={`/taiwan?period=${selectedPeriod}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"

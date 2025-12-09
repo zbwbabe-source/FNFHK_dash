@@ -82,8 +82,9 @@ def calculate_discount_rate(gross_sales, net_sales):
 
 def read_all_csv_files(csv_dir):
     """CSV 디렉토리에서 모든 CSV 파일 읽기 및 통합"""
-    csv_pattern = os.path.join(csv_dir, '*홍콩재고수불.csv')
-    csv_files = glob.glob(csv_pattern)
+    # 2511 파일만 읽기
+    csv_pattern = os.path.join(csv_dir, '*2511*.csv')
+    csv_files = [f for f in glob.glob(csv_pattern) if '홍콩재고수불' in f]
     
     if not csv_files:
         print(f"CSV 파일을 찾을 수 없습니다: {csv_pattern}")
@@ -111,10 +112,18 @@ def read_all_csv_files(csv_dir):
             print(f"  ERROR: {e}")
             continue
     
-    return all_data, sorted(all_periods)
+    # Period를 숫자로 변환하여 정렬 (문자열 정렬 문제 방지)
+    periods_sorted = sorted(all_periods, key=lambda x: int(x) if x.isdigit() else 0)
+    return all_data, periods_sorted
 
-def generate_dashboard_data(csv_dir, output_file_path):
-    """대시보드용 데이터 생성"""
+def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
+    """대시보드용 데이터 생성
+    
+    Args:
+        csv_dir: CSV 파일 디렉토리
+        output_file_path: 출력 JSON 파일 경로
+        target_period: 생성할 Period (예: '2510', '2511'). None이면 가장 최신 Period 사용
+    """
     print("=" * 80)
     print("홍콩 대시보드 데이터 생성")
     print("=" * 80)
@@ -126,9 +135,20 @@ def generate_dashboard_data(csv_dir, output_file_path):
         print("데이터가 없습니다.")
         return
     
-    # 마지막 Period 찾기
-    last_period = periods[-1]
-    last_year, last_month = parse_period(last_period)
+    # Period 결정
+    if target_period:
+        # target_period가 지정된 경우
+        last_period = target_period
+        last_year = 2000 + int(target_period[:2])
+        last_month = int(target_period[2:4])
+        
+        if last_period not in periods:
+            print(f"경고: {target_period} 데이터가 CSV에 없습니다!")
+            print(f"사용 가능한 Period: {periods}")
+    else:
+        # 마지막 Period 찾기
+        last_period = periods[-1]
+        last_year, last_month = parse_period(last_period)
     
     # 전년 동월 Period 찾기
     prev_year = last_year - 1
@@ -2493,6 +2513,13 @@ def generate_dashboard_data(csv_dir, output_file_path):
     with open(output_file_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
+    # public 폴더에도 복사
+    public_output = output_file_path.replace('components/dashboard', 'public/dashboard')
+    os.makedirs(os.path.dirname(public_output), exist_ok=True)
+    with open(public_output, 'w', encoding='utf-8') as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+    print(f"  복사 완료: {public_output}")
+    
     print("\n" + "=" * 80)
     print("완료!")
     print("=" * 80)
@@ -2502,11 +2529,38 @@ def generate_dashboard_data(csv_dir, output_file_path):
     print(f"  - 추세 데이터 포인트: {len(trend_data)}")
     print(f"  - 마지막 Period: {last_period}")
     print(f"  - 전년 동월 Period: {prev_period}")
+    print("=" * 80)
 
 if __name__ == '__main__':
-    # CSV 파일이 있는 디렉토리
-    csv_dir = '../Dashboard_Raw_Data'
-    output_file = 'components/dashboard/hongkong-dashboard-data.json'
+    import traceback
+    from datetime import datetime
     
-    generate_dashboard_data(csv_dir, output_file)
+    try:
+        # CSV 파일이 있는 디렉토리
+        csv_dir = '../Dashboard_Raw_Data'
+        
+        # 2511 데이터 생성 (기존 2510 데이터는 유지)
+        output_file_2511 = 'components/dashboard/hongkong-dashboard-data-2511.json'
+        
+        print("=" * 80)
+        print("홍콩 대시보드 2511 데이터 생성")
+        print("=" * 80)
+        print(f"CSV 디렉토리: {csv_dir}")
+        print(f"출력 파일: {output_file_2511}")
+        print("=" * 80)
+        
+        generate_dashboard_data(csv_dir, output_file_2511)
+        
+        print("\n" + "=" * 80)
+        print("✅ 홍콩 대시보드 2511 데이터 생성 완료!")
+        print("=" * 80)
+    except Exception as e:
+        print("\n" + "=" * 80)
+        print("❌ 에러 발생!")
+        print("=" * 80)
+        print(f"에러: {str(e)}")
+        print("\n상세 에러:")
+        traceback.print_exc()
+        print("=" * 80)
+        sys.exit(1)
 

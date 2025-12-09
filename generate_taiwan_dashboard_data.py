@@ -16,10 +16,10 @@ from datetime import datetime
 import re
 
 # TWD to HKD 환산환율
+# 2511 기준: 4.03
 # 2510 기준: 3.95701015338086
-# 2509 기준: 3.92 (임시)
-# 다음달 업데이트 시 이 값을 변경하세요
-TWD_TO_HKD_RATE = 3.92  # 2509 테스트용 임시 값
+# 2509 기준: 3.92
+TWD_TO_HKD_RATE = 4.03  # 2511 환율
 
 # V- (부가세 제외) 적용 비율
 # 대만재고수불.csv의 실판매출은 V-로 표현해야 하므로 1.05로 나눔
@@ -1588,11 +1588,16 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     print(f"  - 추세 데이터 포인트: {len(trend_data)}")
 
 if __name__ == '__main__':
-    csv_file = '../Dashboard_Raw_Data/대만재고수불.csv'
-    output_file = 'components/dashboard/taiwan-dashboard-data.json'
-    print("스크립트 시작...")
+    # 2511 데이터 생성 (기존 2510 유지)
+    csv_file = '../Dashboard_Raw_Data/대만재고수불_2511.csv'
+    output_file = 'components/dashboard/taiwan-dashboard-data-2511.json'
+    print("=" * 80)
+    print("대만 대시보드 2511 데이터 생성")
+    print("=" * 80)
     print(f"CSV 파일: {csv_file}")
     print(f"출력 파일: {output_file}")
-    generate_dashboard_data(csv_file, output_file)
-    print("스크립트 완료!")
+    print(f"환율: {TWD_TO_HKD_RATE}")
+    print("=" * 80)
+    generate_dashboard_data(csv_file, output_file, target_period='2511')
+    print("\n✅ 대만 대시보드 2511 데이터 생성 완료!")
 

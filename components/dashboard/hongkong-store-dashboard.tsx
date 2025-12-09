@@ -18,7 +18,6 @@ import {
 } from 'recharts';
 import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, ChevronRight, ArrowRight } from 'lucide-react';
 import storeStatusData from './hongkong-store-status.json';
-import dashboardData from './hongkong-dashboard-data.json';
 import storeAreasData from './hongkong-store-areas.json';
 import storeTurnoverTargetsData from './hongkong-store-turnover-targets.json';
 import plData from './hongkong-pl-data.json';
@@ -113,7 +112,11 @@ const getGradeStyle = (grade: string) => {
   }
 };
 
-const HongKongStoreDashboard: React.FC = () => {
+interface HongKongStoreDashboardProps {
+  period?: string;
+}
+
+const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period = '2511' }) => {
   const ALL_CATEGORY_KEYS: StoreCategoryKey[] = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'];
   const [selectedStore, setSelectedStore] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -125,6 +128,37 @@ const HongKongStoreDashboard: React.FC = () => {
   const [showSalesPerPyeongAnalysis, setShowSalesPerPyeongAnalysis] = useState(true); // 1번 섹션 접기/펼치기
   const [expandedCategoriesSalesPerPyeong, setExpandedCategoriesSalesPerPyeong] = useState<Set<string>>(new Set()); // 1번 섹션 펼쳐진 카테고리 목록
   const [showTurnoverRentExplanation, setShowTurnoverRentExplanation] = useState(false); // 턴오버 임차료 설명 접기/펼치기
+  
+  // 동적 데이터 로드
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/dashboard/hongkong-dashboard-data-${period}.json`);
+        if (!response.ok) {
+          throw new Error(`Failed to load data for period ${period}`);
+        }
+        const data = await response.json();
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // 폴백: 기본 데이터 로드 시도
+        try {
+          const fallbackResponse = await fetch('/dashboard/hongkong-dashboard-data.json');
+          const fallbackData = await fallbackResponse.json();
+          setDashboardData(fallbackData);
+        } catch (fallbackError) {
+          console.error('Error loading fallback data:', fallbackError);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [period]);
   
   // AI 분석 편집 상태
   const [editingAiAnalysis, setEditingAiAnalysis] = useState<string | null>(null);
@@ -323,13 +357,30 @@ const HongKongStoreDashboard: React.FC = () => {
     return `${Number(num).toFixed(decimals)}%`;
   };
 
+  // 로딩 중 표시
+  if (isLoading || !dashboardData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Period 표시를 위한 포맷팅
+  const periodYear = period.substring(0, 2);
+  const periodMonth = period.substring(2, 4);
+  const periodLabel = `${periodYear}년 ${periodMonth}월`;
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* 헤더 */}
       <div className="max-w-7xl mx-auto mb-6">
         <div className="bg-gradient-to-r from-slate-800 to-slate-600 text-white rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">매장효율성 분석 (25년 10월 기준)</h1>
+            <h1 className="text-2xl font-bold mb-1">매장효율성 분석 ({periodLabel} 기준)</h1>
             <p className="text-sm text-slate-200">
               매장별 평당매출, 턴오버 달성률, 손익구조를 분석하여 효율성을 한눈에 파악하는 화면입니다.
             </p>

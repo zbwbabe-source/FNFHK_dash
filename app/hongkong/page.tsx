@@ -1,12 +1,22 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import HongKongCEODashboard from '@/components/dashboard/hongkong-ceo-dashboard';
 
-export const metadata = {
-  title: '홍콩법인 25년 10월 경영실적',
-  description: '홍콩법인 경영실적 분석 대시보드',
-};
+function HongKongPageContent() {
+  const searchParams = useSearchParams();
+  const period = searchParams.get('period') || '2511'; // 기본값 2511
+
+  return <HongKongCEODashboard period={period} />;
+}
 
 export default function HongKongPage() {
-  return <HongKongCEODashboard />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HongKongPageContent />
+    </Suspense>
+  );
 }
 
 

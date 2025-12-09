@@ -3,13 +3,76 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ComposedChart, Legend, LabelList, ReferenceLine, Cell, Layer } from 'recharts';
 import { TrendingDown, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
-import dashboardData from './taiwan-dashboard-data.json';
-import plData from './taiwan-pl-data.json';
 
-const TaiwanCEODashboard = () => {
+interface TaiwanCEODashboardProps {
+  period?: string;
+}
+
+const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511' }) => {
+  // 동적 데이터 로드
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [plData, setPlData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    document.title = "대만법인 25년 10월 경영실적";
-  }, []);
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Dashboard 데이터 로드
+        const dashboardResponse = await fetch(`/dashboard/taiwan-dashboard-data-${period}.json`);
+        if (!dashboardResponse.ok) {
+          throw new Error(`Failed to load dashboard data for period ${period}`);
+        }
+        const dashData = await dashboardResponse.json();
+        setDashboardData(dashData);
+        
+        // PL 데이터 로드 (동일한 period 사용)
+        let plResponse = await fetch(`/dashboard/taiwan-pl-data-${period}.json`);
+        
+        // period별 PL 파일이 없으면 기본 파일 사용
+        if (!plResponse.ok) {
+          plResponse = await fetch('/dashboard/taiwan-pl-data.json');
+        }
+        
+        if (plResponse.ok) {
+          const plDataResult = await plResponse.json();
+          setPlData(plDataResult);
+        }
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // 폴백: 기본 데이터 로드 시도
+        try {
+          const fallbackDashboard = await fetch('/dashboard/taiwan-dashboard-data.json');
+          const fallbackPl = await fetch('/dashboard/taiwan-pl-data.json');
+          
+          if (fallbackDashboard.ok) {
+            const dashData = await fallbackDashboard.json();
+            setDashboardData(dashData);
+          }
+          if (fallbackPl.ok) {
+            const plDataResult = await fallbackPl.json();
+            setPlData(plDataResult);
+          }
+        } catch (fallbackError) {
+          console.error('Error loading fallback data:', fallbackError);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [period]);
+
+  // Period 표시를 위한 포맷팅
+  const periodYear = period.substring(0, 2);
+  const periodMonth = period.substring(2, 4);
+  const periodLabel = `${periodYear}년 ${periodMonth}월`;
+
+  useEffect(() => {
+    document.title = `대만법인 ${periodLabel} 경영실적`;
+  }, [periodLabel]);
 
   // ============================================================
   // STATE 관리 - 상세보기 토글 상태
@@ -430,13 +493,25 @@ const TaiwanCEODashboard = () => {
     return num.toFixed(1);
   };
 
+  // 로딩 중 표시
+  if (isLoading || !dashboardData || !plData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       {/* 헤더 */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-600 text-white rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">대만법인 25년 10월 경영실적</h1>
+            <h1 className="text-2xl font-bold mb-1">대만법인 {periodLabel} 경영실적</h1>
             <p className="text-slate-200">(보고일 : 2025년 11월 17일)</p>
           </div>
         </div>

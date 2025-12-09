@@ -1,12 +1,22 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import TaiwanCEODashboard from '@/components/dashboard/taiwan-ceo-dashboard';
 
-export const metadata = {
-  title: '대만법인 25년 10월 경영실적',
-  description: '대만법인 경영실적 분석 대시보드',
-};
+function TaiwanPageContent() {
+  const searchParams = useSearchParams();
+  const period = searchParams.get('period') || '2511'; // 기본값 2511
+
+  return <TaiwanCEODashboard period={period} />;
+}
 
 export default function TaiwanPage() {
-  return <TaiwanCEODashboard />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TaiwanPageContent />
+    </Suspense>
+  );
 }
 
 

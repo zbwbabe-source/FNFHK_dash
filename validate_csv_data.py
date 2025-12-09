@@ -178,10 +178,23 @@ def validate_pl_database(period):
     print(f"[PL Database] {period} 데이터 검증 중...")
     print(f"{'='*80}\n")
     
-    csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    # CSV 파일 찾기 (period별 파일 우선, 없으면 기본 파일)
+    possible_paths = [
+        f'../Dashboard_Raw_Data/hmd_pl_database_{period}.csv',
+        '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    ]
     
-    if not os.path.exists(csv_path):
-        print(f"❌ PL 데이터베이스 파일을 찾을 수 없습니다: {csv_path}")
+    csv_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            csv_path = path
+            break
+    
+    if not csv_path:
+        print(f"❌ PL 데이터베이스 파일을 찾을 수 없습니다.")
+        print(f"   확인 경로:")
+        for path in possible_paths:
+            print(f"   - {path}")
         return False
     
     print(f"✅ 파일 발견: {csv_path}\n")
@@ -259,6 +272,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
 
 

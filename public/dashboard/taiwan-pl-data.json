@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-05T23:58:09.253302"
+    "generated_at": "2025-12-09T21:39:30.171979"
   },
   "current_month": {
     "total": {
@@ -580,13 +580,13 @@
   "discovery": {
     "net_sales": 1342.4435751331707,
     "discount_rate": 19.83098819901273,
-    "direct_cost": 935.2285833378828,
-    "direct_profit": -170.49330598273275,
-    "marketing": 240.0,
-    "travel": 25.74,
-    "sg_a": 424.02,
-    "operating_profit": -594.5133059827327,
-    "cumulative_operating_profit": -5681.846589961829,
+    "direct_cost": 935.228583337883,
+    "direct_profit": -170.49330598273298,
+    "marketing": 0,
+    "travel": 0,
+    "sg_a": 85.37,
+    "operating_profit": -255.86330598273298,
+    "cumulative_operating_profit": -2428.0462513526745,
     "store_count": {
       "online": 2,
       "offline": 3

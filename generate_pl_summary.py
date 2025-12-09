@@ -66,12 +66,33 @@ def read_pl_database(csv_file, brand_filter=None, include_office=False):
 def get_mlb_sg_a(pl_data, period):
     """MLB 영업비 계산 (M99 오피스의 판매관리비, BRD_CD='M'만)"""
     sg_a = 0.0
+    matched_rows = 0
     for row in pl_data:
-        if (row['PERIOD'] == period and 
+        if (str(row['PERIOD']) == str(period) and 
             row['SHOP_CD'] == 'M99' and 
             row['BRD_CD'] == 'M' and  # MLB만
             row['ACCOUNT_NM'].strip() == '판매관리비'):
             sg_a += float(row['VALUE'] or 0)
+            matched_rows += 1
+    # 디버그 로그
+    if matched_rows > 0:
+        print(f"  DEBUG: M99 MLB 영업비 matched rows: {matched_rows}, total: {sg_a:,.2f}")
+    return sg_a
+
+def get_dx_sg_a(pl_data, period):
+    """DX(디스커버리) 영업비 계산 (M99 오피스의 판매관리비, BRD_CD='X'만)"""
+    sg_a = 0.0
+    matched_rows = 0
+    for row in pl_data:
+        if (str(row['PERIOD']) == str(period) and 
+            row['SHOP_CD'] == 'M99' and 
+            row['BRD_CD'] == 'X' and  # DX만
+            row['ACCOUNT_NM'].strip() == '판매관리비'):
+            sg_a += float(row['VALUE'] or 0)
+            matched_rows += 1
+    # 디버그 로그
+    if matched_rows > 0:
+        print(f"  DEBUG: M99 DX 영업비 matched rows: {matched_rows}, total: {sg_a:,.2f}")
     return sg_a
 
 def get_mlb_expense_detail(pl_data, period):
@@ -505,15 +526,21 @@ def main(target_period_short=None):
     
     # 손익 데이터 읽기 (MLB만, 오피스 제외)
     print("\n손익 데이터 읽는 중...")
-    pl_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='M', include_office=False)
+    # Period별 파일 찾기
+    pl_csv_path = f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv'
+    import os
+    if not os.path.exists(pl_csv_path):
+        pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    print(f"PL CSV 파일: {pl_csv_path}")
+    pl_data = read_pl_database(pl_csv_path, brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")
     
-    # 영업이익 계산용 데이터 (MLB + M99 오피스)
-    pl_data_with_office = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='M', include_office=True)
+    # 영업이익 계산용 데이터 (MLB + M99 오피스) - 동일한 파일 사용!
+    pl_data_with_office = read_pl_database(pl_csv_path, brand_filter='M', include_office=True)
     print(f"오피스 포함 MLB 데이터: {len(pl_data_with_office):,}건")
     
-    # 디스커버리 데이터 읽기 (참고용)
-    discovery_data = read_pl_database('../Dashboard_Raw_Data/hmd_pl_database.csv', brand_filter='X', include_office=False)
+    # 디스커버리 데이터 읽기 (참고용) - 동일한 파일 사용!
+    discovery_data = read_pl_database(pl_csv_path, brand_filter='X', include_office=False)
     print(f"디스커버리 데이터: {len(discovery_data):,}건")
     
     # 누적 기간 계산 (디스커버리 누적 계산에 사용)
@@ -908,13 +935,28 @@ def main(target_period_short=None):
         discovery_tag = discovery_current['TAG']
         discovery_net = discovery_current['실판']
         discovery_discount_rate = ((discovery_tag - discovery_net) / discovery_tag * 100) if discovery_tag > 0 else 0
-        discovery_direct_cost = discovery_current['직접비_합계']
-        discovery_direct_profit = discovery_current['매출총이익'] - discovery_direct_cost
-        # 사용자 제공값: 마케팅비 240, 여비교통비 25.74
-        discovery_marketing = 240.0
-        discovery_travel = 25.74
-        discovery_sg_a = 424.02  # 사용자 제공값
+        
+        # 판매관리비 = 직접비
+        discovery_direct_cost = discovery_current.get('판매관리비', 0)
+        discovery_gross_profit = discovery_current['매출총이익']
+        discovery_direct_profit = discovery_gross_profit - discovery_direct_cost
+        
+        # 영업이익 = 직접이익 - M99 오피스 DX 영업비
+        discovery_sg_a = get_dx_sg_a(pl_data_with_office, latest_period_full)
         discovery_op_profit = discovery_direct_profit - discovery_sg_a
+        
+        # 마케팅비, 여비교통비는 영업비 상세에서 추출 (참고용)
+        discovery_marketing = 0
+        discovery_travel = 0
+        for row in pl_data_with_office:
+            if (str(row['PERIOD']) == str(latest_period_full) and 
+                row['SHOP_CD'] == 'M99' and 
+                row['BRD_CD'] == 'X'):
+                account = row['ACCOUNT_NM'].strip()
+                if '광고선전비' in account or '판촉비' in account:
+                    discovery_marketing += float(row.get('VALUE', 0) or 0)
+                elif '여비교통비' in account:
+                    discovery_travel += float(row.get('VALUE', 0) or 0)
         
         # 매장 수 확인 (25년 10월 기준, 매출이 있는 매장만)
         discovery_stores = set()
@@ -946,9 +988,15 @@ def main(target_period_short=None):
             for key in period_discovery.keys():
                 discovery_cumulative[key] += period_discovery[key]
         
-        # 누적 영업이익 계산 (실제 영업한 월수만큼만 영업비 계산)
-        discovery_cumulative_direct_profit = discovery_cumulative['매출총이익'] - discovery_cumulative['직접비_합계']
-        discovery_cumulative_sg_a = discovery_sg_a * len(actual_discovery_periods)  # 실제 영업한 월수만큼만
+        # 누적 영업이익 계산
+        discovery_cumulative_direct_cost = discovery_cumulative.get('판매관리비', 0)
+        discovery_cumulative_direct_profit = discovery_cumulative['매출총이익'] - discovery_cumulative_direct_cost
+        
+        # 누적 M99 오피스 DX 영업비
+        discovery_cumulative_sg_a = 0
+        for period in actual_discovery_periods:
+            discovery_cumulative_sg_a += get_dx_sg_a(pl_data_with_office, period)
+        
         discovery_cumulative_op_profit = discovery_cumulative_direct_profit - discovery_cumulative_sg_a
         
         print(f"온라인{online_count}개, 오프라인{offline_count}개 (10/1 영업개시)")
@@ -1472,13 +1520,35 @@ def main(target_period_short=None):
         } if discovery_data else None
     }
     
-    # JSON 파일 저장
-    output_file = 'components/dashboard/hongkong-pl-data.json'
+    # JSON 파일 저장 (period별 + 기본 파일)
+    import shutil
+    if target_period_short:
+        output_file = f'components/dashboard/hongkong-pl-data-{target_period_short}.json'
+        public_file = f'public/dashboard/hongkong-pl-data-{target_period_short}.json'
+    else:
+        output_file = 'components/dashboard/hongkong-pl-data.json'
+        public_file = 'public/dashboard/hongkong-pl-data.json'
+    
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(pl_json_data, f, ensure_ascii=False, indent=2)
     
+    # public 폴더에도 복사
+    shutil.copy(output_file, public_file)
+    
     print(f"\nP&L 데이터가 {output_file}에 저장되었습니다.")
+    print(f"Public 폴더에도 복사: {public_file}")
+    
+    # 기본 파일로도 복사 (최신 데이터)
+    if target_period_short:
+        default_output = 'components/dashboard/hongkong-pl-data.json'
+        default_public = 'public/dashboard/hongkong-pl-data.json'
+        shutil.copy(output_file, default_output)
+        shutil.copy(output_file, default_public)
+        print(f"기본 파일로도 복사: {default_output}, {default_public}")
 
 if __name__ == '__main__':
-    main()
+    import sys
+    # 명령줄 인자로 period 받기
+    target_period = sys.argv[1] if len(sys.argv) > 1 else None
+    main(target_period)
 

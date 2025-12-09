@@ -1,12 +1,21 @@
-import TaiwanStoreDashboard from '@/components/dashboard/taiwan-store-dashboard';
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: '대만법인 매장효율성 분석',
-  description: 'Taiwan Store Efficiency Analysis - 평당매출 중심 분석',
-};
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import TaiwanStoreDashboard from '@/components/dashboard/taiwan-store-dashboard';
+
+function TaiwanStoresDashboardContent() {
+  const searchParams = useSearchParams();
+  const period = searchParams.get('period') || '2511'; // 기본값 2511
+
+  return <TaiwanStoreDashboard period={period} />;
+}
 
 export default function TaiwanStoresDashboardPage() {
-  return <TaiwanStoreDashboard />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TaiwanStoresDashboardContent />
+    </Suspense>
+  );
 }
 

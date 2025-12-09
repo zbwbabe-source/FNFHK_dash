@@ -4,7 +4,7 @@
     "previous_period": "2410",
     "last_year": 2025,
     "last_month": 10,
-    "generated_at": "2025-12-02T15:52:02.361556"
+    "generated_at": "2025-12-09T21:50:39.689745"
   },
   "sales_summary": {
     "total_net_sales": 13429.605199222546,
@@ -3005,15 +3005,6 @@
         "yoy": 80.79981716882938
       },
       "by_year": {
-        "3년차 이상": {
-          "current": {
-            "stock_price": 0.0
-          },
-          "previous": {
-            "stock_price": 1.701530612244898
-          },
-          "yoy": 0.0
-        },
         "1년차": {
           "current": {
             "stock_price": 17714.354591836734
@@ -3191,6 +3182,15 @@
               }
             ]
           }
+        },
+        "3년차 이상": {
+          "current": {
+            "stock_price": 0.0
+          },
+          "previous": {
+            "stock_price": 1.701530612244898
+          },
+          "yoy": 0.0
         }
       }
     }
