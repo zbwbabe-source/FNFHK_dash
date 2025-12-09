@@ -4253,7 +4253,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   if (selectedInventoryItem === '전체') {
                     return (
                       <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={months.map((month, idx) => ({
+                        <LineChart data={months.map((month: string, idx: number) => ({
                           month,
                           fSeason: inventoryYOY['F당시즌']?.[idx] ?? null,
                           sSeason: inventoryYOY['S당시즌']?.[idx] ?? null,
@@ -4296,7 +4296,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     
                     return (
                       <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={months.map((month, idx) => ({
+                        <LineChart data={months.map((month: string, idx: number) => ({
                           month,
                           value: yoyData[idx] ?? null
                         }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>

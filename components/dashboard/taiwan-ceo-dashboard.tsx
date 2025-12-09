@@ -4668,7 +4668,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   if (selectedInventoryItem === '전체') {
                     return (
                       <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={months.map((month, idx) => ({
+                        <LineChart data={months.map((month: string, idx: number) => ({
                           month,
                           fSeason: inventoryYOY['F당시즌']?.[idx] ?? null,
                           sSeason: inventoryYOY['S당시즌']?.[idx] ?? null,
@@ -4842,7 +4842,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     
                     return (
                       <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={months.map((month, idx) => {
+                        <LineChart data={months.map((month: string, idx: number) => {
                           const isLastMonth = idx === months.length - 1;
                           let yoyValue = yoyData[idx] ?? null;
                           // 마지막 월(10월)은 카드의 YOY 사용 (ending_inventory 기준)
