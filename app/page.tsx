@@ -15,6 +15,32 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
   const [showTwDiscovery, setShowTwDiscovery] = useState(false);
+  const [reportDate, setReportDate] = useState('2024-11-17'); // 보고일자 (YYYY-MM-DD)
+  const [isEditingDate, setIsEditingDate] = useState(false);
+
+  // localStorage에서 보고일자 불러오기
+  useEffect(() => {
+    const savedDate = localStorage.getItem('reportDate');
+    if (savedDate) {
+      setReportDate(savedDate);
+    }
+  }, []);
+
+  // 보고일자 변경시 localStorage에 저장
+  const handleDateChange = (newDate: string) => {
+    setReportDate(newDate);
+    localStorage.setItem('reportDate', newDate);
+  };
+
+  // 날짜 포맷 함수
+  const formatReportDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const weekday = weekdays[date.getDay()];
+    return `${month}월 ${day}일 ${weekday}`;
+  };
 
   // Period별 데이터 로드
   useEffect(() => {
@@ -649,9 +675,26 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-gray-900 leading-tight mb-1">
                 {periodLabel} 홍콩법인 경영대시보드
               </h2>
-              <p className="text-sm text-gray-500">
-                보고일자 11월 17일 월요일
-              </p>
+              <div className="flex items-center gap-2">
+                {isEditingDate ? (
+                  <input
+                    type="date"
+                    value={reportDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    onBlur={() => setIsEditingDate(false)}
+                    autoFocus
+                    className="text-sm px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                  />
+                ) : (
+                  <p 
+                    className="text-sm text-gray-500 cursor-pointer hover:text-blue-600 hover:underline"
+                    onClick={() => setIsEditingDate(true)}
+                    title="클릭하여 수정"
+                  >
+                    보고일자 {formatReportDate(reportDate)}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="relative">
               <select
