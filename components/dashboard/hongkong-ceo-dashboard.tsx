@@ -2019,7 +2019,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           {channel?.country === 'HK' ? 'HK' : 'MC'} {channel?.channel}
                         </span>
                         <span className="font-semibold">
-                          {formatNumber(channel?.current?.sales_per_store)} 
+                          {formatNumber((channel?.current?.sales_per_store || 0) / 1000)} 
                           <span className={(channel?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
                             {' '}({formatPercent(channel?.yoy || 0)}%)
                           </span>
