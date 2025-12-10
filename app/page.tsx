@@ -159,22 +159,12 @@ export default function Home() {
     }
   };
 
-  // 기간 옵션 생성 (24년 1월 ~ 25년 12월)
+  // 기간 옵션 생성 (대시보드가 있는 기간만)
   const periodOptions = useMemo(() => {
-    const options = [];
-    // 24년 1월 ~ 12월
-    for (let month = 1; month <= 12; month++) {
-      const period = `24${String(month).padStart(2, '0')}`;
-      const label = `24년 ${month}월`;
-      options.push({ value: period, label });
-    }
-    // 25년 1월 ~ 12월
-    for (let month = 1; month <= 12; month++) {
-      const period = `25${String(month).padStart(2, '0')}`;
-      const label = `25년 ${month}월`;
-      options.push({ value: period, label });
-    }
-    return options;
+    return [
+      { value: '2510', label: '25년 10월' },
+      { value: '2511', label: '25년 11월' },
+    ];
   }, []);
 
   // 선택된 기간에서 년도와 월 추출
@@ -915,8 +905,17 @@ export default function Home() {
                         {/* 실판매출 */}
                         <div className="mb-3">
                           <div className="text-xs text-gray-600 mb-1">💰 실판매출</div>
-                          <div className="text-lg font-bold text-gray-900">
-                            {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
+                          <div className="flex items-baseline gap-2">
+                            <div className="text-lg font-bold text-gray-900">
+                              {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
+                            </div>
+                            {hkPlData?.discovery?.net_sales_yoy && (
+                              <div className={`text-xs font-semibold ${
+                                hkPlData.discovery.net_sales_yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                YOY {formatPercent(hkPlData.discovery.net_sales_yoy)}%
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1191,8 +1190,17 @@ export default function Home() {
                         {/* 실판매출 */}
                         <div className="mb-3">
                           <div className="text-xs text-gray-600 mb-1">💰 실판매출</div>
-                          <div className="text-lg font-bold text-gray-900">
-                            {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
+                          <div className="flex items-baseline gap-2">
+                            <div className="text-lg font-bold text-gray-900">
+                              {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
+                            </div>
+                            {twPlData?.discovery?.net_sales_yoy && (
+                              <div className={`text-xs font-semibold ${
+                                twPlData.discovery.net_sales_yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                YOY {formatPercent(twPlData.discovery.net_sales_yoy)}%
+                              </div>
+                            )}
                           </div>
                         </div>
 

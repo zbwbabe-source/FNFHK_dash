@@ -936,6 +936,11 @@ def main(target_period_short=None):
         discovery_net = discovery_current['실판']
         discovery_discount_rate = ((discovery_tag - discovery_net) / discovery_tag * 100) if discovery_tag > 0 else 0
         
+        # 전월 실판매출 (YOY 계산용)
+        discovery_prev = aggregate_pl_by_period(discovery_data, prev_period_full)
+        discovery_prev_net = discovery_prev.get('실판', 0)
+        discovery_net_yoy = (discovery_net / discovery_prev_net * 100) if discovery_prev_net > 0 else 0
+        
         # 판매관리비 = 직접비
         discovery_direct_cost = discovery_current.get('판매관리비', 0)
         discovery_gross_profit = discovery_current['매출총이익']
@@ -1505,6 +1510,8 @@ def main(target_period_short=None):
         },
         'discovery': {
             'net_sales': discovery_net if discovery_data else 0,
+            'prev_net_sales': discovery_prev_net if discovery_data else 0,
+            'net_sales_yoy': discovery_net_yoy if discovery_data else 0,
             'discount_rate': discovery_discount_rate if discovery_data else 0,
             'direct_cost': discovery_direct_cost if discovery_data else 0,
             'direct_profit': discovery_direct_profit if discovery_data else 0,
