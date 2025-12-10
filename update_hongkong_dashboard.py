@@ -100,10 +100,13 @@ def calculate_discount_rate(gross_sales, net_sales):
         return 0
     return ((gross_sales - net_sales) / gross_sales) * 100
 
-def read_all_csv_files(csv_dir):
+def read_all_csv_files(csv_dir, target_period=None):
     """CSV 디렉토리에서 모든 CSV 파일 읽기 및 통합"""
-    # 2511 파일만 읽기
-    csv_pattern = os.path.join(csv_dir, '*2511*.csv')
+    # target_period가 지정되면 해당 파일만, 아니면 모든 파일 읽기
+    if target_period:
+        csv_pattern = os.path.join(csv_dir, f'*{target_period}*.csv')
+    else:
+        csv_pattern = os.path.join(csv_dir, '*.csv')
     csv_files = [f for f in glob.glob(csv_pattern) if '홍콩재고수불' in f]
     
     if not csv_files:
@@ -149,7 +152,7 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     print("=" * 80)
     
     # 모든 CSV 파일 읽기
-    data, periods = read_all_csv_files(csv_dir)
+    data, periods = read_all_csv_files(csv_dir, target_period)
     
     if not periods:
         print("데이터가 없습니다.")
@@ -2763,6 +2766,7 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     print("=" * 80)
 
 if __name__ == '__main__':
+    import sys
     import traceback
     from datetime import datetime
     
@@ -2770,20 +2774,22 @@ if __name__ == '__main__':
         # CSV 파일이 있는 디렉토리
         csv_dir = '../Dashboard_Raw_Data'
         
-        # 2511 데이터 생성 (기존 2510 데이터는 유지)
-        output_file_2511 = 'components/dashboard/hongkong-dashboard-data-2511.json'
+        # 커맨드라인 인자로 period 받기 (기본값: 2511)
+        period = sys.argv[1] if len(sys.argv) > 1 else '2511'
+        
+        output_file = f'components/dashboard/hongkong-dashboard-data-{period}.json'
         
         print("=" * 80)
-        print("홍콩 대시보드 2511 데이터 생성")
+        print(f"홍콩 대시보드 {period} 데이터 생성")
         print("=" * 80)
         print(f"CSV 디렉토리: {csv_dir}")
-        print(f"출력 파일: {output_file_2511}")
+        print(f"출력 파일: {output_file}")
         print("=" * 80)
         
-        generate_dashboard_data(csv_dir, output_file_2511)
+        generate_dashboard_data(csv_dir, output_file, target_period=period)
         
         print("\n" + "=" * 80)
-        print("✅ 홍콩 대시보드 2511 데이터 생성 완료!")
+        print(f"✅ 홍콩 대시보드 {period} 데이터 생성 완료!")
         print("=" * 80)
     except Exception as e:
         print("\n" + "=" * 80)
