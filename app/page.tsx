@@ -198,6 +198,11 @@ export default function Home() {
   const selectedMonth = parseInt(selectedPeriod.substring(2, 4));
   const periodLabel = `${selectedYear}년 ${selectedMonth}월`;
 
+  // 브라우저 탭 제목 설정
+  useEffect(() => {
+    document.title = `${periodLabel} 경영실적 종합`;
+  }, [selectedPeriod, periodLabel]);
+
   // 해당 월의 일수 계산
   const getDaysInMonth = (year: number, month: number) => {
     // 20XX 형식의 년도를 2000 + XX로 변환

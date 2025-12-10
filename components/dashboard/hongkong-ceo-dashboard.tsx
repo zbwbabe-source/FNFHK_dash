@@ -542,7 +542,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
     const yoy = (dashboardData?.monthly_item_yoy || {}) as any;
     if (!monthlyData.length) return [];
-    const keys = ['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방외'];
+    const keys = ['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방', '기타ACC'];
 
     const result = monthlyData.map((item: any, idx: number) => {
       let currentTotal = 0;
@@ -572,7 +572,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     const months = (dashboardData?.monthly_inventory_data || []) as any[];
     const yoy = (dashboardData?.monthly_inventory_yoy || {}) as any;
     if (!months.length) return [];
-    const keys = ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'];
+    const keys = ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방', '기타ACC'];
     return months.map((item: any, idx: number) => {
       let currentTotal = 0;
       let prevTotal = 0;
@@ -2033,11 +2033,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <div className="bg-indigo-50 rounded p-2">
                       <div className="text-xs font-semibold text-indigo-800 mb-1">📌 계산근거</div>
                       <div className="text-xs text-indigo-700 space-y-0.5">
-                        <div>• <span className="font-semibold">당월:</span> M08, M20, M05, M12 제외</div>
-                        <div className="pl-4 text-xs">- M05 (LCX): 리뉴얼 10/13-11/7</div>
-                        <div className="pl-4 text-xs">- M12 (WTC): 10/11 영업종료</div>
-                        <div className="pl-4 text-xs">- M08, M20: 종료매장</div>
-                        <div>• <span className="font-semibold">전년 동월:</span> 모든 매장 포함 (M08, M20 포함)</div>
+                        <div>• <span className="font-semibold">당월:</span> LCX, K11 MUSEA, WTC, Langham 제외</div>
+                        <div className="pl-4 text-xs">- LCX: 리뉴얼 10/13-11/7</div>
+                        <div className="pl-4 text-xs">- K11 MUSEA, WTC, Langham: 종료매장</div>
+                        <div>• <span className="font-semibold">전년 동월:</span> 모든 매장 포함 (종료매장 포함)</div>
                         <div>• <span className="font-semibold">온라인 채널:</span> 제외 (오프라인 매장 효율성)</div>
                         <div>• <span className="font-semibold">계산식:</span> 오프라인 실판매출 ÷ 오프라인 매장수</div>
                       </div>
@@ -2054,14 +2053,38 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-cyan-500 hover:shadow-xl transition-shadow min-h-[150px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">📈</span>
-                <h3 className="text-sm font-semibold text-gray-600">당시즌 판매 (25F 의류)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">당시즌 판매</h3>
               </div>
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {formatNumber(seasonSales?.current_season_f?.october?.total_net_sales || 0)}
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatNumber(seasonSales?.previous_season_f?.october?.total_net_sales || 0)}</span> | 
-                <span className="text-green-600"> YOY {formatPercent(((seasonSales?.current_season_f?.october?.total_net_sales || 0) / (seasonSales?.previous_season_f?.october?.total_net_sales || 1)) * 100)}%</span>
+              
+              {/* 25F 의류 + ACC 병기 */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                {/* 25F 의류 */}
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">25F 의류</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatNumber(seasonSales?.current_season_f?.october?.total_net_sales || 0)}
+                  </div>
+                  <div className="text-xs font-semibold">
+                    <span className="text-gray-600">전년 {formatNumber(seasonSales?.previous_season_f?.october?.total_net_sales || 0)}</span>
+                  </div>
+                  <div className="text-xs font-semibold">
+                    <span className="text-green-600">YOY {formatPercent(((seasonSales?.current_season_f?.october?.total_net_sales || 0) / (seasonSales?.previous_season_f?.october?.total_net_sales || 1)) * 100)}%</span>
+                  </div>
+                </div>
+                
+                {/* ACC */}
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">ACC</div>
+                  <div className="text-2xl font-bold text-cyan-600">
+                    {formatNumber(dashboardData?.acc_sales_data?.current?.total?.net_sales || 0)}
+                  </div>
+                  <div className="text-xs font-semibold">
+                    <span className="text-gray-600">전년 {formatNumber(dashboardData?.acc_sales_data?.previous?.total?.net_sales || 0)}</span>
+                  </div>
+                  <div className="text-xs font-semibold">
+                    <span className="text-cyan-600">YOY {formatPercent(((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / (dashboardData?.acc_sales_data?.previous?.total?.net_sales || 1)) * 100)}%</span>
+                  </div>
+                </div>
               </div>
               
               {/* 아이템별 상세보기 */}
@@ -2070,7 +2093,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   onClick={() => setShowSeasonSalesDetail(!showSeasonSalesDetail)}
                   className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                 >
-                  <span>카테고리별 판매금액 TOP 5</span>
+                  <span>카테고리별 판매 상세</span>
                   {showSeasonSalesDetail ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
@@ -2080,45 +2103,67 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </div>
               {showSeasonSalesDetail && (
                 <>
-                  <div className="mt-3 pt-3 border-t space-y-1">
-                    {(seasonSales?.current_season_f?.october?.subcategory_top5 || []).map((item: any, idx: number) => {
-                      // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
-                      const prevItemTop5 = seasonSales?.previous_season_f?.october?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
-                      const prevOctoberData = seasonSales?.previous_season_f?.october as any;
-                      const prevItemDetail = prevOctoberData?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
-                      const prevItem = prevItemTop5 || prevItemDetail;
-                      const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 999;
-                      return (
-                        <div key={idx} className="flex justify-between text-xs">
-                          <span className="text-gray-600">{item.subcategory_code}</span>
-                          <span className="font-semibold">
-                            {formatNumber(item.net_sales)} 
-                            <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
-                          </span>
-                        </div>
-                      );
-                    })}
-                    <div className="mt-2 pt-2 border-t text-xs text-gray-500">
-                      * 판매금액 YOY
+                  {/* 25F 카테고리별 판매금액 TOP 5 */}
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">25F 카테고리별 판매금액 TOP 5</div>
+                    <div className="space-y-1">
+                      {(seasonSales?.current_season_f?.october?.subcategory_top5 || []).map((item: any, idx: number) => {
+                        // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
+                        const prevItemTop5 = seasonSales?.previous_season_f?.october?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevOctoberData = seasonSales?.previous_season_f?.october as any;
+                        const prevItemDetail = prevOctoberData?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevItem = prevItemTop5 || prevItemDetail;
+                        const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 999;
+                        return (
+                          <div key={idx} className="flex justify-between text-xs">
+                            <span className="text-gray-600">{item.subcategory_code}</span>
+                            <span className="font-semibold">
+                              {formatNumber(item.net_sales)} 
+                              <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                   
-                  {/* 25S 참고 */}
-                  <div className="mt-3 pt-3 border-t bg-gray-50 rounded p-2">
-                    <div className="text-xs font-semibold text-gray-700 mb-1">📊 참고: 25S 성과</div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-600">판매금액</span>
-                      <span className="font-semibold text-blue-600">
-                        {formatNumber(seasonSales?.current_season_s?.accumulated?.total_net_sales || 0)} 
-                        <span className="text-gray-500"> (YOY {formatPercent(((seasonSales?.current_season_s?.accumulated?.total_net_sales || 0) / (seasonSales?.previous_season_s?.accumulated?.total_net_sales || 1)) * 100)}%)</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">입고금액</span>
-                      <span className="font-semibold text-blue-600">
-                        {formatNumber(seasonSales?.current_season_f?.accumulated?.net_acp_p || 0)} 
-                        <span className="text-gray-500"> (YOY {formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%)</span>
-                      </span>
+                  {/* ACC 카테고리별 판매 */}
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">ACC 카테고리별 판매</div>
+                    <div className="space-y-1">
+                      {['신발', '모자', '가방', '기타ACC'].map((category) => {
+                        const categoryData = dashboardData?.acc_sales_data?.current?.categories?.[category];
+                        const prevCategoryData = dashboardData?.acc_sales_data?.previous?.categories?.[category];
+                        const yoy = prevCategoryData && prevCategoryData.net_sales > 0 
+                          ? ((categoryData?.net_sales || 0) / prevCategoryData.net_sales * 100) 
+                          : 0;
+                        
+                        return (
+                          <div key={category} className="flex justify-between text-xs">
+                            <span className="text-gray-600">{category}</span>
+                            <span className="font-semibold">
+                              {formatNumber(categoryData?.net_sales || 0)}
+                              <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
+                            </span>
+                          </div>
+                        );
+                      })}
+                      <div className="flex justify-between text-xs font-semibold border-t pt-1 mt-1">
+                        <span className="text-gray-700">악세 합계</span>
+                        <span className="text-indigo-600">
+                          {formatNumber(dashboardData?.acc_sales_data?.current?.total?.net_sales || 0)}
+                          <span className={(() => {
+                            const currentTotal = dashboardData?.acc_sales_data?.current?.total?.net_sales || 0;
+                            const previousTotal = dashboardData?.acc_sales_data?.previous?.total?.net_sales || 1;
+                            const yoy = (currentTotal / previousTotal) * 100;
+                            return yoy >= 100 ? 'text-green-600' : 'text-red-600';
+                          })()}> ({formatPercent((() => {
+                            const currentTotal = dashboardData?.acc_sales_data?.current?.total?.net_sales || 0;
+                            const previousTotal = dashboardData?.acc_sales_data?.previous?.total?.net_sales || 1;
+                            return (currentTotal / previousTotal) * 100;
+                          })())}%)</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -2245,19 +2290,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </div>
               <div className="text-3xl font-bold text-green-600 mb-2">
                 {(() => {
-                  // 가중평균 계산 (재고금액으로 가중) - 모자 + 신발 + 가방외
+                  // 가중평균 계산 (재고금액으로 가중) - 모자 + 신발 + 가방 + 기타ACC
                   const data = dashboardData?.monthly_inventory_data || [];
                   const totalWeightedSum = data.reduce((sum: number, item: any) => {
                     const hatWeeks = item.모자?.stock_weeks || 0;
                     const shoeWeeks = item.신발?.stock_weeks || 0;
-                    const bagWeeks = item.가방외?.stock_weeks || 0;
+                    const bagWeeks = item.가방?.stock_weeks || 0;
+                    const etcWeeks = item.기타ACC?.stock_weeks || 0;
                     const hatWeight = item.모자?.stock_price || 0;
                     const shoeWeight = item.신발?.stock_price || 0;
-                    const bagWeight = item.가방외?.stock_price || 0;
-                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight);
+                    const bagWeight = item.가방?.stock_price || 0;
+                    const etcWeight = item.기타ACC?.stock_price || 0;
+                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight) + (etcWeeks * etcWeight);
                   }, 0);
                   const totalWeight = data.reduce((sum: number, item: any) => {
-                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방외?.stock_price || 0);
+                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방?.stock_price || 0) + (item.기타ACC?.stock_price || 0);
                   }, 0);
                   const currentWeeks = totalWeight > 0 ? totalWeightedSum / totalWeight : 0;
                   
@@ -2266,14 +2313,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const prevTotalWeightedSum = prevData.reduce((sum: number, item: any) => {
                     const hatWeeks = item.모자?.stock_weeks || 0;
                     const shoeWeeks = item.신발?.stock_weeks || 0;
-                    const bagWeeks = item.가방외?.stock_weeks || 0;
+                    const bagWeeks = item.가방?.stock_weeks || 0;
+                    const etcWeeks = item.기타ACC?.stock_weeks || 0;
                     const hatWeight = item.모자?.stock_price || 0;
                     const shoeWeight = item.신발?.stock_price || 0;
-                    const bagWeight = item.가방외?.stock_price || 0;
-                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight);
+                    const bagWeight = item.가방?.stock_price || 0;
+                    const etcWeight = item.기타ACC?.stock_price || 0;
+                    return sum + (hatWeeks * hatWeight) + (shoeWeeks * shoeWeight) + (bagWeeks * bagWeight) + (etcWeeks * etcWeight);
                   }, 0);
                   const prevTotalWeight = prevData.reduce((sum: number, item: any) => {
-                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방외?.stock_price || 0);
+                    return sum + (item.모자?.stock_price || 0) + (item.신발?.stock_price || 0) + (item.가방?.stock_price || 0) + (item.기타ACC?.stock_price || 0);
                   }, 0);
                   const prevWeeks = prevTotalWeight > 0 ? prevTotalWeightedSum / prevTotalWeight : 0;
                   const change = currentWeeks - prevWeeks;
@@ -2314,14 +2363,15 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
                     {(() => {
-                      // 모자, 신발, 가방외 가중평균 계산
+                      // 신발, 모자, 가방, 기타ACC 가중평균 계산
                       const data = dashboardData?.monthly_inventory_data || [];
                       const prevData = (dashboardData as any)?.prev_monthly_inventory_data || [];
                       
                       const items = [
-                        { key: '모자', name: '모자' },
                         { key: '신발', name: '신발' },
-                        { key: '가방외', name: '가방외' }
+                        { key: '모자', name: '모자' },
+                        { key: '가방', name: '가방' },
+                        { key: '기타ACC', name: '기타ACC' }
                       ];
                       
                       return items.map((itemInfo) => {
@@ -2361,40 +2411,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         );
                       });
                     })()}
-                  </div>
-                  
-                  {/* 당월 판매 */}
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">당월 판매 (1K HKD)</div>
-                    <div className="space-y-1">
-                      {(() => {
-                        const categories = ['SHO', 'HEA', 'BAG'];
-                        return categories.map((key) => {
-                          const item = accStock?.by_category ? (accStock.by_category as any)[key] : undefined;
-                          const sales = accStock?.october_sales ? (accStock.october_sales as any)[key] : undefined;
-                          if (!item || !sales) return null;
-                          return (
-                            <div key={key} className="flex justify-between text-xs">
-                              <span className="text-gray-600">{item.category_name || key}</span>
-                              <span className="font-semibold">
-                                {formatNumber((sales.net_sales || 0) / 1000)} 
-                                <span className={(sales.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(sales.yoy || 0)}%)</span>
-                              </span>
-                            </div>
-                          );
-                        });
-                      })()}
-                      <div className="flex justify-between text-xs font-semibold border-t pt-1 mt-1">
-                        <span className="text-gray-700">악세 합계</span>
-                        <span className="text-indigo-600">
-                          {formatNumber((() => {
-                            const categories = ['SHO', 'HEA', 'BAG'];
-                            return categories.reduce((sum, key) => sum + ((accStock?.october_sales ? ((accStock.october_sales as any)[key]?.net_sales || 0) : 0) / 1000), 0);
-                          })())} 
-                          <span className="text-red-600"> (84%)</span>
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </>
               )}
@@ -2461,31 +2477,66 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">악세 합계</span>
                     <span className="font-semibold">
-                      {formatNumber(((endingInventory?.acc_by_category?.SHO?.current?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.HEA?.current?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.BAG?.current?.stock_price || 0)) / 1000)} 
-                      <span className="text-green-600"> ({formatPercent((((endingInventory?.acc_by_category?.SHO?.current?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.HEA?.current?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.BAG?.current?.stock_price || 0)) / 
-                        ((endingInventory?.acc_by_category?.SHO?.previous?.stock_price || 1) + 
-                        (endingInventory?.acc_by_category?.HEA?.previous?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.BAG?.previous?.stock_price || 0))) * 100)}%)</span>
+                      {formatNumber((() => {
+                        const accData = endingInventory?.acc_by_category || {};
+                        return Object.values(accData).reduce((sum: number, item: any) => 
+                          sum + (item?.current?.stock_price || 0), 0) / 1000;
+                      })())} 
+                      <span className="text-green-600"> ({formatPercent((() => {
+                        const accData = endingInventory?.acc_by_category || {};
+                        const current = Object.values(accData).reduce((sum: number, item: any) => 
+                          sum + (item?.current?.stock_price || 0), 0);
+                        const previous = Object.values(accData).reduce((sum: number, item: any) => 
+                          sum + (item?.previous?.stock_price || 0), 0);
+                        return previous > 0 ? (current / previous * 100) : 0;
+                      })())}%)</span>
                     </span>
                   </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">신발 (SHO)</span>
-                    <span className="font-semibold">
-                      {formatNumber((endingInventory?.acc_by_category?.SHO?.current?.stock_price || 0) / 1000)} 
-                      <span className="text-green-600"> ({formatPercent(endingInventory?.acc_by_category?.SHO?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">모자 (HEA)</span>
-                    <span className="font-semibold">
-                      {formatNumber((endingInventory?.acc_by_category?.HEA?.current?.stock_price || 0) / 1000)} 
-                      <span className="text-green-600"> ({formatPercent(endingInventory?.acc_by_category?.HEA?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
+                  {(() => {
+                    const categoryOrder = ['SHO', 'HEA', 'BAG'];
+                    const categoryNames: {[key: string]: string} = {
+                      'SHO': '신발',
+                      'HEA': '모자',
+                      'BAG': '가방'
+                    };
+                    
+                    // 기타ACC 합계 계산
+                    const accData = endingInventory?.acc_by_category || {};
+                    const otherAccCurrent = Object.entries(accData)
+                      .filter(([key]) => !categoryOrder.includes(key))
+                      .reduce((sum: number, [, item]: [string, any]) => sum + (item?.current?.stock_price || 0), 0);
+                    const otherAccPrevious = Object.entries(accData)
+                      .filter(([key]) => !categoryOrder.includes(key))
+                      .reduce((sum: number, [, item]: [string, any]) => sum + (item?.previous?.stock_price || 0), 0);
+                    const otherAccYoy = otherAccPrevious > 0 ? (otherAccCurrent / otherAccPrevious * 100) : 0;
+                    
+                    return (
+                      <>
+                        {categoryOrder.map((key) => {
+                          const item = accData[key];
+                          if (!item) return null;
+                          return (
+                            <div key={key} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{categoryNames[key]}</span>
+                              <span className="font-semibold">
+                                {formatNumber((item?.current?.stock_price || 0) / 1000)} 
+                                <span className="text-green-600"> ({formatPercent(item?.yoy || 0)}%)</span>
+                              </span>
+                            </div>
+                          );
+                        })}
+                        {otherAccCurrent > 0 && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">기타ACC</span>
+                            <span className="font-semibold">
+                              {formatNumber(otherAccCurrent / 1000)} 
+                              <span className="text-green-600"> ({formatPercent(otherAccYoy)}%)</span>
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -3891,7 +3942,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     '과시즌S': calculateDiscount(item.과시즌S.gross_sales, item.과시즌S.net_sales),
                     '모자': calculateDiscount(item.모자.gross_sales, item.모자.net_sales),
                     '신발': calculateDiscount(item.신발.gross_sales, item.신발.net_sales),
-                    '가방외': calculateDiscount(item.가방외.gross_sales, item.가방외.net_sales),
+                    '가방': calculateDiscount(item.가방.gross_sales, item.가방.net_sales),
+                    '기타ACC': calculateDiscount(item.기타ACC.gross_sales, item.기타ACC.net_sales),
                   };
                 })} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -3909,7 +3961,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={3} dot={{ r: 4 }} name="☀️ 과시즌S" />
                 <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={3} dot={{ r: 4 }} name="🧢 모자" />
                 <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={3} dot={{ r: 4 }} name="👟 신발" />
-                <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} name="👜 가방외" />
+                <Line type="monotone" dataKey="가방" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} name="👜 가방" />
+                <Line type="monotone" dataKey="기타ACC" stroke="#F9A8D4" strokeWidth={3} dot={{ r: 4 }} name="✨ 기타ACC" />
               </LineChart>
             ) : (
               <BarChart 
@@ -3920,8 +3973,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const 과시즌S = Math.round(salesPriceType === '실판' ? item.과시즌S.net_sales : item.과시즌S.gross_sales);
                   const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
                   const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                  const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                  const total = 당시즌F + 당시즌S + 과시즌F + 과시즌S + 모자 + 신발 + 가방외;
+                  const 가방 = Math.round(salesPriceType === '실판' ? item.가방.net_sales : item.가방.gross_sales);
+                  const 기타ACC = Math.round(salesPriceType === '실판' ? item.기타ACC.net_sales : item.기타ACC.gross_sales);
+                  const total = 당시즌F + 당시즌S + 과시즌F + 과시즌S + 모자 + 신발 + 가방 + 기타ACC;
                   return {
                     month: `${item.period.slice(2, 4)}월`,
                     '당시즌F': 당시즌F,
@@ -3930,7 +3984,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     '과시즌S': 과시즌S,
                     '모자': 모자,
                     '신발': 신발,
-                    '가방외': 가방외,
+                    '가방': 가방,
+                    '기타ACC': 기타ACC,
                     total,
                   };
                 })} 
@@ -3961,7 +4016,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <Bar dataKey="과시즌S" stackId="a" fill="#B2F5EA" name="☀️ 과시즌S" />
                 <Bar dataKey="모자" stackId="a" fill="#93C5FD" name="🧢 모자" />
                 <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
-                <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" name="👜 가방외" />
+                <Bar dataKey="가방" stackId="a" fill="#C4B5FD" name="👜 가방" />
+                <Bar dataKey="기타ACC" stackId="a" fill="#F9A8D4" name="✨ 기타ACC" />
               </BarChart>
             )}
           </ResponsiveContainer>
@@ -3976,7 +4032,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               { name: '과시즌S', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
               { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
               { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
-              { name: '가방외', displayName: '👜 가방외', color: '#C4B5FD' },
+              { name: '가방', displayName: '👜 가방', color: '#C4B5FD' },
+              { name: '기타ACC', displayName: '✨ 기타ACC', color: '#F9A8D4' },
             ].map((item) => (
               <button
                 key={item.name}
@@ -4028,7 +4085,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         과시즌S: yoyData['과시즌S']?.[idx] ?? 0,
                         모자: yoyData['모자']?.[idx] ?? 0,
                         신발: yoyData['신발']?.[idx] ?? 0,
-                        가방외: yoyData['가방외']?.[idx] ?? 0,
+                        가방: yoyData['가방']?.[idx] ?? 0,
+                        기타ACC: yoyData['기타ACC']?.[idx] ?? 0,
                         전체합계: (overallItemYoy[idx] ?? 0),
                       };
 
@@ -4055,7 +4113,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={2} name="☀️ 과시즌S" />
                     <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={2} name="🧢 모자" />
                     <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={2} name="👟 신발" />
-                    <Line type="monotone" dataKey="가방외" stroke="#C4B5FD" strokeWidth={2} name="👜 가방외" />
+                    <Line type="monotone" dataKey="가방" stroke="#C4B5FD" strokeWidth={2} name="👜 가방" />
+                    <Line type="monotone" dataKey="기타ACC" stroke="#F9A8D4" strokeWidth={2} name="✨ 기타ACC" />
                     <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -4105,7 +4164,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           { key: '과시즌S', label: '☀️ 과시즌S' },
                           { key: '모자', label: '🧢 모자' },
                           { key: '신발', label: '👟 신발' },
-                          { key: '가방외', label: '👜 가방외' },
+                          { key: '가방', label: '👜 가방' },
+                          { key: '기타ACC', label: '✨ 기타ACC' },
                         ].map((row) => (
                           <tr key={row.key}>
                             <td className="border border-gray-300 px-1 py-1 font-semibold">
@@ -4186,8 +4246,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         const 과S = Math.round(salesPriceType === '실판' ? item.과시즌S.net_sales : item.과시즌S.gross_sales);
                         const 모자 = Math.round(salesPriceType === '실판' ? item.모자.net_sales : item.모자.gross_sales);
                         const 신발 = Math.round(salesPriceType === '실판' ? item.신발.net_sales : item.신발.gross_sales);
-                        const 가방외 = Math.round(salesPriceType === '실판' ? item.가방외.net_sales : item.가방외.gross_sales);
-                        return 당F + 당S + 과F + 과S + 모자 + 신발 + 가방외;
+                        const 가방 = Math.round(salesPriceType === '실판' ? item.가방.net_sales : item.가방.gross_sales);
+                        const 기타ACC = Math.round(salesPriceType === '실판' ? item.기타ACC.net_sales : item.기타ACC.gross_sales);
+                        return 당F + 당S + 과F + 과S + 모자 + 신발 + 가방 + 기타ACC;
                       });
                       const maxTotal = Math.max(...totals);
                       const minTotal = Math.min(...totals);
@@ -4224,8 +4285,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       const 과S = Math.round(salesPriceType === '실판' ? latest.과시즌S?.net_sales : latest.과시즌S?.gross_sales) || 0;
                       const 모자 = Math.round(salesPriceType === '실판' ? latest.모자?.net_sales : latest.모자?.gross_sales) || 0;
                       const 신발 = Math.round(salesPriceType === '실판' ? latest.신발?.net_sales : latest.신발?.gross_sales) || 0;
-                      const 가방외 = Math.round(salesPriceType === '실판' ? latest.가방외?.net_sales : latest.가방외?.gross_sales) || 0;
-                      const total = 당F + 당S + 과F + 과S + 모자 + 신발 + 가방외;
+                      const 가방 = Math.round(salesPriceType === '실판' ? latest.가방?.net_sales : latest.가방?.gross_sales) || 0;
+                      const 기타ACC = Math.round(salesPriceType === '실판' ? latest.기타ACC?.net_sales : latest.기타ACC?.gross_sales) || 0;
+                      const total = 당F + 당S + 과F + 과S + 모자 + 신발 + 가방 + 기타ACC;
                       
                       const currentSeason = 당F + 당S;
                       const currentSeasonPct = total > 0 ? ((currentSeason / total) * 100).toFixed(1) : '0';

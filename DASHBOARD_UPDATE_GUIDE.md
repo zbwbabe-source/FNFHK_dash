@@ -685,7 +685,72 @@ Vercel 자동 배포
 
 ---
 
-**마지막 업데이트**: 2025-12-04
+## 📦 데이터 분류 규칙
+
+### 시즌 코드 분류
+
+대시보드는 `Season_Code`를 기반으로 데이터를 자동 분류합니다:
+
+#### 1. 의류 시즌 (F/S)
+- **당시즌 F**: 예) 25F (2025년 Fall/Winter)
+- **당시즌 S**: 예) 25S (2025년 Spring/Summer)
+- **과시즌 F**: 예) 24F, 23F (이전 년도 Fall/Winter)
+- **과시즌 S**: 예) 24S, 23S (이전 년도 Spring/Summer)
+
+#### 2. ACC (액세서리) - N시즌
+
+**식별 방법**: `Season_Code`가 **N으로 끝나는 경우** (예: 25N, 24FN)
+
+**카테고리 분류** (`Category` 기준):
+- **신발**: Category에 "SHO" 포함
+- **모자**: Category에 "HEA" 포함
+- **가방**: Category에 "BAG" 포함
+- **기타ACC**: 위 3가지에 해당하지 않는 나머지 모든 ACC
+
+**표시 순서**: 신발 → 모자 → 가방 → 기타ACC (항상 이 순서로 표시)
+
+**TOP 5 산출 방식**:
+- 각 카테고리별로 Net Sales 기준 내림차순 정렬
+- 상위 5개 Subcategory를 표시
+- ACC는 총 4개 카테고리이므로 각각 대표 상품 표시
+
+### 정체재고 분류 규칙 (참고용 - 현재 미사용)
+
+**정의**: 기준월 1개월간 해당 Subcategory의 택가매출(Gross Sales)이 기말 택재고(Stock Price)의 **0.1% 미만**인 경우
+
+**계산식**:
+```
+정체재고 판단 = Gross Sales < Stock Price × 0.001
+```
+
+**예시**:
+- Stock Price = 100,000 HKD
+- Gross Sales = 50 HKD
+- 비율 = 50 / 100,000 = 0.05% < 0.1% → **정체재고**
+
+**데이터 출력**:
+- `is_stagnant`: true/false
+- `sales_to_stock_ratio`: 매출/재고 비율 (%)
+- `stock_price`: 기말 택재고 (K HKD)
+
+> **참고**: 현재 대시보드에서는 정체재고 여부를 표시하지 않지만, 데이터는 수집되어 JSON에 저장됩니다.
+
+### 데이터 처리 위치
+
+**ACC 데이터 처리**:
+- 스크립트: `update_hongkong_dashboard.py`
+- 함수: `get_acc_category(subcategory_code)`
+- 출력: `acc_sales_data` in `hongkong-dashboard-data-{period}.json`
+
+**프론트엔드 표시**:
+- 컴포넌트: `components/dashboard/hongkong-ceo-dashboard.tsx`
+- 카드: "당시즌 판매" (25F 의류 + ACC 병기)
+- 상세: ACC 카테고리별 판매 TOP 5
+
+---
+
+**마지막 업데이트**: 2025-12-09
+
 
 
 
