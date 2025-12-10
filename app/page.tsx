@@ -909,12 +909,17 @@ export default function Home() {
                             <div className="text-lg font-bold text-gray-900">
                               {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
                             </div>
-                            {hkPlData?.discovery?.net_sales_yoy && (
-                              <div className={`text-xs font-semibold ${
-                                hkPlData.discovery.net_sales_yoy >= 100 ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                                YOY {formatPercent(hkPlData.discovery.net_sales_yoy)}%
-                              </div>
+                            {hkPlData?.discovery?.prev_net_sales !== undefined && hkPlData.discovery.prev_net_sales > 0 && (
+                              <>
+                                <div className="text-xs text-gray-500">
+                                  (전월: {formatPlNumber(hkPlData.discovery.prev_net_sales)})
+                                </div>
+                                <div className={`text-xs font-semibold ${
+                                  hkPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                  전월비 {formatPercent(hkPlData.discovery.net_sales_mom)}%
+                                </div>
+                              </>
                             )}
                           </div>
                         </div>
@@ -1194,12 +1199,17 @@ export default function Home() {
                             <div className="text-lg font-bold text-gray-900">
                               {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
                             </div>
-                            {twPlData?.discovery?.net_sales_yoy && (
-                              <div className={`text-xs font-semibold ${
-                                twPlData.discovery.net_sales_yoy >= 100 ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                                YOY {formatPercent(twPlData.discovery.net_sales_yoy)}%
-                              </div>
+                            {twPlData?.discovery?.prev_net_sales !== undefined && twPlData.discovery.prev_net_sales > 0 && (
+                              <>
+                                <div className="text-xs text-gray-500">
+                                  (전월: {formatPlNumber(twPlData.discovery.prev_net_sales)})
+                                </div>
+                                <div className={`text-xs font-semibold ${
+                                  twPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                  전월비 {formatPercent(twPlData.discovery.net_sales_mom)}%
+                                </div>
+                              </>
                             )}
                           </div>
                         </div>

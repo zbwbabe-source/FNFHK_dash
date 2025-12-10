@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-10T08:54:42.717068"
+    "generated_at": "2025-12-10T09:09:46.355791"
   },
   "current_month": {
     "hk": {
@@ -374,7 +374,7 @@
   "discovery": {
     "net_sales": 408.25809000000004,
     "prev_net_sales": 0.0,
-    "net_sales_yoy": 0,
+    "net_sales_mom": 0,
     "discount_rate": 9.735326892038291,
     "direct_cost": 1385.32082,
     "direct_profit": -1122.1580377414862,

@@ -554,6 +554,12 @@ def main(target_period_short=None):
     else:
         prev_period_full = f"{prev_year}{latest_month:02d}"
     
+    # 전월 (MOM - Month over Month) 계산
+    if latest_month == 1:
+        prev_month_period = f"{latest_year - 1}12"
+    else:
+        prev_month_period = f"{latest_year}{latest_month - 1:02d}"
+    
     print(f"처리 Period: {latest_period_full} ({latest_year}년 {latest_month}월)")
     print(f"전년 동월 Period: {prev_period_full} ({prev_year}년 {latest_month}월)")
     
@@ -946,10 +952,10 @@ def main(target_period_short=None):
         discovery_net = discovery_current['실판']
         discovery_discount_rate = ((discovery_tag - discovery_net) / discovery_tag * 100) if discovery_tag > 0 else 0
         
-        # 전월 실판매출 (YOY 계산용)
-        discovery_prev = aggregate_pl_by_period(discovery_data, prev_period_full)
-        discovery_prev_net = discovery_prev.get('실판', 0)
-        discovery_net_yoy = (discovery_net / discovery_prev_net * 100) if discovery_prev_net > 0 else 0
+        # 전월 실판매출 (MOM - Month over Month)
+        discovery_prev_month = aggregate_pl_by_period(discovery_data, prev_month_period)
+        discovery_prev_net = discovery_prev_month.get('실판', 0)
+        discovery_net_mom = (discovery_net / discovery_prev_net * 100) if discovery_prev_net > 0 else 0
         
         # 판매관리비 = 직접비
         discovery_direct_cost = discovery_current.get('판매관리비', 0)
@@ -1302,7 +1308,7 @@ def main(target_period_short=None):
         'discovery': {
             'net_sales': discovery_net if discovery_data else 0,
             'prev_net_sales': discovery_prev_net if discovery_data else 0,
-            'net_sales_yoy': discovery_net_yoy if discovery_data else 0,
+            'net_sales_mom': discovery_net_mom if discovery_data else 0,
             'discount_rate': discovery_discount_rate if discovery_data else 0,
             'direct_cost': discovery_direct_cost if discovery_data else 0,
             'direct_profit': discovery_direct_profit if discovery_data else 0,
