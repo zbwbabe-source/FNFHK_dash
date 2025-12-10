@@ -134,20 +134,20 @@ def get_mlb_expense_detail(pl_data, period):
     for row in pl_data:
         if (row['PERIOD'] == period and 
             row['SHOP_CD'] == 'M99' and 
-            row['BRD_CD'] == 'M'):  # MLB만
+            row['BRD_CD'] == 'M'):  # MLB M99(오피스)만
             
             account_cd = row['ACCOUNT_CD'].strip()
             account_nm = row['ACCOUNT_NM'].strip()
             value = float(row['VALUE'] or 0)
             
             # 계정 코드 또는 계정명으로 매핑
-            if account_cd == 'SAL_EXP' or account_nm == ' - Payroll':
+            if account_cd == 'SAL_EXP' or account_nm == ' - Payroll' or account_nm == '1. 급 여':
                 expense_detail['salary'] += value
             elif account_cd == 'AD_EXP' or account_nm == '9. 광고선전비':
                 expense_detail['marketing'] += value
             elif account_cd == 'COMM_EXP' or account_nm == '10. 지급수수료':
                 expense_detail['fee'] += value
-            elif account_cd == 'FIX_RENT' or account_nm == ' - Base Rent':
+            elif account_cd == 'FIX_RENT' or account_nm == ' - Base Rent' or account_nm == '4. 임차료':
                 expense_detail['rent'] += value
             elif account_cd == 'INS_EXP' or account_nm == '13. 보험료':
                 expense_detail['insurance'] += value

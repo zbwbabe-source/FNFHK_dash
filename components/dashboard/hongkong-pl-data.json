@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2511",
     "previous_period": "2411",
-    "generated_at": "2025-12-10T09:15:25.908273"
+    "generated_at": "2025-12-10T13:34:57.033454"
   },
   "current_month": {
     "hk": {
@@ -49,10 +49,10 @@
       "operating_profit": 357.99245751455874,
       "operating_profit_rate": 1.629674893883424,
       "expense_detail": {
-        "salary": 0.0,
+        "salary": 593.4363099999999,
         "marketing": 408.4461500000001,
         "fee": 0.65544,
-        "rent": 0.0,
+        "rent": 83.705,
         "insurance": 17.4444,
         "travel": 13.52205,
         "other": 194.78433,
@@ -141,10 +141,10 @@
       "operating_profit": -9040.145329743937,
       "operating_profit_rate": -4.02254905026276,
       "expense_detail": {
-        "salary": 0.0,
+        "salary": 5991.373209999999,
         "marketing": 3545.6168000000002,
         "fee": 845.2338199999999,
-        "rent": 0.0,
+        "rent": 1099.1137,
         "insurance": 196.01454,
         "travel": 293.42045,
         "other": 2892.104585,
@@ -221,10 +221,10 @@
         "sg_a": 14154.673860000003,
         "operating_profit": 5013.386855965575,
         "expense_detail": {
-          "salary": 0.0,
+          "salary": 5330.85269,
           "marketing": 4270.554730000001,
           "fee": 65.39630999999999,
-          "rent": 0.0,
+          "rent": 1315.4005000000002,
           "insurance": 217.53439000000003,
           "travel": 153.95448999999996,
           "other": 2800.98075,
@@ -321,10 +321,10 @@
       "sg_a": 1192.66984,
       "operating_profit": -822.6276000000012,
       "expense_detail": {
-        "salary": 0.0,
+        "salary": 445.60046,
         "marketing": 398.54038,
         "fee": 5.701,
-        "rent": 0.0,
+        "rent": 118.88387,
         "insurance": 13.7826,
         "travel": 4.7326,
         "other": 205.42893,

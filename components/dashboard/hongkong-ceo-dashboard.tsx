@@ -1246,76 +1246,149 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </button>
               </div>
               {showItemProfitDetail && (
-                <div className="mt-3 pt-3 border-t">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th className="text-left py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">항목</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">금액</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">YOY</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">전년비</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700">택매출</td>
-                          <td className="text-right py-1 px-2 font-semibold">{formatNumber(pl?.tag_sales)}</td>
-                          <td className="text-right py-1 px-2 text-red-600 font-semibold">{formatPercent(plYoy?.tag_sales)}%</td>
-                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.tag_sales || 0).className}`}>{formatChange(plChange?.tag_sales || 0).text}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent(pl?.discount_rate, 1)}%)</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.discount)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.discount)}%</td>
-                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.discount || 0).className}`}>{formatChange(plChange?.discount || 0).text}</td>
-                        </tr>
-                        <tr className="bg-blue-50 font-semibold">
-                          <td className="py-1.5 px-2 text-blue-800 border-t border-blue-200">= 실판매출</td>
-                          <td className="text-right py-1.5 px-2 text-blue-800 border-t border-blue-200">{formatNumber(pl?.net_sales)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(plYoy?.net_sales)}%</td>
-                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-blue-200 ${formatChange(plChange?.net_sales || 0).className}`}>{formatChange(plChange?.net_sales || 0).text}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent(pl?.cogs_rate, 1)}%)</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.cogs)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.cogs)}%</td>
-                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.cogs || 0).className}`}>{formatChange(plChange?.cogs || 0).text}</td>
-                        </tr>
-                        <tr className="bg-green-50 font-semibold">
-                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent(pl?.gross_profit_rate, 1)}%)</td>
-                          <td className="text-right py-1.5 px-2 text-green-800 border-t border-green-200">{formatNumber(pl?.gross_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(plYoy?.gross_profit)}%</td>
-                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-green-200 ${formatChange(plChange?.gross_profit || 0).className}`}>{formatChange(plChange?.gross_profit || 0).text}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 직접비</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.direct_cost)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.direct_cost)}%</td>
-                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.direct_cost || 0).className}`}>{formatChange(plChange?.direct_cost || 0).text}</td>
-                        </tr>
-                        <tr className="bg-yellow-50 font-semibold">
-                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent(pl?.direct_profit_rate, 1)}%)</td>
-                          <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(plYoy?.direct_profit)}%</td>
-                          <td className={`text-right py-1.5 px-2 font-semibold border-t border-yellow-200 ${formatChange(plChange?.direct_profit || 0).className}`}>{formatChange(plChange?.direct_profit || 0).text}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 영업비</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.sg_a)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.sg_a)}%</td>
-                          <td className={`text-right py-1 px-2 font-semibold ${formatChange(plChange?.sg_a || 0).className}`}>{formatChange(plChange?.sg_a || 0).text}</td>
-                        </tr>
-                        <tr className={(pl?.operating_profit || 0) >= 0 ? 'bg-green-50 font-bold' : 'bg-red-50 font-bold'}>
-                          <td className={`py-1.5 px-2 border-t-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-800 border-green-300' : 'text-red-800 border-red-300'}`}>= 영업이익 ({formatPercent(pl?.operating_profit_rate, 1)}%)</td>
-                          <td className={`text-right py-1.5 px-2 border-t-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-800 border-green-300' : 'text-red-800 border-red-300'}`}>{formatNumber(pl?.operating_profit)}</td>
-                          <td className={`text-right py-1.5 px-2 border-t-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-700 border-green-300' : 'text-red-700 border-red-300'}`}>
-                            {(pl?.operating_profit || 0) >= 0 ? '흑자전환' : ((plChange?.operating_profit || 0) < 0 ? '적자악화' : '적자개선')}
-                          </td>
-                          <td className={`text-right py-1.5 px-2 font-semibold border-t-2 ${(pl?.operating_profit || 0) >= 0 ? 'border-green-300' : 'border-red-300'} ${formatChange(plChange?.operating_profit || 0).className}`}>{formatChange(plChange?.operating_profit || 0).text}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div className="mt-2 pt-2 border-t">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg">
+                    <div className="text-xs text-gray-600 mb-2 font-semibold">
+                      💰 Tag매출대비 백분율 기준 PL
+                    </div>
+                    <div className="space-y-2">
+                      {(() => {
+                        const tagSales = pl?.tag_sales || 1;
+                        const discountPct = ((pl?.discount || 0) / tagSales * 100);
+                        const netSalesPct = ((pl?.net_sales || 0) / tagSales * 100);
+                        const cogsPct = ((pl?.cogs || 0) / tagSales * 100);
+                        const grossProfitPct = ((pl?.gross_profit || 0) / tagSales * 100);
+                        const directCostPct = ((pl?.direct_cost || 0) / tagSales * 100);
+                        const directProfitPct = ((pl?.direct_profit || 0) / tagSales * 100);
+                        const sgaPct = ((pl?.sg_a || 0) / tagSales * 100);
+                        const opProfitPct = ((pl?.operating_profit || 0) / tagSales * 100);
+                        
+                        return (
+                          <>
+                            {/* 택매출 */}
+                            <div className="bg-white p-2 rounded shadow-sm border-l-4 border-blue-600">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-gray-800">택매출</span>
+                                  <span className="text-blue-900 font-bold text-sm">{formatNumber(pl?.tag_sales)}K</span>
+                                </div>
+                                <span className="text-xs font-bold text-blue-600">택대비 100.0%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-md h-8 relative overflow-hidden">
+                                <div className="absolute inset-0 flex">
+                                  <div className="bg-blue-600 flex items-center justify-center" style={{width: '100%'}}>
+                                    <span className="text-white font-bold text-sm">100%</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 실판매출 */}
+                            <div className="bg-white p-2 rounded shadow-sm border-l-4 border-blue-600">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-gray-800">실판매출</span>
+                                  <span className="text-blue-900 font-bold text-sm">{formatNumber(pl?.net_sales)}K</span>
+                                </div>
+                                <span className="text-xs font-bold text-blue-600">택대비 {formatPercent(netSalesPct, 1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-md h-9 relative overflow-hidden">
+                                <div className="absolute inset-0 flex">
+                                  <div className="bg-blue-600 flex items-center justify-center" style={{width: `${netSalesPct}%`}}>
+                                    <span className="text-white font-bold text-sm">{formatPercent(netSalesPct, 1)}%</span>
+                                  </div>
+                                  <div className="bg-gray-400 flex items-center justify-center border-l-2 border-white" style={{width: `${discountPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-xs leading-tight text-center">할인<br/><span className="text-red-600">{formatPercent(discountPct, 1)}%</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 매출총이익 */}
+                            <div className="bg-white p-2 rounded shadow-sm border-l-4 border-blue-600">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-gray-800">총이익</span>
+                                  <span className="text-blue-900 font-bold text-sm">{formatNumber(pl?.gross_profit)}K</span>
+                                </div>
+                                <span className="text-xs font-bold text-blue-600">택대비 {formatPercent(grossProfitPct, 1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-md h-9 relative overflow-hidden">
+                                <div className="absolute inset-0 flex">
+                                  <div className="bg-blue-600 flex items-center justify-center" style={{width: `${grossProfitPct}%`}}>
+                                    <span className="text-white font-bold text-sm">{formatPercent(grossProfitPct, 1)}%</span>
+                                  </div>
+                                  <div className="bg-gray-500 flex items-center justify-center border-l-2 border-white" style={{width: `${cogsPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-xs leading-tight text-center">원가<br/><span className="text-orange-600">{formatPercent(cogsPct, 1)}%</span></span>
+                                  </div>
+                                  <div className="bg-gray-400 flex items-center justify-center border-l-2 border-white" style={{width: `${discountPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-xs leading-tight text-center">할인<br/><span className="text-red-600">{formatPercent(discountPct, 1)}%</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 직접이익 */}
+                            <div className="bg-white p-2 rounded shadow-sm border-l-4 border-blue-600">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-gray-800">직접이익</span>
+                                  <span className="text-blue-900 font-bold text-sm">{formatNumber(pl?.direct_profit)}K</span>
+                                </div>
+                                <span className="text-blue-600 font-bold text-xs">택대비 {formatPercent(directProfitPct, 1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-md h-10 relative overflow-hidden">
+                                <div className="absolute inset-0 flex">
+                                  <div className="bg-blue-600" style={{width: `${Math.max(Math.abs(directProfitPct), 8)}%`}}>
+                                  </div>
+                                  <div className="bg-gray-600 flex items-center justify-center border-l-2 border-white" style={{width: `${directCostPct}%`}}>
+                                    <span className="text-gray-100 font-bold text-[10px] leading-tight text-center">직접비<br/><span className="text-yellow-400">{formatPercent(directCostPct, 1)}%</span></span>
+                                  </div>
+                                  <div className="bg-gray-500 flex items-center justify-center border-l-2 border-white" style={{width: `${cogsPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-[10px] leading-tight text-center">원가<br/><span className="text-orange-600">{formatPercent(cogsPct, 1)}%</span></span>
+                                  </div>
+                                  <div className="bg-gray-400 flex items-center justify-center border-l-2 border-white" style={{width: `${discountPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-[10px] leading-tight text-center">할인<br/><span className="text-red-600">{formatPercent(discountPct, 1)}%</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 영업이익 */}
+                            <div className={`p-2 rounded shadow-sm ${(pl?.operating_profit || 0) >= 0 ? 'bg-white border-l-4 border-blue-600' : 'bg-white border-l-4 border-red-600'}`}>
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-gray-800">영업이익</span>
+                                  <span className={`font-bold text-sm ${(pl?.operating_profit || 0) >= 0 ? 'text-blue-900' : 'text-red-900'}`}>{formatNumber(pl?.operating_profit)}K</span>
+                                </div>
+                                <span className={`font-bold text-xs ${(pl?.operating_profit || 0) >= 0 ? 'text-blue-600' : 'text-red-600'}`}>택대비 {formatPercent(opProfitPct, 1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-md h-10 relative overflow-hidden">
+                                <div className="absolute inset-0 flex">
+                                  <div className={`${(pl?.operating_profit || 0) >= 0 ? 'bg-blue-600' : 'bg-red-600'}`} style={{width: `${Math.max(Math.abs(opProfitPct), 5)}%`}}>
+                                  </div>
+                                  <div className="bg-gray-700 border-l-2 border-white" style={{width: `${sgaPct}%`}}>
+                                  </div>
+                                  <div className="bg-gray-600 flex items-center justify-center border-l-2 border-white" style={{width: `${directCostPct}%`}}>
+                                    <span className="text-gray-100 font-bold text-[10px] leading-tight text-center">직접비<br/><span className="text-yellow-400">{formatPercent(directCostPct, 1)}%</span></span>
+                                  </div>
+                                  <div className="bg-gray-500 flex items-center justify-center border-l-2 border-white" style={{width: `${cogsPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-[10px] leading-tight text-center">원가<br/><span className="text-orange-600">{formatPercent(cogsPct, 1)}%</span></span>
+                                  </div>
+                                  <div className="bg-gray-400 flex items-center justify-center border-l-2 border-white" style={{width: `${discountPct}%`}}>
+                                    <span className="text-gray-900 font-bold text-[10px] leading-tight text-center">할인<br/><span className="text-red-600">{formatPercent(discountPct, 1)}%</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="mt-1 flex items-center gap-2">
+                                <span className="text-gray-900 font-bold text-[10px]">영업비</span>
+                                <span className="text-purple-600 font-bold text-xs">{formatPercent(sgaPct, 1)}%</span>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1555,8 +1628,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                       </button>
                                       {showOtherDetail && hasOtherDetail && (
                                         <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                          {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
-                                            if (value === 0) return null;
+                                          {Object.entries(otherDetail)
+                                            .filter(([key, value]: [string, any]) => value !== 0)
+                                            .sort(([, a]: [string, any], [, b]: [string, any]) => Number(b) - Number(a))
+                                            .map(([key, value]: [string, any]) => {
                                             const prevValue = (otherDetailPrev as any)[key] || 0;
                                             let detailYoy = 0;
                                             let showDetailYoy = false;
@@ -1672,8 +1747,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                     </button>
                                     {showOtherDetail && hasOtherDetail && (
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                        {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
-                                          if (value === 0) return null;
+                                        {Object.entries(otherDetail)
+                                          .filter(([key, value]: [string, any]) => value !== 0)
+                                          .sort(([, a]: [string, any], [, b]: [string, any]) => Number(b) - Number(a))
+                                          .map(([key, value]: [string, any]) => {
                                           const prevValue = (otherDetailPrev as any)[key] || 0;
                                           const detailYoy = prevValue > 0 ? ((value / prevValue) * 100) : 0;
                                           const detailColorClass = detailYoy >= 100 ? 'text-red-600' : 'text-green-600';
@@ -1842,8 +1919,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                     </button>
                                     {(showOtherDetailCumulative && otherDetail && Object.keys(otherDetail).length > 0) && (
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                        {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
-                                          if (value === 0) return null;
+                                        {Object.entries(otherDetail)
+                                          .filter(([key, value]: [string, any]) => value !== 0)
+                                          .sort(([, a]: [string, any], [, b]: [string, any]) => Number(b) - Number(a))
+                                          .map(([key, value]: [string, any]) => {
                                           const prevValue = (otherDetailPrev as any)[key] || 0;
                                           let detailYoy = 0;
                                           let showDetailYoy = false;
