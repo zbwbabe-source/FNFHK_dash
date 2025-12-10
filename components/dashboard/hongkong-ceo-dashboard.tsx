@@ -105,6 +105,27 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
       .catch(err => console.log('전월 데이터 없음:', err));
   }, [prevMonthPeriod]);
 
+  // 보고일자 관리 (localStorage에서 읽기)
+  const [reportDate, setReportDate] = useState('2024-11-17');
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedDate = localStorage.getItem('reportDate');
+      if (savedDate) {
+        setReportDate(savedDate);
+      }
+    }
+  }, []);
+
+  // 날짜 포맷 함수 (년도 포함)
+  const formatReportDateWithYear = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
   useEffect(() => {
     document.title = `홍콩법인 ${periodLabel} 경영실적`;
   }, [periodLabel]);
@@ -649,7 +670,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-1">홍콩법인 {periodLabel} 경영실적</h1>
-            <p className="text-slate-200">(보고일 : 2025년 11월 17일)</p>
+            <p className="text-slate-200">(보고일 : {formatReportDateWithYear(reportDate)})</p>
           </div>
         </div>
       </div>
