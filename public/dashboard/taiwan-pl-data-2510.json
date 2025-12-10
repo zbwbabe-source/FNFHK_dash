@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-10T09:09:57.630250"
+    "generated_at": "2025-12-10T09:15:30.054950"
   },
   "current_month": {
     "total": {
@@ -590,6 +590,10 @@
     "operating_profit": -255.86330598273298,
     "cumulative_operating_profit": -2428.0462513526745,
     "store_count": {
+      "online": 2,
+      "offline": 3
+    },
+    "prev_store_count": {
       "online": 2,
       "offline": 3
     }

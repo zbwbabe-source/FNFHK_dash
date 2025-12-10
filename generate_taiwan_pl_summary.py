@@ -985,6 +985,18 @@ def main(target_period_short=None):
         online_count = sum(1 for _, _, ch in discovery_stores if ch == 'Online')
         offline_count = sum(1 for _, _, ch in discovery_stores if ch in ['Retail', 'Outlet'])
         
+        # 전월 매장수 계산
+        discovery_prev_stores = set()
+        for row in discovery_data:
+            if row.get('PERIOD') == prev_month_period and row.get('ACCOUNT_NM', '').strip() == '실매출액':
+                if float(row.get('VALUE', 0) or 0) != 0:
+                    store_code = row['SHOP_CD'].strip()
+                    channel = get_store_channel(store_code)
+                    discovery_prev_stores.add((row['CNTRY_CD'], store_code, channel))
+        
+        prev_online_count = sum(1 for _, _, ch in discovery_prev_stores if ch == 'Online')
+        prev_offline_count = sum(1 for _, _, ch in discovery_prev_stores if ch in ['Retail', 'Outlet'])
+
         # 디스커버리 누적 계산 (실제 영업한 기간만)
         # 디스커버리가 실제로 영업한 기간 확인
         discovery_periods = set()
@@ -1320,6 +1332,10 @@ def main(target_period_short=None):
             'store_count': {
                 'online': online_count if discovery_data else 0,
                 'offline': offline_count if discovery_data else 0
+            },
+            'prev_store_count': {
+                'online': prev_online_count if discovery_data else 0,
+                'offline': prev_offline_count if discovery_data else 0
             }
         } if discovery_data else None,
         'prev_month': {

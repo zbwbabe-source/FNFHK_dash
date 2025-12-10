@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2510",
     "previous_period": "2410",
-    "generated_at": "2025-12-10T09:09:46.355791"
+    "generated_at": "2025-12-10T09:15:21.703458"
   },
   "current_month": {
     "hk": {
@@ -386,6 +386,10 @@
     "store_count": {
       "online": 1,
       "offline": 1
+    },
+    "prev_store_count": {
+      "online": 0,
+      "offline": 0
     }
   }
 }

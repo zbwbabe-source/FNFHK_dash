@@ -897,8 +897,18 @@ export default function Home() {
                         <div className="mb-3 pb-2 border-b border-orange-200">
                           <div className="text-xs text-gray-600 mb-1">매장수</div>
                           <div className="flex gap-2 text-xs">
-                            <span className="text-gray-700">오프라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.offline || 0}개</span></span>
-                            <span className="text-gray-700">온라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.online || 0}개</span></span>
+                            <span className="text-gray-700">
+                              오프라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.offline || 0}개</span>
+                              {hkPlData?.discovery?.prev_store_count?.offline !== undefined && (
+                                <span className="text-gray-500 ml-1">(전월: {hkPlData.discovery.prev_store_count.offline}개)</span>
+                              )}
+                            </span>
+                            <span className="text-gray-700">
+                              온라인: <span className="font-semibold">{hkPlData?.discovery?.store_count?.online || 0}개</span>
+                              {hkPlData?.discovery?.prev_store_count?.online !== undefined && (
+                                <span className="text-gray-500 ml-1">(전월: {hkPlData.discovery.prev_store_count.online}개)</span>
+                              )}
+                            </span>
                           </div>
                         </div>
 
@@ -1187,8 +1197,18 @@ export default function Home() {
                         <div className="mb-3 pb-2 border-b border-orange-200">
                           <div className="text-xs text-gray-600 mb-1">매장수</div>
                           <div className="flex gap-2 text-xs">
-                            <span className="text-gray-700">오프라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.offline || 0}개</span></span>
-                            <span className="text-gray-700">온라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.online || 0}개</span></span>
+                            <span className="text-gray-700">
+                              오프라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.offline || 0}개</span>
+                              {twPlData?.discovery?.prev_store_count?.offline !== undefined && (
+                                <span className="text-gray-500 ml-1">(전월: {twPlData.discovery.prev_store_count.offline}개)</span>
+                              )}
+                            </span>
+                            <span className="text-gray-700">
+                              온라인: <span className="font-semibold">{twPlData?.discovery?.store_count?.online || 0}개</span>
+                              {twPlData?.discovery?.prev_store_count?.online !== undefined && (
+                                <span className="text-gray-500 ml-1">(전월: {twPlData.discovery.prev_store_count.online}개)</span>
+                              )}
+                            </span>
                           </div>
                         </div>
 
