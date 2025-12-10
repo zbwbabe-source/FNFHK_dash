@@ -5,7 +5,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "홍콩법인 25년 10월 경영실적",
+  title: "경영실적 대시보드",
   description: "경영실적 분석 대시보드",
 }
 
