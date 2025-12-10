@@ -4,14 +4,204 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-10T16:01:04.749704"
+    "generated_at": "2025-12-10T22:01:22.675083"
   },
   "sales_summary": {
     "total_net_sales": 21338.977,
     "total_yoy": 0,
     "total_change": 2586.163,
-    "same_store_yoy": 114.94357376151139,
-    "same_store_count": 2,
+    "same_store_yoy": 108.65980873947716,
+    "same_store_count": 19,
+    "same_store_details": {
+      "included": [
+        {
+          "shop_cd": "M01",
+          "shop_nm": "M01 MLB MONG KOK",
+          "current_sales": 1629919.0,
+          "previous_sales": 1574165.0
+        },
+        {
+          "shop_cd": "M02",
+          "shop_nm": "M02 MLB Times Square",
+          "current_sales": 554785.0,
+          "previous_sales": 503589.0
+        },
+        {
+          "shop_cd": "M07",
+          "shop_nm": "M07 MLB CITYGATE OUTLET",
+          "current_sales": 1851300.0,
+          "previous_sales": 1654820.0
+        },
+        {
+          "shop_cd": "M09",
+          "shop_nm": "M09 Sheung Shui",
+          "current_sales": 596559.0,
+          "previous_sales": 595415.0
+        },
+        {
+          "shop_cd": "M10",
+          "shop_nm": "M10 HK-I SQUARE",
+          "current_sales": 1919545.0,
+          "previous_sales": 1625764.0
+        },
+        {
+          "shop_cd": "M11",
+          "shop_nm": "M11-APM",
+          "current_sales": 1088959.0,
+          "previous_sales": 1015552.0
+        },
+        {
+          "shop_cd": "M13",
+          "shop_nm": "M13 Tai Po Mega Mall",
+          "current_sales": 453934.0,
+          "previous_sales": 405631.0
+        },
+        {
+          "shop_cd": "M14",
+          "shop_nm": "M14 NewTownPlaza",
+          "current_sales": 1193278.0,
+          "previous_sales": 1153629.0
+        },
+        {
+          "shop_cd": "M15",
+          "shop_nm": "M15 YuenLongPlaza",
+          "current_sales": 561054.0,
+          "previous_sales": 430986.0
+        },
+        {
+          "shop_cd": "M16",
+          "shop_nm": "M16 Hysan Place",
+          "current_sales": 549527.0,
+          "previous_sales": 428323.0
+        },
+        {
+          "shop_cd": "M17",
+          "shop_nm": "M17 Tuen Mun Town Plaza",
+          "current_sales": 767366.0,
+          "previous_sales": 588029.0
+        },
+        {
+          "shop_cd": "M18",
+          "shop_nm": "M18 Langham Place",
+          "current_sales": 1576150.0,
+          "previous_sales": 1415463.0
+        },
+        {
+          "shop_cd": "M19",
+          "shop_nm": "M19 NewTownPlaza KIDS",
+          "current_sales": 214217.0,
+          "previous_sales": 129416.0
+        },
+        {
+          "shop_cd": "M21",
+          "shop_nm": "M21 MOKO",
+          "current_sales": 872344.0,
+          "previous_sales": 688077.0
+        },
+        {
+          "shop_cd": "M22",
+          "shop_nm": "M22 YOHO Mall",
+          "current_sales": 585185.0,
+          "previous_sales": 471779.0
+        },
+        {
+          "shop_cd": "MC1",
+          "shop_nm": "MC1 MLB Venetian",
+          "current_sales": 2816989.0,
+          "previous_sales": 2768911.0
+        },
+        {
+          "shop_cd": "MC2",
+          "shop_nm": "MC2 MLB Londoner",
+          "current_sales": 651128.0,
+          "previous_sales": 793407.0
+        },
+        {
+          "shop_cd": "MC3",
+          "shop_nm": "MC3 MLB Senado Square",
+          "current_sales": 1479116.0,
+          "previous_sales": 1552234.0
+        },
+        {
+          "shop_cd": "MC4",
+          "shop_nm": "MC4 Senado2",
+          "current_sales": 708442.0,
+          "previous_sales": 675114.0
+        }
+      ],
+      "excluded": [
+        {
+          "shop_cd": "M03",
+          "shop_nm": "Temp Store",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "M04",
+          "shop_nm": "M04 MLB Telford Plaza",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "M05",
+          "shop_nm": "M05 MLB LCX",
+          "reason": "10/13-11/7 리뉴얼중",
+          "current_sales": 628140.0,
+          "previous_sales": 707798.0
+        },
+        {
+          "shop_cd": "M06",
+          "shop_nm": "M06 MLB KIDS K11",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "M08",
+          "shop_nm": "M08 V City",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 523877.0
+        },
+        {
+          "shop_cd": "M12",
+          "shop_nm": "M12 World Trade Centre",
+          "reason": "10/11 종료",
+          "current_sales": 0.0,
+          "previous_sales": 52165.0
+        },
+        {
+          "shop_cd": "M20",
+          "shop_nm": "M20 OceanTerminal KIDS",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 266683.0
+        },
+        {
+          "shop_cd": "M99",
+          "shop_nm": "M99 MLB HK Office",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "WHM",
+          "shop_nm": "WHM HK MAIN WAREHOUSE",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "WMM",
+          "shop_nm": "WMM MC MAIN WAREHOUSE",
+          "reason": "종료",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        }
+      ]
+    },
     "total_discount_rate": 19.907444749720725,
     "total_discount_rate_previous": 19.196893696648868,
     "total_discount_rate_change": 0.7105510530718568,
@@ -2981,124 +3171,334 @@
   "stagnant_inventory": {
     "24F": [
       {
+        "subcategory_code": "KC",
+        "subcategory_name": "Knit Cardigan",
+        "season_code": "24F",
+        "stock_price": 3612045.0,
+        "current_net_sales": 78588.0,
+        "current_gross_sales": 130565.0,
+        "discount_rate": 39.8,
+        "stock_days": 830.0
+      },
+      {
+        "subcategory_code": "DV",
+        "subcategory_name": "VEST",
+        "season_code": "24F",
+        "stock_price": 2854004.0,
+        "current_net_sales": 79868.0,
+        "current_gross_sales": 134152.0,
+        "discount_rate": 40.5,
+        "stock_days": 638.0
+      },
+      {
+        "subcategory_code": "PT",
+        "subcategory_name": "PANTS",
+        "season_code": "24F",
+        "stock_price": 2460154.0,
+        "current_net_sales": 30403.0,
+        "current_gross_sales": 49813.0,
+        "discount_rate": 39.0,
+        "stock_days": 1482.0
+      },
+      {
+        "subcategory_code": "SK",
+        "subcategory_name": "SKIRT",
+        "season_code": "24F",
+        "stock_price": 1185167.0,
+        "current_net_sales": 5964.0,
+        "current_gross_sales": 9973.0,
+        "discount_rate": 40.2,
+        "stock_days": 3565.0
+      },
+      {
+        "subcategory_code": "FD",
+        "subcategory_name": "Fleece Jumper",
+        "season_code": "24F",
+        "stock_price": 606690.0,
+        "current_net_sales": 14832.0,
+        "current_gross_sales": 22864.0,
+        "discount_rate": 35.1,
+        "stock_days": 796.0
+      },
+      {
         "subcategory_code": "OP",
         "subcategory_name": "ONEPIECE",
         "season_code": "24F",
-        "stock_price": 547851.0,
-        "sales_10m": 15610.0,
-        "gross_sales_10m": 18050.0,
-        "discount_rate": 13.5,
-        "stock_days": 9227.0
+        "stock_price": 489056.0,
+        "current_net_sales": 1006.0,
+        "current_gross_sales": 1798.0,
+        "discount_rate": 44.0,
+        "stock_days": 8160.0
+      },
+      {
+        "subcategory_code": "S2",
+        "subcategory_name": "Sweatshirt & Sweatpants",
+        "season_code": "24F",
+        "stock_price": 471661.0,
+        "current_net_sales": 528.0,
+        "current_gross_sales": 839.0,
+        "discount_rate": 37.1,
+        "stock_days": 16865.0
+      },
+      {
+        "subcategory_code": "CB",
+        "subcategory_name": "Beret",
+        "season_code": "24F",
+        "stock_price": 332019.0,
+        "current_net_sales": 1340.0,
+        "current_gross_sales": 1995.0,
+        "discount_rate": 32.8,
+        "stock_days": 4993.0
+      },
+      {
+        "subcategory_code": "HT",
+        "subcategory_name": "Hat",
+        "season_code": "24F",
+        "stock_price": 318449.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "S1",
         "subcategory_name": "T-Shirt & Sweatpants",
         "season_code": "24F",
         "stock_price": 257161.0,
-        "sales_10m": 79965.0,
-        "gross_sales_10m": 92772.0,
-        "discount_rate": 13.8,
-        "stock_days": 843.0
+        "current_net_sales": 585.0,
+        "current_gross_sales": 939.0,
+        "discount_rate": 37.7,
+        "stock_days": 8216.0
       },
       {
-        "subcategory_code": "CR",
-        "subcategory_name": "Crossbody Bag",
+        "subcategory_code": "PD",
+        "subcategory_name": "Padded Jumper",
         "season_code": "24F",
-        "stock_price": 225678.0,
-        "sales_10m": 59829.0,
-        "gross_sales_10m": 66997.0,
-        "discount_rate": 10.7,
-        "stock_days": 1024.0
+        "stock_price": 194201.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
-        "subcategory_code": "WB",
-        "subcategory_name": "Winter Boots",
+        "subcategory_code": "DS",
+        "subcategory_name": "SKIRT",
         "season_code": "24F",
-        "stock_price": 126849.0,
-        "sales_10m": 49944.0,
-        "gross_sales_10m": 54892.0,
-        "discount_rate": 9.0,
-        "stock_days": 703.0
+        "stock_price": 171041.0,
+        "current_net_sales": 3800.0,
+        "current_gross_sales": 6562.0,
+        "discount_rate": 42.1,
+        "stock_days": 782.0
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "24F",
         "stock_price": 40521.0,
-        "sales_10m": 16797.0,
-        "gross_sales_10m": 19348.0,
-        "discount_rate": 13.2,
-        "stock_days": 637.0
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "24F",
         "stock_price": 15810.0,
-        "sales_10m": 1256.0,
-        "gross_sales_10m": 1477.0,
-        "discount_rate": 15.0,
-        "stock_days": 3254.0
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "ET",
         "subcategory_name": "ACCESSARY",
         "season_code": "24F",
         "stock_price": 5277.0,
-        "sales_10m": 2466.0,
-        "gross_sales_10m": 2763.0,
-        "discount_rate": 10.7,
-        "stock_days": 581.0
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       }
     ],
     "23F": [
       {
-        "subcategory_code": "OR",
-        "subcategory_name": "Shopping Bag",
+        "subcategory_code": "JP",
+        "subcategory_name": "JUMPER",
         "season_code": "23F",
-        "stock_price": 572732.0,
-        "sales_10m": 1696.0,
-        "gross_sales_10m": 2066.0,
-        "discount_rate": 17.9,
-        "stock_days": 84274.0
+        "stock_price": 4114143.0,
+        "current_net_sales": 14968.0,
+        "current_gross_sales": 27398.0,
+        "discount_rate": 45.4,
+        "stock_days": 4505.0
+      },
+      {
+        "subcategory_code": "BN",
+        "subcategory_name": "Beanie",
+        "season_code": "23F",
+        "stock_price": 3428163.0,
+        "current_net_sales": 34689.0,
+        "current_gross_sales": 62799.0,
+        "discount_rate": 44.8,
+        "stock_days": 1638.0
+      },
+      {
+        "subcategory_code": "BQ",
+        "subcategory_name": "Shoulder Bag",
+        "season_code": "23F",
+        "stock_price": 2001783.0,
+        "current_net_sales": 27615.0,
+        "current_gross_sales": 62989.0,
+        "discount_rate": 56.2,
+        "stock_days": 953.0
+      },
+      {
+        "subcategory_code": "PT",
+        "subcategory_name": "PANTS",
+        "season_code": "23F",
+        "stock_price": 1591071.0,
+        "current_net_sales": 26731.0,
+        "current_gross_sales": 49460.0,
+        "discount_rate": 46.0,
+        "stock_days": 965.0
+      },
+      {
+        "subcategory_code": "HT",
+        "subcategory_name": "Hat",
+        "season_code": "23F",
+        "stock_price": 1143739.0,
+        "current_net_sales": 12728.0,
+        "current_gross_sales": 24924.0,
+        "discount_rate": 48.9,
+        "stock_days": 1377.0
+      },
+      {
+        "subcategory_code": "MF",
+        "subcategory_name": "MUFFLER",
+        "season_code": "23F",
+        "stock_price": 899108.0,
+        "current_net_sales": 836.0,
+        "current_gross_sales": 1358.0,
+        "discount_rate": 38.4,
+        "stock_days": 19862.0
+      },
+      {
+        "subcategory_code": "WJ",
+        "subcategory_name": "Windbreaker",
+        "season_code": "23F",
+        "stock_price": 862773.0,
+        "current_net_sales": 14395.0,
+        "current_gross_sales": 28840.0,
+        "discount_rate": 50.1,
+        "stock_days": 897.0
+      },
+      {
+        "subcategory_code": "SK",
+        "subcategory_name": "SKIRT",
+        "season_code": "23F",
+        "stock_price": 782870.0,
+        "current_net_sales": 1266.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 34.0,
+        "stock_days": 12245.0
+      },
+      {
+        "subcategory_code": "KP",
+        "subcategory_name": "Sweater Pullover",
+        "season_code": "23F",
+        "stock_price": 775529.0,
+        "current_net_sales": 1244.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 35.1,
+        "stock_days": 12130.0
+      },
+      {
+        "subcategory_code": "S2",
+        "subcategory_name": "Sweatshirt & Sweatpants",
+        "season_code": "23F",
+        "stock_price": 549766.0,
+        "current_net_sales": 2169.0,
+        "current_gross_sales": 3626.0,
+        "discount_rate": 40.2,
+        "stock_days": 4549.0
+      },
+      {
+        "subcategory_code": "CP",
+        "subcategory_name": "CAP",
+        "season_code": "23F",
+        "stock_price": 397192.0,
+        "current_net_sales": 4989.0,
+        "current_gross_sales": 8477.0,
+        "discount_rate": 41.1,
+        "stock_days": 1406.0
+      },
+      {
+        "subcategory_code": "OP",
+        "subcategory_name": "ONEPIECE",
+        "season_code": "23F",
+        "stock_price": 346157.0,
+        "current_net_sales": 2692.0,
+        "current_gross_sales": 4116.0,
+        "discount_rate": 34.6,
+        "stock_days": 2523.0
+      },
+      {
+        "subcategory_code": "S1",
+        "subcategory_name": "T-Shirt & Sweatpants",
+        "season_code": "23F",
+        "stock_price": 304976.0,
+        "current_net_sales": 2158.0,
+        "current_gross_sales": 3532.0,
+        "discount_rate": 38.9,
+        "stock_days": 2590.0
+      },
+      {
+        "subcategory_code": "DS",
+        "subcategory_name": "SKIRT",
+        "season_code": "23F",
+        "stock_price": 247422.0,
+        "current_net_sales": 1029.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 46.4,
+        "stock_days": 3870.0
       },
       {
         "subcategory_code": "JK",
         "subcategory_name": "Jacket",
         "season_code": "23F",
         "stock_price": 180021.0,
-        "sales_10m": 23848.0,
-        "gross_sales_10m": 43745.0,
-        "discount_rate": 45.5,
-        "stock_days": 1251.0
+        "current_net_sales": -2870.0,
+        "current_gross_sales": -5218.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 105245.0,
-        "sales_10m": 2833.0,
-        "gross_sales_10m": 3295.0,
-        "discount_rate": 14.0,
-        "stock_days": 9710.0
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "DP",
+        "subcategory_name": "PANTS",
+        "season_code": "23F",
+        "stock_price": 103726.0,
+        "current_net_sales": 497.0,
+        "current_gross_sales": 749.0,
+        "discount_rate": 33.6,
+        "stock_days": 4155.0
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "23F",
         "stock_price": 54467.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
-        "discount_rate": null,
-        "stock_days": null
-      },
-      {
-        "subcategory_code": "WM",
-        "subcategory_name": "Winter Headwear",
-        "season_code": "23F",
-        "stock_price": 49839.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3107,8 +3507,18 @@
         "subcategory_name": "Polo shirt",
         "season_code": "23F",
         "stock_price": 45474.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "CR",
+        "subcategory_name": "Crossbody Bag",
+        "season_code": "23F",
+        "stock_price": 40986.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3117,8 +3527,8 @@
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 9646.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3127,8 +3537,8 @@
         "subcategory_name": "Training Set",
         "season_code": "23F",
         "stock_price": 4956.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3137,8 +3547,8 @@
         "subcategory_name": "SHORT PANTS",
         "season_code": "23F",
         "stock_price": 1438.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3147,60 +3557,200 @@
         "subcategory_name": "ACCESSARY",
         "season_code": "23F",
         "stock_price": 518.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       }
     ],
     "22F~": [
       {
+        "subcategory_code": "KC",
+        "subcategory_name": "Knit Cardigan",
+        "season_code": "22F",
+        "stock_price": 1722970.0,
+        "current_net_sales": 19380.0,
+        "current_gross_sales": 43564.0,
+        "discount_rate": 55.5,
+        "stock_days": 1187.0
+      },
+      {
+        "subcategory_code": "FD",
+        "subcategory_name": "Fleece Jumper",
+        "season_code": "22F",
+        "stock_price": 1358797.0,
+        "current_net_sales": 9225.0,
+        "current_gross_sales": 20567.0,
+        "discount_rate": 55.1,
+        "stock_days": 1982.0
+      },
+      {
+        "subcategory_code": "JP",
+        "subcategory_name": "JUMPER",
+        "season_code": "22F",
+        "stock_price": 1222292.0,
+        "current_net_sales": 4468.0,
+        "current_gross_sales": 8708.0,
+        "discount_rate": 48.7,
+        "stock_days": 4211.0
+      },
+      {
+        "subcategory_code": "KP",
+        "subcategory_name": "Sweater Pullover",
+        "season_code": "22F",
+        "stock_price": 1072663.0,
+        "current_net_sales": 16352.0,
+        "current_gross_sales": 38391.0,
+        "discount_rate": 57.4,
+        "stock_days": 838.0
+      },
+      {
+        "subcategory_code": "CP",
+        "subcategory_name": "CAP",
+        "season_code": "22F",
+        "stock_price": 1066216.0,
+        "current_net_sales": 11210.0,
+        "current_gross_sales": 22372.0,
+        "discount_rate": 49.9,
+        "stock_days": 1430.0
+      },
+      {
+        "subcategory_code": "BN",
+        "subcategory_name": "Beanie",
+        "season_code": "22F",
+        "stock_price": 884392.0,
+        "current_net_sales": 2595.0,
+        "current_gross_sales": 4455.0,
+        "discount_rate": 41.8,
+        "stock_days": 5956.0
+      },
+      {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "22F",
-        "stock_price": 520789.0,
-        "sales_10m": 8062.0,
-        "gross_sales_10m": 27993.0,
-        "discount_rate": 71.2,
-        "stock_days": 5656.0
+        "stock_price": 409554.0,
+        "current_net_sales": 2132.0,
+        "current_gross_sales": 4367.0,
+        "discount_rate": 51.2,
+        "stock_days": 2814.0
       },
       {
         "subcategory_code": "MU",
         "subcategory_name": "Mules",
         "season_code": "22F",
         "stock_price": 366514.0,
-        "sales_10m": 25558.0,
-        "gross_sales_10m": 75178.0,
-        "discount_rate": 66.0,
-        "stock_days": 1482.0
+        "current_net_sales": 501.0,
+        "current_gross_sales": 759.0,
+        "discount_rate": 34.0,
+        "stock_days": 14487.0
       },
       {
-        "subcategory_code": "VT",
+        "subcategory_code": "CB",
+        "subcategory_name": "Beret",
+        "season_code": "22F",
+        "stock_price": 339175.0,
+        "current_net_sales": 296.0,
+        "current_gross_sales": 449.0,
+        "discount_rate": 34.1,
+        "stock_days": 22662.0
+      },
+      {
+        "subcategory_code": "DV",
         "subcategory_name": "VEST",
         "season_code": "22F",
-        "stock_price": 63837.0,
-        "sales_10m": 3321.0,
-        "gross_sales_10m": 8181.0,
-        "discount_rate": 59.4,
-        "stock_days": 2372.0
+        "stock_price": 247197.0,
+        "current_net_sales": 918.0,
+        "current_gross_sales": 1669.0,
+        "discount_rate": 45.0,
+        "stock_days": 4443.0
+      },
+      {
+        "subcategory_code": "MF",
+        "subcategory_name": "MUFFLER",
+        "season_code": "22F",
+        "stock_price": 224949.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "DR",
+        "subcategory_name": "DENIM SHIRT",
+        "season_code": "22F",
+        "stock_price": 146476.0,
+        "current_net_sales": 1088.0,
+        "current_gross_sales": 2718.0,
+        "discount_rate": 60.0,
+        "stock_days": 1617.0
+      },
+      {
+        "subcategory_code": "TS",
+        "subcategory_name": "T/SHIRTS",
+        "season_code": "22F",
+        "stock_price": 99988.0,
+        "current_net_sales": 807.0,
+        "current_gross_sales": 1587.0,
+        "discount_rate": 49.1,
+        "stock_days": 1890.0
+      },
+      {
+        "subcategory_code": "OP",
+        "subcategory_name": "ONEPIECE",
+        "season_code": "22F",
+        "stock_price": 80444.0,
+        "current_net_sales": 1450.0,
+        "current_gross_sales": 2797.0,
+        "discount_rate": 48.2,
+        "stock_days": 863.0
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "22F",
         "stock_price": 61753.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
       {
-        "subcategory_code": "WR",
-        "subcategory_name": "Wire Cap",
+        "subcategory_code": "SK",
+        "subcategory_name": "SKIRT",
         "season_code": "22F",
-        "stock_price": 30083.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "stock_price": 55907.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "WJ",
+        "subcategory_name": "Windbreaker",
+        "season_code": "22F",
+        "stock_price": 47801.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "DJ",
+        "subcategory_name": "JUMPER",
+        "season_code": "22F",
+        "stock_price": 47722.0,
+        "current_net_sales": 1000.0,
+        "current_gross_sales": 1819.0,
+        "discount_rate": 45.0,
+        "stock_days": 787.0
+      },
+      {
+        "subcategory_code": "DS",
+        "subcategory_name": "SKIRT",
+        "season_code": "22F",
+        "stock_price": 36006.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3209,8 +3759,8 @@
         "subcategory_name": "Winter Headwear",
         "season_code": "22F",
         "stock_price": 29882.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3219,58 +3769,38 @@
         "subcategory_name": "BASEBALL SHIRTS",
         "season_code": "22F",
         "stock_price": 27534.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
-      },
-      {
-        "subcategory_code": "BK",
-        "subcategory_name": "Backpack",
-        "season_code": "22F",
-        "stock_price": 23529.0,
-        "sales_10m": 1063.0,
-        "gross_sales_10m": 2277.0,
-        "discount_rate": 53.3,
-        "stock_days": 3141.0
       },
       {
         "subcategory_code": "LP",
         "subcategory_name": "Slippers",
         "season_code": "22F",
         "stock_price": 17661.0,
-        "sales_10m": 5622.0,
-        "gross_sales_10m": 17052.0,
-        "discount_rate": 67.0,
-        "stock_days": 315.0
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "JK",
         "subcategory_name": "Jacket",
         "season_code": "22F",
         "stock_price": 15145.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
-      },
-      {
-        "subcategory_code": "OR",
-        "subcategory_name": "Shopping Bag",
-        "season_code": "22F",
-        "stock_price": 14473.0,
-        "sales_10m": 30962.0,
-        "gross_sales_10m": 107249.0,
-        "discount_rate": 71.1,
-        "stock_days": 41.0
       },
       {
         "subcategory_code": "GL",
         "subcategory_name": "GLOVE",
         "season_code": "22F",
         "stock_price": 7959.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3279,8 +3809,18 @@
         "subcategory_name": "ACCESSARY",
         "season_code": "22F",
         "stock_price": 5090.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
+      },
+      {
+        "subcategory_code": "CP",
+        "subcategory_name": "CAP",
+        "season_code": "21F",
+        "stock_price": 529.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       }
@@ -3293,330 +3833,330 @@
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "24F",
         "stock_price": 7539992.0,
-        "sales_10m": 3186508.0,
-        "gross_sales_10m": 3838196.0,
-        "discount_rate": 16.979018267957134,
-        "stock_days": 597.196591315295
+        "current_net_sales": 479187.0,
+        "current_gross_sales": 770128.0,
+        "discount_rate": 37.77826543120105,
+        "stock_days": 293.71709637878376
       },
       {
         "subcategory_code": "DJ",
         "subcategory_name": "JUMPER",
         "season_code": "24F",
         "stock_price": 7246824.0,
-        "sales_10m": 3765275.0,
-        "gross_sales_10m": 4440742.0,
-        "discount_rate": 15.210678755937634,
-        "stock_days": 496.09603440145816
+        "current_net_sales": 572927.0,
+        "current_gross_sales": 965521.0,
+        "discount_rate": 40.66136313969349,
+        "stock_days": 225.1682977376981
       },
       {
         "subcategory_code": "HD",
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "24F",
         "stock_price": 4503546.0,
-        "sales_10m": 1147070.0,
-        "gross_sales_10m": 1357789.0,
-        "discount_rate": 15.519274349696454,
-        "stock_days": 1008.314240283284
+        "current_net_sales": 182131.0,
+        "current_gross_sales": 282327.0,
+        "discount_rate": 35.48934391680569,
+        "stock_days": 478.5457288888416
       },
       {
         "subcategory_code": "KC",
         "subcategory_name": "Knit Cardigan",
         "season_code": "24F",
         "stock_price": 4411794.0,
-        "sales_10m": 737262.0,
-        "gross_sales_10m": 887222.0,
-        "discount_rate": 16.902195842754125,
-        "stock_days": 1511.6683039870516
+        "current_net_sales": 78588.0,
+        "current_gross_sales": 130565.0,
+        "discount_rate": 39.80929039175889,
+        "stock_days": 1013.7006088921227
       },
       {
         "subcategory_code": "JP",
         "subcategory_name": "JUMPER",
         "season_code": "24F",
         "stock_price": 4192188.0,
-        "sales_10m": 1429693.0,
-        "gross_sales_10m": 1734243.0,
-        "discount_rate": 17.560976172312646,
-        "stock_days": 734.859620018648
+        "current_net_sales": 104398.0,
+        "current_gross_sales": 170517.0,
+        "discount_rate": 38.77560595131278,
+        "stock_days": 737.554847903728
       },
       {
         "subcategory_code": "DV",
         "subcategory_name": "VEST",
         "season_code": "24F",
         "stock_price": 3705619.0,
-        "sales_10m": 1787928.0,
-        "gross_sales_10m": 2069042.0,
-        "discount_rate": 13.586674412602548,
-        "stock_days": 544.4588249054393
+        "current_net_sales": 79868.0,
+        "current_gross_sales": 134152.0,
+        "discount_rate": 40.46454767726161,
+        "stock_days": 828.6762031128868
       },
       {
         "subcategory_code": "WJ",
         "subcategory_name": "Windbreaker",
         "season_code": "24F",
         "stock_price": 3184576.0,
-        "sales_10m": 1697672.0,
-        "gross_sales_10m": 2161925.0,
-        "discount_rate": 21.4740566855927,
-        "stock_days": 447.8005037177515
+        "current_net_sales": 224878.0,
+        "current_gross_sales": 377196.0,
+        "discount_rate": 40.3816583420821,
+        "stock_days": 253.2828555976203
       },
       {
         "subcategory_code": "BN",
         "subcategory_name": "Beanie",
         "season_code": "24F",
         "stock_price": 3035690.0,
-        "sales_10m": 1059727.0,
-        "gross_sales_10m": 1148815.0,
-        "discount_rate": 7.754773396935103,
-        "stock_days": 803.3058064179177
+        "current_net_sales": 100769.0,
+        "current_gross_sales": 137477.0,
+        "discount_rate": 26.70119365421125,
+        "stock_days": 662.4431723124595
       },
       {
         "subcategory_code": "PT",
         "subcategory_name": "PANTS",
         "season_code": "24F",
         "stock_price": 3004462.0,
-        "sales_10m": 1514579.0,
-        "gross_sales_10m": 1723508.0,
-        "discount_rate": 12.122311007549719,
-        "stock_days": 529.9403588495093
+        "current_net_sales": 30403.0,
+        "current_gross_sales": 49813.0,
+        "discount_rate": 38.96573183707064,
+        "stock_days": 1809.444522514203
       },
       {
         "subcategory_code": "TR",
         "subcategory_name": "T/SHIRTS",
         "season_code": "24F",
         "stock_price": 2671917.0,
-        "sales_10m": 1462336.0,
-        "gross_sales_10m": 1847771.0,
-        "discount_rate": 20.859457151346135,
-        "stock_days": 439.5906029480926
+        "current_net_sales": 226692.0,
+        "current_gross_sales": 360886.0,
+        "discount_rate": 37.18459568949751,
+        "stock_days": 222.11310496943634
       },
       {
         "subcategory_code": "SK",
         "subcategory_name": "SKIRT",
         "season_code": "24F",
         "stock_price": 1355683.0,
-        "sales_10m": 190507.0,
-        "gross_sales_10m": 231484.0,
-        "discount_rate": 17.701871403639128,
-        "stock_days": 1780.3719997926423
+        "current_net_sales": 5964.0,
+        "current_gross_sales": 9973.0,
+        "discount_rate": 40.198536047327785,
+        "stock_days": 4078.05976135566
       },
       {
         "subcategory_code": "TS",
         "subcategory_name": "T/SHIRTS",
         "season_code": "24F",
         "stock_price": 1266223.0,
-        "sales_10m": 1164021.0,
-        "gross_sales_10m": 1615743.0,
-        "discount_rate": 27.957540277135656,
-        "stock_days": 238.23825447487627
+        "current_net_sales": 62253.0,
+        "current_gross_sales": 103560.0,
+        "discount_rate": 39.88702201622248,
+        "stock_days": 366.808516801854
       },
       {
         "subcategory_code": "WP",
         "subcategory_name": "PANTS",
         "season_code": "24F",
         "stock_price": 1109559.0,
-        "sales_10m": 605303.0,
-        "gross_sales_10m": 744918.0,
-        "discount_rate": 18.742331370701205,
-        "stock_days": 452.80948507084
+        "current_net_sales": 47624.0,
+        "current_gross_sales": 79547.0,
+        "discount_rate": 40.13099174073189,
+        "stock_days": 418.454121462783
       },
       {
         "subcategory_code": "FD",
         "subcategory_name": "Fleece Jumper",
         "season_code": "24F",
         "stock_price": 1001726.0,
-        "sales_10m": 577095.0,
-        "gross_sales_10m": 666055.0,
-        "discount_rate": 13.356254363378401,
-        "stock_days": 457.2065430032054
+        "current_net_sales": 14832.0,
+        "current_gross_sales": 22864.0,
+        "discount_rate": 35.129461161651506,
+        "stock_days": 1314.3710636808958
       },
       {
         "subcategory_code": "DR",
         "subcategory_name": "DENIM SHIRT",
         "season_code": "24F",
         "stock_price": 619996.0,
-        "sales_10m": 239900.0,
-        "gross_sales_10m": 315466.0,
-        "discount_rate": 23.95376997838119,
-        "stock_days": 597.4614823784497
+        "current_net_sales": 32642.0,
+        "current_gross_sales": 54411.0,
+        "discount_rate": 40.008454172869456,
+        "stock_days": 341.8404366764073
       },
       {
         "subcategory_code": "OP",
         "subcategory_name": "ONEPIECE",
         "season_code": "24F",
         "stock_price": 547851.0,
-        "sales_10m": 15610.0,
-        "gross_sales_10m": 18050.0,
-        "discount_rate": 13.518005540166206,
-        "stock_days": 9226.964210526316
+        "current_net_sales": 1006.0,
+        "current_gross_sales": 1798.0,
+        "discount_rate": 44.048943270300335,
+        "stock_days": 9141.006674082313
       },
       {
         "subcategory_code": "KP",
         "subcategory_name": "Sweater Pullover",
         "season_code": "24F",
         "stock_price": 545185.0,
-        "sales_10m": 270352.0,
-        "gross_sales_10m": 313706.0,
-        "discount_rate": 13.819946064149235,
-        "stock_days": 528.3170866990112
+        "current_net_sales": 15890.0,
+        "current_gross_sales": 27114.0,
+        "discount_rate": 41.39558899461533,
+        "stock_days": 603.2142066828944
       },
       {
         "subcategory_code": "S2",
         "subcategory_name": "Sweatshirt & Sweatpants",
         "season_code": "24F",
         "stock_price": 479212.0,
-        "sales_10m": 188292.0,
-        "gross_sales_10m": 216862.0,
-        "discount_rate": 13.17427672897972,
-        "stock_days": 671.7656758676025
+        "current_net_sales": 528.0,
+        "current_gross_sales": 839.0,
+        "discount_rate": 37.06793802145411,
+        "stock_days": 17135.113230035757
       },
       {
         "subcategory_code": "CP",
         "subcategory_name": "CAP",
         "season_code": "24F",
         "stock_price": 383649.0,
-        "sales_10m": 312375.0,
-        "gross_sales_10m": 338762.0,
-        "discount_rate": 7.789244366251233,
-        "stock_days": 344.2809287936663
+        "current_net_sales": 40606.0,
+        "current_gross_sales": 56668.0,
+        "discount_rate": 28.344038963789085,
+        "stock_days": 203.1035152114068
       },
       {
         "subcategory_code": "MF",
         "subcategory_name": "MUFFLER",
         "season_code": "24F",
         "stock_price": 361709.0,
-        "sales_10m": 186990.0,
-        "gross_sales_10m": 210257.0,
-        "discount_rate": 11.065981156394319,
-        "stock_days": 522.9768140894239
+        "current_net_sales": 19942.0,
+        "current_gross_sales": 32525.0,
+        "discount_rate": 38.68716372021522,
+        "stock_days": 333.62859338970026
       },
       {
         "subcategory_code": "CB",
         "subcategory_name": "Beret",
         "season_code": "24F",
         "stock_price": 334812.0,
-        "sales_10m": 79225.0,
-        "gross_sales_10m": 84977.0,
-        "discount_rate": 6.768890405639174,
-        "stock_days": 1197.7693728891347
+        "current_net_sales": 1340.0,
+        "current_gross_sales": 1995.0,
+        "discount_rate": 32.83208020050125,
+        "stock_days": 5034.766917293234
       },
       {
         "subcategory_code": "HT",
         "subcategory_name": "Hat",
         "season_code": "24F",
         "stock_price": 318449.0,
-        "sales_10m": 99667.0,
-        "gross_sales_10m": 107236.0,
-        "discount_rate": 7.058264015815584,
-        "stock_days": 902.7611622962437
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "S1",
         "subcategory_name": "T-Shirt & Sweatpants",
         "season_code": "24F",
         "stock_price": 257161.0,
-        "sales_10m": 79965.0,
-        "gross_sales_10m": 92772.0,
-        "discount_rate": 13.804811796662786,
-        "stock_days": 842.6782218772905
+        "current_net_sales": 585.0,
+        "current_gross_sales": 939.0,
+        "discount_rate": 37.69968051118211,
+        "stock_days": 8216.006389776358
       },
       {
         "subcategory_code": "DS",
         "subcategory_name": "SKIRT",
         "season_code": "24F",
         "stock_price": 247732.0,
-        "sales_10m": 44372.0,
-        "gross_sales_10m": 57915.0,
-        "discount_rate": 23.384270050936717,
-        "stock_days": 1300.3630838297504
+        "current_net_sales": 3800.0,
+        "current_gross_sales": 6562.0,
+        "discount_rate": 42.09082596769277,
+        "stock_days": 1132.5754343188053
       },
       {
         "subcategory_code": "CR",
         "subcategory_name": "Crossbody Bag",
         "season_code": "24F",
         "stock_price": 225678.0,
-        "sales_10m": 59829.0,
-        "gross_sales_10m": 66997.0,
-        "discount_rate": 10.698986521784558,
-        "stock_days": 1024.017672433094
+        "current_net_sales": 6014.0,
+        "current_gross_sales": 10861.0,
+        "discount_rate": 44.62756652241966,
+        "stock_days": 623.3624896418378
       },
       {
         "subcategory_code": "PD",
         "subcategory_name": "Padded Jumper",
         "season_code": "24F",
         "stock_price": 194201.0,
-        "sales_10m": 437116.0,
-        "gross_sales_10m": 502119.0,
-        "discount_rate": 12.945735970955091,
-        "stock_days": 117.57592124576045
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "WB",
         "subcategory_name": "Winter Boots",
         "season_code": "24F",
         "stock_price": 126849.0,
-        "sales_10m": 49944.0,
-        "gross_sales_10m": 54892.0,
-        "discount_rate": 9.01406398017926,
-        "stock_days": 702.5084893973622
+        "current_net_sales": 8866.0,
+        "current_gross_sales": 13939.0,
+        "discount_rate": 36.394289403830975,
+        "stock_days": 273.008824162422
       },
       {
         "subcategory_code": "DK",
         "subcategory_name": "DENIM JACKET",
         "season_code": "24F",
         "stock_price": 100923.0,
-        "sales_10m": 64065.0,
-        "gross_sales_10m": 88859.0,
-        "discount_rate": 27.90263226009746,
-        "stock_days": 345.2727579648657
+        "current_net_sales": 10354.0,
+        "current_gross_sales": 16635.0,
+        "discount_rate": 37.757739705440336,
+        "stock_days": 182.00721370604148
       },
       {
         "subcategory_code": "SH",
         "subcategory_name": "SHOES",
         "season_code": "24F",
         "stock_price": 65593.0,
-        "sales_10m": 139452.0,
-        "gross_sales_10m": 166353.0,
-        "discount_rate": 16.171033885773024,
-        "stock_days": 119.86722211201482
+        "current_net_sales": 3082.0,
+        "current_gross_sales": 4895.0,
+        "discount_rate": 37.03779366700715,
+        "stock_days": 402.0
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "24F",
         "stock_price": 40521.0,
-        "sales_10m": 16797.0,
-        "gross_sales_10m": 19348.0,
-        "discount_rate": 13.184825304941079,
-        "stock_days": 636.6747984287782
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "DP",
         "subcategory_name": "PANTS",
         "season_code": "24F",
         "stock_price": 26590.0,
-        "sales_10m": 86724.0,
-        "gross_sales_10m": 112311.0,
-        "discount_rate": 22.78227422069076,
-        "stock_days": 71.9730035348274
+        "current_net_sales": 5555.0,
+        "current_gross_sales": 9408.0,
+        "discount_rate": 40.954506802721085,
+        "stock_days": 84.78954081632654
       },
       {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "24F",
         "stock_price": 15810.0,
-        "sales_10m": 1256.0,
-        "gross_sales_10m": 1477.0,
-        "discount_rate": 14.962762356127286,
-        "stock_days": 3254.0555179417743
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "ET",
         "subcategory_name": "ACCESSARY",
         "season_code": "24F",
         "stock_price": 5277.0,
-        "sales_10m": 2466.0,
-        "gross_sales_10m": 2763.0,
-        "discount_rate": 10.749185667752444,
-        "stock_days": 580.6036916395223
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       }
     ],
     "23F": [
@@ -3625,308 +4165,308 @@
         "subcategory_name": "JUMPER",
         "season_code": "23F",
         "stock_price": 4604580.0,
-        "sales_10m": 210345.0,
-        "gross_sales_10m": 414858.0,
-        "discount_rate": 49.297108890270884,
-        "stock_days": 3374.1480699420044
+        "current_net_sales": 14968.0,
+        "current_gross_sales": 27398.0,
+        "discount_rate": 45.368275056573474,
+        "stock_days": 5041.878969267829
       },
       {
         "subcategory_code": "MT",
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "23F",
         "stock_price": 4583704.0,
-        "sales_10m": 1008790.0,
-        "gross_sales_10m": 1889919.0,
-        "discount_rate": 46.62258012115863,
-        "stock_days": 737.3046231081861
+        "current_net_sales": 217752.0,
+        "current_gross_sales": 419268.0,
+        "discount_rate": 48.06376828186267,
+        "stock_days": 327.97904920003435
       },
       {
         "subcategory_code": "BN",
         "subcategory_name": "Beanie",
         "season_code": "23F",
         "stock_price": 4267994.0,
-        "sales_10m": 77633.0,
-        "gross_sales_10m": 117179.0,
-        "discount_rate": 33.748367881617014,
-        "stock_days": 11072.54863072735
+        "current_net_sales": 34689.0,
+        "current_gross_sales": 62799.0,
+        "discount_rate": 44.76185926527492,
+        "stock_days": 2038.8831032341277
       },
       {
         "subcategory_code": "KC",
         "subcategory_name": "Knit Cardigan",
         "season_code": "23F",
         "stock_price": 2547581.0,
-        "sales_10m": 293177.0,
-        "gross_sales_10m": 596084.0,
-        "discount_rate": 50.816160138503975,
-        "stock_days": 1299.2541722307594
+        "current_net_sales": 62798.0,
+        "current_gross_sales": 118647.0,
+        "discount_rate": 47.07156523131643,
+        "stock_days": 644.158132949
       },
       {
         "subcategory_code": "PT",
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 2228770.0,
-        "sales_10m": 239549.0,
-        "gross_sales_10m": 449429.0,
-        "discount_rate": 46.69925616727003,
-        "stock_days": 1507.5708955140858
+        "current_net_sales": 26731.0,
+        "current_gross_sales": 49460.0,
+        "discount_rate": 45.95430651031136,
+        "stock_days": 1351.8621107966032
       },
       {
         "subcategory_code": "HD",
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "23F",
         "stock_price": 2226105.0,
-        "sales_10m": 274787.0,
-        "gross_sales_10m": 504287.0,
-        "discount_rate": 45.50979898351534,
-        "stock_days": 1341.96582501631
+        "current_net_sales": 84040.0,
+        "current_gross_sales": 161341.0,
+        "discount_rate": 47.911566185904384,
+        "stock_days": 413.9254746158757
       },
       {
         "subcategory_code": "BQ",
         "subcategory_name": "Shoulder Bag",
         "season_code": "23F",
         "stock_price": 2170146.0,
-        "sales_10m": 73206.0,
-        "gross_sales_10m": 117419.0,
-        "discount_rate": 37.65404236111702,
-        "stock_days": 5618.548820889294
+        "current_net_sales": 27615.0,
+        "current_gross_sales": 62989.0,
+        "discount_rate": 56.1590118909651,
+        "stock_days": 1033.5833240724571
       },
       {
         "subcategory_code": "DJ",
         "subcategory_name": "JUMPER",
         "season_code": "23F",
         "stock_price": 2170011.0,
-        "sales_10m": 687998.0,
-        "gross_sales_10m": 1246828.0,
-        "discount_rate": 44.82013557603775,
-        "stock_days": 529.0892921878559
+        "current_net_sales": 85047.0,
+        "current_gross_sales": 159276.0,
+        "discount_rate": 46.60400813681911,
+        "stock_days": 408.7265501393807
       },
       {
         "subcategory_code": "TR",
         "subcategory_name": "T/SHIRTS",
         "season_code": "23F",
         "stock_price": 1898202.0,
-        "sales_10m": 363921.0,
-        "gross_sales_10m": 681062.0,
-        "discount_rate": 46.565657752157655,
-        "stock_days": 847.2846936108607
+        "current_net_sales": 62570.0,
+        "current_gross_sales": 120793.0,
+        "discount_rate": 48.200640765607275,
+        "stock_days": 471.4350997160431
       },
       {
         "subcategory_code": "HT",
         "subcategory_name": "Hat",
         "season_code": "23F",
         "stock_price": 1465583.0,
-        "sales_10m": 36292.0,
-        "gross_sales_10m": 62591.0,
-        "discount_rate": 42.017222923423496,
-        "stock_days": 7118.231566838683
+        "current_net_sales": 12728.0,
+        "current_gross_sales": 24924.0,
+        "discount_rate": 48.93275557695394,
+        "stock_days": 1764.0623495426096
       },
       {
         "subcategory_code": "WJ",
         "subcategory_name": "Windbreaker",
         "season_code": "23F",
         "stock_price": 1215434.0,
-        "sales_10m": 433659.0,
-        "gross_sales_10m": 836359.0,
-        "discount_rate": 48.14917995741063,
-        "stock_days": 441.78628555440906
+        "current_net_sales": 14395.0,
+        "current_gross_sales": 28840.0,
+        "discount_rate": 50.086685159500696,
+        "stock_days": 1264.3210818307907
       },
       {
         "subcategory_code": "DV",
         "subcategory_name": "VEST",
         "season_code": "23F",
         "stock_price": 1109757.0,
-        "sales_10m": 453677.0,
-        "gross_sales_10m": 828388.0,
-        "discount_rate": 45.23375519684013,
-        "stock_days": 407.2561746428002
+        "current_net_sales": 31097.0,
+        "current_gross_sales": 60184.0,
+        "discount_rate": 48.330120962382026,
+        "stock_days": 553.1820749700918
       },
       {
         "subcategory_code": "MF",
         "subcategory_name": "MUFFLER",
         "season_code": "23F",
         "stock_price": 922994.0,
-        "sales_10m": 11357.0,
-        "gross_sales_10m": 13072.0,
-        "discount_rate": 13.119645042839656,
-        "stock_days": 21464.976744186046
+        "current_net_sales": 836.0,
+        "current_gross_sales": 1358.0,
+        "discount_rate": 38.43888070692195,
+        "stock_days": 20390.147275405005
       },
       {
         "subcategory_code": "SK",
         "subcategory_name": "SKIRT",
         "season_code": "23F",
         "stock_price": 846260.0,
-        "sales_10m": 45853.0,
-        "gross_sales_10m": 113615.0,
-        "discount_rate": 59.64177265325882,
-        "stock_days": 2264.340448004225
+        "current_net_sales": 1266.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 33.99374348279458,
+        "stock_days": 13236.60062565172
       },
       {
         "subcategory_code": "KP",
         "subcategory_name": "Sweater Pullover",
         "season_code": "23F",
         "stock_price": 802069.0,
-        "sales_10m": 50520.0,
-        "gross_sales_10m": 110897.0,
-        "discount_rate": 54.444214000378736,
-        "stock_days": 2198.697674418605
+        "current_net_sales": 1244.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 35.140771637122,
+        "stock_days": 12545.396246089678
       },
       {
         "subcategory_code": "CB",
         "subcategory_name": "Beret",
         "season_code": "23F",
         "stock_price": 734673.0,
-        "sales_10m": 39338.0,
-        "gross_sales_10m": 63238.0,
-        "discount_rate": 37.79373161706569,
-        "stock_days": 3531.7466080521203
+        "current_net_sales": 29991.0,
+        "current_gross_sales": 56061.0,
+        "discount_rate": 46.5029164659924,
+        "stock_days": 393.14657248354473
       },
       {
         "subcategory_code": "TS",
         "subcategory_name": "T/SHIRTS",
         "season_code": "23F",
         "stock_price": 703203.0,
-        "sales_10m": 357969.0,
-        "gross_sales_10m": 695110.0,
-        "discount_rate": 48.50181985585015,
-        "stock_days": 307.5393995195005
+        "current_net_sales": 21371.0,
+        "current_gross_sales": 38698.0,
+        "discount_rate": 44.77492376867021,
+        "stock_days": 545.1467776112461
       },
       {
         "subcategory_code": "FD",
         "subcategory_name": "Fleece Jumper",
         "season_code": "23F",
         "stock_price": 630516.0,
-        "sales_10m": 122864.0,
-        "gross_sales_10m": 221523.0,
-        "discount_rate": 44.5366846783404,
-        "stock_days": 865.2684551942688
+        "current_net_sales": 19793.0,
+        "current_gross_sales": 37613.0,
+        "discount_rate": 47.37723659373089,
+        "stock_days": 502.8974024938186
       },
       {
         "subcategory_code": "WP",
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 586435.0,
-        "sales_10m": 158612.0,
-        "gross_sales_10m": 308512.0,
-        "discount_rate": 48.58806140441863,
-        "stock_days": 577.8583653148013
+        "current_net_sales": 12395.0,
+        "current_gross_sales": 23677.0,
+        "discount_rate": 47.64961777252186,
+        "stock_days": 743.0438822485957
       },
       {
         "subcategory_code": "S2",
         "subcategory_name": "Sweatshirt & Sweatpants",
         "season_code": "23F",
         "stock_price": 573419.0,
-        "sales_10m": 1449.0,
-        "gross_sales_10m": 2527.0,
-        "discount_rate": 42.65927977839335,
-        "stock_days": 68982.73684210527
+        "current_net_sales": 2169.0,
+        "current_gross_sales": 3626.0,
+        "discount_rate": 40.18201875344732,
+        "stock_days": 4744.2277992278
       },
       {
         "subcategory_code": "OR",
         "subcategory_name": "Shopping Bag",
         "season_code": "23F",
         "stock_price": 572732.0,
-        "sales_10m": 1696.0,
-        "gross_sales_10m": 2066.0,
-        "discount_rate": 17.909002904162634,
-        "stock_days": 84274.21490803485
+        "current_net_sales": 25481.0,
+        "current_gross_sales": 81161.0,
+        "discount_rate": 68.60437895048113,
+        "stock_days": 211.7021722255763
       },
       {
         "subcategory_code": "CP",
         "subcategory_name": "CAP",
         "season_code": "23F",
         "stock_price": 435442.0,
-        "sales_10m": 101598.0,
-        "gross_sales_10m": 147379.0,
-        "discount_rate": 31.063448659578363,
-        "stock_days": 898.1901627776007
+        "current_net_sales": 4989.0,
+        "current_gross_sales": 8477.0,
+        "discount_rate": 41.146632063229916,
+        "stock_days": 1541.0239471511147
       },
       {
         "subcategory_code": "OP",
         "subcategory_name": "ONEPIECE",
         "season_code": "23F",
         "stock_price": 368683.0,
-        "sales_10m": 47401.0,
-        "gross_sales_10m": 86951.0,
-        "discount_rate": 45.48538832215846,
-        "stock_days": 1288.9976193488287
+        "current_net_sales": 2692.0,
+        "current_gross_sales": 4116.0,
+        "discount_rate": 34.59669582118562,
+        "stock_days": 2687.1938775510203
       },
       {
         "subcategory_code": "S1",
         "subcategory_name": "T-Shirt & Sweatpants",
         "season_code": "23F",
         "stock_price": 333015.0,
-        "sales_10m": 1648.0,
-        "gross_sales_10m": 2805.0,
-        "discount_rate": 41.24777183600713,
-        "stock_days": 36091.46524064171
+        "current_net_sales": 2158.0,
+        "current_gross_sales": 3532.0,
+        "discount_rate": 38.90147225368064,
+        "stock_days": 2828.5532276330687
       },
       {
         "subcategory_code": "DS",
         "subcategory_name": "SKIRT",
         "season_code": "23F",
         "stock_price": 291536.0,
-        "sales_10m": 9011.0,
-        "gross_sales_10m": 18137.0,
-        "discount_rate": 50.31703148260463,
-        "stock_days": 4886.5272095715945
+        "current_net_sales": 1029.0,
+        "current_gross_sales": 1918.0,
+        "discount_rate": 46.35036496350365,
+        "stock_days": 4560.0
       },
       {
         "subcategory_code": "DK",
         "subcategory_name": "DENIM JACKET",
         "season_code": "23F",
         "stock_price": 220355.0,
-        "sales_10m": 46225.0,
-        "gross_sales_10m": 95332.0,
-        "discount_rate": 51.511559602232204,
-        "stock_days": 702.6803172072338
+        "current_net_sales": 3170.0,
+        "current_gross_sales": 6533.0,
+        "discount_rate": 51.47711617939691,
+        "stock_days": 1011.8858105005356
       },
       {
         "subcategory_code": "JK",
         "subcategory_name": "Jacket",
         "season_code": "23F",
         "stock_price": 180021.0,
-        "sales_10m": 23848.0,
-        "gross_sales_10m": 43745.0,
-        "discount_rate": 45.48405532060807,
-        "stock_days": 1251.0317522002513
+        "current_net_sales": -2870.0,
+        "current_gross_sales": -5218.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "DP",
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 112805.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
-        "discount_rate": null,
-        "stock_days": null
+        "current_net_sales": 497.0,
+        "current_gross_sales": 749.0,
+        "discount_rate": 33.64485981308411,
+        "stock_days": 4518.22429906542
       },
       {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 105245.0,
-        "sales_10m": 2833.0,
-        "gross_sales_10m": 3295.0,
-        "discount_rate": 14.021244309559938,
-        "stock_days": 9710.009104704097
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "DR",
         "subcategory_name": "DENIM SHIRT",
         "season_code": "23F",
         "stock_price": 87033.0,
-        "sales_10m": 60575.0,
-        "gross_sales_10m": 109241.0,
-        "discount_rate": 44.54920771505204,
-        "stock_days": 242.19873490722347
+        "current_net_sales": 2321.0,
+        "current_gross_sales": 3859.0,
+        "discount_rate": 39.85488468515159,
+        "stock_days": 676.5975641357865
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "23F",
         "stock_price": 54467.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3935,18 +4475,18 @@
         "subcategory_name": "Winter Headwear",
         "season_code": "23F",
         "stock_price": 49839.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
-        "discount_rate": null,
-        "stock_days": null
+        "current_net_sales": 1614.0,
+        "current_gross_sales": 2694.0,
+        "discount_rate": 40.089086859688194,
+        "stock_days": 555.0
       },
       {
         "subcategory_code": "PQ",
         "subcategory_name": "Polo shirt",
         "season_code": "23F",
         "stock_price": 45474.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3955,8 +4495,8 @@
         "subcategory_name": "Crossbody Bag",
         "season_code": "23F",
         "stock_price": 40986.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3965,8 +4505,8 @@
         "subcategory_name": "PANTS",
         "season_code": "23F",
         "stock_price": 9646.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3975,8 +4515,8 @@
         "subcategory_name": "Training Set",
         "season_code": "23F",
         "stock_price": 4956.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3985,8 +4525,8 @@
         "subcategory_name": "SHORT PANTS",
         "season_code": "23F",
         "stock_price": 1438.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -3995,8 +4535,8 @@
         "subcategory_name": "ACCESSARY",
         "season_code": "23F",
         "stock_price": 518.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       }
@@ -4007,248 +4547,248 @@
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "22F",
         "stock_price": 2879486.0,
-        "sales_10m": 525440.0,
-        "gross_sales_10m": 1197010.0,
-        "discount_rate": 56.10395903125287,
-        "stock_days": 731.2919223732466
+        "current_net_sales": 100529.0,
+        "current_gross_sales": 226248.0,
+        "discount_rate": 55.56690003889537,
+        "stock_days": 381.8136734910364
       },
       {
         "subcategory_code": "KC",
         "subcategory_name": "Knit Cardigan",
         "season_code": "22F",
         "stock_price": 2058628.0,
-        "sales_10m": 73147.0,
-        "gross_sales_10m": 170462.0,
-        "discount_rate": 57.08896997571307,
-        "stock_days": 3671.333857399303
+        "current_net_sales": 19380.0,
+        "current_gross_sales": 43564.0,
+        "discount_rate": 55.51372693049307,
+        "stock_days": 1417.6576990175374
       },
       {
         "subcategory_code": "FD",
         "subcategory_name": "Fleece Jumper",
         "season_code": "22F",
         "stock_price": 1877199.0,
-        "sales_10m": 127268.0,
-        "gross_sales_10m": 292292.0,
-        "discount_rate": 56.45860988326742,
-        "stock_days": 1952.3917726109507
+        "current_net_sales": 9225.0,
+        "current_gross_sales": 20567.0,
+        "discount_rate": 55.146594058443135,
+        "stock_days": 2738.1713424417753
       },
       {
         "subcategory_code": "KP",
         "subcategory_name": "Sweater Pullover",
         "season_code": "22F",
         "stock_price": 1503394.0,
-        "sales_10m": 103027.0,
-        "gross_sales_10m": 256318.0,
-        "discount_rate": 59.80500784182149,
-        "stock_days": 1783.065473357314
+        "current_net_sales": 16352.0,
+        "current_gross_sales": 38391.0,
+        "discount_rate": 57.406683858195926,
+        "stock_days": 1174.801906696882
       },
       {
         "subcategory_code": "JP",
         "subcategory_name": "JUMPER",
         "season_code": "22F",
         "stock_price": 1374216.0,
-        "sales_10m": 45039.0,
-        "gross_sales_10m": 109939.0,
-        "discount_rate": 59.032736335604284,
-        "stock_days": 3799.9405488498164
+        "current_net_sales": 4468.0,
+        "current_gross_sales": 8708.0,
+        "discount_rate": 48.690858980248045,
+        "stock_days": 4734.3224621038125
       },
       {
         "subcategory_code": "HD",
         "subcategory_name": "SWEAT SHIRTS",
         "season_code": "22F",
         "stock_price": 1223285.0,
-        "sales_10m": 150609.0,
-        "gross_sales_10m": 320478.0,
-        "discount_rate": 53.00488645086402,
-        "stock_days": 1160.3874212894489
+        "current_net_sales": 79305.0,
+        "current_gross_sales": 194480.0,
+        "discount_rate": 59.222027972027966,
+        "stock_days": 188.70089469354176
       },
       {
         "subcategory_code": "CP",
         "subcategory_name": "CAP",
         "season_code": "22F",
         "stock_price": 1202572.0,
-        "sales_10m": 88948.0,
-        "gross_sales_10m": 214804.0,
-        "discount_rate": 58.591087689242286,
-        "stock_days": 1701.932403493417
+        "current_net_sales": 11210.0,
+        "current_gross_sales": 22372.0,
+        "discount_rate": 49.89272304666548,
+        "stock_days": 1612.6032540675844
       },
       {
         "subcategory_code": "BN",
         "subcategory_name": "Beanie",
         "season_code": "22F",
         "stock_price": 939776.0,
-        "sales_10m": 37027.0,
-        "gross_sales_10m": 83813.0,
-        "discount_rate": 55.821889205731814,
-        "stock_days": 3408.6824716929355
+        "current_net_sales": 2595.0,
+        "current_gross_sales": 4455.0,
+        "discount_rate": 41.75084175084175,
+        "stock_days": 6328.457912457912
       },
       {
         "subcategory_code": "PT",
         "subcategory_name": "PANTS",
         "season_code": "22F",
         "stock_price": 745401.0,
-        "sales_10m": 44900.0,
-        "gross_sales_10m": 94467.0,
-        "discount_rate": 52.470174770025515,
-        "stock_days": 2398.7414017593446
+        "current_net_sales": 19932.0,
+        "current_gross_sales": 46250.0,
+        "discount_rate": 56.90378378378378,
+        "stock_days": 483.50335135135134
       },
       {
         "subcategory_code": "HT",
         "subcategory_name": "Hat",
         "season_code": "22F",
         "stock_price": 600773.0,
-        "sales_10m": 15016.0,
-        "gross_sales_10m": 37185.0,
-        "discount_rate": 59.618125588274836,
-        "stock_days": 4911.5232486217565
+        "current_net_sales": 12570.0,
+        "current_gross_sales": 26299.0,
+        "discount_rate": 52.20350583672383,
+        "stock_days": 685.3184531731245
       },
       {
         "subcategory_code": "LG",
         "subcategory_name": "PANTS",
         "season_code": "22F",
         "stock_price": 520789.0,
-        "sales_10m": 8062.0,
-        "gross_sales_10m": 27993.0,
-        "discount_rate": 71.19994284285357,
-        "stock_days": 5655.694495052335
+        "current_net_sales": 2132.0,
+        "current_gross_sales": 4367.0,
+        "discount_rate": 51.17929929013052,
+        "stock_days": 3577.6665903366156
       },
       {
         "subcategory_code": "MU",
         "subcategory_name": "Mules",
         "season_code": "22F",
         "stock_price": 366514.0,
-        "sales_10m": 25558.0,
-        "gross_sales_10m": 75178.0,
-        "discount_rate": 66.0033520444811,
-        "stock_days": 1482.0859293942376
+        "current_net_sales": 501.0,
+        "current_gross_sales": 759.0,
+        "discount_rate": 33.99209486166008,
+        "stock_days": 14486.719367588932
       },
       {
         "subcategory_code": "CB",
         "subcategory_name": "Beret",
         "season_code": "22F",
         "stock_price": 344596.0,
-        "sales_10m": 9795.0,
-        "gross_sales_10m": 27223.0,
-        "discount_rate": 64.01939536421408,
-        "stock_days": 3848.1131396245823
+        "current_net_sales": 296.0,
+        "current_gross_sales": 449.0,
+        "discount_rate": 34.075723830734965,
+        "stock_days": 23024.23162583519
       },
       {
         "subcategory_code": "DV",
         "subcategory_name": "VEST",
         "season_code": "22F",
         "stock_price": 290176.0,
-        "sales_10m": 21335.0,
-        "gross_sales_10m": 44575.0,
-        "discount_rate": 52.13684800897364,
-        "stock_days": 1978.990555243971
+        "current_net_sales": 918.0,
+        "current_gross_sales": 1669.0,
+        "discount_rate": 44.99700419412822,
+        "stock_days": 5215.865787896944
       },
       {
         "subcategory_code": "TR",
         "subcategory_name": "T/SHIRTS",
         "season_code": "22F",
         "stock_price": 274191.0,
-        "sales_10m": 4942.0,
-        "gross_sales_10m": 10524.0,
-        "discount_rate": 53.04066894716838,
-        "stock_days": 7920.378563283922
+        "current_net_sales": 5301.0,
+        "current_gross_sales": 12048.0,
+        "discount_rate": 56.00099601593625,
+        "stock_days": 682.7465139442231
       },
       {
         "subcategory_code": "PD",
         "subcategory_name": "Padded Jumper",
         "season_code": "22F",
         "stock_price": 228313.0,
-        "sales_10m": 21435.0,
-        "gross_sales_10m": 49602.0,
-        "discount_rate": 56.786016692875286,
-        "stock_days": 1399.2813193016411
+        "current_net_sales": 5951.0,
+        "current_gross_sales": 13303.0,
+        "discount_rate": 55.265729534691424,
+        "stock_days": 514.8755919717357
       },
       {
         "subcategory_code": "MF",
         "subcategory_name": "MUFFLER",
         "season_code": "22F",
         "stock_price": 224949.0,
-        "sales_10m": 10759.0,
-        "gross_sales_10m": 21900.0,
-        "discount_rate": 50.87214611872146,
-        "stock_days": 3122.5797260273976
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "S2",
         "subcategory_name": "Sweatshirt & Sweatpants",
         "season_code": "22F",
         "stock_price": 224868.0,
-        "sales_10m": 29306.0,
-        "gross_sales_10m": 62247.0,
-        "discount_rate": 52.919819429048786,
-        "stock_days": 1098.203479685768
+        "current_net_sales": 4969.0,
+        "current_gross_sales": 11208.0,
+        "discount_rate": 55.6655960028551,
+        "stock_days": 601.8950749464668
       },
       {
         "subcategory_code": "DR",
         "subcategory_name": "DENIM SHIRT",
         "season_code": "22F",
         "stock_price": 172189.0,
-        "sales_10m": 22613.0,
-        "gross_sales_10m": 46583.0,
-        "discount_rate": 51.4565399394629,
-        "stock_days": 1123.7029817744672
+        "current_net_sales": 1088.0,
+        "current_gross_sales": 2718.0,
+        "discount_rate": 59.97056659308315,
+        "stock_days": 1900.5408388520973
       },
       {
         "subcategory_code": "OP",
         "subcategory_name": "ONEPIECE",
         "season_code": "22F",
         "stock_price": 168518.0,
-        "sales_10m": 3170.0,
-        "gross_sales_10m": 6870.0,
-        "discount_rate": 53.85735080058224,
-        "stock_days": 7456.9828238719065
+        "current_net_sales": 1450.0,
+        "current_gross_sales": 2797.0,
+        "discount_rate": 48.158741508759384,
+        "stock_days": 1807.4865927779765
       },
       {
         "subcategory_code": "WP",
         "subcategory_name": "PANTS",
         "season_code": "22F",
         "stock_price": 155734.0,
-        "sales_10m": 11657.0,
-        "gross_sales_10m": 24943.0,
-        "discount_rate": 53.2654452150904,
-        "stock_days": 1898.0530008419196
+        "current_net_sales": 2775.0,
+        "current_gross_sales": 6052.0,
+        "discount_rate": 54.147389292795765,
+        "stock_days": 771.9795109054858
       },
       {
         "subcategory_code": "TS",
         "subcategory_name": "T/SHIRTS",
         "season_code": "22F",
         "stock_price": 130358.0,
-        "sales_10m": 13360.0,
-        "gross_sales_10m": 29322.0,
-        "discount_rate": 54.436941545597165,
-        "stock_days": 1351.5050815087645
+        "current_net_sales": 807.0,
+        "current_gross_sales": 1587.0,
+        "discount_rate": 49.14933837429111,
+        "stock_days": 2464.2344045368623
       },
       {
         "subcategory_code": "DP",
         "subcategory_name": "PANTS",
         "season_code": "22F",
         "stock_price": 69976.0,
-        "sales_10m": 1239.0,
-        "gross_sales_10m": 4767.0,
-        "discount_rate": 74.00881057268722,
-        "stock_days": 4462.492972519404
+        "current_net_sales": 1566.0,
+        "current_gross_sales": 3478.0,
+        "discount_rate": 54.97412305922944,
+        "stock_days": 603.588269120184
       },
       {
         "subcategory_code": "VT",
         "subcategory_name": "VEST",
         "season_code": "22F",
         "stock_price": 63837.0,
-        "sales_10m": 3321.0,
-        "gross_sales_10m": 8181.0,
-        "discount_rate": 59.4059405940594,
-        "stock_days": 2372.136413641364
+        "current_net_sales": 9586.0,
+        "current_gross_sales": 22848.0,
+        "discount_rate": 58.044467787114854,
+        "stock_days": 83.81959033613445
       },
       {
         "subcategory_code": "WS",
         "subcategory_name": "WOVEN SHIRTS",
         "season_code": "22F",
         "stock_price": 61753.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4257,8 +4797,8 @@
         "subcategory_name": "SKIRT",
         "season_code": "22F",
         "stock_price": 55907.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4267,28 +4807,28 @@
         "subcategory_name": "JUMPER",
         "season_code": "22F",
         "stock_price": 53779.0,
-        "sales_10m": 2369.0,
-        "gross_sales_10m": 4778.0,
-        "discount_rate": 50.418585182084556,
-        "stock_days": 3421.6860611134366
+        "current_net_sales": 1000.0,
+        "current_gross_sales": 1819.0,
+        "discount_rate": 45.024738867509626,
+        "stock_days": 886.9543705332601
       },
       {
         "subcategory_code": "WJ",
         "subcategory_name": "Windbreaker",
         "season_code": "22F",
         "stock_price": 47801.0,
-        "sales_10m": 652.0,
-        "gross_sales_10m": 1359.0,
-        "discount_rate": 52.02354672553348,
-        "stock_days": 10692.791758646064
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "DS",
         "subcategory_name": "SKIRT",
         "season_code": "22F",
         "stock_price": 36006.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4297,28 +4837,28 @@
         "subcategory_name": "Crossbody Bag",
         "season_code": "22F",
         "stock_price": 30465.0,
-        "sales_10m": 14003.0,
-        "gross_sales_10m": 37508.0,
-        "discount_rate": 62.66663111869468,
-        "stock_days": 246.9169243894636
+        "current_net_sales": 4148.0,
+        "current_gross_sales": 11446.0,
+        "discount_rate": 63.76026559496767,
+        "stock_days": 79.84885549536956
       },
       {
         "subcategory_code": "WR",
         "subcategory_name": "Wire Cap",
         "season_code": "22F",
         "stock_price": 30083.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
-        "discount_rate": null,
-        "stock_days": null
+        "current_net_sales": 855.0,
+        "current_gross_sales": 1796.0,
+        "discount_rate": 52.39420935412027,
+        "stock_days": 502.5
       },
       {
         "subcategory_code": "WM",
         "subcategory_name": "Winter Headwear",
         "season_code": "22F",
         "stock_price": 29882.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4327,8 +4867,8 @@
         "subcategory_name": "BASEBALL SHIRTS",
         "season_code": "22F",
         "stock_price": 27534.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4337,38 +4877,38 @@
         "subcategory_name": "DENIM JACKET",
         "season_code": "22F",
         "stock_price": 25789.0,
-        "sales_10m": 5832.0,
-        "gross_sales_10m": 12755.0,
-        "discount_rate": 54.276754214033716,
-        "stock_days": 614.6496275970208
+        "current_net_sales": 1216.0,
+        "current_gross_sales": 3038.0,
+        "discount_rate": 59.97366688610928,
+        "stock_days": 254.66425279789337
       },
       {
         "subcategory_code": "BK",
         "subcategory_name": "Backpack",
         "season_code": "22F",
         "stock_price": 23529.0,
-        "sales_10m": 1063.0,
-        "gross_sales_10m": 2277.0,
-        "discount_rate": 53.31576635924462,
-        "stock_days": 3141.3333333333335
+        "current_net_sales": 2090.0,
+        "current_gross_sales": 4554.0,
+        "discount_rate": 54.106280193236714,
+        "stock_days": 155.0
       },
       {
         "subcategory_code": "LP",
         "subcategory_name": "Slippers",
         "season_code": "22F",
         "stock_price": 17661.0,
-        "sales_10m": 5622.0,
-        "gross_sales_10m": 17052.0,
-        "discount_rate": 67.03026038001407,
-        "stock_days": 314.8571428571429
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
+        "discount_rate": null,
+        "stock_days": null
       },
       {
         "subcategory_code": "JK",
         "subcategory_name": "Jacket",
         "season_code": "22F",
         "stock_price": 15145.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4377,18 +4917,18 @@
         "subcategory_name": "Shopping Bag",
         "season_code": "22F",
         "stock_price": 14473.0,
-        "sales_10m": 30962.0,
-        "gross_sales_10m": 107249.0,
-        "discount_rate": 71.13073315368908,
-        "stock_days": 41.02408414064467
+        "current_net_sales": 3553.0,
+        "current_gross_sales": 14367.0,
+        "discount_rate": 75.26971531983017,
+        "stock_days": 30.221340572144495
       },
       {
         "subcategory_code": "GL",
         "subcategory_name": "GLOVE",
         "season_code": "22F",
         "stock_price": 7959.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4397,18 +4937,18 @@
         "subcategory_name": "Shoulder Bag",
         "season_code": "22F",
         "stock_price": 5454.0,
-        "sales_10m": 24080.0,
-        "gross_sales_10m": 67743.0,
-        "discount_rate": 64.45389191503182,
-        "stock_days": 24.475089677162217
+        "current_net_sales": 2955.0,
+        "current_gross_sales": 8984.0,
+        "discount_rate": 67.10819234194123,
+        "stock_days": 18.21237756010686
       },
       {
         "subcategory_code": "ET",
         "subcategory_name": "ACCESSARY",
         "season_code": "22F",
         "stock_price": 5090.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       },
@@ -4417,8 +4957,8 @@
         "subcategory_name": "CAP",
         "season_code": "21F",
         "stock_price": 529.0,
-        "sales_10m": 0.0,
-        "gross_sales_10m": 0.0,
+        "current_net_sales": 0.0,
+        "current_gross_sales": 0.0,
         "discount_rate": null,
         "stock_days": null
       }

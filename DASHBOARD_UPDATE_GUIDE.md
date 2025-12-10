@@ -714,19 +714,19 @@ Vercel 자동 배포
 - 상위 5개 Subcategory를 표시
 - ACC는 총 4개 카테고리이므로 각각 대표 상품 표시
 
-### 정체재고 분류 규칙 (참고용 - 현재 미사용)
+### 정체재고 분류 규칙
 
-**정의**: 기준월 1개월간 해당 Subcategory의 택가매출(Gross Sales)이 기말 택재고(Stock Price)의 **0.1% 미만**인 경우
+**정의**: 기준월 1개월간 해당 Subcategory의 택가매출(Gross Sales)이 기말 택재고(Stock Price)의 **5% 미만**인 경우
 
 **계산식**:
 ```
-정체재고 판단 = Gross Sales < Stock Price × 0.001
+정체재고 판단 = Gross Sales < Stock Price × 0.05
 ```
 
 **예시**:
 - Stock Price = 100,000 HKD
-- Gross Sales = 50 HKD
-- 비율 = 50 / 100,000 = 0.05% < 0.1% → **정체재고**
+- Gross Sales = 4,000 HKD
+- 비율 = 4,000 / 100,000 = 4% < 5% → **정체재고**
 
 **데이터 출력**:
 - `is_stagnant`: true/false
@@ -746,6 +746,43 @@ Vercel 자동 배포
 - 컴포넌트: `components/dashboard/hongkong-ceo-dashboard.tsx`
 - 카드: "당시즌 판매" (25F 의류 + ACC 병기)
 - 상세: ACC 카테고리별 판매 TOP 5
+
+---
+
+## 📊 대시보드 개발 규칙
+
+### YOY 및 평균값 계산 규칙
+
+**⚠️ 중요: 단순평균 사용 금지**
+
+모든 평균값은 **가중평균(Weighted Average)** 으로 계산해야 합니다.
+
+**❌ 잘못된 예시 (단순평균)**:
+```typescript
+// 마카오 YOY를 Retail과 Outlet의 평균으로 계산 (잘못됨)
+const mcYoy = (mcRetail.yoy + mcOutlet.yoy) / 2;  // ❌ 매출 규모 무시
+```
+
+**✅ 올바른 예시 (가중평균)**:
+```typescript
+// 마카오 YOY를 실제 매출액 기준으로 계산 (올바름)
+const mcCurrentTotal = mcRetail.current.net_sales + mcOutlet.current.net_sales;
+const mcPreviousTotal = mcRetail.previous.net_sales + mcOutlet.previous.net_sales;
+const mcYoy = mcPreviousTotal > 0 ? (mcCurrentTotal / mcPreviousTotal) * 100 : 0;  // ✅
+```
+
+**이유**:
+- 단순평균은 각 항목의 **실제 규모(매출액, 재고금액 등)를 무시**합니다
+- 예: Retail 1,000K (YOY 120%) + Outlet 5,000K (YOY 70%)
+  - 단순평균: (120% + 70%) / 2 = **95%** ❌
+  - 가중평균: (1,200K + 3,500K) / (1,000K + 5,000K) = **78%** ✅
+
+**적용 대상**:
+- YOY (전년 대비 증감률)
+- 할인율
+- 이익률
+- 재고주수
+- 기타 모든 비율 및 평균 지표
 
 ---
 

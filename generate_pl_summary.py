@@ -806,7 +806,13 @@ def main(target_period_short=None):
     # 직접이익 계산 (매출총이익 - 직접비)
     hk_offline_direct_profit = current_hk_offline['매출총이익'] - current_hk_offline['직접비_합계']
     hk_offline_direct_profit_prev = prev_hk_offline['매출총이익'] - prev_hk_offline['직접비_합계']
-    hk_offline_direct_profit_yoy = (hk_offline_direct_profit / hk_offline_direct_profit_prev * 100) if hk_offline_direct_profit_prev != 0 else 0
+    # 전년이 적자면 YOY 계산 대신 흑자전환 표시
+    if hk_offline_direct_profit_prev <= 0:
+        hk_offline_direct_profit_yoy = None  # 흑자전환
+    elif hk_offline_direct_profit_prev > 0:
+        hk_offline_direct_profit_yoy = (hk_offline_direct_profit / hk_offline_direct_profit_prev * 100) if hk_offline_direct_profit_prev != 0 else 0
+    else:
+        hk_offline_direct_profit_yoy = 0
     hk_offline_direct_profit_rate = (hk_offline_direct_profit / current_hk_offline['실판'] * 100) if current_hk_offline['실판'] > 0 else 0
     
     mc_offline_direct_profit = current_mc_offline['매출총이익'] - current_mc_offline['직접비_합계']
@@ -846,7 +852,8 @@ def main(target_period_short=None):
     
     print(f"\n채널별 직접이익[이익률]:")
     hk_offline_status = "적자개선" if hk_offline_direct_profit > hk_offline_direct_profit_prev else "적자악화" if hk_offline_direct_profit < 0 else ""
-    print(f"HK 오프라인: {hk_offline_direct_profit:,.0f} ({hk_offline_direct_profit_yoy:.0f}%) [{hk_offline_direct_profit_rate:.1f}%] {hk_offline_status}")
+    hk_offline_yoy_str = "흑자전환" if hk_offline_direct_profit_yoy is None else f"{hk_offline_direct_profit_yoy:.0f}%"
+    print(f"HK 오프라인: {hk_offline_direct_profit:,.0f} ({hk_offline_yoy_str}) [{hk_offline_direct_profit_rate:.1f}%] {hk_offline_status}")
     print(f"MC 오프라인: {mc_offline_direct_profit:,.0f} ({mc_offline_direct_profit_yoy:.0f}%) [{mc_offline_direct_profit_rate:.1f}%]")
     print(f"HK 온라인: {hk_online_direct_profit:,.0f} ({hk_online_direct_profit_yoy:.0f}%) [{hk_online_direct_profit_rate:.1f}%]")
     print(f"전체 직접이익: {total_direct_profit:,.0f} ({total_direct_profit_yoy:.0f}%)")
@@ -996,7 +1003,7 @@ def main(target_period_short=None):
         
         prev_online_count = sum(1 for _, _, ch in discovery_prev_stores if ch == 'Online')
         prev_offline_count = sum(1 for _, _, ch in discovery_prev_stores if ch in ['Retail', 'Outlet'])
-
+        
         # 디스커버리 누적 계산 (실제 영업한 기간만)
         # 디스커버리가 실제로 영업한 기간 확인
         discovery_periods = set()

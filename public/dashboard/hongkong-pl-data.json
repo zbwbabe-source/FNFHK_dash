@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2511",
     "previous_period": "2411",
-    "generated_at": "2025-12-10T13:34:57.033454"
+    "generated_at": "2025-12-10T16:28:30.313799"
   },
   "current_month": {
     "hk": {
@@ -352,7 +352,7 @@
     "hk_offline": {
       "direct_profit": 516.9961730064533,
       "direct_profit_rate": 3.436958512611125,
-      "yoy": -67.69350638120666,
+      "yoy": null,
       "status": "적자개선"
     },
     "mc_offline": {

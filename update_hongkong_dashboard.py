@@ -472,13 +472,66 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     
     # 전년 동일매장 기준 계산 (폐점 매장 제외)
     print("전년 동일매장 기준 계산 중...")
+    
+    # 매장 상세 정보 수집
+    same_store_details_included = []
+    same_store_details_excluded = []
+    
+    # 제외 매장 정의 (종료/리뉴얼)
+    EXCLUDED_STORES = {
+        'M12': {'name': 'WTC', 'reason': '10/11 종료'},
+        'M05': {'name': 'LCX', 'reason': '10/13-11/7 리뉴얼중'}
+    }
+    
     for store_code in store_summary:
         store = store_summary[store_code]
-        # 폐점 매장이 아니고, 온라인 포함
-        if not store['closed']:
-            same_store_summary['current']['net_sales'] += store['current']['net_sales']
-            same_store_summary['previous']['net_sales'] += store['previous']['net_sales']
+        
+        # 오프라인 매장만 (온라인 제외)
+        is_online = store_code in ['HE1', 'HE2', 'XE1']
+        
+        if is_online:
+            continue
+        
+        current_sales = store['current']['net_sales']
+        previous_sales = store['previous']['net_sales']
+        
+        # 전년 동일 매장 조건: 현재도 매출이 있고 전년에도 매출이 있는 매장
+        # 단, EXCLUDED_STORES에 명시된 매장은 제외
+        is_excluded_store = store_code in EXCLUDED_STORES
+        has_both_sales = current_sales > 0 and previous_sales > 0
+        
+        if has_both_sales and not is_excluded_store:
+            # 포함된 매장 (전년 동일 매장)
+            same_store_summary['current']['net_sales'] += current_sales
+            same_store_summary['previous']['net_sales'] += previous_sales
             same_store_summary['store_count'] += 1
+            
+            same_store_details_included.append({
+                'shop_cd': store_code,
+                'shop_nm': store['store_name'],
+                'current_sales': current_sales,
+                'previous_sales': previous_sales
+            })
+        else:
+            # 제외된 매장
+            # 1. EXCLUDED_STORES에 명시된 매장 (리뉴얼/종료)
+            # 2. 전년 또는 당년에 매출이 없는 매장 (신규/종료)
+            if is_excluded_store:
+                reason = EXCLUDED_STORES[store_code]['reason']
+            elif current_sales == 0:
+                reason = '종료'
+            elif previous_sales == 0:
+                reason = '신규'
+            else:
+                reason = '기타'
+            
+            same_store_details_excluded.append({
+                'shop_cd': store_code,
+                'shop_nm': store['store_name'],
+                'reason': reason,
+                'current_sales': current_sales,
+                'previous_sales': previous_sales
+            })
     
     # YOY 계산
     if same_store_summary['previous']['net_sales'] > 0:
@@ -487,6 +540,10 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
         same_store_yoy = 0
     
     same_store_summary['yoy'] = same_store_yoy
+    same_store_summary['details'] = {
+        'included': same_store_details_included,
+        'excluded': same_store_details_excluded
+    }
     
     # 추세 데이터 생성 (가장 최근 월이 속하는 년도의 1월부터)
     print("추세 데이터 생성 중...")
@@ -1943,15 +2000,37 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     # ============================================================
     print("과시즌 정체재고 분석 중...")
     
-    # 과거 10개월 Period 계산 (25년 1~10월)
+    # 과거 10개월 Period 계산 (참고용 - 누적 매출 집계용)
     recent_10m_periods = sorted([p for p in periods if p <= last_period and p >= f"{last_year % 100:02d}01"])[:10]
-    print(f"  - 10개월 기간: {recent_10m_periods[0] if recent_10m_periods else 'N/A'} ~ {recent_10m_periods[-1] if recent_10m_periods else 'N/A'}")
+    print(f"  - 10개월 기간 (참고용): {recent_10m_periods[0] if recent_10m_periods else 'N/A'} ~ {recent_10m_periods[-1] if recent_10m_periods else 'N/A'}")
     
-    # Subcategory별 과거 10개월 실판 판매금액 집계 (정체재고 판단용 - 모든 과시즌 합계)
-    subcategory_10m_sales = defaultdict(float)
-    # Subcategory별 시즌별 과거 10개월 실판 판매금액 집계 (표시용 - 시즌별 구분)
+    # Subcategory별 당월(last_period) 택가매출/실판매출 집계 (정체재고 판단용)
+    subcategory_current_gross_sales = defaultdict(lambda: defaultdict(float))
+    subcategory_current_net_sales = defaultdict(lambda: defaultdict(float))
+    current_period_data = [row for row in data 
+                          if row['Period'] == last_period 
+                          and row['Brand'] == 'MLB'
+                          and row['Season_Code'].endswith('F')]  # FW 시즌 전체 (당시즌+과시즌)
+    print(f"  - 당월 FW 시즌 데이터: {len(current_period_data)}건")
+    for row in current_period_data:
+        subcat_code = row.get('Subcategory_Code', '').strip()
+        season_code = row.get('Season_Code', '').strip()
+        if subcat_code and season_code:
+            gross_sales = float(row.get('Gross_Sales', 0) or 0)
+            net_sales = float(row.get('Net_Sales', 0) or 0)
+            subcategory_current_gross_sales[subcat_code][season_code] += gross_sales
+            subcategory_current_net_sales[subcat_code][season_code] += net_sales
+    
+    # 디버그: 몇 개의 시즌별 매출이 집계되었는지 확인
+    total_seasons = sum(len(seasons) for seasons in subcategory_current_gross_sales.values())
+    print(f"  - 집계된 Subcategory+Season 조합: {total_seasons}개")
+    
+    # 디버그: 24F 총 매출 확인
+    total_24f_gross = sum(subcategory_current_gross_sales.get(sc, {}).get('24F', 0) for sc in subcategory_current_gross_sales.keys())
+    print(f"  - 24F 총 당월 택가매출: {total_24f_gross:,.0f} HKD")
+    
+    # Subcategory별 시즌별 과거 10개월 실판/택가 판매금액 집계 (참고용 - 표시용)
     subcategory_season_10m_sales = defaultdict(lambda: defaultdict(float))
-    # Subcategory별 시즌별 과거 10개월 택가 판매금액 집계 (회전율 계산용 - 시즌별 구분)
     subcategory_season_10m_gross_sales = defaultdict(lambda: defaultdict(float))
     for period in recent_10m_periods:
         period_data = [row for row in data 
@@ -1961,14 +2040,11 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
         for row in period_data:
             subcat_code = row.get('Subcategory_Code', '').strip()
             season_code = row.get('Season_Code', '').strip()
-            if subcat_code:
+            if subcat_code and season_code:
                 net_sales = float(row.get('Net_Sales', 0) or 0)
                 gross_sales = float(row.get('Gross_Sales', 0) or 0)
-                subcategory_10m_sales[subcat_code] += net_sales  # 정체재고 판단용 (모든 과시즌 합계)
-                # 시즌별 구분 (표시용)
-                if season_code:
-                    subcategory_season_10m_sales[subcat_code][season_code] += net_sales
-                    subcategory_season_10m_gross_sales[subcat_code][season_code] += gross_sales
+                subcategory_season_10m_sales[subcat_code][season_code] += net_sales
+                subcategory_season_10m_gross_sales[subcat_code][season_code] += gross_sales
     
     # 현재 시점의 Subcategory별 택가 재고금액 집계 (과시즌 FW만)
     subcategory_stock = defaultdict(lambda: {
@@ -1992,25 +2068,27 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                     subcat_name = row.get('Subcategory', '').strip()
                     if subcat_code:
                         stock_price = float(row.get('Stock_Price', 0) or 0)
-                        sales_10m_all = subcategory_10m_sales.get(subcat_code, 0)  # 실판 매출 (정체재고 판단용 - 모든 과시즌 합계)
-                        # 해당 시즌의 실판 매출과 택가 매출 (표시용)
-                        sales_10m = subcategory_season_10m_sales.get(subcat_code, {}).get(season_code, 0)
-                        gross_sales_10m = subcategory_season_10m_gross_sales.get(subcat_code, {}).get(season_code, 0)
+                        # 당월 택가매출/실판매출 (정체재고 판단용 및 표시용)
+                        current_gross_sales = subcategory_current_gross_sales.get(subcat_code, {}).get(season_code, 0)
+                        current_net_sales = subcategory_current_net_sales.get(subcat_code, {}).get(season_code, 0)
                         
-                        # 연차별 정체재고 기준 (실판 기준 - 모든 과시즌 합계 사용)
-                        # 1년차 (24F): 100,000 HKD 미만 (당시즌이었기 때문에 기준을 2배로)
-                        # 2년차 (23F) 및 3년차 이상 (22F~): 50,000 HKD 미만
-                        threshold = 100000 if season_year == 24 else 50000
+                        # 정체재고 기준: 당월 택가매출 < 기말재고 × 0.05 (5%)
+                        # 또는 재고는 있는데 판매가 0인 경우
+                        is_stagnant = False
+                        if stock_price > 0:
+                            if current_gross_sales == 0:
+                                is_stagnant = True  # 판매 0 = 정체재고
+                            elif current_gross_sales < stock_price * 0.05:
+                                is_stagnant = True  # 매출/재고 비율 < 5%
                         
-                        # 조건: 실판 판매금액 < 기준값 (모든 과시즌 합계 기준)
-                        if sales_10m_all < threshold and stock_price > 0:
+                        if is_stagnant:
                             key = f"{subcat_code}_{season_code}"
                             subcategory_stock[key]['subcategory_code'] = subcat_code
                             subcategory_stock[key]['subcategory_name'] = subcat_name
                             subcategory_stock[key]['season_code'] = season_code
                             subcategory_stock[key]['stock_price'] += stock_price
-                            subcategory_stock[key]['sales_10m'] = sales_10m  # 해당 시즌의 실판 매출
-                            subcategory_stock[key]['gross_sales_10m'] = gross_sales_10m  # 해당 시즌의 택가 매출
+                            subcategory_stock[key]['current_net_sales'] = current_net_sales  # 당월 실판매출
+                            subcategory_stock[key]['current_gross_sales'] = current_gross_sales  # 당월 택가매출
             except ValueError:
                 continue
     
@@ -2026,17 +2104,17 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
         if len(season_code) >= 2:
             try:
                 season_year = int(season_code[:2])
-                # 재고일수 = (택가 재고 / 택가 매출) × 304일 (10개월: 1월~10월)
+                # 재고일수 = (택가 재고 / 당월 택가 매출) × 30일 (1개월 기준)
                 # 판매가 0이면 None으로 표시 (UI에서 "-"로 표시)
-                if item['gross_sales_10m'] > 0 and item['stock_price'] > 0:
-                    stock_days = (item['stock_price'] / item['gross_sales_10m']) * 304
+                if item['current_gross_sales'] > 0 and item['stock_price'] > 0:
+                    stock_days = (item['stock_price'] / item['current_gross_sales']) * 30
                 else:
                     stock_days = None
                 
-                # 할인율 = (1 - 실판매출 / 택가매출) × 100
+                # 할인율 = (1 - 실판매출 / 택가매출) × 100 (당월 기준)
                 # 택가매출이 0이면 None으로 표시
-                if item['gross_sales_10m'] > 0:
-                    discount_rate = (1 - item['sales_10m'] / item['gross_sales_10m']) * 100
+                if item['current_gross_sales'] > 0:
+                    discount_rate = (1 - item['current_net_sales'] / item['current_gross_sales']) * 100
                 else:
                     discount_rate = None
                 
@@ -2045,10 +2123,10 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                     'subcategory_name': item['subcategory_name'],
                     'season_code': season_code,
                     'stock_price': round(item['stock_price'], 0),  # HKD (택가 재고)
-                    'sales_10m': round(item['sales_10m'], 0),  # HKD (실판 매출)
-                    'gross_sales_10m': round(item['gross_sales_10m'], 0),  # HKD (택가 매출)
+                    'current_net_sales': round(item['current_net_sales'], 0),  # HKD (당월 실판 매출)
+                    'current_gross_sales': round(item['current_gross_sales'], 0),  # HKD (당월 택가 매출)
                     'discount_rate': round(discount_rate, 1) if discount_rate is not None else None,  # 할인율 (%)
-                    'stock_days': round(stock_days, 0) if stock_days is not None else None,  # 재고일수 (10개월 기준)
+                    'stock_days': round(stock_days, 0) if stock_days is not None else None,  # 재고일수 (당월 기준, 30일)
                 }
                 
                 if season_year == 24:
@@ -2079,8 +2157,8 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
         'subcategory_name': '',
         'season_code': '',
         'stock_price': 0,
-        'sales_10m': 0,  # 실판 매출
-        'gross_sales_10m': 0,  # 택가 매출
+        'current_net_sales': 0,  # 당월 실판 매출
+        'current_gross_sales': 0,  # 당월 택가 매출
         'discount_rate': None,
         'stock_days': None,
     })
@@ -2110,31 +2188,30 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                             # 재고금액 누적
                             all_past_season_inventory[key]['stock_price'] += stock_price
                             
-                            # 매출 정보는 subcategory+season 조합이므로 마지막에 한번만 설정
-                            # 해당 시즌의 실판 매출과 택가 매출
-                            sales_10m = subcategory_season_10m_sales.get(subcat_code, {}).get(season_code, 0)
-                            gross_sales_10m = subcategory_season_10m_gross_sales.get(subcat_code, {}).get(season_code, 0)
-                            all_past_season_inventory[key]['sales_10m'] = sales_10m
-                            all_past_season_inventory[key]['gross_sales_10m'] = gross_sales_10m
+                            # 당월 매출 정보 (subcategory+season 조합)
+                            current_gross = subcategory_current_gross_sales.get(subcat_code, {}).get(season_code, 0)
+                            current_net = subcategory_current_net_sales.get(subcat_code, {}).get(season_code, 0)
+                            all_past_season_inventory[key]['current_net_sales'] = current_net
+                            all_past_season_inventory[key]['current_gross_sales'] = current_gross
             except ValueError:
                 continue
     
-    # 재고일수와 할인율 계산 (모든 항목에 대해)
+    # 재고일수와 할인율 계산 (모든 항목에 대해, 당월 기준)
     for key, item in all_past_season_inventory.items():
-        gross_sales_10m = item['gross_sales_10m']
-        sales_10m = item['sales_10m']
+        current_gross = item['current_gross_sales']
+        current_net = item['current_net_sales']
         stock_price = item['stock_price']
         
-        # 할인율 계산
-        if gross_sales_10m > 0:
-            discount_rate = ((gross_sales_10m - sales_10m) / gross_sales_10m) * 100
+        # 할인율 계산 (당월 기준)
+        if current_gross > 0:
+            discount_rate = ((current_gross - current_net) / current_gross) * 100
             item['discount_rate'] = discount_rate
         else:
             item['discount_rate'] = None
         
-        # 재고일수 계산
-        if gross_sales_10m > 0 and stock_price > 0:
-            stock_days = (stock_price / gross_sales_10m) * 304
+        # 재고일수 계산 (당월 기준, 30일)
+        if current_gross > 0 and stock_price > 0:
+            stock_days = (stock_price / current_gross) * 30
             item['stock_days'] = stock_days
         else:
             item['stock_days'] = None
@@ -2336,6 +2413,7 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
             'total_change': total_change / 1000,  # 1K HKD 단위
             'same_store_yoy': same_store_yoy,
             'same_store_count': same_store_summary['store_count'],
+            'same_store_details': same_store_summary.get('details', {'included': [], 'excluded': []}),
             'total_discount_rate': total_discount_rate_current,
             'total_discount_rate_previous': total_discount_rate_previous,
             'total_discount_rate_change': total_discount_rate_change,

@@ -117,6 +117,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     }
   }, []);
 
+  // 카테고리를 짧은 기호와 색상으로 변환하는 헬퍼 함수
+  const getCategoryBadge = (category: string) => {
+    const badges: Record<string, { symbol: string; color: string; text: string }> = {
+      'profit_improving': { symbol: '흑↑', color: 'bg-green-300', text: 'text-green-800' },
+      'profit_deteriorating': { symbol: '흑↓', color: 'bg-blue-300', text: 'text-blue-800' },
+      'loss_improving': { symbol: '적↑', color: 'bg-amber-300', text: 'text-amber-800' },
+      'loss_deteriorating': { symbol: '적↓', color: 'bg-red-300', text: 'text-red-800' }
+    };
+    return badges[category] || { symbol: '-', color: 'bg-gray-300', text: 'text-gray-800' };
+  };
+
   // 날짜 포맷 함수 (년도 포함)
   const formatReportDateWithYear = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -146,6 +157,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
   const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(true);
+  const [showSameStoreDetails, setShowSameStoreDetails] = useState(false);
   const [showDiscoveryDetail, setShowDiscoveryDetail] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [expenseType, setExpenseType] = useState<'당월' | '누적'>('당월');
@@ -190,40 +202,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [isEditingYoySummary, setIsEditingYoySummary] = useState(false);
   const [showStockWeeksModal, setShowStockWeeksModal] = useState(false);
   const [showStagnantInventoryModal, setShowStagnantInventoryModal] = useState(false);
-  const [stagnantInventoryCriteria, setStagnantInventoryCriteria] = useState<'sales' | 'days'>('sales');
   const [showPastSeasonDetailModal, setShowPastSeasonDetailModal] = useState(false);
   const [stagnantModalView, setStagnantModalView] = useState<'detail' | 'stagnant'>('detail'); // 'detail' = 과시즌F 상세분석, 'stagnant' = 정체재고
 
-  // 정체재고 필터링 데이터 (useMemo로 메모이제이션)
+  // 정체재고 데이터 (매출/재고 비율 기준)
   const filteredStagnantInventory = useMemo(() => {
     const stagnant24F_sales = (dashboardData as any)?.stagnant_inventory?.['24F'] || [];
     const stagnant23F_sales = (dashboardData as any)?.stagnant_inventory?.['23F'] || [];
     const stagnant22F_sales = (dashboardData as any)?.stagnant_inventory?.['22F~'] || [];
     
-    if (stagnantInventoryCriteria === 'sales') {
-      return {
-        '24F': stagnant24F_sales,
-        '23F': stagnant23F_sales,
-        '22F~': stagnant22F_sales
-      };
-    } else {
-      // 재고일수 기준으로 필터링 (300일 이상 또는 판매가 0인 경우)
-      return {
-        '24F': stagnant24F_sales.filter((item: any) => 
-          (item.stock_days && item.stock_days >= 300) || 
-          (item.stock_days === null || item.stock_days === undefined)
-        ),
-        '23F': stagnant23F_sales.filter((item: any) => 
-          (item.stock_days && item.stock_days >= 300) || 
-          (item.stock_days === null || item.stock_days === undefined)
-        ),
-        '22F~': stagnant22F_sales.filter((item: any) => 
-          (item.stock_days && item.stock_days >= 300) || 
-          (item.stock_days === null || item.stock_days === undefined)
-        )
-      };
-    }
-  }, [stagnantInventoryCriteria]);
+    return {
+      '24F': stagnant24F_sales,
+      '23F': stagnant23F_sales,
+      '22F~': stagnant22F_sales
+    };
+  }, [dashboardData]);
 
   // ============================================================
   // 헬퍼 함수
@@ -291,6 +284,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const accStock = dashboardData?.acc_stock_summary || {};
   const endingInventory = dashboardData?.ending_inventory || {};
   const pastSeasonFW = endingInventory?.past_season_fw || {};
+  const pastSeasonSS = endingInventory?.by_season?.과시즌_SS || {};
   const pl = plData?.current_month?.total || {};
   const plYoy = plData?.current_month?.yoy || {};
   const plChange = plData?.current_month?.change || {};
@@ -824,7 +818,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <div className="font-semibold text-gray-900 mb-1">마카오 부진</div>
                     <div className="leading-relaxed">
                       매출 <span className="font-bold text-orange-600">{formatNumber(((mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0)) / 1000)}K</span>
-                      {' '}(<span className="bg-orange-100 px-1.5 py-0.5 rounded font-bold text-orange-700">YOY {formatPercent(((mcRetail?.yoy || 0) + (mcOutlet?.yoy || 0)) / 2)}%</span>)
+                      {' '}(<span className="bg-orange-100 px-1.5 py-0.5 rounded font-bold text-orange-700">YOY {formatPercent((() => {
+                        // 가중평균 계산 (단순평균 금지)
+                        const mcCurrentTotal = (mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0);
+                        const mcPreviousTotal = (mcRetail?.previous?.net_sales || 0) + (mcOutlet?.previous?.net_sales || 0);
+                        return mcPreviousTotal > 0 ? (mcCurrentTotal / mcPreviousTotal) * 100 : 0;
+                      })())}%</span>)
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       * 직접이익: {formatNumber(plData?.channel_direct_profit?.mc_offline?.direct_profit || 0)}K (YOY {formatPercent(plData?.channel_direct_profit?.mc_offline?.yoy || 0)}%)
@@ -1021,7 +1020,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <span>MC (마카오)</span>
                     <span className="text-red-600">
                       {formatNumber(((mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0)) / 1000)} 
-                      ({formatPercent(((mcRetail?.yoy || 0) + (mcOutlet?.yoy || 0)) / 2)}%)
+                      ({formatPercent((() => {
+                        const mcCurrentTotal = (mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0);
+                        const mcPreviousTotal = (mcRetail?.previous?.net_sales || 0) + (mcOutlet?.previous?.net_sales || 0);
+                        return mcPreviousTotal > 0 ? (mcCurrentTotal / mcPreviousTotal) * 100 : 0;
+                      })())}%)
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
@@ -1044,14 +1047,51 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               {/* 전년 동일매장 기준 YOY */}
               <div className="mt-3 pt-3 border-t">
                 <div className="bg-blue-50 rounded-lg p-2">
-                  <div className="text-xs font-semibold text-blue-800 mb-1">📌 전년 동일매장 기준</div>
+                  <div className="text-xs font-semibold text-blue-800 mb-1">📌 전년 동일 오프라인 매장 기준</div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-blue-700">실판매출 YOY (종료매장 제외)</span>
                     <span className="text-sm font-bold text-blue-900">{formatPercent(salesSummary?.same_store_yoy)}%</span>
                   </div>
                   <div className="text-[10px] text-blue-600 mt-1 italic">
-                    * 종료매장 제외 (온라인 포함 {salesSummary?.same_store_count || 0}개 매장 기준)
+                    * 종료매장 제외 ({salesSummary?.same_store_count || 0}개 오프라인 매장 기준)
                   </div>
+                  
+                  {/* 토글 버튼 */}
+                  <button
+                    onClick={() => setShowSameStoreDetails(!showSameStoreDetails)}
+                    className="mt-2 text-xs text-blue-700 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
+                  >
+                    <span>매장 리스트</span>
+                    {showSameStoreDetails ? (
+                      <ChevronDown className="w-3 h-3" />
+                    ) : (
+                      <ChevronRight className="w-3 h-3" />
+                    )}
+                  </button>
+                  
+                  {/* 매장 리스트 */}
+                  {showSameStoreDetails && (
+                    <div className="mt-2 space-y-1 border-t border-blue-200 pt-2">
+                      {/* 포함된 매장 (순번 표시) */}
+                      {dashboardData?.sales_summary?.same_store_details?.included?.map((store: any, idx: number) => (
+                        <div key={idx} className="text-[10px] text-blue-800 flex items-center gap-1.5">
+                          <span className="text-blue-400 font-mono">{idx + 1}.</span>
+                          <span>{store.shop_nm}</span>
+                        </div>
+                      ))}
+                      
+                      {/* 제외된 매장 (회색 스타일) - 전년에도 제외된 매장은 제외 */}
+                      {dashboardData?.sales_summary?.same_store_details?.excluded
+                        ?.filter((store: any) => store.current_sales > 0 || store.previous_sales > 0)
+                        ?.map((store: any, idx: number) => (
+                          <div key={idx} className="text-[10px] text-gray-400 flex items-center gap-1.5">
+                            <span className="text-gray-300 font-mono">-</span>
+                            <span>{store.shop_nm}</span>
+                            <span className="text-[9px] italic ml-auto">({store.reason})</span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1136,25 +1176,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
-                  
-                  {/* 할인 금액 */}
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">할인 금액 (1K HKD)</div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">당월 할인</span>
-                      <span className="font-semibold text-purple-600">
-                        {formatNumber(pl?.discount || 0)}K
-                        <span className="text-green-600"> (YOY {formatPercent(plYoy?.discount || 0)}%)</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">누적 할인</span>
-                      <span className="font-semibold text-purple-600">
-                        {formatNumber((plData?.cumulative?.total as any)?.discount || 0)}K
-                        <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate, 1)}%p)</span>
-                      </span>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -1194,10 +1215,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <div className="mt-3 pt-3 border-t space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">HK 오프라인</span>
-                    <span className="font-semibold text-red-600">
+                    <span className={`font-semibold ${(plData?.channel_direct_profit?.hk_offline?.direct_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {formatNumber(plData?.channel_direct_profit?.hk_offline?.direct_profit || 0)} 
-                      <span className="text-green-600"> ({plData?.channel_direct_profit?.hk_offline?.status || ''})</span> 
-                      <span className="text-red-600"> [{formatPercent(plData?.channel_direct_profit?.hk_offline?.direct_profit_rate || 0, 1)}%]</span>
+                      <span className="text-green-600"> ({plData?.channel_direct_profit?.hk_offline?.yoy === null || plData?.channel_direct_profit?.hk_offline?.yoy === undefined ? '흑자전환' : `${formatPercent(plData?.channel_direct_profit?.hk_offline?.yoy || 0)}%`})</span> 
+                      <span className="text-blue-600"> [{formatPercent(plData?.channel_direct_profit?.hk_offline?.direct_profit_rate || 0, 1)}%]</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
@@ -2028,20 +2049,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     ))}
                   </div>
                   
-                  {/* 계산근거 */}
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="bg-indigo-50 rounded p-2">
-                      <div className="text-xs font-semibold text-indigo-800 mb-1">📌 계산근거</div>
-                      <div className="text-xs text-indigo-700 space-y-0.5">
-                        <div>• <span className="font-semibold">당월:</span> LCX, K11 MUSEA, WTC, Langham 제외</div>
-                        <div className="pl-4 text-xs">- LCX: 리뉴얼 10/13-11/7</div>
-                        <div className="pl-4 text-xs">- K11 MUSEA, WTC, Langham: 종료매장</div>
-                        <div>• <span className="font-semibold">전년 동월:</span> 모든 매장 포함 (종료매장 포함)</div>
-                        <div>• <span className="font-semibold">온라인 채널:</span> 제외 (오프라인 매장 효율성)</div>
-                        <div>• <span className="font-semibold">계산식:</span> 오프라인 실판매출 ÷ 오프라인 매장수</div>
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
             </div>
@@ -2447,49 +2454,31 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               {showEndInventoryDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">당시즌 의류 (25F)</span>
+                    <span className="text-gray-600">당시즌F</span>
                     <span className="font-semibold">
                       {formatNumber((endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0) / 1000)} 
                       <span className={(endingInventory?.by_season?.['당시즌_의류']?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(endingInventory?.by_season?.['당시즌_의류']?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">당시즌 SS (25S)</span>
+                    <span className="text-gray-600">당시즌S</span>
                     <span className="font-semibold">
                       {formatNumber((endingInventory?.by_season?.['당시즌_SS']?.current?.stock_price || 0) / 1000)} 
                       <span className={(endingInventory?.by_season?.['당시즌_SS']?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(endingInventory?.by_season?.['당시즌_SS']?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">과시즌 FW</span>
+                    <span className="text-gray-600">과시즌F</span>
                     <span className="font-semibold">
                       {formatNumber((endingInventory?.by_season?.['과시즌_FW']?.current?.stock_price || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(endingInventory?.by_season?.['과시즌_FW']?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">과시즌 SS</span>
+                    <span className="text-gray-600">과시즌S</span>
                     <span className="font-semibold">
                       {formatNumber((endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(endingInventory?.by_season?.['과시즌_SS']?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">악세 합계</span>
-                    <span className="font-semibold">
-                      {formatNumber((() => {
-                        const accData = endingInventory?.acc_by_category || {};
-                        return Object.values(accData).reduce((sum: number, item: any) => 
-                          sum + (item?.current?.stock_price || 0), 0) / 1000;
-                      })())} 
-                      <span className="text-green-600"> ({formatPercent((() => {
-                        const accData = endingInventory?.acc_by_category || {};
-                        const current = Object.values(accData).reduce((sum: number, item: any) => 
-                          sum + (item?.current?.stock_price || 0), 0);
-                        const previous = Object.values(accData).reduce((sum: number, item: any) => 
-                          sum + (item?.previous?.stock_price || 0), 0);
-                        return previous > 0 ? (current / previous * 100) : 0;
-                      })())}%)</span>
                     </span>
                   </div>
                   {(() => {
@@ -2541,18 +2530,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               )}
             </div>
 
-            {/* 과시즌 FW 재고 */}
+            {/* 과시즌 재고 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-red-500 hover:shadow-xl transition-shadow min-h-[150px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">📦</span>
-                <h3 className="text-sm font-semibold text-gray-600">과시즌 FW 재고 (TAG, 1K HKD)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">과시즌 재고 (TAG, 1K HKD)</h3>
               </div>
               <div className="text-3xl font-bold text-red-600 mb-2">
-                {formatNumber(pastSeasonFW?.total?.current || 0)}
+                {formatNumber((pastSeasonFW?.total?.current || 0) + ((pastSeasonSS?.current?.stock_price || 0) / 1000))}
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatNumber(pastSeasonFW?.total?.previous || 0)}</span> | 
-                <span className="text-red-600"> YOY {formatPercent(pastSeasonFW?.total?.yoy || 0)}% 🔴</span>
+                <span className="text-gray-600">전년 {formatNumber((pastSeasonFW?.total?.previous || 0) + ((pastSeasonSS?.previous?.stock_price || 0) / 1000))}</span> | 
+                <span className="text-red-600"> YOY {formatPercent(
+                  ((pastSeasonFW?.total?.current || 0) + ((pastSeasonSS?.current?.stock_price || 0) / 1000)) / 
+                  ((pastSeasonFW?.total?.previous || 0) + ((pastSeasonSS?.previous?.stock_price || 0) / 1000)) * 100
+                )}% 🔴</span>
               </div>
               
               {/* 재고 시즌별 상세보기 */}
@@ -2572,25 +2564,37 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               {showPastSeasonDetail && (
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
-                    <div className="flex justify-between text-xs">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                    <div className="flex justify-between text-xs pl-2">
                       <span className="text-gray-600">1년차 (24FW)</span>
                       <span className="font-semibold">
                         {formatNumber((pastSeasonFW?.by_year?.['1년차']?.current?.stock_price || 0) / 1000)} 
                         <span className="text-green-600"> ({formatPercent(pastSeasonFW?.by_year?.['1년차']?.yoy || 0)}%)</span>
                       </span>
                     </div>
-                    <div className="flex justify-between text-xs">
+                    <div className="flex justify-between text-xs pl-2">
                       <span className="text-gray-600">2년차 (23FW)</span>
                       <span className="font-semibold">
                         {formatNumber((pastSeasonFW?.by_year?.['2년차']?.current?.stock_price || 0) / 1000)} 
                         <span className="text-red-600"> ({formatPercent(pastSeasonFW?.by_year?.['2년차']?.yoy || 0)}%)</span>
                       </span>
                     </div>
-                    <div className="flex justify-between text-xs">
+                    <div className="flex justify-between text-xs pl-2">
                       <span className="text-gray-600">3년차 이상 (22FW~)</span>
                       <span className="font-semibold">
                         {formatNumber((pastSeasonFW?.by_year?.['3년차_이상']?.current?.stock_price || 0) / 1000)} 
                         <span className="text-red-600"> (+{formatNumber((pastSeasonFW?.by_year?.['3년차_이상']?.change || 0) / 1000)})</span>
+                      </span>
+                    </div>
+                    
+                    <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                    <div className="flex justify-between text-xs pl-2">
+                      <span className="text-gray-600">전체</span>
+                      <span className="font-semibold">
+                        {formatNumber((pastSeasonSS?.current?.stock_price || 0) / 1000)} 
+                        <span className={(pastSeasonSS?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
+                          {' '}({formatPercent(pastSeasonSS?.yoy || 0)}%)
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -2602,7 +2606,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="text-xs text-red-700 space-y-1">
                         {pastSeasonFW?.['1year_subcategory']?.MT && (
                           <div className="flex justify-between items-center">
-                            <span>• SWEAT SHIRTS (MT)</span>
+                            <span>• MT</span>
                             <span className="font-semibold text-red-600">
                               YOY {formatPercent(pastSeasonFW['1year_subcategory'].MT.yoy)}% 
                               (당월 {formatNumber(pastSeasonFW['1year_subcategory'].MT.current.stock_price / 1000)}K, 
@@ -2612,7 +2616,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         )}
                         {pastSeasonFW?.['1year_subcategory']?.JP && (
                           <div className="flex justify-between items-center">
-                            <span>• JUMPER (JP)</span>
+                            <span>• JP</span>
                             <span className="font-semibold text-red-600">
                               YOY {formatPercent(pastSeasonFW['1year_subcategory'].JP.yoy)}% 
                               (당월 {formatNumber(pastSeasonFW['1year_subcategory'].JP.current.stock_price / 1000)}K, 
@@ -2622,7 +2626,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         )}
                         {pastSeasonFW?.['1year_subcategory']?.KC && (
                           <div className="flex justify-between items-center">
-                            <span>• Knit Cardigan (KC)</span>
+                            <span>• KC</span>
                             <span className="font-semibold text-red-600">
                               YOY {formatPercent(pastSeasonFW['1year_subcategory'].KC.yoy)}% 
                               (당월 {formatNumber(pastSeasonFW['1year_subcategory'].KC.current.stock_price / 1000)}K, 
@@ -4374,7 +4378,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               <Bar dataKey="과시즌SS" stackId="a" fill="#B2F5EA" name="☀️ 과시즌S" />
               <Bar dataKey="모자" stackId="a" fill="#93C5FD" name="🧢 모자" />
               <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
-              <Bar dataKey="가방외" stackId="a" fill="#C4B5FD" name="👜 가방외" />
+              <Bar dataKey="가방" stackId="a" fill="#C4B5FD" name="👜 가방" />
+              <Bar dataKey="기타ACC" stackId="a" fill="#F9A8D4" name="✨ 기타ACC" />
               <Layer>
                 {(dashboardData?.monthly_inventory_data || []).map((item: any, dataIndex: number) => {
                   // 차트 데이터 매핑
@@ -4385,7 +4390,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
                     모자: Math.round(d.모자?.stock_price || 0),
                     신발: Math.round(d.신발?.stock_price || 0),
-                    가방외: Math.round(d.가방외?.stock_price || 0),
+                    가방: Math.round(d.가방?.stock_price || 0),
+                    기타ACC: Math.round(d.기타ACC?.stock_price || 0),
                   }));
                   
                   if (chartData.length === 0) return null;
@@ -4527,7 +4533,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 { name: '과시즌SS', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
                 { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
                 { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
-                { name: '가방외', displayName: '👜 가방외', color: '#C4B5FD' },
+                { name: '가방', displayName: '👜 가방', color: '#C4B5FD' },
+                { name: '기타ACC', displayName: '✨ 기타ACC', color: '#F9A8D4' },
               ].map((item) => (
                 <button
                   key={item.name}
@@ -4665,7 +4672,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               {itemKey === '과시즌SS' && '☀️ 과시즌S'}
                               {itemKey === '모자' && '🧢 모자'}
                               {itemKey === '신발' && '👟 신발'}
-                              {itemKey === '가방외' && '👜 가방외'}
+                              {itemKey === '가방' && '👜 가방'}
+                              {itemKey === '기타ACC' && '✨ 기타ACC'}
                             </td>
                             {months.map((month: string, idx: number) => {
                               const yoyValue =
@@ -4741,7 +4749,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              오프라인 매장별 현황 (실판V-, 25년 10월 기준)
+              오프라인 매장별 현황 (실판V-, {(() => {
+                const p = period || '2510';
+                const year = parseInt(p.substring(0, 2)) + 2000;
+                const month = parseInt(p.substring(2, 4));
+                return `${year % 100}년 ${month}월`;
+              })()} 기준)
             </h3>
             <div className="flex items-center gap-2">
               <button
@@ -4759,7 +4772,45 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             </div>
           </div>
           
-          <div className="grid grid-cols-6 gap-3 w-full" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
+          {/* 전년도 카테고리 범례 */}
+          <div className="mb-3 p-2 bg-gray-50 rounded border border-gray-200">
+            <div className="flex items-center gap-4 text-xs">
+              <span className="font-semibold text-gray-700">전년도 카테고리:</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <span className="bg-green-300 text-green-800 text-[9px] px-1.5 py-0.5 rounded font-bold">흑↑</span>
+                  <span className="text-gray-600">전년동월 흑자&성장</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="bg-blue-300 text-blue-800 text-[9px] px-1.5 py-0.5 rounded font-bold">흑↓</span>
+                  <span className="text-gray-600">전년동월 흑자&역성장</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="bg-amber-300 text-amber-800 text-[9px] px-1.5 py-0.5 rounded font-bold">적↑</span>
+                  <span className="text-gray-600">전년동월 적자&성장</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="bg-red-300 text-red-800 text-[9px] px-1.5 py-0.5 rounded font-bold">적↓</span>
+                  <span className="text-gray-600">전년동월 적자&역성장</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {(() => {
+            // 동적으로 카드 개수 계산 (전체 요약 1 + 홍콩 카드들 + 마카오 1)
+            const hkCardCount = [
+              storeStatusData?.categories?.profit_improving?.count,
+              storeStatusData?.categories?.profit_deteriorating?.count,
+              storeStatusData?.categories?.loss_improving?.count,
+              storeStatusData?.categories?.loss_deteriorating?.count
+            ].filter(count => count && count > 0).length;
+            
+            const mcCardCount = storeStatusData?.mc_summary?.count > 0 ? 1 : 0;
+            const totalCards = 1 + hkCardCount + mcCardCount; // 전체 요약 1 + 홍콩 + 마카오
+            
+            return (
+              <div className="grid gap-3 w-full" style={{ gridTemplateColumns: `repeat(${totalCards}, minmax(0, 1fr))` }}>
             {/* 전체 매장 요약 */}
             <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-4 border border-slate-600 min-w-0 shadow-lg">
               <h4 className="text-base font-bold text-white mb-3">전체 매장 요약</h4>
@@ -4803,28 +4854,30 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="text-white font-semibold text-xs mb-2">
                     홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)
                       </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="bg-green-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-white text-sm">✓</span>
-                      <span className="text-white text-xs font-semibold">흑자 & 개선</span>
-                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-semibold text-center">흑자 & 성장</span>
+                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
                       </div>
-                    <div className="bg-blue-700 rounded px-2 py-1.5 flex items-center gap-1.5">
+                    <div className="bg-blue-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-orange-300 text-sm">▲</span>
-                      <span className="text-white text-xs font-semibold">흑자 & 악화</span>
-                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-semibold text-center">흑자 & 악화</span>
+                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
                       </div>
-                    <div className="bg-amber-700 rounded px-2 py-1.5 flex items-center gap-1.5">
+                    <div className="bg-amber-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-blue-300 text-sm">↗</span>
-                      <span className="text-white text-xs font-semibold">적자 & 개선</span>
-                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.loss_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-semibold text-center">적자 & 성장</span>
+                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_improving?.count || 0}개</span>
                     </div>
-                    <div className="bg-red-600 rounded px-2 py-1.5 flex items-center gap-1.5">
+                    <div className="bg-red-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-red-200 text-sm">↓</span>
-                      <span className="text-white text-xs font-semibold">적자 & 악화</span>
-                      <span className="text-white text-xs font-bold ml-auto">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-semibold text-center">적자 & 악화</span>
+                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
                 </div>
-                    <div className="bg-slate-500 rounded px-2 py-1.5 flex items-center gap-1.5 col-span-2">
+                  </div>
+                  <div className="mt-2">
+                    <div className="bg-slate-500 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-white text-xs font-semibold">리뉴얼 중</span>
                       <span className="text-white text-xs font-bold ml-auto">1개 (LCX)</span>
                     </div>
@@ -4896,13 +4949,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </div>
             </div>
             
-            {/* 흑자 & 매출개선 */}
+            {/* 흑자 & 성장 */}
             {(() => {
               const cat = storeStatusData?.categories?.profit_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-green-50 rounded-lg p-3 border-2 border-green-400 min-w-0">
-                  <h4 className="text-sm font-bold text-green-800 mb-2">흑자 & 매출개선</h4>
+                  <h4 className="text-sm font-bold text-green-800 mb-2">흑자 & 성장</h4>
                   <div className="text-xs text-green-700 mb-1 font-semibold">최우수</div>
                   <div className="space-y-2 text-xs mb-3">
                     <div>
@@ -4932,17 +4985,27 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.profit_improving.stores && (
                     <div className="space-y-1 text-xs mb-3">
-                      {cat.stores.map((store: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
-                          <span className="font-semibold text-green-900">{store.shop_nm}</span>
-                          <div className="text-right">
-                            <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                      {cat.stores.map((store: any, idx: number) => {
+                        const prevBadge = getCategoryBadge(store.previous_category);
+                        return (
+                          <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
+                            <div className="flex items-center gap-1.5">
+                              {store.previous_category && (
+                                <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
+                                  {prevBadge.symbol}
+                                </span>
+                              )}
+                              <span className="font-semibold text-green-900">{store.shop_nm}</span>
                             </div>
-                            <div className="text-green-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            <div className="text-right">
+                              <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                              </div>
+                              <div className="text-green-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   <div className="mt-3 pt-2 border-t border-green-300">
@@ -5041,17 +5104,27 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.profit_deteriorating.stores && (
                     <div className="space-y-1 text-xs mb-3">
-                      {cat.stores.map((store: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
-                          <span className="font-semibold text-blue-900">{store.shop_nm}</span>
-                          <div className="text-right">
-                            <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                      {cat.stores.map((store: any, idx: number) => {
+                        const prevBadge = getCategoryBadge(store.previous_category);
+                        return (
+                          <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
+                            <div className="flex items-center gap-1.5">
+                              {store.previous_category && (
+                                <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
+                                  {prevBadge.symbol}
+                                </span>
+                              )}
+                              <span className="font-semibold text-blue-900">{store.shop_nm}</span>
                             </div>
-                            <div className="text-blue-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            <div className="text-right">
+                              <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                              </div>
+                              <div className="text-blue-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   <div className="mt-3 pt-2 border-t border-blue-300">
@@ -5114,13 +5187,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               );
             })()}
             
-            {/* 적자 & 매출개선 */}
+            {/* 적자 & 성장 */}
             {(() => {
               const cat = storeStatusData?.categories?.loss_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-yellow-50 rounded-lg p-3 border-2 border-yellow-400 min-w-0">
-                  <h4 className="text-sm font-bold text-yellow-800 mb-2">적자 & 매출개선</h4>
+                  <h4 className="text-sm font-bold text-yellow-800 mb-2">적자 & 성장</h4>
                   <div className="text-xs text-yellow-700 mb-1 font-semibold">개선중</div>
                   <div className="space-y-2 text-xs mb-3">
                     <div>
@@ -5150,17 +5223,27 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.loss_improving.stores && (
                     <div className="space-y-1 text-xs mb-3">
-                      {cat.stores.map((store: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
-                          <span className="font-semibold text-yellow-900">{store.shop_nm}</span>
-                          <div className="text-right">
-                            <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                      {cat.stores.map((store: any, idx: number) => {
+                        const prevBadge = getCategoryBadge(store.previous_category);
+                        return (
+                          <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
+                            <div className="flex items-center gap-1.5">
+                              {store.previous_category && (
+                                <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
+                                  {prevBadge.symbol}
+                                </span>
+                              )}
+                              <span className="font-semibold text-yellow-900">{store.shop_nm}</span>
                             </div>
-                            <div className="text-yellow-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            <div className="text-right">
+                              <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                              </div>
+                              <div className="text-yellow-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   <div className="mt-3 pt-2 border-t border-yellow-300">
@@ -5263,19 +5346,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.loss_deteriorating.stores && (
                     <div className="space-y-1 text-xs mb-3">
-                      {cat.stores.map((store: any, idx: number) => (
-                        <div key={idx} className={`flex justify-between items-center rounded px-2 py-1 ${store.shop_cd === 'M05' ? 'bg-gray-100 opacity-60' : 'bg-white'}`}>
-                          <span className={`font-semibold ${store.shop_cd === 'M05' ? 'text-gray-500' : 'text-red-900'}`}>
-                            {store.shop_nm}{store.shop_cd === 'M05' ? ' (리뉴얼)' : ''}
-                          </span>
-                          <div className="text-right">
-                            <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                      {cat.stores.map((store: any, idx: number) => {
+                        const prevBadge = getCategoryBadge(store.previous_category);
+                        return (
+                          <div key={idx} className={`flex justify-between items-center rounded px-2 py-1 ${store.shop_cd === 'M05' ? 'bg-gray-100 opacity-60' : 'bg-white'}`}>
+                            <div className="flex items-center gap-1.5">
+                              {store.previous_category && (
+                                <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
+                                  {prevBadge.symbol}
+                                </span>
+                              )}
+                              <span className={`font-semibold ${store.shop_cd === 'M05' ? 'text-gray-500' : 'text-red-900'}`}>
+                                {store.shop_nm}{store.shop_cd === 'M05' ? ' (리뉴얼)' : ''}
+                              </span>
                             </div>
-                            <div className="text-red-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            <div className="text-right">
+                              <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                              </div>
+                              <div className="text-red-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   <div className="mt-3 pt-2 border-t border-red-300">
@@ -5374,17 +5467,27 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.mc_summary.stores && (
                     <div className="space-y-1 text-xs mb-3">
-                      {mc.stores.map((store: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
-                          <span className="font-semibold text-purple-900">{store.shop_nm}</span>
-                          <div className="text-right">
-                            <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                      {mc.stores.map((store: any, idx: number) => {
+                        const prevBadge = getCategoryBadge(store.previous_category);
+                        return (
+                          <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1">
+                            <div className="flex items-center gap-1.5">
+                              {store.previous_category && (
+                                <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
+                                  {prevBadge.symbol}
+                                </span>
+                              )}
+                              <span className="font-semibold text-purple-900">{store.shop_nm}</span>
                             </div>
-                            <div className="text-purple-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            <div className="text-right">
+                              <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                              </div>
+                              <div className="text-purple-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   <div className="mt-3 pt-2 border-t border-purple-300">
@@ -5440,7 +5543,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               );
             })()}
-          </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -7545,30 +7650,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 >
                   🚨 정체재고 분석
                 </button>
-                {stagnantModalView === 'stagnant' && (
-                  <div className="flex gap-2 ml-auto">
-                    <button
-                      onClick={() => setStagnantInventoryCriteria('sales')}
-                      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                        stagnantInventoryCriteria === 'sales'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      📊 판매금액 기준
-                    </button>
-                    <button
-                      onClick={() => setStagnantInventoryCriteria('days')}
-                      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                        stagnantInventoryCriteria === 'days'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      📅 재고일수 기준 (300일 이상)
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* 정체재고 분석 뷰 */}
@@ -7576,23 +7657,18 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <>
               {/* 기준 설명 */}
               <div className="mb-6 bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-500">
-                {stagnantInventoryCriteria === 'sales' ? (
-                  <p className="text-sm text-yellow-900">
-                    <span className="font-semibold">📊 분석 기준 (판매금액 - 실판 기준):</span> 과거 10개월간 실판 판매금액이 연차별 기준 미만인 Subcategory를 정체재고로 분류
-                    <br />
-                    <span className="text-xs mt-1 block">- 1년차 (24F): <span className="font-bold">100,000 HKD 미만</span> (25년 초에는 당시즌이었기 때문에 기준 2배 적용)</span>
-                    <span className="text-xs">- 2년차 (23F) 및 3년차 이상 (22F~): <span className="font-bold">50,000 HKD 미만</span></span>
-                    <br />
-                    <span className="text-xs mt-1 block text-blue-700">※ 재고일수는 택가 매출 기준으로 계산됩니다 (택가 재고 / 택가 매출 × 304일). 판매가 0인 경우 "-"로 표시됩니다.</span>
-                  </p>
-                ) : (
-                  <p className="text-sm text-yellow-900">
-                    <span className="font-semibold">📅 분석 기준 (재고일수 기준):</span> 재고일수가 <span className="font-bold">300일 이상</span>이거나 <span className="font-bold text-red-600">판매가 0인</span> Subcategory를 정체재고로 분류
-                    <br />
-                    <span className="text-xs mt-1 block text-blue-700">※ 재고일수는 택가 매출 기준으로 계산됩니다 (택가 재고 / 택가 매출 × 304일).</span>
-                    <span className="text-xs mt-1 block text-red-700">※ 판매가 0인 경우 재고일수를 계산할 수 없지만, 더 심각한 정체재고로 간주하여 포함됩니다.</span>
-                  </p>
-                )}
+                <p className="text-sm text-yellow-900">
+                  <span className="font-semibold">📊 분석 기준 (매출/재고 비율):</span> <span className="font-bold text-red-600">기준월 2511 (25년 11월) 1개월간</span> 해당 Subcategory의 택가매출(Gross Sales)이 <span className="font-bold text-red-600">2511 기말 택재고(Stock Price)의 5% 미만</span>인 경우를 정체재고로 분류
+                  <br />
+                  <span className="text-xs mt-1 block">
+                    <span className="font-bold">계산식:</span> 2511 월간 Gross Sales &lt; 2511 기말 Stock Price × 0.05
+                  </span>
+                  <span className="text-xs mt-1 block">
+                    <span className="font-bold">예시:</span> 기말재고 100,000 HKD / 당월 매출 4,000 HKD → 비율 4% &lt; 5% → 정체재고
+                  </span>
+                  <br />
+                  <span className="text-xs mt-1 block text-blue-700">※ 재고일수는 당월 택가 매출 기준으로 계산됩니다 (택가 재고 / 당월 택가 매출 × 30일). 판매가 0인 경우 "-"로 표시됩니다.</span>
+                </p>
                 {(() => {
                   const metadata = (dashboardData as any)?.metadata;
                   if (!metadata) return null;
@@ -7622,7 +7698,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   return (
                     <>
                       <p className="text-xs text-yellow-800 mt-2">
-                        <span className="font-semibold">기간:</span> {periodLabel} (10개월, Period: {startPeriod} ~ {lastPeriod})
+                        <span className="font-semibold">판단 기준:</span> {lastPeriod} ({lastYear}년 {lastMonth}월) 1개월 당월 택가매출 vs 기말재고
                       </p>
                       <p className="text-xs text-yellow-800 mt-2">
                         <span className="font-semibold">정체재고 합계:</span> {formatNumber(Math.round(totalStagnantStock / 1000))}K ({formatPercent(stagnantRatio, 1)}%, 과시즌F 전체 대비, 택가 기준)
@@ -7686,8 +7762,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                           <td className="p-2">{item.season_code}</td>
                           <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                           <td className="p-2 text-right">
                             {item.discount_rate !== null && item.discount_rate !== undefined ? (
                               <span className="text-gray-600">
@@ -7772,8 +7848,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                           <td className="p-2">{item.season_code}</td>
                           <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                           <td className="p-2 text-right">
                             {item.discount_rate !== null && item.discount_rate !== undefined ? (
                               <span className="text-gray-600">
@@ -7858,8 +7934,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                           <td className="p-2">{item.season_code}</td>
                           <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                          <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                          <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                          <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                           <td className="p-2 text-right">
                             {item.discount_rate !== null && item.discount_rate !== undefined ? (
                               <span className="text-gray-600">
@@ -7903,17 +7979,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems24F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -7937,21 +8013,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>
@@ -8057,17 +8129,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems23F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -8091,21 +8163,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>
@@ -8211,17 +8279,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems22F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -8245,21 +8313,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>
@@ -8386,17 +8450,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems24F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems24F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems24F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -8420,21 +8484,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>
@@ -8540,17 +8600,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems23F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems23F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems23F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -8574,21 +8634,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>
@@ -8694,17 +8750,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 
                 // 기타 합계 계산
                 const othersStockPrice = others.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const othersSales = others.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const othersGrossSales = others.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const othersSales = others.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const othersDiscountRate = othersGrossSales > 0 ? ((othersGrossSales - othersSales) / othersGrossSales) * 100 : null;
-                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 304 : null;
+                const othersStockDays = othersGrossSales > 0 && othersStockPrice > 0 ? (othersStockPrice / othersGrossSales) * 30 : null;
                 
                 // 전체 합계 계산
                 const allStockPrice = allItems22F.reduce((sum: number, item: any) => sum + (item.stock_price || 0), 0);
-                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.gross_sales_10m || 0), 0);
-                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.sales_10m || 0), 0);
+                const allGrossSales = allItems22F.reduce((sum: number, item: any) => sum + (item.current_gross_sales || 0), 0);
+                const allSales = allItems22F.reduce((sum: number, item: any) => sum + (item.current_net_sales || 0), 0);
                 const allDiscountRate = allGrossSales > 0 ? ((allGrossSales - allSales) / allGrossSales) * 100 : null;
-                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 304 : null;
+                const allStockDays = allGrossSales > 0 && allStockPrice > 0 ? (allStockPrice / allGrossSales) * 30 : null;
                 
                 return (
                   <div className="mb-6">
@@ -8728,21 +8784,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '택가매출';
+                                if (!metadata) return '당월 택가매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 택가매출`;
+                                return `${lastPeriod} 당월 택가매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">
                               {(() => {
                                 const metadata = (dashboardData as any)?.metadata;
-                                if (!metadata) return '실판매출';
+                                if (!metadata) return '당월 실판매출';
                                 const lastPeriod = metadata.last_period || '2510';
-                                const lastYear = parseInt(lastPeriod.substring(0, 2)) + 2000;
-                                const lastMonth = parseInt(lastPeriod.substring(2, 4));
-                                return `${lastYear}년 1월~${lastMonth}월 실판매출`;
+                                return `${lastPeriod} 당월 실판매출`;
                               })()}
                             </th>
                             <th className="text-right p-2 font-semibold">할인율 (%)</th>

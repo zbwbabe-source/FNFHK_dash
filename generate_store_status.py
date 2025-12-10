@@ -103,15 +103,19 @@ def categorize_store(direct_profit, yoy):
             return 'loss_deteriorating'  # 적자 & 매출악화
 
 def main():
-    csv_file = '../Dashboard_Raw_Data/hmd_pl_database (1).csv'
+    import sys
     
-    # 최신 기간 확인 (hongkong-dashboard-data.json에서)
-    try:
-        with open('components/dashboard/hongkong-dashboard-data.json', 'r', encoding='utf-8') as f:
-            dashboard_data = json.load(f)
-            last_period_short = dashboard_data.get('metadata', {}).get('last_period', '2510')
-    except:
-        last_period_short = '2510'
+    # 명령줄 인자로 period 받기
+    if len(sys.argv) > 1:
+        last_period_short = sys.argv[1]
+    else:
+        # 최신 기간 확인 (hongkong-dashboard-data.json에서)
+        try:
+            with open('components/dashboard/hongkong-dashboard-data.json', 'r', encoding='utf-8') as f:
+                dashboard_data = json.load(f)
+                last_period_short = dashboard_data.get('metadata', {}).get('last_period', '2510')
+        except:
+            last_period_short = '2510'
     
     # 기간 파싱 (4자리 -> 6자리 변환)
     year, month = parse_period(last_period_short)
@@ -119,12 +123,19 @@ def main():
         print(f"Invalid period: {last_period_short}")
         return
     
+    # Period별 CSV 파일명 생성
+    csv_file = f'../Dashboard_Raw_Data/hmd_pl_database_{last_period_short}.csv'
+    
     # CSV 형식으로 변환 (202510)
     last_period = f"{year}{month:02d}"
     
     # 전년 동월 계산
     prev_year = year - 1
     prev_period = f"{prev_year}{month:02d}"
+    
+    # 전전년 동월 계산 (전년도 YOY 계산용)
+    prev_prev_year = prev_year - 1
+    prev_prev_period = f"{prev_prev_year}{month:02d}"
     
     # 데이터 읽기
     pl_data = read_pl_database(csv_file)
@@ -153,9 +164,16 @@ def main():
             continue
 
         previous_data = get_store_data(pl_data, prev_period, shop_cd)
+        prev_prev_data = get_store_data(pl_data, prev_prev_period, shop_cd)
         
-        # YOY 계산
+        # YOY 계산 (현재년도 대비 전년도)
         yoy = calculate_yoy(current_data['net_sales'], previous_data['net_sales'])
+        
+        # 전년도 YOY 계산 (전년도 대비 전전년도)
+        prev_yoy = calculate_yoy(previous_data['net_sales'], prev_prev_data['net_sales'])
+        
+        # 전년도 카테고리 분류
+        prev_category = categorize_store(previous_data['direct_profit'], prev_yoy)
         
         store_info = {
             'shop_cd': shop_cd,
@@ -173,7 +191,8 @@ def main():
                 'direct_profit': previous_data['direct_profit'],
             },
             'yoy': yoy,
-            'category': None  # 초기값
+            'category': None,  # 초기값
+            'previous_category': prev_category  # 전년도 카테고리 추가
         }
         
         # 제외 매장인지 확인
@@ -222,10 +241,10 @@ def main():
     }
     
     category_names = {
-        'profit_improving': '흑자 & 매출개선',
-        'profit_deteriorating': '흑자 & 매출악화',
-        'loss_improving': '적자 & 매출개선',
-        'loss_deteriorating': '적자 & 매출악화'
+        'profit_improving': '흑자 & 성장',
+        'profit_deteriorating': '흑자 & 악화',
+        'loss_improving': '적자 & 성장',
+        'loss_deteriorating': '적자 & 악화'
     }
     
     for cat_key, cat_name in category_names.items():

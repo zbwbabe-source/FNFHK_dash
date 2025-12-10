@@ -80,8 +80,8 @@ def get_mlb_sg_a(pl_data, period):
     """MLB 영업비 계산 (T99 오피스의 판매관리비, BRD_CD='M'만)"""
     sg_a = 0.0
     for row in pl_data:
-        if (row['PERIOD'] == period and
-            row['SHOP_CD'] == 'T99' and
+        if (row['PERIOD'] == period and 
+            row['SHOP_CD'] == 'T99' and 
             row['BRD_CD'] == 'M' and  # MLB만
             row['ACCOUNT_NM'].strip() == '판매관리비'):
             sg_a += float(row['VALUE'] or 0)
@@ -996,7 +996,7 @@ def main(target_period_short=None):
         
         prev_online_count = sum(1 for _, _, ch in discovery_prev_stores if ch == 'Online')
         prev_offline_count = sum(1 for _, _, ch in discovery_prev_stores if ch in ['Retail', 'Outlet'])
-
+        
         # 디스커버리 누적 계산 (실제 영업한 기간만)
         # 디스커버리가 실제로 영업한 기간 확인
         discovery_periods = set()
@@ -1389,7 +1389,7 @@ def main(target_period_short=None):
         output_file = f'components/dashboard/taiwan-pl-data-{target_period_short}.json'
         public_file = f'public/dashboard/taiwan-pl-data-{target_period_short}.json'
     else:
-        output_file = 'components/dashboard/taiwan-pl-data.json'
+    output_file = 'components/dashboard/taiwan-pl-data.json'
         public_file = 'public/dashboard/taiwan-pl-data.json'
     
     with open(output_file, 'w', encoding='utf-8') as f:
