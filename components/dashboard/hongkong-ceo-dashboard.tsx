@@ -2049,6 +2049,20 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     ))}
                   </div>
                   
+                  {/* 점당매출 계산 기준 설명 */}
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="bg-amber-50 rounded p-2">
+                      <div className="text-xs font-semibold text-amber-800 mb-1">📊 점당매출 계산기준</div>
+                      <div className="text-xs text-amber-700 space-y-1">
+                        <div>• <span className="font-semibold">계산식:</span> 총 오프라인 매출 ÷ 오프라인 매장수</div>
+                        <div>• <span className="font-semibold">당월:</span> {offlineEfficiency?.total?.current?.store_count || 0}개 매장 (LCX 리뉴얼, WTC 등 종료매장 제외)</div>
+                        <div>• <span className="font-semibold">전년 동월:</span> {offlineEfficiency?.total?.previous?.store_count || 0}개 매장 (모든 매장 포함)</div>
+                        <div className="pt-1 mt-1 border-t border-amber-200">
+                          <span className="font-semibold">※ 참고:</span> 전년 동일매장 기준 YOY ({formatPercent(salesSummary?.same_store_yoy)}%)는 {salesSummary?.same_store_count || 0}개 동일매장만 비교한 순수 성장률입니다.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
@@ -8037,8 +8051,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
@@ -8187,8 +8201,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
@@ -8337,8 +8351,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
@@ -8508,8 +8522,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
@@ -8658,8 +8672,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
@@ -8808,8 +8822,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <td className="p-2 font-semibold">{item.subcategory_code} - {item.subcategory_name}</td>
                               <td className="p-2">{item.season_code}</td>
                               <td className="p-2 text-right font-bold text-red-600">{formatNumber(Math.round((item.stock_price || 0) / 1000))}</td>
-                              <td className="p-2 text-right">{formatNumber((item.gross_sales_10m || 0) / 1000, 1)}</td>
-                              <td className="p-2 text-right">{formatNumber((item.sales_10m || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_gross_sales || 0) / 1000, 1)}</td>
+                              <td className="p-2 text-right">{formatNumber((item.current_net_sales || 0) / 1000, 1)}</td>
                               <td className="p-2 text-right">
                                 {item.discount_rate !== null && item.discount_rate !== undefined ? (
                                   <span className="text-gray-600">
