@@ -5034,7 +5034,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
               onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
             >
-                매장효율성 분석
+                평당매출 상세
             </button>
             </div>
           </div>
