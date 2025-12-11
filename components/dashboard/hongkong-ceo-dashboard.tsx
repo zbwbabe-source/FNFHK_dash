@@ -5903,17 +5903,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {expenseType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-indigo-900">11,686K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 97% (▼ 391K)</div>
+                <div className="text-2xl font-bold mb-2 text-indigo-900">{formatNumber(Math.round(directCostCurrent?.totalDirectCost || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round((directCostCurrent?.totalDirectCost || 0) / (directCostCurrent?.totalDirectCostPrev || 1) * 100)}% (▼ {formatNumber(Math.round((directCostCurrent?.totalDirectCostPrev || 0) - (directCostCurrent?.totalDirectCost || 0)))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-indigo-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-indigo-700">매출대비율</span>
-                    <span className="text-xs font-semibold text-indigo-900">58.2%</span>
+                    <span className="text-xs font-semibold text-indigo-900">{((directCostCurrent?.totalDirectCost || 0) / (pl?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-indigo-700">전년비</span>
-                    <span className="text-xs font-semibold text-red-600">+2.4%p</span>
+                    <span className={`text-xs font-semibold ${((directCostCurrent?.totalDirectCost || 0) / (pl?.net_sales || 1) * 100) - ((directCostCurrent?.totalDirectCostPrev || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100) > 0 ? 'text-red-600' : 'text-green-600'}`}>{((directCostCurrent?.totalDirectCost || 0) / (pl?.net_sales || 1) * 100) - ((directCostCurrent?.totalDirectCostPrev || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100) > 0 ? '+' : ''}{(((directCostCurrent?.totalDirectCost || 0) / (pl?.net_sales || 1) * 100) - ((directCostCurrent?.totalDirectCostPrev || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100)).toFixed(1)}%p</span>
                   </div>
                 </div>
               </>
@@ -6556,41 +6556,41 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-emerald-900">1,451K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 130% (+333K)</div>
+                <div className="text-2xl font-bold mb-2 text-emerald-900">{formatNumber(pl?.sg_a || 0)}</div>
+                <div className="text-xs mb-3 text-red-600">YOY {formatPercent(plYoy?.sg_a || 0)}% ({(pl?.sg_a || 0) >= (plData?.prev_month?.total?.sg_a || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round((pl?.sg_a || 0) - (plData?.prev_month?.total?.sg_a || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-emerald-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-emerald-700">매출 대비 비율</span>
-                    <span className="text-xs font-semibold text-emerald-900">7.2%</span>
+                    <span className="text-xs font-semibold text-emerald-900">{((pl?.sg_a || 0) / (pl?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-emerald-700">전년 비율</span>
-                    <span className="text-xs font-semibold text-emerald-900">5.2%</span>
+                    <span className="text-xs font-semibold text-emerald-900">{((plData?.prev_month?.total?.sg_a || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-emerald-700">효율성 악화</span>
-                    <span className="text-xs font-semibold text-red-600">▲ 2.0%p</span>
+                    <span className="text-xs text-emerald-700">{((pl?.sg_a || 0) / (pl?.net_sales || 1) * 100) - ((plData?.prev_month?.total?.sg_a || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100) > 0 ? '효율성 악화' : '효율성 개선'}</span>
+                    <span className={`text-xs font-semibold ${((pl?.sg_a || 0) / (pl?.net_sales || 1) * 100) - ((plData?.prev_month?.total?.sg_a || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100) > 0 ? 'text-red-600' : 'text-green-600'}`}>{((pl?.sg_a || 0) / (pl?.net_sales || 1) * 100) - ((plData?.prev_month?.total?.sg_a || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100) > 0 ? '▲' : '▼'} {Math.abs(((pl?.sg_a || 0) / (pl?.net_sales || 1) * 100) - ((plData?.prev_month?.total?.sg_a || 0) / (plData?.prev_month?.total?.net_sales || 1) * 100)).toFixed(1)}%p</span>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-emerald-900">13,385K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 103% (+403K)</div>
+                <div className="text-2xl font-bold mb-2 text-emerald-900">{formatNumber(plData?.cumulative?.total?.sg_a || 0)}</div>
+                <div className="text-xs mb-3 text-red-600">YOY {formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}% ({(plData?.cumulative?.total?.sg_a || 0) >= (plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round((plData?.cumulative?.total?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.total?.sg_a || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-emerald-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-emerald-700">매출 대비 비율</span>
-                    <span className="text-xs font-semibold text-emerald-900">6.6%</span>
+                    <span className="text-xs font-semibold text-emerald-900">{((plData?.cumulative?.total?.sg_a || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-emerald-700">전년 비율</span>
-                    <span className="text-xs font-semibold text-emerald-900">5.5%</span>
+                    <span className="text-xs font-semibold text-emerald-900">{((plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) / (plData?.cumulative?.prev_cumulative?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-emerald-700">효율성 악화</span>
-                    <span className="text-xs font-semibold text-red-600">▲ 1.1%p</span>
+                    <span className="text-xs text-emerald-700">{((plData?.cumulative?.total?.sg_a || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100) - ((plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) / (plData?.cumulative?.prev_cumulative?.total?.net_sales || 1) * 100) > 0 ? '효율성 악화' : '효율성 개선'}</span>
+                    <span className={`text-xs font-semibold ${((plData?.cumulative?.total?.sg_a || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100) - ((plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) / (plData?.cumulative?.prev_cumulative?.total?.net_sales || 1) * 100) > 0 ? 'text-red-600' : 'text-green-600'}`}>{((plData?.cumulative?.total?.sg_a || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100) - ((plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) / (plData?.cumulative?.prev_cumulative?.total?.net_sales || 1) * 100) > 0 ? '▲' : '▼'} {Math.abs(((plData?.cumulative?.total?.sg_a || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100) - ((plData?.cumulative?.prev_cumulative?.total?.sg_a || 0) / (plData?.cumulative?.prev_cumulative?.total?.net_sales || 1) * 100)).toFixed(1)}%p</span>
                   </div>
                 </div>
               </>
@@ -6608,17 +6608,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">605K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 137% (+164K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.current_month?.total?.expense_detail as any)?.salary || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round(((plData?.current_month?.total?.expense_detail as any)?.salary || 0) / ((plData?.prev_month?.total?.expense_detail as any)?.salary || 1) * 100)}% ({((plData?.current_month?.total?.expense_detail as any)?.salary || 0) >= ((plData?.prev_month?.total?.expense_detail as any)?.salary || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round(((plData?.current_month?.total?.expense_detail as any)?.salary || 0) - ((plData?.prev_month?.total?.expense_detail as any)?.salary || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">41.7%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.salary || 0) / (pl?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">3.0%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.salary || 0) / (pl?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
@@ -6673,17 +6673,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">5,232K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 114% (+626K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.cumulative?.total?.expense_detail as any)?.salary || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round(((plData?.cumulative?.total?.expense_detail as any)?.salary || 0) / ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.salary || 1) * 100)}% ({((plData?.cumulative?.total?.expense_detail as any)?.salary || 0) >= ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.salary || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round(((plData?.cumulative?.total?.expense_detail as any)?.salary || 0) - ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.salary || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">39.1%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.salary || 0) / (plData?.cumulative?.total?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">2.6%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.salary || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
@@ -6746,17 +6746,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">417K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 136% (+111K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.current_month?.total?.expense_detail as any)?.marketing || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round(((plData?.current_month?.total?.expense_detail as any)?.marketing || 0) / ((plData?.prev_month?.total?.expense_detail as any)?.marketing || 1) * 100)}% ({((plData?.current_month?.total?.expense_detail as any)?.marketing || 0) >= ((plData?.prev_month?.total?.expense_detail as any)?.marketing || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round(((plData?.current_month?.total?.expense_detail as any)?.marketing || 0) - ((plData?.prev_month?.total?.expense_detail as any)?.marketing || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">28.7%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.marketing || 0) / (pl?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">2.1%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.marketing || 0) / (pl?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
@@ -6811,17 +6811,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">3,137K</div>
-                <div className="text-xs mb-3 text-green-600">YOY 76% (▼ 1,000K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0))}K</div>
+                <div className="text-xs mb-3 text-green-600">YOY {Math.round(((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0) / ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.marketing || 1) * 100)}% ({((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0) >= ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.marketing || 0) ? '+' : '▼'}{formatNumber(Math.abs(Math.round(((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0) - ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.marketing || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">23.4%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0) / (plData?.cumulative?.total?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">1.5%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.marketing || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
