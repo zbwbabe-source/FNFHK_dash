@@ -5252,7 +5252,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.profit_improving.stores && (
                     <>
-                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년 당년</div>
+                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년→당년</div>
                     <div className="space-y-1 text-xs mb-3">
                       {cat.stores.map((store: any, idx: number) => {
                         const prevBadge = getCategoryBadge(store.previous_category);
@@ -5380,7 +5380,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.profit_deteriorating.stores && (
                     <>
-                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년 당년</div>
+                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년→당년</div>
                     <div className="space-y-1 text-xs mb-3">
                       {cat.stores.map((store: any, idx: number) => {
                         const prevBadge = getCategoryBadge(store.previous_category);
@@ -5508,7 +5508,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.loss_improving.stores && (
                     <>
-                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년 당년</div>
+                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년→당년</div>
                     <div className="space-y-1 text-xs mb-3">
                       {cat.stores.map((store: any, idx: number) => {
                         const prevBadge = getCategoryBadge(store.previous_category);
@@ -5640,7 +5640,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.loss_deteriorating.stores && (
                     <>
-                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년 당년</div>
+                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년→당년</div>
                     <div className="space-y-1 text-xs mb-3">
                       {cat.stores.map((store: any, idx: number) => {
                         const prevBadge = getCategoryBadge(store.previous_category);
@@ -5770,7 +5770,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   {expandedStoreCategories.mc_summary.stores && (
                     <>
-                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년 당년</div>
+                      <div className="text-[10px] text-gray-500 mb-1.5 px-2">전년→당년</div>
                     <div className="space-y-1 text-xs mb-3">
                       {mc.stores.map((store: any, idx: number) => {
                         const prevBadge = getCategoryBadge(store.previous_category);
