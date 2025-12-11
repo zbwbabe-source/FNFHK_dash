@@ -965,8 +965,26 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                   <span className="text-xs font-normal text-gray-600">({stores.length}개 매장)</span>
                         </div>
                               </td>
-                              <td className="p-2 text-center border-r border-gray-300 bg-white">
-                                {formatPercent(avgTurnoverAchievement, 1)}
+                              <td className="p-2 border-r border-gray-300 bg-white">
+                                <div className="flex items-center gap-2 px-2">
+                                  <div className="flex-1 min-w-[60px]">
+                                    <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                                      <div 
+                                        className={`h-full rounded-full transition-all ${
+                                          avgTurnoverAchievement >= 100 ? 'bg-green-500' :
+                                          avgTurnoverAchievement >= 80 ? 'bg-yellow-500' :
+                                          'bg-red-500'
+                                        }`}
+                                        style={{ 
+                                          width: `${Math.min(avgTurnoverAchievement, 150)}%` 
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="text-xs font-semibold min-w-[45px] text-right">
+                                    {formatPercent(avgTurnoverAchievement, 1)}
+                                  </span>
+                                </div>
                               </td>
                               <td className={`p-2 text-center border-r border-gray-300 bg-white ${avgDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {formatPercent(avgDirectProfitRate, 1)}
