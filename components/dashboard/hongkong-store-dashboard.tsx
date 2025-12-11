@@ -1146,8 +1146,26 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                           <td className="p-3 border-r border-gray-300 sticky left-0 bg-blue-100 z-10">
                             전체 합계 ({allStoresWithTurnover.length}개 매장)
                           </td>
-                          <td className="p-3 text-center border-r border-gray-300 text-blue-800">
-                            {formatPercent(avgAchievement, 1)}
+                          <td className="p-3 border-r border-gray-300 text-blue-800">
+                            <div className="flex items-center gap-2 px-2">
+                              <div className="flex-1 min-w-[60px]">
+                                <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                                  <div 
+                                    className={`h-full rounded-full transition-all ${
+                                      avgAchievement >= 100 ? 'bg-green-500' :
+                                      avgAchievement >= 80 ? 'bg-yellow-500' :
+                                      'bg-red-500'
+                                    }`}
+                                    style={{ 
+                                      width: `${Math.min(avgAchievement, 150)}%` 
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-xs font-semibold min-w-[45px] text-right">
+                                {formatPercent(avgAchievement, 1)}
+                              </span>
+                            </div>
                           </td>
                           
                           {/* 현재 지표 */}
