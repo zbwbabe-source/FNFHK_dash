@@ -983,7 +983,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                     </div>
                                   </div>
                                   <span className="text-xs font-semibold min-w-[45px] text-right">
-                                    {formatPercent(avgTurnoverAchievement, 1)}
+                                {formatPercent(avgTurnoverAchievement, 1)}
                                   </span>
                                 </div>
                               </td>
@@ -1185,7 +1185,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                 </div>
                               </div>
                               <span className="text-xs font-semibold min-w-[45px] text-right">
-                                {formatPercent(avgAchievement, 1)}
+                            {formatPercent(avgAchievement, 1)}
                               </span>
                             </div>
                           </td>
@@ -1323,9 +1323,9 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           
           // 변화량 계산
           return null;
-        })()}
-      </div>
-      </div>
+                })()}
+              </div>
+                </div>
     </div>
   );
 };

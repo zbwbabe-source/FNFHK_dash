@@ -7,9 +7,9 @@
     "generated_at": "2025-12-09T20:29:24.029756"
   },
   "sales_summary": {
-    "total_net_sales": 17682.64374335342,
-    "total_yoy": 17.351758963495495,
-    "total_change": 2614.5749734136834,
+    "total_net_sales": 17683,
+    "total_yoy": 117,
+    "total_change": 2615,
     "same_store_yoy": 117.3517589634955,
     "same_store_count": 17,
     "same_store_details": {
@@ -185,7 +185,8 @@
           "previous_sales": 0.0
         }
       ]
-    }
+    },
+    "prev_total_net_sales": 15068
   },
   "country_channel_summary": {
     "TW_Retail": {
