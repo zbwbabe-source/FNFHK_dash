@@ -11,7 +11,181 @@
     "total_yoy": 17.351758963495495,
     "total_change": 2614.5749734136834,
     "same_store_yoy": 117.3517589634955,
-    "same_store_count": 28
+    "same_store_count": 17,
+    "same_store_details": {
+      "included": [
+        {
+          "shop_cd": "T01",
+          "shop_nm": "T01 MLB忠孝旗艦店",
+          "current_sales": 619105.9907834099,
+          "previous_sales": 644336.9963369963
+        },
+        {
+          "shop_cd": "T02",
+          "shop_nm": "T02 新光三越南西3",
+          "current_sales": 764212.454212454,
+          "previous_sales": 490276.73401866964
+        },
+        {
+          "shop_cd": "T03",
+          "shop_nm": "T03 TAIPEI 101",
+          "current_sales": 708024.5775729645,
+          "previous_sales": 699014.0612076094
+        },
+        {
+          "shop_cd": "T06",
+          "shop_nm": "T06 台中中友百貨",
+          "current_sales": 547310.4100200874,
+          "previous_sales": 432686.28146047494
+        },
+        {
+          "shop_cd": "T08",
+          "shop_nm": "T08 HANSHIN ARENA",
+          "current_sales": 1404594.3518846743,
+          "previous_sales": 861600.3781165071
+        },
+        {
+          "shop_cd": "T10",
+          "shop_nm": "T10 Banqiao Megacity",
+          "current_sales": 794300.8389460001,
+          "previous_sales": 721224.8611603448
+        },
+        {
+          "shop_cd": "T11",
+          "shop_nm": "T11 Nanfang TS MALL",
+          "current_sales": 653898.8538343377,
+          "previous_sales": 452571.4285714285
+        },
+        {
+          "shop_cd": "T12",
+          "shop_nm": "T12 TAIMALL",
+          "current_sales": 756458.4662649179,
+          "previous_sales": 640491.3151364761
+        },
+        {
+          "shop_cd": "T13",
+          "shop_nm": "T13 SKM TAINAN",
+          "current_sales": 991366.8911733426,
+          "previous_sales": 776967.741935484
+        },
+        {
+          "shop_cd": "T14",
+          "shop_nm": "T14 Metrowalk",
+          "current_sales": 548279.0972468391,
+          "previous_sales": 388765.4496041593
+        },
+        {
+          "shop_cd": "T16",
+          "shop_nm": "T16 ZhongXiao SOGO",
+          "current_sales": 753203.8284296347,
+          "previous_sales": 641171.688526527
+        },
+        {
+          "shop_cd": "TE1",
+          "shop_nm": "TE1 TW MOMO online store",
+          "current_sales": 1977253.692544015,
+          "previous_sales": 2517977.5493323877
+        },
+        {
+          "shop_cd": "TE2",
+          "shop_nm": "TE2 TW 91APP",
+          "current_sales": 2334824.530308402,
+          "previous_sales": 1726146.7564693368
+        },
+        {
+          "shop_cd": "TE3",
+          "shop_nm": "TE3 SHOPEE",
+          "current_sales": 1362660.7585962422,
+          "previous_sales": 550527.4725274728
+        },
+        {
+          "shop_cd": "TU1",
+          "shop_nm": "TU1 Mitsui Outlet Taichung",
+          "current_sales": 668667.3756351176,
+          "previous_sales": 579414.6283823703
+        },
+        {
+          "shop_cd": "TU2",
+          "shop_nm": "TU2 Mitsui Outlet Park Linkou",
+          "current_sales": 458965.1423844971,
+          "previous_sales": 611747.1345858439
+        },
+        {
+          "shop_cd": "TU3",
+          "shop_nm": "TU3 Gloria Outlet",
+          "current_sales": 1149718.5395249913,
+          "previous_sales": 851863.1690889754
+        }
+      ],
+      "excluded": [
+        {
+          "shop_cd": "T04",
+          "shop_nm": "T04 新光三越A11",
+          "current_sales": 0.0,
+          "previous_sales": 282539.0523455038
+        },
+        {
+          "shop_cd": "T05",
+          "shop_nm": "T05 新光三越中港",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "T07",
+          "shop_nm": "T07 新竹巨城",
+          "current_sales": 0.0,
+          "previous_sales": 668498.6411438023
+        },
+        {
+          "shop_cd": "T09",
+          "shop_nm": "T09 Taichung Eslite",
+          "current_sales": 0.0,
+          "previous_sales": 413753.9879475364
+        },
+        {
+          "shop_cd": "T15",
+          "shop_nm": "T15 Xindian Yulong City",
+          "current_sales": 0.0,
+          "previous_sales": 116493.4420418291
+        },
+        {
+          "shop_cd": "T17",
+          "shop_nm": "T17 LALAPORT Nangang",
+          "current_sales": 586984.2845326714,
+          "previous_sales": 0
+        },
+        {
+          "shop_cd": "T18",
+          "shop_nm": "T18 LALAPORT Taichung",
+          "current_sales": 602813.6594588206,
+          "previous_sales": 0
+        },
+        {
+          "shop_cd": "T99",
+          "shop_nm": "T99 TW BACK OFFICE",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "TE4",
+          "shop_nm": "TE4 LINE GIFTSHOP",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "WTE",
+          "shop_nm": "WTE TW EC warehouse",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        },
+        {
+          "shop_cd": "WTM",
+          "shop_nm": "WTM TW MAIN WAREHOUSE",
+          "current_sales": 0.0,
+          "previous_sales": 0.0
+        }
+      ]
+    }
   },
   "country_channel_summary": {
     "TW_Retail": {
@@ -1418,9 +1592,13 @@
         "gross_sales": 6620503.722084365,
         "net_sales": 4734236.322816971
       },
-      "가방외": {
-        "gross_sales": 1092449.1315136473,
-        "net_sales": 816310.528181497
+      "가방": {
+        "gross_sales": 347571.11083447206,
+        "net_sales": 259715.48594926327
+      },
+      "기타ACC": {
+        "gross_sales": 744878.0206791753,
+        "net_sales": 556595.0422322338
       }
     },
     {
@@ -1449,9 +1627,13 @@
         "gross_sales": 4508672.456575681,
         "net_sales": 3426441.451022094
       },
-      "가방외": {
-        "gross_sales": 1004451.612903226,
-        "net_sales": 786125.2510929931
+      "가방": {
+        "gross_sales": 319574.0220805787,
+        "net_sales": 250111.8074018136
+      },
+      "기타ACC": {
+        "gross_sales": 684877.5908226473,
+        "net_sales": 536013.4436911795
       }
     },
     {
@@ -1480,9 +1662,13 @@
         "gross_sales": 3113538.461538462,
         "net_sales": 2286009.2165898615
       },
-      "가방외": {
-        "gross_sales": 1215178.6600496278,
-        "net_sales": 827632.9906652487
+      "가방": {
+        "gross_sales": 386618.4562301683,
+        "net_sales": 263317.81465211697
+      },
+      "기타ACC": {
+        "gross_sales": 828560.2038194595,
+        "net_sales": 564315.1760131317
       }
     },
     {
@@ -1511,9 +1697,13 @@
         "gross_sales": 3564915.6327543426,
         "net_sales": 2545443.9324116744
       },
-      "가방외": {
-        "gross_sales": 756399.5037220842,
-        "net_sales": 568767.3401866951
+      "가방": {
+        "gross_sales": 240654.33177567035,
+        "net_sales": 180957.71284210874
+      },
+      "기타ACC": {
+        "gross_sales": 515745.17194641393,
+        "net_sales": 387809.6273445864
       }
     },
     {
@@ -1542,9 +1732,13 @@
         "gross_sales": 4297692.307692306,
         "net_sales": 3158194.0210327283
       },
-      "가방외": {
-        "gross_sales": 1040712.1588089335,
-        "net_sales": 803128.9140966556
+      "가방": {
+        "gross_sales": 331110.59422508563,
+        "net_sales": 255521.6538358067
+      },
+      "기타ACC": {
+        "gross_sales": 709601.5645838479,
+        "net_sales": 547607.2602608489
       }
     },
     {
@@ -1573,9 +1767,13 @@
         "gross_sales": 4006104.2183622853,
         "net_sales": 2881898.6175115197
       },
-      "가방외": {
-        "gross_sales": 1015240.6947890819,
-        "net_sales": 774941.5101028002
+      "가방": {
+        "gross_sales": 323006.6516353803,
+        "net_sales": 246553.6140112797
+      },
+      "기타ACC": {
+        "gross_sales": 692234.0431537017,
+        "net_sales": 528387.8960915206
       }
     },
     {
@@ -1604,9 +1802,13 @@
         "gross_sales": 3817049.87593052,
         "net_sales": 2766060.4986411436
       },
-      "가방외": {
-        "gross_sales": 1067007.4441687334,
-        "net_sales": 783357.4382606641
+      "가방": {
+        "gross_sales": 339476.6419233907,
+        "net_sales": 249231.20641732513
+      },
+      "기타ACC": {
+        "gross_sales": 727530.8022453428,
+        "net_sales": 534126.231843339
       }
     },
     {
@@ -1635,9 +1837,13 @@
         "gross_sales": 3879647.642679898,
         "net_sales": 2883775.0206782455
       },
-      "가방외": {
-        "gross_sales": 943908.1885856085,
-        "net_sales": 710176.0604986406
+      "가방": {
+        "gross_sales": 300311.6650181124,
+        "net_sales": 225947.987064218
+      },
+      "기타ACC": {
+        "gross_sales": 643596.5235674961,
+        "net_sales": 484228.07343442267
       }
     },
     {
@@ -1666,9 +1872,13 @@
         "gross_sales": 3247704.7146401964,
         "net_sales": 2402975.0679428084
       },
-      "가방외": {
-        "gross_sales": 1360878.411910671,
-        "net_sales": 787449.3678364643
+      "가방": {
+        "gross_sales": 432973.955211145,
+        "net_sales": 250533.0853488839
+      },
+      "기타ACC": {
+        "gross_sales": 927904.4566995262,
+        "net_sales": 536916.2824875804
       }
     },
     {
@@ -1697,9 +1907,13 @@
         "gross_sales": 3594099.255583126,
         "net_sales": 2643172.8701406135
       },
-      "가방외": {
-        "gross_sales": 1327942.928039703,
-        "net_sales": 739444.1687344906
+      "가방": {
+        "gross_sales": 422495.2771796634,
+        "net_sales": 235259.86127245965
+      },
+      "기타ACC": {
+        "gross_sales": 905447.6508600398,
+        "net_sales": 504184.307462031
       }
     },
     {
@@ -1728,9 +1942,13 @@
         "gross_sales": 4595081.885856079,
         "net_sales": 3434142.030012998
       },
-      "가방외": {
-        "gross_sales": 1181888.3374689827,
-        "net_sales": 760111.7806924256
+      "가방": {
+        "gross_sales": 376026.8835284162,
+        "net_sales": 241835.42130477182
+      },
+      "기타ACC": {
+        "gross_sales": 805861.4539405665,
+        "net_sales": 518276.35938765376
       }
     }
   ],
@@ -1854,8 +2072,12 @@
         "stock_price": 40013.8734491315,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 14525.789081885858,
+      "가방": {
+        "stock_price": 4621.491748492678,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 9904.29733339318,
         "stock_weeks": 0
       }
     },
@@ -1885,8 +2107,12 @@
         "stock_price": 37638.91315136475,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 14925.238213399502,
+      "가방": {
+        "stock_price": 4748.579568288641,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 10176.658645110861,
         "stock_weeks": 0
       }
     },
@@ -1916,8 +2142,12 @@
         "stock_price": 37790.81637717121,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 13825.595533498756,
+      "가방": {
+        "stock_price": 4398.719774593227,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 9426.87575890553,
         "stock_weeks": 0
       }
     },
@@ -1947,8 +2177,12 @@
         "stock_price": 36479.95285359801,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 12932.317617866001,
+      "가방": {
+        "stock_price": 4114.516521128972,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 8817.80109673703,
         "stock_weeks": 0
       }
     },
@@ -1978,8 +2212,12 @@
         "stock_price": 35817.99503722084,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 12240.679900744419,
+      "가방": {
+        "stock_price": 3894.466650887519,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 8346.2132498569,
         "stock_weeks": 0
       }
     },
@@ -2009,8 +2247,12 @@
         "stock_price": 33376.81637717121,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 11900.339950372208,
+      "가방": {
+        "stock_price": 3786.1848726336266,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 8114.155077738583,
         "stock_weeks": 0
       }
     },
@@ -2040,8 +2282,12 @@
         "stock_price": 34601.21588089328,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 11422.111662531015,
+      "가방": {
+        "stock_price": 3634.0328570911483,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 7788.078805439867,
         "stock_weeks": 0
       }
     },
@@ -2071,8 +2317,12 @@
         "stock_price": 33689.01488833745,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 11516.349875930517,
+      "가방": {
+        "stock_price": 3664.0154709900103,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 7852.334404940507,
         "stock_weeks": 0
       }
     },
@@ -2102,8 +2352,12 @@
         "stock_price": 39069.1712158809,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 11515.86104218362,
+      "가방": {
+        "stock_price": 3663.8599447659317,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 7852.001097417689,
         "stock_weeks": 0
       }
     },
@@ -2133,8 +2387,12 @@
         "stock_price": 40862.196029776685,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 11165.838709677422,
+      "가방": {
+        "stock_price": 3552.497642012769,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 7613.341067664654,
         "stock_weeks": 0
       }
     },
@@ -2164,8 +2422,12 @@
         "stock_price": 39399.3870967742,
         "stock_weeks": 0
       },
-      "가방외": {
-        "stock_price": 10645.560794044668,
+      "가방": {
+        "stock_price": 3386.967213306615,
+        "stock_weeks": 0
+      },
+      "기타ACC": {
+        "stock_price": 7258.593580738054,
         "stock_weeks": 0
       }
     }
@@ -2249,7 +2511,20 @@
       95,
       93
     ],
-    "가방외": [
+    "가방": [
+      96,
+      95,
+      89,
+      86,
+      85,
+      89,
+      76,
+      72,
+      76,
+      77,
+      76
+    ],
+    "기타ACC": [
       96,
       95,
       89,
@@ -2887,12 +3162,12 @@
   "acc_stock_summary": {
     "total": {
       "current": {
-        "stock_weeks": 37.973628235694285
+        "stock_weeks": 54.70422402901111
       },
       "previous": {
-        "stock_weeks": 50.07347433911501
+        "stock_weeks": 69.92259215071277
       },
-      "stock_weeks_change": -12.099846103420724
+      "stock_weeks_change": -15.218368121701666
     },
     "by_category": {
       "ATC": {
@@ -2901,14 +3176,14 @@
         "current": {
           "stock_price": 1872.883374689826,
           "gross_sales_6m": 1483.9602977667494,
-          "stock_weeks": 32.81419847634591
+          "stock_weeks": 368.0209412278373
         },
         "previous": {
           "stock_price": 2409.6352357320097,
           "gross_sales_6m": 1131.937965260546,
-          "stock_weeks": 55.34801203934489
+          "stock_weeks": 356.3005115390962
         },
-        "stock_weeks_change": -22.53381356299898
+        "stock_weeks_change": 11.720429688741092
       },
       "BAG": {
         "category": "BAG",
@@ -2916,14 +3191,14 @@
         "current": {
           "stock_price": 8772.677419354843,
           "gross_sales_6m": 5412.905707196029,
-          "stock_weeks": 42.13810940766968
+          "stock_weeks": 63.07257885097884
         },
         "previous": {
           "stock_price": 11672.724565756824,
           "gross_sales_6m": 4966.813895781636,
-          "stock_weeks": 61.10372667021713
+          "stock_weeks": 86.24033940224399
         },
-        "stock_weeks_change": -18.965617262547447
+        "stock_weeks_change": -23.167760551265147
       },
       "HEA": {
         "category": "HEA",
@@ -2931,14 +3206,14 @@
         "current": {
           "stock_price": 26569.230769230773,
           "gross_sales_6m": 21551.795781637713,
-          "stock_weeks": 32.05301344719342
+          "stock_weeks": 40.39513968610438
         },
         "previous": {
           "stock_price": 23342.436724565756,
           "gross_sales_6m": 16149.24317617866,
-          "stock_weeks": 37.58091622113521
+          "stock_weeks": 62.90082376570117
         },
-        "stock_weeks_change": -5.52790277394179
+        "stock_weeks_change": -22.50568407959679
       },
       "SHO": {
         "category": "SHO",
@@ -2946,14 +3221,14 @@
         "current": {
           "stock_price": 36518.50124069479,
           "gross_sales_6m": 21151.662531017366,
-          "stock_weeks": 44.88919161156812
+          "stock_weeks": 46.19804680434437
         },
         "previous": {
           "stock_price": 38543.33250620347,
           "gross_sales_6m": 21662.33746898263,
-          "stock_weeks": 46.2612424257628
+          "stock_weeks": 51.440269969483445
         },
-        "stock_weeks_change": -1.3720508141946794
+        "stock_weeks_change": -5.242223165139073
       },
       "WTC": {
         "category": "WTC",
@@ -3045,12 +3320,12 @@
       "과시즌_SS": {
         "season_type": "과시즌S",
         "current": {
-          "stock_price": 4181.486352357319
+          "stock_price": 16509.734491315136
         },
         "previous": {
           "stock_price": 14025.344913151366
         },
-        "yoy": 29.81378624376217
+        "yoy": 117.71357206220428
       },
       "당시즌_의류": {
         "season_type": "당시즌F",
@@ -3334,6 +3609,56 @@
             "stock_price": 1.6550868486352355
           },
           "yoy": -95.65217391304348
+        }
+      }
+    }
+  },
+  "acc_sales_data": {
+    "current": {
+      "total": {
+        "gross_sales": 7657.707432352593,
+        "net_sales": 7657.707432352593
+      },
+      "categories": {
+        "신발": {
+          "gross_sales": 3411.3465674110835,
+          "net_sales": 3411.3465674110835
+        },
+        "모자": {
+          "gross_sales": 3388.008507621411,
+          "net_sales": 3388.008507621411
+        },
+        "가방": {
+          "gross_sales": 627.7762022923313,
+          "net_sales": 627.7762022923313
+        },
+        "기타ACC": {
+          "gross_sales": 230.5761550277679,
+          "net_sales": 230.5761550277679
+        }
+      }
+    },
+    "previous": {
+      "total": {
+        "gross_sales": 6367.4462530634655,
+        "net_sales": 6367.4462530634655
+      },
+      "categories": {
+        "신발": {
+          "gross_sales": 3280.1409302029647,
+          "net_sales": 3280.1409302029647
+        },
+        "모자": {
+          "gross_sales": 2228.9529655404017,
+          "net_sales": 2228.9529655404017
+        },
+        "가방": {
+          "gross_sales": 627.7762022923313,
+          "net_sales": 627.7762022923313
+        },
+        "기타ACC": {
+          "gross_sales": 230.5761550277679,
+          "net_sales": 230.5761550277679
         }
       }
     }

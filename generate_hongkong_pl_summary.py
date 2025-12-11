@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-대만 대시보드 손익요약 데이터 생성
+홍콩/마카오 대시보드 손익요약 데이터 생성
 """
 import csv
 import json

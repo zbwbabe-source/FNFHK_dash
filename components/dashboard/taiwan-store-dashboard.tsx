@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import plData from './taiwan-pl-data.json';
 import storeAreasData from './taiwan-store-areas.json';
 
 type StoreCategoryKey = 'large_profit' | 'small_medium_profit' | 'loss';
@@ -41,25 +40,45 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
   
   // 동적 데이터 로드
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [plData, setPlData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/dashboard/taiwan-dashboard-data-${period}.json`);
-        if (!response.ok) {
-          throw new Error(`Failed to load data for period ${period}`);
+        
+        // Dashboard 데이터 로드
+        const dashboardResponse = await fetch(`/dashboard/taiwan-dashboard-data-${period}.json`);
+        if (!dashboardResponse.ok) {
+          throw new Error(`Failed to load dashboard data for period ${period}`);
         }
-        const data = await response.json();
-        setDashboardData(data);
+        const dashData = await dashboardResponse.json();
+        setDashboardData(dashData);
+        
+        // PL 데이터 로드
+        const plResponse = await fetch(`/dashboard/taiwan-pl-data-${period}.json`);
+        if (!plResponse.ok) {
+          throw new Error(`Failed to load PL data for period ${period}`);
+        }
+        const plDataResult = await plResponse.json();
+        setPlData(plDataResult);
+        
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('Error loading data:', error);
         // 폴백: 기본 데이터 로드 시도
         try {
-          const fallbackResponse = await fetch('/dashboard/taiwan-dashboard-data.json');
-          const fallbackData = await fallbackResponse.json();
-          setDashboardData(fallbackData);
+          const fallbackDashboard = await fetch('/dashboard/taiwan-dashboard-data.json');
+          const fallbackPl = await fetch('/dashboard/taiwan-pl-data.json');
+          
+          if (fallbackDashboard.ok) {
+            const dashData = await fallbackDashboard.json();
+            setDashboardData(dashData);
+          }
+          if (fallbackPl.ok) {
+            const plDataResult = await fallbackPl.json();
+            setPlData(plDataResult);
+          }
         } catch (fallbackError) {
           console.error('Error loading fallback data:', fallbackError);
         }
@@ -72,8 +91,43 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
 
   // 페이지 타이틀 설정
   useEffect(() => {
-    document.title = "대만법인 매장효율성 분석";
+    document.title = "대만법인 평당매출 분석";
   }, []);
+
+  // 매장명 포맷 함수 (한글 이름으로 변환)
+  const formatStoreName = (storeName: string) => {
+    const mapping: { [key: string]: string } = {
+      "T08 HANSHIN ARENA": "한신아레나",
+      "T03 TAIPEI 101": "Taipei 101",
+      "T12 TAIMALL": "TAIMALL",
+      "T06 台中中友百貨": "중우백화점",
+      "T11 Nanfang TS MALL": "TS Mall",
+      "T10 Banqiao Megacity": "반치아오",
+      "T18 LALAPORT Taichung": "라라포트 타이중",
+      "T17 LALAPORT Nangang": "라라포트 난강",
+      "T02 新光三越南西3": "난징3",
+      "T14 Metrowalk": "Metrowalk",
+      "T01 MLB忠孝旗艦店": "종샤오",
+      "T13 SKM TAINAN": "SKM Tainan",
+      "T16 ZhongXiao SOGO": "Sogo종샤오",
+      "T09 Taichung Eslite": "성품서적 타이중",
+      "T07 新竹巨城": "신주 빅시티",
+      "T04 新光三越A11": "A11",
+      "T15 Xindian Yulong City": "신디엔",
+      "TU3 Gloria Outlet": "글로리아 (아)",
+      "TU1 Mitsui Outlet Taichung": "미츠이 타이중 (아)",
+      "TU2 Mitsui Outlet Park Linkou": "미츠이 린커우 (아)",
+      "TE1 TW MOMO online store": "MOMO",
+      "TE2 TW 91APP": "91APP",
+      "TE3 SHOPEE": "SHOPEE",
+      "T05 新光三越中港": "중강",
+      "T99 TW BACK OFFICE": "Back Office",
+      "TE4 LINE GIFTSHOP": "LINE GIFTSHOP",
+      "WTE TW EC warehouse": "EC창고",
+      "WTM TW MAIN WAREHOUSE": "메인창고",
+    };
+    return mapping[storeName] || storeName.replace(/T\d{2,3}\s?/, '').replace(/MLB\s?/, '').trim();
+  };
 
   // 로컬스토리지에서 AI 분석 로드
   useEffect(() => {
@@ -96,10 +150,12 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
 
   // 매장 데이터 처리
   const allStores: TaiwanStoreRow[] = useMemo(() => {
+    if (!dashboardData || !plData) return [];
+    
     const result: TaiwanStoreRow[] = [];
     const storeAreas = (storeAreasData as any)?.store_areas || {};
-    const plStores = (plData as any)?.channel_direct_profit?.stores || {};
-    const storeSummary = (dashboardData as any)?.store_summary || {};
+    const plStores = plData?.channel_direct_profit?.stores || {};
+    const storeSummary = dashboardData?.store_summary || {};
 
     // store_summary의 각 매장을 순회
     Object.entries(storeSummary).forEach(([storeCode, storeInfo]: [string, any]) => {
@@ -160,7 +216,7 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
 
     // 평당매출 기준 내림차순 정렬
     return result.sort((a, b) => b.sales_per_pyeong - a.sales_per_pyeong);
-  }, []);
+  }, [dashboardData, plData]);
 
   const formatNumber = (num: number) => {
     return Math.round(num).toLocaleString('ko-KR');
@@ -281,8 +337,8 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
       <div className="max-w-7xl mx-auto space-y-6">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg p-6 shadow-lg">
-          <h1 className="text-3xl font-bold mb-2">대만법인 매장효율성 분석 ({periodLabel}, {period})</h1>
-          <p className="text-purple-100">Taiwan Store Efficiency Analysis - 평당매출 중심 분석 (단위: 1K HKD)</p>
+          <h1 className="text-3xl font-bold mb-2">대만법인 평당매출 분석 ({periodLabel}, {period})</h1>
+          <p className="text-purple-100">(단위: 1K HKD)</p>
         </div>
 
         {/* 매장별 평당매출 분석 */}
@@ -357,7 +413,7 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
               </div>
               {stats.maxStore && (
                 <div className="text-xs text-gray-600 mt-1">
-                  {stats.maxStore.store_name}
+                  {formatStoreName(stats.maxStore.store_name)}
                 </div>
               )}
             </div>
@@ -368,7 +424,7 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
               </div>
               {stats.minStore && (
                 <div className="text-xs text-gray-600 mt-1">
-                  {stats.minStore.store_name}
+                  {formatStoreName(stats.minStore.store_name)}
                 </div>
               )}
             </div>
@@ -485,7 +541,7 @@ const TaiwanStoreDashboard: React.FC<TaiwanStoreDashboardProps> = ({ period = '2
                         return (
                           <tr key={store.store_code} className="border-b border-gray-200 hover:bg-gray-50">
                             <td className="p-2 text-gray-600 pl-8">
-                              {store.store_name}
+                              {formatStoreName(store.store_name)}
                               {isNewStore && (
                                 <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded">신규</span>
                               )}
