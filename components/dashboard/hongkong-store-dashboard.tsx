@@ -986,16 +986,16 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                   </span>
                                 </div>
                               </td>
-                              <td className={`p-2 text-center border-r border-gray-300 bg-white ${avgDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              <td className={`p-2 text-right border-r border-gray-300 bg-white ${avgDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {formatPercent(avgDirectProfitRate, 1)}
                               </td>
-                              <td className="p-2 text-center border-r border-gray-300 bg-white">
+                              <td className="p-2 text-right border-r border-gray-300 bg-white">
                                 {avgRentRate.toFixed(1)}%
                               </td>
-                              <td className="p-2 text-center border-r-2 border-gray-400 bg-white">
+                              <td className="p-2 text-right border-r-2 border-gray-400 bg-white">
                                 {avgLaborRate > 0 ? avgLaborRate.toFixed(1) + '%' : '-'}
                               </td>
-                              <td className="p-2 text-center bg-white">
+                              <td className="p-2 text-right bg-white">
                                 {avgTurnoverRentRate > 0 ? avgTurnoverRentRate.toFixed(1) + '%' : '-'}
                               </td>
                             </tr>
