@@ -806,7 +806,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                     <tr className="bg-gray-200 border-b-2 border-gray-400">
                       <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 sticky left-0 bg-gray-100 z-10">매장명<br/>(면적, YOY)</th>
                       <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300">턴오버율<br/>달성률 (%)</th>
-                      <th colSpan={3} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
+                      <th colSpan={4} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
                         <span>현재 지표</span>
                       </th>
                       <th colSpan={1} className="text-center p-2 font-bold bg-green-50 w-24">
@@ -818,6 +818,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       {/* 현재 지표 그룹 */}
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">직접이익률<br/>(%)</th>
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">임차료율<br/>(%)</th>
+                      <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">턴오버<br/>기준율(%)</th>
                       <th className="text-right p-2 font-semibold border-r-2 border-gray-400 bg-blue-50 w-24">인건비율<br/>(%)</th>
                       
                       {/* 턴오버 달성시 지표 그룹 */}
@@ -992,6 +993,18 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                               <td className="p-2 text-right border-r border-gray-300 bg-white">
                                 {avgRentRate.toFixed(1)}%
                               </td>
+                              <td className="p-2 text-right border-r border-gray-300 bg-white">
+                                {(() => {
+                                  const storesWithTurnover = stores.filter(s => s.turnover_rate_achievement > 0);
+                                  const avgTurnoverRate = storesWithTurnover.length > 0
+                                    ? storesWithTurnover.reduce((sum, s) => {
+                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.shop_cd];
+                                        return sum + (turnoverData?.turnover_rate || 0) * 100;
+                                      }, 0) / storesWithTurnover.length
+                                    : 0;
+                                  return avgTurnoverRate > 0 ? avgTurnoverRate.toFixed(1) + '%' : '-';
+                                })()}
+                              </td>
                               <td className="p-2 text-right border-r-2 border-gray-400 bg-white">
                                 {avgLaborRate > 0 ? avgLaborRate.toFixed(1) + '%' : '-'}
                               </td>
@@ -1066,6 +1079,12 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                       `}
                                     >
                                       {store.rent_rate.toFixed(1)}%
+                                    </td>
+                                    <td className="p-2 text-right border-r border-gray-300 bg-white font-semibold text-blue-600">
+                                      {(() => {
+                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[store.shop_cd];
+                                        return turnoverData?.turnover_rate ? (turnoverData.turnover_rate * 100).toFixed(1) + '%' : '-';
+                                      })()}
                                     </td>
                                     <td
                                       className={`
@@ -1174,6 +1193,17 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                           </td>
                           <td className="p-3 text-right border-r border-gray-300 bg-blue-50">
                             {formatPercent(avgCurrentRentRate, 1)}
+                          </td>
+                          <td className="p-3 text-right border-r border-gray-300 bg-blue-50 font-semibold text-blue-800">
+                            {(() => {
+                              const avgTurnoverRate = allStoresWithTurnover.length > 0
+                                ? allStoresWithTurnover.reduce((sum, s) => {
+                                    const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.shop_cd];
+                                    return sum + (turnoverData?.turnover_rate || 0) * 100;
+                                  }, 0) / allStoresWithTurnover.length
+                                : 0;
+                              return avgTurnoverRate > 0 ? formatPercent(avgTurnoverRate, 1) : '-';
+                            })()}
                           </td>
                           <td className="p-3 text-right border-r-2 border-gray-400 bg-blue-50">
                             {formatPercent(avgCurrentLaborRate, 1)}
