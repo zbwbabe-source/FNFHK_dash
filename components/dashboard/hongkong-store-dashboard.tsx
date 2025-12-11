@@ -124,7 +124,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   const [showCurrentDetails, setShowCurrentDetails] = useState(true); // 현재 지표 상세 컬럼 표시 (엑셀 그룹처럼) - 기본값: 펼침
   const [showTurnoverDetails, setShowTurnoverDetails] = useState(false); // 턴오버 달성시 상세 컬럼 표시 (엑셀 그룹처럼) - 사용 안 함
   const [showTurnoverSummary, setShowTurnoverSummary] = useState(true); // 상단 요약(턴오버 달성 효과) 토글
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set()); // 펼쳐진 카테고리 목록
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'])); // 펼쳐진 카테고리 목록 (기본값: 전체 펼침)
   const [showSalesPerPyeongAnalysis, setShowSalesPerPyeongAnalysis] = useState(true); // 1번 섹션 접기/펼치기
   const [expandedCategoriesSalesPerPyeong, setExpandedCategoriesSalesPerPyeong] = useState<Set<string>>(new Set()); // 1번 섹션 펼쳐진 카테고리 목록
   const [showTurnoverRentExplanation, setShowTurnoverRentExplanation] = useState(false); // 턴오버 임차료 설명 접기/펼치기
@@ -809,7 +809,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       <th colSpan={3} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
                         <span>현재 지표</span>
                       </th>
-                      <th colSpan={3} className="text-center p-2 font-bold bg-green-50">
+                      <th colSpan={1} className="text-center p-2 font-bold bg-green-50">
                         <span>턴오버 100% 달성시 지표</span>
                       </th>
                     </tr>
@@ -821,9 +821,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       <th className="text-center p-2 font-semibold border-r-2 border-gray-400 bg-blue-50">인건비율<br/>(%)</th>
                       
                       {/* 턴오버 달성시 지표 그룹 */}
-                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">직접이익률<br/>(%)</th>
-                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">임차료율<br/>(%)</th>
-                      <th className="text-center p-2 font-semibold bg-green-50">인건비율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold bg-green-50">임차료율<br/>(%)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -979,14 +977,8 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                               <td className="p-2 text-center border-r-2 border-gray-400 bg-white">
                                 {avgLaborRate > 0 ? avgLaborRate.toFixed(1) + '%' : '-'}
                               </td>
-                              <td className={`p-2 text-center border-r border-gray-300 bg-white ${avgTurnoverDirectProfitRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {avgTurnoverDirectProfitRate > 0 ? avgTurnoverDirectProfitRate.toFixed(1) + '%' : '-'}
-                              </td>
-                              <td className="p-2 text-center border-r border-gray-300 bg-white">
-                                {avgTurnoverRentRate > 0 ? avgTurnoverRentRate.toFixed(1) + '%' : '-'}
-                              </td>
                               <td className="p-2 text-center bg-white">
-                                {avgTurnoverLaborRate > 0 ? avgTurnoverLaborRate.toFixed(1) + '%' : '-'}
+                                {avgTurnoverRentRate > 0 ? avgTurnoverRentRate.toFixed(1) + '%' : '-'}
                               </td>
                             </tr>
                             
@@ -1069,21 +1061,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                     {/* 턴오버 달성시 지표: 직접이익률, 임차료율, 인건비율 */}
                                     <td
                                       className={`
-                                        p-2 text-right border-r border-gray-300 bg-white font-semibold
-                                        ${
-                                          store.turnover_rate_achievement > 0
-                                            ? store.turnover_achievement_direct_profit_rate >= 0
-                                              ? 'text-green-600'
-                                              : 'text-red-600'
-                                            : 'text-gray-400'
-                                        }
-                                      `}
-                                    >
-                                      {store.turnover_rate_achievement > 0 ? store.turnover_achievement_direct_profit_rate.toFixed(1) + '%' : '-'}
-                                    </td>
-                                    <td
-                                      className={`
-                                        p-2 text-right border-r border-gray-300 bg-white font-semibold
+                                        p-2 text-right bg-white font-semibold
                                         ${
                                           store.turnover_rate_achievement > 0
                                             ? store.turnover_achievement_rent_rate <= 20
@@ -1096,22 +1074,6 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                       `}
                                     >
                                       {store.turnover_rate_achievement > 0 ? store.turnover_achievement_rent_rate.toFixed(1) + '%' : '-'}
-                                    </td>
-                                    <td
-                                      className={`
-                                        p-2 text-right bg-white font-semibold
-                                        ${
-                                          store.turnover_rate_achievement > 0 && store.turnover_achievement_labor_rate > 0
-                                            ? store.turnover_achievement_labor_rate <= 10
-                                              ? 'text-green-600'
-                                              : store.turnover_achievement_labor_rate <= 12
-                                                ? 'text-yellow-600'
-                                                : 'text-red-600'
-                                            : 'text-gray-400'
-                                        }
-                                      `}
-                                    >
-                                      {store.turnover_rate_achievement > 0 && store.turnover_achievement_labor_rate > 0 ? store.turnover_achievement_labor_rate.toFixed(1) + '%' : '-'}
                                     </td>
                                   </tr>
                                 </React.Fragment>
@@ -1182,14 +1144,8 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                           </td>
                           
                           {/* 턴오버 달성시 지표 */}
-                          <td className="p-3 text-right border-r border-gray-300 bg-green-50">
-                            {formatPercent(avgTurnoverDirectProfitRate, 1)}
-                          </td>
-                          <td className="p-3 text-right border-r border-gray-300 bg-green-50">
-                            {formatPercent(avgTurnoverRentRate, 1)}
-                          </td>
                           <td className="p-3 text-right bg-green-50">
-                            {formatPercent(avgTurnoverLaborRate, 1)}
+                            {formatPercent(avgTurnoverRentRate, 1)}
                           </td>
                         </tr>
                       );
