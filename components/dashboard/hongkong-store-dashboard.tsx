@@ -809,19 +809,19 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       <th colSpan={3} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
                         <span>현재 지표</span>
                       </th>
-                      <th colSpan={1} className="text-center p-2 font-bold bg-green-50">
-                        <span>턴오버 100% 달성시 지표</span>
+                      <th colSpan={1} className="text-center p-2 font-bold bg-green-50 w-24">
+                        <span>턴오버 100% 달성시</span>
                       </th>
                     </tr>
                     {/* 컬럼 헤더 행 */}
                     <tr className="bg-gray-100 border-b-2 border-gray-300">
                       {/* 현재 지표 그룹 */}
-                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50">직접이익률<br/>(%)</th>
-                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50">임차료율<br/>(%)</th>
-                      <th className="text-center p-2 font-semibold border-r-2 border-gray-400 bg-blue-50">인건비율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">직접이익률<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">임차료율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold border-r-2 border-gray-400 bg-blue-50 w-24">인건비율<br/>(%)</th>
                       
                       {/* 턴오버 달성시 지표 그룹 */}
-                      <th className="text-center p-2 font-semibold bg-green-50">임차료율<br/>(%)</th>
+                      <th className="text-center p-2 font-semibold bg-green-50 w-24">임차료율<br/>(%)</th>
                     </tr>
                   </thead>
                   <tbody>
