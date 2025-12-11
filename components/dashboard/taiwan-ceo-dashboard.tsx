@@ -970,7 +970,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
               <span className="text-3xl mr-3">🏢</span>
-              대만법인 경영실적 (MLB 기준)
+              대만법인 경영실적 (MLB 기준, 1K HKD)
             </h2>
             <button
               onClick={toggleAllDetails}
@@ -991,13 +991,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-blue-500 hover:shadow-xl transition-shadow min-h-[400px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">📊</span>
-                <h3 className="text-sm font-semibold text-gray-600">실판매출 (V-, 1K HKD)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">실판매출 (V-)</h3>
               </div>
-              <div className="text-3xl font-bold text-red-600 mb-2">
-                {formatNumber(pl?.net_sales)}
+              <div className="text-3xl font-bold text-gray-900 mb-2">
+                {formatNumber(pl?.net_sales)}K
               </div>
-              <div className="text-sm text-red-600 font-semibold mb-3">
-                YOY {formatPercent(plYoy?.net_sales)}% (△{formatNumber(Math.abs(plChange?.net_sales || 0))})
+              <div className={`text-sm font-semibold mb-3 ${(plYoy?.net_sales || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                YOY {formatPercent(plYoy?.net_sales)}% ({(plChange?.net_sales || 0) >= 0 ? '+' : '△'}{formatNumber(Math.abs(plChange?.net_sales || 0))}K)
               </div>
               
               {/* 채널별 상세보기 */}
@@ -1177,7 +1177,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-orange-500 hover:shadow-xl transition-shadow min-h-[400px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">💰</span>
-                <h3 className="text-sm font-semibold text-gray-600">영업이익 (1K HKD)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">영업이익</h3>
               </div>
               <div className={`text-3xl font-bold mb-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatNumber(pl?.operating_profit || 0)}
@@ -1382,7 +1382,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
                   <span className="text-2xl mr-2">📈</span>
-                  <h3 className="text-sm font-semibold text-gray-600">영업비 (1K HKD)</h3>
+                  <h3 className="text-sm font-semibold text-gray-600">영업비</h3>
                 </div>
                 
                 {/* 당월/누적 토글 */}
@@ -2003,10 +2003,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div>
                   <div className="text-xs text-gray-500 mb-1">25F</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatNumber(seasonSales?.current_season_f?.november?.total_net_sales || 0)}
+                    {formatNumber(Math.round((seasonSales?.current_season_f?.november?.total_net_sales || 0) / 1000))}
               </div>
                   <div className="text-xs font-semibold">
-                    <span className="text-gray-600">전년 {formatNumber(seasonSales?.previous_season_f?.november?.total_net_sales || 0)}</span>
+                    <span className="text-gray-600">전년 {formatNumber(Math.round((seasonSales?.previous_season_f?.november?.total_net_sales || 0) / 1000))}</span>
                   </div>
                   <div className="text-xs font-semibold">
                     <span className="text-green-600">YOY {formatPercent(((seasonSales?.current_season_f?.november?.total_net_sales || 0) / (seasonSales?.previous_season_f?.november?.total_net_sales || 1)) * 100)}%</span>
@@ -2053,12 +2053,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         const prevItemTop5 = seasonSales?.previous_season_f?.november?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
                         const prevItemDetail = seasonSales?.previous_season_f?.november?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
                       const prevItem = prevItemTop5 || prevItemDetail;
-                      const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 999;
+                      const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 0;
                       return (
                         <div key={idx} className="flex justify-between text-xs">
                           <span className="text-gray-600">{item.subcategory_code}</span>
                           <span className="font-semibold">
-                            {formatNumber(item.net_sales)} 
+                            {formatNumber(Math.round(item.net_sales / 1000))} 
                             <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                           </span>
                         </div>
@@ -2118,12 +2118,21 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               
               <div className="text-3xl font-bold text-indigo-600 mb-1">
-                {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0, 1)}%
+                {formatPercent(seasonSales?.current_season_f?.november?.sell_through?.rate || 0, 1)}%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(seasonSales?.previous_season_f?.accumulated?.sales_rate || 0, 1)}%</span> | 
-                <span className={(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}> 
-                  전년비 {(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? '+' : ''}{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0, 1)}%p
+                <span className="text-gray-600">전년 {formatPercent(seasonSales?.previous_season_f?.november?.sell_through?.rate || 0, 1)}%</span> | 
+                <span className={((() => {
+                  const curr = seasonSales?.current_season_f?.november?.sell_through?.rate || 0;
+                  const prev = seasonSales?.previous_season_f?.november?.sell_through?.rate || 0;
+                  return curr - prev;
+                })()) >= 0 ? 'text-green-600' : 'text-red-600'}> 
+                  전년비 {(() => {
+                    const curr = seasonSales?.current_season_f?.november?.sell_through?.rate || 0;
+                    const prev = seasonSales?.previous_season_f?.november?.sell_through?.rate || 0;
+                    const diff = curr - prev;
+                    return (diff >= 0 ? '+' : '') + formatPercent(Math.abs(diff), 1);
+                  })()}%p
                 </span>
               </div>
               
@@ -2132,15 +2141,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">입고</span>
                   <span className="text-sm font-bold text-red-600">
-                    {formatNumber(seasonSales?.current_season_f?.accumulated?.net_acp_p || 0)} 
-                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%) 🔽
+                    {formatNumber(seasonSales?.current_season_f?.november?.sell_through?.receiving_tag || 0)} 
+                    ({formatPercent(seasonSales?.current_season_f?.november?.sell_through?.receiving_yoy || 0)}%) 🔽
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">판매금액</span>
                   <span className="text-sm font-bold text-green-600">
-                    {formatNumber(seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0)} 
-                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0)}%) ✓
+                    {formatNumber(seasonSales?.current_season_f?.november?.sell_through?.sales_tag || 0)} 
+                    ({formatPercent(seasonSales?.current_season_f?.november?.sell_through?.sales_yoy || 0)}%) ✓
                   </span>
                 </div>
               </div>
@@ -2162,51 +2171,19 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               {showCurrentSeasonDetail && (
                 <>
-                  {/* 재고 경보 및 대응 전략 */}
-                  <div className="mt-3 pt-3 border-t bg-gradient-to-r from-orange-100 to-red-100 rounded-lg p-3 border-2 border-orange-500">
-                    <div className="flex items-start">
-                      <div className="flex-1">
-                        <div className="text-xs text-red-700 leading-tight space-y-1">
-                          {(() => {
-                            const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
-                            const tsItem = subcategoryDetail.find((item: any) => item.subcategory_code === 'TS');
-                            const ptItem = subcategoryDetail.find((item: any) => item.subcategory_code === 'PT');
-                            return (
-                              <>
-                                {tsItem && (
-                                  <div>
-                                    • <span className="font-semibold">T/SHIRTS</span>: 판매율 {formatPercent(tsItem.sales_rate, 1)}%
-                                  </div>
-                                )}
-                                {ptItem && (
-                                  <div>
-                                    • <span className="font-semibold">PANTS</span>: 판매율 {formatPercent(ptItem.sales_rate, 1)}%
-                                  </div>
-                                )}
-                                <div className="pt-1 border-t border-red-300">→ <span className="font-semibold">26SS 조기운영</span>으로 대응 (대만 시장 특성 반영)</div>
-                              </>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-              
-                  {/* 카테고리별 입고/판매율 */}
+                  {/* 서브카테고리별 입고/판매율 */}
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-xs font-semibold text-gray-700 mb-2">카테고리별 입고YOY/판매율</div>
                     <div className="space-y-1">
                       {(() => {
-                        const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
-                        // 입고 높은순으로 정렬
-                        const sorted = [...subcategoryDetail].sort((a: any, b: any) => (b.net_acp_p || 0) - (a.net_acp_p || 0));
-                        // 상위 5개만 표시
-                        return sorted.slice(0, 5).map((item: any, idx: number) => (
+                        const subcategoryDetail = seasonSales?.current_season_f?.november?.sell_through?.subcategory_detail || [];
+                        // 입고 높은순으로 이미 정렬되어 있음, 상위 10개만 표시
+                        return subcategoryDetail.slice(0, 10).map((item: any, idx: number) => (
                           <div key={idx} className="flex justify-between text-xs">
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
-                              <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
-                              <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
+                              <span className={(item.receiving_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.receiving_yoy || 0)}%</span> / 
+                              <span className={(item.sell_through || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sell_through || 0, 1)}%</span>
                             </span>
                           </div>
                         ));
@@ -2226,12 +2203,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <span className="text-2xl mr-2">📦</span>
                 <h3 className="text-sm font-semibold text-gray-600">ACC 재고주수</h3>
               </div>
-              <div className="text-3xl font-bold text-green-600 mb-2">
+              <div className={`text-3xl font-bold mb-2 ${(accStock?.total?.current?.stock_weeks || 0) >= 35 ? 'text-red-600' : (accStock?.total?.current?.stock_weeks || 0) >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
                 {formatStockWeeks(accStock?.total?.current?.stock_weeks || 0)}주
               </div>
               <div className="text-sm font-semibold mb-3">
                 <span className="text-gray-600">전년 {formatStockWeeks(accStock?.total?.previous?.stock_weeks || 0)}주</span> | 
-                <span className="text-green-600"> YOY △{formatStockWeeks((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0))}주</span>
+                <span className={((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? 'text-red-600' : 'text-green-600'}>
+                  {((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)))}주
+                </span>
               </div>
               
               <div className="bg-pink-50 rounded p-2 mb-3">
@@ -2285,7 +2264,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-amber-500 hover:shadow-xl transition-shadow min-h-[150px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">🏭</span>
-                <h3 className="text-sm font-semibold text-gray-600">기말재고 (TAG, 1K HKD)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">기말재고 (TAG)</h3>
               </div>
               <div className="text-3xl font-bold text-green-600 mb-2">
                 {formatNumber(endingInventory?.total?.current)}
@@ -2312,14 +2291,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               {showEndInventoryDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">당시즌 F (25F)</span>
+                    <span className="text-gray-600">25F</span>
                     <span className="font-semibold">
                       {formatNumber(endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0)} 
                       <span className={yoySeasonF >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonF)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">당시즌 S (25S)</span>
+                    <span className="text-gray-600">25S</span>
                     <span className="font-semibold">
                       {formatNumber(endingInventory?.by_season?.['당시즌_SS']?.current?.stock_price || 0)} 
                       <span className={yoySeasonS >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonS)}%)</span>
@@ -2375,7 +2354,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-red-500 hover:shadow-xl transition-shadow min-h-[150px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">📦</span>
-                <h3 className="text-sm font-semibold text-gray-600">과시즌 재고 (TAG, 1K HKD)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">과시즌 재고 (TAG)</h3>
               </div>
               <div className="text-3xl font-bold text-red-600 mb-2">
                 {formatNumber((pastSeasonFW?.total?.current || 0) + (endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0))}
@@ -3269,10 +3248,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
       <div className="mt-4 grid grid-cols-3 gap-4">
         {/* ① 2025년 채널별 실판매출 추세 (1K HKD) */}
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-            2025년 채널별 실판매출 추세 (1K HKD)
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-gray-900 flex items-center whitespace-nowrap">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              2025년 채널별 실판매출 추세 (1K HKD)
+            </h3>
+          </div>
 
           <ResponsiveContainer width="100%" height={250}>
             <BarChart 
@@ -3296,7 +3277,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               <YAxis
                 tick={{ fontSize: 11 }}
                 domain={[0, 26000]}
+                ticks={[0, 6500, 13000, 19500, 26000]}
                 tickFormatter={(value) => value.toLocaleString()}
+                allowDecimals={false}
+                width={60}
               />
               <Tooltip 
                 formatter={(value: any, name: string) => [
@@ -3948,7 +3932,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   stroke="#FFD4B3"
                   strokeWidth={3}
                   dot={{ r: 4 }}
-                  name="🍂 당시즌F"
+                  name="🍂 25F"
                 />
                 <Line
                   type="monotone"
@@ -3956,7 +3940,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   stroke="#B3E5FC"
                   strokeWidth={3}
                   dot={{ r: 4 }}
-                  name="☀️ 당시즌S"
+                  name="☀️ 25S"
                 />
                 <Line
                   type="monotone"
@@ -4013,40 +3997,38 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   const 당시즌F = Math.round(
                     (salesPriceType === '실판'
                       ? item.당시즌F?.net_sales
-                      : item.당시즌F?.gross_sales || 0) / 1000,
+                      : item.당시즌F?.gross_sales || 0),
                   );
                   const 당시즌S = Math.round(
                     (salesPriceType === '실판'
                       ? item.당시즌S?.net_sales
-                      : item.당시즌S?.gross_sales || 0) / 1000,
+                      : item.당시즌S?.gross_sales || 0),
                   );
                   const 과시즌F = Math.round(
                     (salesPriceType === '실판'
                       ? item.과시즌F?.net_sales
-                      : item.과시즌F?.gross_sales || 0) / 1000,
+                      : item.과시즌F?.gross_sales || 0),
                   );
                   const 과시즌S = Math.round(
                     (salesPriceType === '실판'
                       ? item.과시즌S?.net_sales
-                      : item.과시즌S?.gross_sales || 0) / 1000,
+                      : item.과시즌S?.gross_sales || 0),
                   );
                   const 모자 = Math.round(
-                    (salesPriceType === '실판' ? item.모자?.net_sales || 0 : item.모자?.gross_sales || 0) /
-                      1000,
+                    (salesPriceType === '실판' ? item.모자?.net_sales || 0 : item.모자?.gross_sales || 0),
                   );
                   const 신발 = Math.round(
-                    (salesPriceType === '실판' ? item.신발?.net_sales || 0 : item.신발?.gross_sales || 0) /
-                      1000,
+                    (salesPriceType === '실판' ? item.신발?.net_sales || 0 : item.신발?.gross_sales || 0),
                   );
                   const 가방 = Math.round(
                     (salesPriceType === '실판'
                       ? item.가방?.net_sales || 0
-                      : item.가방?.gross_sales || 0) / 1000,
+                      : item.가방?.gross_sales || 0),
                   );
                   const 기타ACC = Math.round(
                     (salesPriceType === '실판'
                       ? item.기타ACC?.net_sales || 0
-                      : item.기타ACC?.gross_sales || 0) / 1000,
+                      : item.기타ACC?.gross_sales || 0),
                   );
                   const total =
                     당시즌F + 당시즌S + 과시즌F + 과시즌S + 모자 + 신발 + 가방 + 기타ACC;
@@ -4076,7 +4058,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <YAxis 
                   tick={{ fontSize: 11 }} 
                   domain={[0, 26000]}
-                  ticks={[0, 13000, 26000]}
+                  ticks={[0, 6500, 13000, 19500, 26000]}
                   tickFormatter={(value) => value.toLocaleString()}
                   allowDecimals={false}
                   width={60}
@@ -4095,8 +4077,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   }}
                 />
                 {/* 레이블 부분은 기존 대만 코드 그대로 써도 무방 */}
-                <Bar dataKey="당시즌F" stackId="a" fill="#FFD4B3" />
-                <Bar dataKey="당시즌S" stackId="a" fill="#B3E5FC" />
+                <Bar dataKey="당시즌F" stackId="a" fill="#FFD4B3" name="25F" />
+                <Bar dataKey="당시즌S" stackId="a" fill="#B3E5FC" name="25S" />
                 <Bar dataKey="과시즌F" stackId="a" fill="#FFB3BA" />
                 <Bar dataKey="과시즌S" stackId="a" fill="#B2F5EA" />
                 <Bar dataKey="모자" stackId="a" fill="#93C5FD" />
@@ -4111,10 +4093,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="mt-3 flex flex-wrap gap-2 justify-center">
             {[
               { name: '전체', color: '#E5E7EB', emoji: '📊' },
-              { name: '당시즌F', color: '#FFD4B3', emoji: '🍂' },
-              { name: '당시즌S', color: '#B3E5FC', emoji: '☀️' },
-              { name: '과시즌F', color: '#FFB3BA', emoji: '🍂' },
-              { name: '과시즌S', color: '#B2F5EA', emoji: '☀️' },
+              { name: '당시즌F', color: '#FFD4B3', emoji: '🍂', displayName: '25F' },
+              { name: '당시즌S', color: '#B3E5FC', emoji: '☀️', displayName: '25S' },
+              { name: '과시즌F', color: '#FFB3BA', emoji: '🍂', displayName: '과시즌F' },
+              { name: '과시즌S', color: '#B2F5EA', emoji: '☀️', displayName: '과시즌S' },
               { name: '모자', color: '#93C5FD', emoji: '🧢' },
               { name: '신발', color: '#FCD34D', emoji: '👟' },
               { name: '가방', color: '#C4B5FD', emoji: '👜' },
@@ -4136,7 +4118,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   borderColor: selectedItem === item.name ? '#EA580C' : '#D1D5DB'
                 }}
               >
-                  {item.emoji} {item.name}
+                  {item.emoji} {item.displayName || item.name}
               </button>
             ))}
           </div>
@@ -4159,7 +4141,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       let 과시즌S = (dashboardData?.monthly_item_yoy as any)?.['과시즌S']?.[idx] || 0;
                       let 모자 = (dashboardData?.monthly_item_yoy as any)?.['모자']?.[idx] || 0;
                       let 신발 = (dashboardData?.monthly_item_yoy as any)?.['신발']?.[idx] || 0;
-                      let 가방외 = (dashboardData?.monthly_item_yoy as any)?.['가방외']?.[idx] || 0;
+                      let 가방 = (dashboardData?.monthly_item_yoy as any)?.['가방']?.[idx] || 0;
+                      let 기타ACC = (dashboardData?.monthly_item_yoy as any)?.['기타ACC']?.[idx] || 0;
                       
                       if (isLastMonth) {
                         // 마지막 월(10월)은 카드의 YOY 사용
@@ -4168,13 +4151,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         const prevSeasonF = seasonSales?.previous_season_f?.october?.total_net_sales || 0;
                         당시즌F = prevSeasonF > 0 ? Math.round((currentSeasonF / prevSeasonF) * 100) : 0;
                         
-                        // 모자, 신발, 가방외는 accStock?.october_sales 사용
+                        // 모자, 신발, 가방, 기타ACC는 accStock?.october_sales 사용
                         const heaSales = accStock?.october_sales ? (accStock.october_sales as any)?.HEA : undefined;
                         const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
                         const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
+                        const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
                         모자 = Math.round(heaSales?.yoy || 0);
                         신발 = Math.round(shoSales?.yoy || 0);
-                        가방외 = Math.round(bagSales?.yoy || 0);
+                        가방 = Math.round(bagSales?.yoy || 0);
+                        기타ACC = Math.round(atcSales?.yoy || 0);
                         
                         // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
                         const lastMonthData = item;
@@ -4204,7 +4189,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         과시즌S,
                         모자,
                         신발,
-                        가방외,
+                        가방,
+                        기타ACC,
                       };
                     })} 
                     margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
@@ -4216,8 +4202,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       formatter={(value: any) => [`${value}%`, 'YOY']}
                       contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                     />
-                    <Line type="monotone" dataKey="당시즌F" stroke="#FFD4B3" strokeWidth={2} name="🍂 당시즌F" />
-                    <Line type="monotone" dataKey="당시즌S" stroke="#B3E5FC" strokeWidth={2} name="☀️ 당시즌S" />
+                    <Line type="monotone" dataKey="당시즌F" stroke="#FFD4B3" strokeWidth={2} name="🍂 25F" />
+                    <Line type="monotone" dataKey="당시즌S" stroke="#B3E5FC" strokeWidth={2} name="☀️ 25S" />
                     <Line type="monotone" dataKey="과시즌F" stroke="#FFB3BA" strokeWidth={2} name="🍂 과시즌F" />
                     <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={2} name="☀️ 과시즌S" />
                     <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={2} name="🧢 모자" />
@@ -4249,10 +4235,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           // 신발은 accStock?.october_sales 사용
                           const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
                           yoy = Math.round(shoSales?.yoy || 0);
-                        } else if (selectedItem === '가방외') {
-                          // 가방외는 accStock?.october_sales 사용
+                        } else if (selectedItem === '가방') {
+                          // 가방은 accStock?.october_sales 사용
                           const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
                           yoy = Math.round(bagSales?.yoy || 0);
+                        } else if (selectedItem === '기타ACC') {
+                          // 기타ACC는 accStock?.october_sales 사용
+                          const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
+                          yoy = Math.round(atcSales?.yoy || 0);
                         } else {
                           // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
                           const lastMonthData = item;
@@ -4296,7 +4286,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         selectedItem === '과시즌S' ? '#5EEAD4' :
                         selectedItem === '모자' ? '#93C5FD' :
                         selectedItem === '신발' ? '#FCD34D' :
-                        selectedItem === '가방외' ? '#C4B5FD' :
+                        selectedItem === '가방' ? '#C4B5FD' :
+                        selectedItem === '기타ACC' ? '#9CA3AF' :
                         '#F59E0B'
                       } 
                       strokeWidth={2} 
@@ -4343,10 +4334,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                   // 신발은 accStock?.october_sales 사용
                                   const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
                                   yoy = Math.round(shoSales?.yoy || 0);
-                                } else if (item === '가방외') {
-                                  // 가방외는 accStock?.october_sales 사용
+                                } else if (item === '가방') {
+                                  // 가방은 accStock?.october_sales 사용
                                   const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
                                   yoy = Math.round(bagSales?.yoy || 0);
+                                } else if (item === '기타ACC') {
+                                  // 기타ACC는 accStock?.october_sales 사용
+                                  const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
+                                  yoy = Math.round(atcSales?.yoy || 0);
                                 } else {
                                   // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
                                   const prevYearMonth = (dashboardData?.monthly_item_data || []).find((d: any) => {
@@ -4787,8 +4782,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="flex flex-wrap gap-2 justify-center">
               {[
                 { name: '전체', color: '#E5E7EB', displayName: '전체', emoji: '📊' },
-                { name: 'F당시즌', color: '#FED7AA', displayName: '당시즌F', emoji: '🍂' },
-                { name: 'S당시즌', color: '#A5F3FC', displayName: '당시즌S', emoji: '☀️' },
+                { name: 'F당시즌', color: '#FED7AA', displayName: '25F', emoji: '🍂' },
+                { name: 'S당시즌', color: '#A5F3FC', displayName: '25S', emoji: '☀️' },
                 { name: '과시즌FW', color: '#FCA5A5', displayName: '과시즌F', emoji: '❄️' },
                 { name: '과시즌SS', color: '#5EEAD4', displayName: '과시즌S', emoji: '🌊' },
                 { name: '모자', color: '#93C5FD', displayName: '모자', emoji: '🧢' },
