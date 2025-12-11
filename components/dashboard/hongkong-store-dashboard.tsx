@@ -689,7 +689,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           >
             <div className="flex items-center gap-2">
               <span className="text-blue-600 text-sm">ℹ️</span>
-              <h3 className="text-xs font-semibold text-gray-800">턴오버 임차료 기준</h3>
+              <h3 className="text-xs font-semibold text-gray-800">턴오버 기준율</h3>
             </div>
             {showTurnoverRentExplanation ? (
               <ChevronDown className="w-4 h-4 text-gray-600" />
@@ -818,7 +818,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       {/* 현재 지표 그룹 */}
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">직접이익률<br/>(%)</th>
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">임차료율<br/>(%)</th>
-                      <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">턴오버<br/>기준율(%)</th>
+                      <th className="text-right p-2 font-semibold border-r border-gray-300 bg-purple-100 w-24">턴오버기준율<br/>(%)</th>
                       <th className="text-right p-2 font-semibold border-r-2 border-gray-400 bg-blue-50 w-24">인건비율<br/>(%)</th>
                       
                       {/* 턴오버 달성시 지표 그룹 */}
@@ -993,14 +993,17 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                               <td className="p-2 text-right border-r border-gray-300 bg-white">
                                 {avgRentRate.toFixed(1)}%
                               </td>
-                              <td className="p-2 text-right border-r border-gray-300 bg-white">
+                              <td className="p-2 text-right border-r border-gray-300 bg-white text-blue-600">
                                 {(() => {
-                                  const storesWithTurnover = stores.filter(s => s.turnover_rate_achievement > 0);
-                                  const avgTurnoverRate = storesWithTurnover.length > 0
-                                    ? storesWithTurnover.reduce((sum, s) => {
-                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.shop_cd];
+                                  const storesWithRate = stores.filter(s => {
+                                    const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.store_code];
+                                    return turnoverData?.turnover_rate;
+                                  });
+                                  const avgTurnoverRate = storesWithRate.length > 0
+                                    ? storesWithRate.reduce((sum, s) => {
+                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.store_code];
                                         return sum + (turnoverData?.turnover_rate || 0) * 100;
-                                      }, 0) / storesWithTurnover.length
+                                      }, 0) / storesWithRate.length
                                     : 0;
                                   return avgTurnoverRate > 0 ? avgTurnoverRate.toFixed(1) + '%' : '-';
                                 })()}
@@ -1082,7 +1085,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                     </td>
                                     <td className="p-2 text-right border-r border-gray-300 bg-white font-semibold text-blue-600">
                                       {(() => {
-                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[store.shop_cd];
+                                        const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[store.store_code];
                                         return turnoverData?.turnover_rate ? (turnoverData.turnover_rate * 100).toFixed(1) + '%' : '-';
                                       })()}
                                     </td>
@@ -1196,13 +1199,17 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                           </td>
                           <td className="p-3 text-right border-r border-gray-300 bg-blue-50 font-semibold text-blue-800">
                             {(() => {
-                              const avgTurnoverRate = allStoresWithTurnover.length > 0
-                                ? allStoresWithTurnover.reduce((sum, s) => {
-                                    const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.shop_cd];
+                              const allStoresWithRate = allStoresWithTurnover.filter(s => {
+                                const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.store_code];
+                                return turnoverData?.turnover_rate;
+                              });
+                              const avgTurnoverRate = allStoresWithRate.length > 0
+                                ? allStoresWithRate.reduce((sum, s) => {
+                                    const turnoverData = (storeTurnoverTargetsData as any)?.store_turnover_targets?.[s.store_code];
                                     return sum + (turnoverData?.turnover_rate || 0) * 100;
-                                  }, 0) / allStoresWithTurnover.length
+                                  }, 0) / allStoresWithRate.length
                                 : 0;
-                              return avgTurnoverRate > 0 ? formatPercent(avgTurnoverRate, 1) : '-';
+                              return avgTurnoverRate > 0 ? avgTurnoverRate.toFixed(1) + '%' : '-';
                             })()}
                           </td>
                           <td className="p-3 text-right border-r-2 border-gray-400 bg-blue-50">
@@ -1315,381 +1322,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
             : 0;
           
           // 변화량 계산
-          const salesIncrease = turnoverAchievementHkTotalSales - hkTotalSales;
-          const salesIncreaseRate = hkTotalSales > 0 ? (salesIncrease / hkTotalSales) * 100 : 0;
-          const directProfitChange = turnoverAchievementHkTotalDirectProfit - hkCurrentDirectProfit;
-          const operatingProfitChange = turnoverAchievementHkTotalOperatingProfit - hkCurrentOperatingProfit;
-          const rentRateChange = turnoverAchievementHkTotalRentRate - hkCurrentRentRate;
-          const laborRateChange = turnoverAchievementHkTotalLaborCostRate - hkCurrentLaborCostRate;
-          const directProfitRateChange = turnoverAchievementHkTotalDirectProfitRate - hkCurrentDirectProfitRate;
-          const operatingProfitRateChange = turnoverAchievementHkTotalOperatingProfitRate - hkCurrentOperatingProfitRate;
-
-                    return (
-            <div className="mb-4 bg-white rounded-lg shadow-md p-4">
-              <div className="mb-2">
-                <h2 className="text-sm font-semibold text-gray-900">
-                  3. 매출증가에 따른 손익구조 시뮬레이션
-                  <span className="ml-1 text-xs align-middle text-gray-600">*(마카오 제외)</span>
-                </h2>
-                      </div>
-              
-              {/* AI 분석 */}
-              {(() => {
-                const defaultText = `턴오버 100% 달성 시 ${formatPercent(salesIncreaseRate, 1)}의 매출 증가로 영업이익이 ${formatNumber(operatingProfitChange)}K HKD 개선되며, 영업이익률은 ${formatPercent(hkCurrentOperatingProfitRate, 1)}에서 ${formatPercent(turnoverAchievementHkTotalOperatingProfitRate, 1)}로 상승합니다. BEP(손익분기점) 달성을 위해서는 추가적인 매출 증가가 필요합니다.`;
-                const displayText = aiAnalysisTexts['section3'] || defaultText;
-
-                  return (
-                  <div className="mb-4 p-3 bg-purple-50 border-l-4 border-purple-500 rounded">
-                    {editingAiAnalysis === 'section3' ? (
-                      <div>
-                        <textarea
-                          className="w-full text-xs p-2 border border-purple-300 rounded"
-                          rows={3}
-                          value={displayText}
-                          onChange={(e) => setAiAnalysisTexts({ ...aiAnalysisTexts, section3: e.target.value })}
-                          onBlur={() => saveAiAnalysis('section3', displayText)}
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => saveAiAnalysis('section3', displayText)}
-                            className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
-                          >
-                            저장
-                          </button>
-                          <button
-                            onClick={() => {
-                              const newTexts = { ...aiAnalysisTexts };
-                              delete newTexts['section3'];
-                              setAiAnalysisTexts(newTexts);
-                              localStorage.setItem('hongkong-store-ai-analysis', JSON.stringify(newTexts));
-                              setEditingAiAnalysis(null);
-                            }}
-                            className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500"
-                          >
-                            기본값으로 복원
-                          </button>
-                          <button
-                            onClick={() => setEditingAiAnalysis(null)}
-                            className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                          >
-                            취소
-                          </button>
-                          </div>
-                            </div>
-                    ) : (
-                      <div className="flex items-start justify-between">
-                        <p className="text-xs text-gray-700 flex-1">
-                          <span className="font-semibold text-purple-700">💡 AI 분석:</span> {displayText}
-                        </p>
-                        <button
-                          onClick={() => setEditingAiAnalysis('section3')}
-                          className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
-                        >
-                          수정
-                        </button>
-                            </div>
-                    )}
-                    </div>
-                  );
-                })()}
-
-              <div className="grid grid-cols-4 gap-4">
-                {/* 1. 현재 상태 */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
-                  <div className="text-center mb-3">
-                    <div className="text-sm font-bold text-gray-800">홍콩 10월 실적</div>
-              </div>
-                  <div className="space-y-3">
-                    <div className="pb-2 border-b border-gray-200">
-                      <div className="text-xs text-gray-500 mb-1">매출액</div>
-                      <div className="text-lg font-bold text-gray-900">{formatNumber(hkTotalSales)}K</div>
-                </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <div className="text-gray-500">임차료</div>
-                        <div className="font-semibold text-gray-800">{formatNumber(hkTotalRent)}K</div>
-                        <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentRentRate, 1)}</div>
-              </div>
-                      <div>
-                        <div className="text-gray-500">인건비</div>
-                        <div className="font-semibold text-gray-800">{formatNumber(hkTotalLaborCost)}K</div>
-                        <div className="text-gray-400 text-[10px]">{formatPercent(hkCurrentLaborCostRate, 1)}</div>
-          </div>
-        </div>
-                    <div className="pt-2 border-t border-gray-300">
-                      <div className="text-xs text-gray-500 mb-1">직접이익</div>
-                      <div className={`text-xl font-bold ${hkCurrentDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatNumber(hkCurrentDirectProfit)}K
-              </div>
-                      <div className="text-[10px] text-gray-400">{formatPercent(hkCurrentDirectProfitRate, 1)}</div>
-                </div>
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">영업이익</div>
-                      <div className={`text-xl font-bold ${hkCurrentOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatNumber(hkCurrentOperatingProfit)}K
-              </div>
-                      <div className="text-[10px] text-gray-400">{formatPercent(hkCurrentOperatingProfitRate, 1)}</div>
-          </div>
-        </div>
-                </div>
-                
-                {/* 세 번째: 1차 목표 달성시 (BEP: 영업이익 0) */}
-          {(() => {
-                  // 1차 목표: BEP(영업이익 0) 달성 (매출총이익으로 고정비 회수)
-                  const targetOperatingProfitRate = 0.0;
-                  
-                  // 현재 오프라인 매출 기준으로 계산
-                  // 현재 오프라인 직접이익과 영업이익 (pl-data 기준)
-                  const currentHkOfflineDirectProfit = (plData as any)?.channel_direct_profit?.hk_offline?.direct_profit || 0;
-                  const currentHkOfflineOperatingProfit = currentHkOfflineDirectProfit - hkTotalSgA;
-                  
-                  // 현재 오프라인 매출 기준 매출총이익 계산
-                  // 직접이익 = 매출총이익 - 임차료 - 인건비
-                  // 매출총이익 = 직접이익 + 임차료 + 인건비
-                  const currentHkOfflineGrossProfit = currentHkOfflineDirectProfit + hkTotalRent + hkTotalLaborCost;
-                  const currentHkOfflineGrossProfitRate = currentHkOfflineSales > 0 
-                    ? (currentHkOfflineGrossProfit / currentHkOfflineSales) * 100 
-                    : 0;
-                  
-                  // 고정비용 (임차료 + 인건비 + 영업비) - 모두 고정
-                  const fixedCosts = hkTotalRent + hkTotalLaborCost + hkTotalSgA;
-                  
-                  // BEP(영업이익 0) 달성을 위한 필요 오프라인 매출 계산
-                  // 영업이익 = 매출 * 0.0
-                  // 영업이익 = 직접이익 - 영업비
-                  // 직접이익 = 매출총이익 - 임차료 - 인건비
-                  // 매출총이익 = 매출 * 매출총이익률
-                  // 따라서: 0 = (매출 * 매출총이익률 - 임차료 - 인건비) - 영업비
-                  // 0 = 매출 * 매출총이익률 - 고정비용
-                  // 매출 * 매출총이익률 = 고정비용
-                  // 매출 = 고정비용 / 매출총이익률
-                  const grossProfitRateDecimal = currentHkOfflineGrossProfitRate / 100;
-                  const targetRateDecimal = targetOperatingProfitRate / 100;
-                  
-                  // 분모가 양수인지 확인 (매출총이익률이 0보다 커야 함)
-                  const denominator = grossProfitRateDecimal - targetRateDecimal;
-                  
-                  // 목표 달성을 위한 오프라인 매출 계산
-                  const primaryTargetOfflineSales = denominator > 0 
-                    ? fixedCosts / denominator
-                    : currentHkOfflineSales;
-                  
-                  // 오프라인 매출 증가분
-                  const primaryTargetOfflineSalesIncrease = primaryTargetOfflineSales - currentHkOfflineSales;
-                  
-                  // 전체 홍콩 매출 = 현재 전체 매출 + 오프라인 매출 증가분 (온라인 매출은 고정)
-                  const primaryTargetHkTotalSales = hkTotalSales + primaryTargetOfflineSalesIncrease;
-                  
-                  // 검증: 계산된 매출로 영업이익률이 정확히 5%가 되는지 확인
-                  // (이미 위에서 계산했지만, 매출액이 먼저 표시되도록 순서 확인)
-                  
-                  // 1차 목표 달성시 오프라인 매출 기준으로 계산
-                  // 현재 오프라인 매출원가율 계산
-                  const currentHkOfflineCogs = currentHkOfflineSales - currentHkOfflineGrossProfit;
-                  const currentHkOfflineCogsRate = currentHkOfflineSales > 0 
-                    ? (currentHkOfflineCogs / currentHkOfflineSales) * 100 
-                    : 0;
-                  
-                  // 1차 목표 달성시 오프라인 매출원가 (현재 매출원가율 유지)
-                  const primaryTargetOfflineCogs = (primaryTargetOfflineSales * currentHkOfflineCogsRate) / 100;
-                  const primaryTargetOfflineGrossProfit = primaryTargetOfflineSales - primaryTargetOfflineCogs;
-                  
-                  // 1차 목표 달성시 오프라인 직접이익 = 매출총이익 - 임차료 - 인건비
-                  const primaryTargetOfflineDirectProfit = primaryTargetOfflineGrossProfit - hkTotalRent - hkTotalLaborCost;
-                  
-                  // 1차 목표 달성시 오프라인 직접이익 증가분
-                  const primaryTargetOfflineDirectProfitIncrease = primaryTargetOfflineDirectProfit - currentHkOfflineDirectProfit;
-                  
-                  // 1차 목표 달성시 홍콩 전체 직접이익 = 현재 전체 직접이익 + 오프라인 직접이익 증가분
-                  const primaryTargetHkTotalDirectProfit = hkTotalDirectProfit + primaryTargetOfflineDirectProfitIncrease;
-                  
-                  // 1차 목표 달성시 홍콩 전체 영업이익 = 전체 직접이익 - 영업비 (고정)
-                  const primaryTargetHkTotalOperatingProfit = primaryTargetHkTotalDirectProfit - hkTotalSgA;
-                  
-                  // 1차 목표 달성시 홍콩 전체 매출총이익 계산 (표시용)
-                  const primaryTargetHkTotalGrossProfit = primaryTargetHkTotalSales - (primaryTargetHkTotalSales * currentHkOfflineCogsRate / 100);
-                  
-                  // 1차 목표 달성시 임차료율 및 인건비율
-                  const primaryTargetRentRate = primaryTargetHkTotalSales > 0 
-                    ? (hkTotalRent / primaryTargetHkTotalSales) * 100 
-                    : 0;
-                  const primaryTargetLaborCostRate = primaryTargetHkTotalSales > 0 
-                    ? (hkTotalLaborCost / primaryTargetHkTotalSales) * 100 
-                    : 0;
-                  
-                  // 1차 목표 달성시 직접이익률 및 영업이익률
-                  const primaryTargetDirectProfitRate = primaryTargetHkTotalSales > 0 
-                    ? (primaryTargetHkTotalDirectProfit / primaryTargetHkTotalSales) * 100 
-                    : 0;
-                  const primaryTargetOperatingProfitRate = primaryTargetHkTotalSales > 0 
-                    ? (primaryTargetHkTotalOperatingProfit / primaryTargetHkTotalSales) * 100 
-                    : 0;
-                  
-                  // 변화량 계산
-                  const primaryTargetSalesIncreaseRate = currentHkOfflineSales > 0 ? (primaryTargetOfflineSalesIncrease / currentHkOfflineSales) * 100 : 0;
-                  const primaryTargetDirectProfitChange = primaryTargetHkTotalDirectProfit - hkCurrentDirectProfit;
-                  const primaryTargetOperatingProfitChange = primaryTargetHkTotalOperatingProfit - hkCurrentOperatingProfit;
-                  const primaryTargetDirectProfitRateChange = primaryTargetDirectProfitRate - hkCurrentDirectProfitRate;
-                  const primaryTargetOperatingProfitRateChange = primaryTargetOperatingProfitRate - hkCurrentOperatingProfitRate;
-                  const primaryTargetRentRateChange = primaryTargetRentRate - hkCurrentRentRate;
-                  const primaryTargetLaborCostRateChange = primaryTargetLaborCostRate - hkCurrentLaborCostRate;
-                  
-                  // 변수명 통일 (표시용)
-                  const primaryTargetDirectProfit = primaryTargetHkTotalDirectProfit;
-                  const primaryTargetOperatingProfit = primaryTargetHkTotalOperatingProfit;
-
-            return (
-                    <>
-                      {/* 변화량 표시 */}
-                      <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200 flex flex-col justify-center">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-center pb-3 border-b border-indigo-300">
-                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full p-3 shadow-lg">
-                              <ArrowRight className="w-12 h-12 text-white" strokeWidth={3.5} />
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-xs text-gray-500 mb-1">매출 증가</div>
-                            <div className="text-lg font-bold text-blue-600">+{formatPercent(primaryTargetSalesIncreaseRate, 1)}</div>
-                            <div className="text-[10px] text-gray-400">+{formatNumber(primaryTargetOfflineSalesIncrease)}K</div>
-                          </div>
-                          
-                          <div className="pt-2 border-t border-indigo-200">
-                            <div className="text-xs text-gray-500 mb-1">직접이익 변화</div>
-                            <div className={`text-lg font-bold ${
-                              primaryTargetDirectProfitChange >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {primaryTargetDirectProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetDirectProfitChange)}K
-                            </div>
-                            <div className="text-[10px] text-gray-400">
-                              {primaryTargetDirectProfitRateChange >= 0 ? '+' : ''}{formatPercent(primaryTargetDirectProfitRateChange, 1)}%p
-                            </div>
-                          </div>
-                          
-                          <div className="pt-2 border-t border-indigo-200">
-                            <div className="text-xs text-gray-500 mb-1">영업이익 변화</div>
-                            <div className={`text-lg font-bold ${
-                              primaryTargetOperatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {primaryTargetOperatingProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetOperatingProfitChange)}K
-                            </div>
-                            <div className="text-[10px] text-gray-400">
-                              {primaryTargetOperatingProfitRateChange >= 0 ? '+' : ''}{formatPercent(primaryTargetOperatingProfitRateChange, 1)}%p
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* 2. 1차 목표 (BEP) */}
-                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-300">
-                      <div className="text-center mb-3">
-                        <div className="text-sm font-bold text-purple-800">1차목표, BEP수준 달성</div>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="pb-2 border-b border-purple-200">
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs text-gray-500">매출액</div>
-                            <div className="text-xs font-semibold text-purple-600">+{formatPercent(primaryTargetSalesIncreaseRate, 1)}</div>
-                          </div>
-                          <div className="text-lg font-bold text-gray-900">{formatNumber(primaryTargetHkTotalSales)}K</div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <div className="text-gray-500">임차료</div>
-                            <div className="font-semibold text-gray-800">{formatNumber(hkTotalRent)}K</div>
-                            <div className="text-gray-400 text-[10px]">{formatPercent(primaryTargetRentRate, 1)}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-500">인건비</div>
-                            <div className="font-semibold text-gray-800">{formatNumber(hkTotalLaborCost)}K</div>
-                            <div className="text-gray-400 text-[10px]">{formatPercent(primaryTargetLaborCostRate, 1)}</div>
-                          </div>
-                        </div>
-                        <div className="pt-2 border-t border-purple-300">
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs text-gray-500">직접이익</div>
-                            <div className={`text-xs font-semibold ${primaryTargetDirectProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {primaryTargetDirectProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetDirectProfitChange)}K
-                            </div>
-                          </div>
-                          <div className={`text-xl font-bold ${primaryTargetHkTotalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatNumber(primaryTargetHkTotalDirectProfit)}K
-                          </div>
-                          <div className="text-[10px] text-gray-400">{formatPercent(primaryTargetDirectProfitRate, 1)}</div>
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs text-gray-500">영업이익</div>
-                            <div className={`text-xs font-semibold ${primaryTargetOperatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {primaryTargetOperatingProfitChange >= 0 ? '+' : ''}{formatNumber(primaryTargetOperatingProfitChange)}K
-                            </div>
-                          </div>
-                          <div className={`text-xl font-bold ${primaryTargetHkTotalOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatNumber(primaryTargetHkTotalOperatingProfit)}K
-                          </div>
-                          <div className="text-[10px] text-gray-400">{formatPercent(primaryTargetOperatingProfitRate, 1)} ✓</div>
-                        </div>
-                      </div>
-                    </div>
-                    </>
-            );
-          })()}
-                
-                {/* 3. 턴오버 100% 달성 */}
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-300">
-                  <div className="text-center mb-3">
-                    <div className="text-sm font-bold text-green-800">턴오버 기준 100% 달성시</div>
-      </div>
-                  <div className="space-y-3">
-                    <div className="pb-2 border-b border-green-200">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-xs text-gray-500">매출액</div>
-                        <div className="text-xs font-semibold text-green-600">+{formatPercent(salesIncreaseRate, 1)}</div>
-                      </div>
-                      <div className="text-lg font-bold text-gray-900">{formatNumber(turnoverAchievementHkTotalSales)}K</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <div className="text-gray-500">임차료</div>
-                        <div className="font-semibold text-gray-800">{formatNumber(turnoverAchievementHkTotalRent)}K</div>
-                        <div className="text-gray-400 text-[10px]">{formatPercent(turnoverAchievementHkTotalRentRate, 1)}</div>
-                      </div>
-                      <div>
-                        <div className="text-gray-500">인건비</div>
-                        <div className="font-semibold text-gray-800">{formatNumber(turnoverAchievementHkTotalLaborCost)}K</div>
-                        <div className="text-gray-400 text-[10px]">{formatPercent(turnoverAchievementHkTotalLaborCostRate, 1)}</div>
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-green-300">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-xs text-gray-500">직접이익</div>
-                        <div className={`text-xs font-semibold ${directProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {directProfitChange >= 0 ? '+' : ''}{formatNumber(directProfitChange)}K
-                        </div>
-                      </div>
-                      <div className={`text-xl font-bold ${turnoverAchievementHkTotalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatNumber(turnoverAchievementHkTotalDirectProfit)}K
-                      </div>
-                      <div className="text-[10px] text-gray-400">{formatPercent(turnoverAchievementHkTotalDirectProfitRate, 1)}</div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-xs text-gray-500">영업이익</div>
-                        <div className={`text-xs font-semibold ${operatingProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {operatingProfitChange >= 0 ? '+' : ''}{formatNumber(operatingProfitChange)}K
-                        </div>
-                      </div>
-                      <div className={`text-xl font-bold ${turnoverAchievementHkTotalOperatingProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatNumber(turnoverAchievementHkTotalOperatingProfit)}K
-                      </div>
-                      <div className="text-[10px] text-gray-400">{formatPercent(turnoverAchievementHkTotalOperatingProfitRate, 1)}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
+          return null;
         })()}
       </div>
       </div>
