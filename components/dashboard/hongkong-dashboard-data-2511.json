@@ -22022,5 +22022,37 @@
         "yoy": 0
       }
     ]
+  },
+  "acc_inbound_yoy_6months": {
+    "period": "2506-2511",
+    "prev_period": "2406-2411",
+    "items": {
+      "모자": {
+        "current": 30461.2,
+        "previous": 23473.4,
+        "yoy": 129.8
+      },
+      "신발": {
+        "current": 32608.8,
+        "previous": 16353.7,
+        "yoy": 199.4
+      },
+      "가방": {
+        "current": 5549.5,
+        "previous": 11661.9,
+        "yoy": 47.6
+      },
+      "기타ACC": {
+        "current": 832.4,
+        "previous": 1161.7,
+        "yoy": 71.7
+      },
+      "ACC전체": {
+        "current": 69451.9,
+        "previous": 52650.7,
+        "yoy": 131.9
+      }
+    },
+    "note": "입고(택가) = 기말재고 + 택매출 - 기초재고"
   }
 }

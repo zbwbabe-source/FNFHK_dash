@@ -233,6 +233,102 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
     return Object.values(dashboardData.store_summary);
   }, [dashboardData]);
 
+  // 평당매출 계산 (대만 - 당월 및 전년)
+  const { 
+    totalArea: twTotalArea, 
+    salesPerPyeong: twSalesPerPyeong, 
+    dailySalesPerPyeong: twDailySalesPerPyeong,
+    prevTotalArea: twPrevTotalArea,
+    prevSalesPerPyeong: twPrevSalesPerPyeong,
+    prevDailySalesPerPyeong: twPrevDailySalesPerPyeong,
+    yoy: twSalesPerPyeongYoy
+  } = useMemo(() => {
+    const storeAreas = (storeAreasData as any).store_areas;
+    const currentMonthDays = period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30;
+    
+    // === 당월 계산 ===
+    let totalArea = 0;
+    
+    // 당월 매출이 있고, 폐점이 아닌 오프라인 매장들의 면적 합계
+    allTWStores?.forEach((store: any) => {
+      const storeCode = store.store_code;
+      const area = storeAreas[storeCode] || 0;
+      
+      // 온라인 매장 제외
+      if (store.channel === 'Online') {
+        return;
+      }
+      
+      // 당월 매출이 0이면 제외
+      if ((store.current?.net_sales || 0) === 0) {
+        return;
+      }
+      
+      // 폐점이면서 평당매출이 매우 낮은 매장 제외 (정리 매출만 있는 경우)
+      // 평당매출이 1 K HKD/평 미만이면 제외
+      if (store.closed === true && area > 0) {
+        const salesPerPyeong = (store.current.net_sales / 1000) / area;
+        if (salesPerPyeong < 1) {
+          return; // 폐점 + 저매출 매장 제외
+        }
+      }
+      
+      totalArea += area;
+    });
+    
+    // PL 데이터에서 대만 오프라인 실판매출 (당월)
+    const twNetSales = plData?.current_month?.offline?.net_sales || 0;
+    
+    // 평당매출 (K HKD/평)
+    const salesPerPyeong = totalArea > 0 ? twNetSales / totalArea : 0;
+    
+    // 1일 평당매출 (HKD/평/일)
+    const dailySalesPerPyeong = totalArea > 0 && currentMonthDays > 0 ? (salesPerPyeong * 1000) / currentMonthDays : 0;
+    
+    // === 전년 계산 ===
+    let prevTotalArea = 0;
+    
+    // 전년 매출이 있는 오프라인 매장들의 면적 합계
+    allTWStores?.forEach((store: any) => {
+      const storeCode = store.store_code;
+      const area = storeAreas[storeCode] || 0;
+      
+      // 온라인 매장 제외
+      if (store.channel === 'Online') {
+        return;
+      }
+      
+      // 전년 매출이 0이면 제외
+      if ((store.previous?.net_sales || 0) === 0) {
+        return;
+      }
+      
+      prevTotalArea += area;
+    });
+    
+    // PL 데이터에서 대만 오프라인 실판매출 (전년)
+    const twPrevNetSales = plData?.prev_month?.offline?.net_sales || 0;
+    
+    // 전년 평당매출 (K HKD/평)
+    const prevSalesPerPyeong = prevTotalArea > 0 ? twPrevNetSales / prevTotalArea : 0;
+    
+    // 전년 1일 평당매출 (HKD/평/일)
+    const prevDailySalesPerPyeong = prevTotalArea > 0 && currentMonthDays > 0 ? (prevSalesPerPyeong * 1000) / currentMonthDays : 0;
+    
+    // YOY 계산
+    const yoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
+    
+    return { 
+      totalArea, 
+      salesPerPyeong, 
+      dailySalesPerPyeong,
+      prevTotalArea,
+      prevSalesPerPyeong,
+      prevDailySalesPerPyeong,
+      yoy
+    };
+  }, [allTWStores, plData, period]);
+
   // 채널별 매장 효율성 계산
   const channelEfficiency = useMemo(() => {
     const channels: { [key: string]: { current: { net_sales: number, store_count: number, sales_per_store: number }, previous: { net_sales: number, store_count: number, sales_per_store: number }, yoy: number } } = {
@@ -1901,31 +1997,38 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               )}
             </div>
 
-            {/* 매장효율성 카드 */}
+            {/* 매장효율성 카드 - 평당매출 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-indigo-500 hover:shadow-xl transition-shadow min-h-[400px]">
               <div className="flex items-center mb-3">
                 <span className="text-2xl mr-2">🏪</span>
-                <h3 className="text-sm font-semibold text-gray-600">매장효율성 (점당매출)</h3>
+                <h3 className="text-sm font-semibold text-gray-600">매장효율성 (평당매출)</h3>
               </div>
               <div className="text-3xl font-bold text-green-600 mb-2">
-                {formatNumber((offlineEfficiency?.total?.current?.sales_per_store || 0) / 1000)}
+                {formatNumber(Math.round(twDailySalesPerPyeong))} HKD
               </div>
-              <div className="text-sm text-green-600 font-semibold mb-3">
-                YOY {formatPercent(offlineEfficiency?.total?.yoy)}% 
-                (전년 {formatNumber((offlineEfficiency?.total?.previous?.sales_per_store || 0) / 1000)})
+              <div className="text-sm font-semibold mb-3">
+                <span className="text-gray-600">평당매출/1일</span>
+              </div>
+              <div className="text-sm font-semibold mb-3">
+                <span className={twSalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                  YOY {formatPercent(twSalesPerPyeongYoy)}%
+                </span>
+                <span className="text-gray-600"> (전년 {formatNumber(Math.round(twPrevDailySalesPerPyeong))} HKD)</span>
               </div>
               <div className="text-xs text-gray-600 mb-3">
-                매장수: {offlineEfficiency?.total?.current?.store_count || 0}개 
-                (전년 {offlineEfficiency?.total?.previous?.store_count || 0}개)
+                (면적: {formatNumber(twTotalArea)}평 | {period ? parseInt(period.slice(2, 4)) : 11}월: {period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30}일)
+              </div>
+              <div className="text-[9px] text-gray-500 mb-3">
+                *폐점+저매출 매장 제외
               </div>
               
-              {/* 매장효율성 상세보기 */}
+              {/* 평당매출 상세보기 */}
               <div className="border-t pt-3">
                 <button 
                   onClick={() => setShowStoreDetail(!showStoreDetail)}
                   className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                 >
-                  <span>채널별 효율성</span>
+                  <span>평당매출 계산 상세</span>
                   {showStoreDetail ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
@@ -1935,54 +2038,56 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               {showStoreDetail && (
                 <>
-                  <div className="mt-3 pt-3 border-t space-y-1">
-                    {Object.entries(channelEfficiency).map(([key, channel]: [string, any]) => (
-                      <div key={key} className="flex justify-between text-xs">
-                        <span className="text-gray-600">
-                          TW {key}
-                        </span>
-                        <span className="font-semibold">
-                          {formatNumber((channel?.current?.sales_per_store || 0) / 1000)} 
-                          <span className="text-gray-500"> (전년 {formatNumber((channel?.previous?.sales_per_store || 0) / 1000)})</span>
-                          <span className={(channel?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
-                            {' '}({formatPercent(channel?.yoy || 0)}%)
-                          </span>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* 계산근거 */}
                   <div className="mt-3 pt-3 border-t">
                     <div className="bg-indigo-50 rounded p-2">
-                      <div className="text-xs font-semibold text-indigo-800 mb-1">📌 계산근거</div>
-                      <div className="text-xs text-indigo-700 space-y-0.5">
-                        <div>• <span className="font-semibold">당월:</span> 정상 운영 매장만 포함 (종료/리뉴얼 매장 제외)</div>
-                        <div>• <span className="font-semibold">전년 동월:</span> 모든 매장 포함</div>
-                        <div>• <span className="font-semibold">온라인 채널:</span> 제외 (오프라인 매장 효율성)</div>
-                        <div>• <span className="font-semibold">계산식:</span> 오프라인 실판매출 ÷ 오프라인 매장수</div>
-                        {(storeChanges.newStores.length > 0 || storeChanges.closedStores.length > 0 || storeChanges.renovatedStores.length > 0) && (
-                          <div className="mt-2 pt-2 border-t border-indigo-200">
-                            {storeChanges.newStores.length > 0 && (
-                              <div className="mb-1">
-                                <span className="font-semibold text-green-700">신규 매장:</span> {storeChanges.newStores.join(', ')}
-                              </div>
-                            )}
-                            {storeChanges.closedStores.length > 0 && (
-                              <div className="mb-1">
-                                <span className="font-semibold text-red-700">종료 매장:</span> {storeChanges.closedStores.join(', ')}
-                              </div>
-                            )}
-                            {storeChanges.renovatedStores.length > 0 && (
-                              <div>
-                                <span className="font-semibold text-orange-700">리뉴얼 매장:</span> {storeChanges.renovatedStores.join(', ')}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                      <div className="text-xs font-semibold text-indigo-800 mb-1">📊 평당매출 계산기준</div>
+                      <div className="px-2 pb-2 text-xs text-indigo-700 space-y-1">
+                        <div className="font-semibold text-indigo-800 mb-1">당월</div>
+                        <div>• <span className="font-semibold">계산식:</span> (PL 매출 ÷ 총 면적 × 1000) ÷ 일수</div>
+                        <div>• <span className="font-semibold">매출:</span> {formatNumber(plData?.current_month?.offline?.net_sales || 0)} K HKD (PL 데이터)</div>
+                        <div>• <span className="font-semibold">면적:</span> {formatNumber(twTotalArea)}평 (폐점+저매출 제외)</div>
+                        <div>• <span className="font-semibold">일수:</span> {period ? parseInt(period.slice(2, 4)) : 11}월 {period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30}일</div>
+                        
+                        <div className="font-semibold text-indigo-800 mb-1 mt-2 pt-2 border-t border-indigo-200">전년</div>
+                        <div>• <span className="font-semibold">매출:</span> {formatNumber(plData?.prev_month?.offline?.net_sales || 0)} K HKD (PL 데이터)</div>
+                        <div>• <span className="font-semibold">면적:</span> {formatNumber(twPrevTotalArea)}평</div>
+                        <div>• <span className="font-semibold">평당매출/1일:</span> {formatNumber(Math.round(twPrevDailySalesPerPyeong))} HKD</div>
+                        
+                        <div className="pt-1 mt-1 border-t border-indigo-200">
+                          <span className="font-semibold">YOY:</span> <span className={twSalesPerPyeongYoy >= 100 ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}>{formatPercent(twSalesPerPyeongYoy)}%</span>
+                        </div>
+                        
+                        <div className="pt-1 mt-1 border-t border-indigo-200 text-[10px]">
+                          <span className="font-semibold">※ 참고:</span> 평당매출이 1 K HKD/평 미만인 폐점 매장은 제외됩니다.
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
+                  {(storeChanges.newStores.length > 0 || storeChanges.closedStores.length > 0 || storeChanges.renovatedStores.length > 0) && (
+                    <div className="mt-3 pt-3 border-t">
+                      <div className="bg-amber-50 rounded p-2">
+                        <div className="text-xs font-semibold text-amber-800 mb-1">🏪 매장 변동사항</div>
+                        <div className="text-xs text-amber-700 space-y-0.5">
+                          {storeChanges.newStores.length > 0 && (
+                            <div className="mb-1">
+                              <span className="font-semibold text-green-700">신규 매장:</span> {storeChanges.newStores.join(', ')}
+                            </div>
+                          )}
+                          {storeChanges.closedStores.length > 0 && (
+                            <div className="mb-1">
+                              <span className="font-semibold text-red-700">종료 매장:</span> {storeChanges.closedStores.join(', ')}
+                            </div>
+                          )}
+                          {storeChanges.renovatedStores.length > 0 && (
+                            <div>
+                              <span className="font-semibold text-orange-700">리뉴얼 매장:</span> {storeChanges.renovatedStores.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>

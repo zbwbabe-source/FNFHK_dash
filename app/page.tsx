@@ -243,9 +243,25 @@ export default function Home() {
 
     Object.keys(hkData.store_summary).forEach(storeCode => {
       const store = hkData.store_summary[storeCode];
+      
+      // M10A는 M10에 합쳐서 계산하므로 건너뛰기
+      if (storeCode === 'M10A') {
+        return;
+      }
+      
       // 홍콩만, MLB 브랜드만, 온라인 제외, 오프라인만 (Retail, Outlet)
       if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.current?.net_sales > 0) {
         const area = (storeAreas as Record<string, number>)[storeCode] || 0;
+        
+        // 폐점이면서 매출이 매우 적은 매장 제외 (정리 매출만 있는 경우)
+        // 평당매출이 1 K HKD/평 미만이면 제외
+        if (store.closed === true && area > 0) {
+          const salesPerPyeong = (store.current.net_sales / 1000) / area;
+          if (salesPerPyeong < 1) {
+            return; // 폐점 + 저매출 매장 제외
+          }
+        }
+        
         if (area > 0) {
           totalArea += area;
           storesWithArea.push(storeCode);
@@ -489,11 +505,27 @@ export default function Home() {
   const hkOnlyOfflineCurrent = useMemo(() => {
     if (!hkData?.store_summary) return 0;
     let total = 0;
+    let m10CombinedSales = 0;
+    
     Object.entries(hkData.store_summary).forEach(([code, store]: [string, any]) => {
       // M으로 시작하고 MC로 시작하지 않으면 홍콩
       const isHKOnly = code.startsWith('M') && !code.startsWith('MC');
+      
       if (store.brand === 'MLB' && isHKOnly && store.channel !== 'Online' && store.current?.net_sales) {
-        total += store.current.net_sales;
+        // M10과 M10A의 매출을 합산
+        if (code === 'M10') {
+          m10CombinedSales = store.current.net_sales;
+          // M10A 매출도 추가
+          if (hkData.store_summary['M10A']?.current?.net_sales) {
+            m10CombinedSales += hkData.store_summary['M10A'].current.net_sales;
+          }
+          total += m10CombinedSales;
+        } else if (code === 'M10A') {
+          // M10A는 M10에 이미 합산되었으므로 건너뛰기
+          return;
+        } else {
+          total += store.current.net_sales;
+        }
       }
     });
     return total;
@@ -598,8 +630,8 @@ export default function Home() {
   const twOutlet = twData?.country_channel_summary?.TW_Outlet;
   const twOnline = twData?.country_channel_summary?.TW_Online;
 
-  // 대만 오프라인 (Retail + Outlet)
-  const twOfflineCurrent = (twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0);
+  // 대만 오프라인 (PL 데이터 사용, K HKD 단위)
+  const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales || 0;
   const twOfflinePrevious = (twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0);
   const twOfflineYoy = twOfflinePrevious > 0 ? (twOfflineCurrent / twOfflinePrevious) * 100 : 0;
 
@@ -614,8 +646,9 @@ export default function Home() {
   const twTotalYoy = twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0;
 
   // 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인)
-  // hkOnlyOfflineCurrent는 HKD 단위이므로, K HKD로 변환(1000으로 나누기) 후 평당매출 계산
-  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? (hkOnlyOfflineCurrent / 1000) / hkOfflineTotalArea : 0; // K HKD/평 단위
+  // PL 데이터 사용 (이미 K HKD 단위)
+  const hkOnlyOfflineCurrentKHKD = hkPlData?.current_month?.hk?.net_sales || 0; // K HKD 단위
+  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? hkOnlyOfflineCurrentKHKD / hkOfflineTotalArea : 0; // K HKD/평 단위
   // hkOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
   // 누적 평균 면적 (PL 데이터에서 월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩만)
   const hkCumulativeAvgArea = hkPlData?.cumulative?.offline?.average_area || hkOfflineTotalArea; // 누적 평균 면적, 없으면 당월 면적 사용
@@ -626,14 +659,14 @@ export default function Home() {
   const hkDailySalesPerPyeongCumulative = cumulativeDays > 0 && hkSalesPerPyeongCumulative > 0 ? (hkSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 누적 일수로 나누기
   
   // 디버깅: 평당매출 계산 확인 (면적: 홍콩만, 매출: 홍콩만 오프라인)
-  console.log('=== 홍콩 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인, 마카오 제외) ===');
+  console.log('=== 홍콩 평당매출 계산 (면적: 홍콩만, 매출: PL 데이터, M10A는 M10에 포함) ===');
   console.log('[당월]');
-  console.log('홍콩만 오프라인 매출 (마카오 제외):', hkOnlyOfflineCurrent.toLocaleString(), 'HKD =', (hkOnlyOfflineCurrent / 1000).toFixed(2), 'K HKD');
-  console.log('홍콩 오프라인 면적:', hkOfflineTotalArea, '평');
+  console.log('홍콩 오프라인 매출 (PL 데이터):', hkOnlyOfflineCurrentKHKD.toFixed(2), 'K HKD');
+  console.log('홍콩 오프라인 면적:', hkOfflineTotalArea, '평 (M10A는 M10에 포함, 면적 0인 매장 제외)');
   console.log('평당매출:', hkSalesPerPyeongCurrent.toFixed(2), 'K HKD/평');
   console.log('당월 일수:', currentMonthDays, '일');
   console.log('1일 평당매출:', hkDailySalesPerPyeongCurrent.toFixed(1), 'HKD/평/일');
-  console.log('계산식: (' + hkOfflineCurrent.toLocaleString() + ' / 1000) / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
+  console.log('계산식: ' + hkOnlyOfflineCurrentKHKD.toFixed(2) + ' / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
   console.log('일평균 계산식: (' + hkSalesPerPyeongCurrent.toFixed(2) + ' * 1000) / ' + currentMonthDays + ' = ' + hkDailySalesPerPyeongCurrent.toFixed(1) + ' HKD/평/일');
     console.log('[누적]');
     console.log('누적 오프라인 매출:', hkOfflineCumulative.toFixed(2), 'K HKD (PL 데이터, 이미 K HKD 단위)');
@@ -652,8 +685,8 @@ export default function Home() {
   }
 
   // 대만 평당매출 계산 (당월, 누적)
-  // twOfflineCurrent는 HKD 단위이므로, K HKD로 변환(1000으로 나누기) 후 평당매출 계산
-  const twSalesPerPyeongCurrent = twOfflineTotalArea > 0 ? (twOfflineCurrent / 1000) / twOfflineTotalArea : 0; // K HKD/평 단위
+  // twOfflineCurrent는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
+  const twSalesPerPyeongCurrent = twOfflineTotalArea > 0 ? twOfflineCurrent / twOfflineTotalArea : 0; // K HKD/평 단위
   // twOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
   const twSalesPerPyeongCumulative = twOfflineTotalArea > 0 ? twOfflineCumulative / twOfflineTotalArea : 0; // K HKD/평 단위
   // 평당매출/1일 계산: 평당매출(K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
