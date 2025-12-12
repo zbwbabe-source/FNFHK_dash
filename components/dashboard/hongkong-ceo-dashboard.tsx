@@ -4323,7 +4323,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   });
                   
                   // 디버깅: 01월 데이터 출력
-                  const jan = mappedData.find(d => d.period === '2501');
+                  const jan = mappedData.find((d: any) => d.period === '2501');
                   if (jan) {
                     console.log('🔍 [아이템별 그래프] 2501 (01월) 렌더링 데이터:');
                     console.log('  실판가 선택?', salesPriceType === '실판');
