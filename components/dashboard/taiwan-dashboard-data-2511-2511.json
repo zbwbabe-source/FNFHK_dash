@@ -4,7 +4,7 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-12T21:54:59.543791"
+    "generated_at": "2025-12-12T21:58:53.687234"
   },
   "sales_summary": {
     "total_net_sales": 17682.64374335342,
@@ -2329,7 +2329,7 @@
             "ac_sales_gross": 1878.2382133995036,
             "sales_rate": 21.167934856018164,
             "net_acp_p_yoy": 180.32249784545903,
-            "ac_sales_gross_yoy": 151.69606676045836
+            "ac_sales_gross_yoy": 141.7914098625079
           },
           {
             "subcategory_code": "MT",
@@ -2338,7 +2338,7 @@
             "ac_sales_gross": 1634.5235732009926,
             "sales_rate": 23.730316240661796,
             "net_acp_p_yoy": 72.05962522533001,
-            "ac_sales_gross_yoy": 86.32813216711183
+            "ac_sales_gross_yoy": 87.35688871767208
           },
           {
             "subcategory_code": "TS",
@@ -2347,7 +2347,7 @@
             "ac_sales_gross": 3826.3498759305207,
             "sales_rate": 58.10441030402325,
             "net_acp_p_yoy": 130.97158908927065,
-            "ac_sales_gross_yoy": 116.16767414389545
+            "ac_sales_gross_yoy": 120.58375443399498
           },
           {
             "subcategory_code": "BN",
@@ -2356,7 +2356,7 @@
             "ac_sales_gross": 2302.9801488833746,
             "sales_rate": 48.76167749236736,
             "net_acp_p_yoy": 181.9855145213338,
-            "ac_sales_gross_yoy": 357.80275956189354
+            "ac_sales_gross_yoy": 329.4506781919332
           },
           {
             "subcategory_code": "PT",
@@ -2365,7 +2365,7 @@
             "ac_sales_gross": 954.2630272952853,
             "sales_rate": 28.661950889034138,
             "net_acp_p_yoy": 80.84637804114574,
-            "ac_sales_gross_yoy": 94.97006934429145
+            "ac_sales_gross_yoy": 90.47018071775686
           }
         ]
       }
@@ -2889,95 +2889,6 @@
         "yoy": 74.95106062589012
       },
       "by_year": {
-        "2년차": {
-          "current": {
-            "stock_price": 16077.776674937959
-          },
-          "previous": {
-            "stock_price": 9920.436724565761
-          },
-          "yoy": 162.06722668897137,
-          "subcategory_top5": [
-            {
-              "subcategory_code": "MT",
-              "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 2914.5459057071957,
-              "yoy": 138.9927022328777
-            },
-            {
-              "subcategory_code": "JP",
-              "subcategory_name": "JUMPER",
-              "stock_price": 2712.67493796526,
-              "yoy": 2971.9660722053063
-            },
-            {
-              "subcategory_code": "PT",
-              "subcategory_name": "PANTS",
-              "stock_price": 1064.4317617866004,
-              "yoy": 153.6312128874213
-            },
-            {
-              "subcategory_code": "BQ",
-              "subcategory_name": "Shoulder Bag",
-              "stock_price": 972.5434243176177,
-              "yoy": 0
-            },
-            {
-              "subcategory_code": "HT",
-              "subcategory_name": "Hat",
-              "stock_price": 886.9032258064516,
-              "yoy": 720.2168174582386
-            },
-            {
-              "subcategory_code": "TR",
-              "subcategory_name": "T/SHIRTS",
-              "stock_price": 857.2828784119105,
-              "yoy": 270.37486304586
-            },
-            {
-              "subcategory_code": "KC",
-              "subcategory_name": "Knit Cardigan",
-              "stock_price": 757.8287841191067,
-              "yoy": 107.98335372278362
-            }
-          ],
-          "others": {
-            "stock_price": 5911.565756823821,
-            "yoy": 101.19319364388961,
-            "subcategory_top5": [
-              {
-                "subcategory_code": "OP",
-                "subcategory_name": "ONEPIECE",
-                "stock_price": 593.8511166253102,
-                "yoy": 1495.5755530558683
-              },
-              {
-                "subcategory_code": "HD",
-                "subcategory_name": "SWEAT SHIRTS",
-                "stock_price": 568.1538461538461,
-                "yoy": 59.18911792533308
-              },
-              {
-                "subcategory_code": "DK",
-                "subcategory_name": "DENIM JACKET",
-                "stock_price": 454.56575682382135,
-                "yoy": 0
-              },
-              {
-                "subcategory_code": "CP",
-                "subcategory_name": "CAP",
-                "stock_price": 426.8138957816377,
-                "yoy": 112.17806995232597
-              },
-              {
-                "subcategory_code": "BN",
-                "subcategory_name": "Beanie",
-                "stock_price": 403.4516129032258,
-                "yoy": 117.5325473300708
-              }
-            ]
-          }
-        },
         "1년차": {
           "current": {
             "stock_price": 14093.191066997522
@@ -3063,6 +2974,95 @@
                 "subcategory_name": "DENIM JACKET",
                 "stock_price": 289.73945409429285,
                 "yoy": 52.60229663433601
+              }
+            ]
+          }
+        },
+        "2년차": {
+          "current": {
+            "stock_price": 16077.776674937959
+          },
+          "previous": {
+            "stock_price": 9920.436724565761
+          },
+          "yoy": 162.06722668897137,
+          "subcategory_top5": [
+            {
+              "subcategory_code": "MT",
+              "subcategory_name": "SWEAT SHIRTS",
+              "stock_price": 2914.5459057071957,
+              "yoy": 138.9927022328777
+            },
+            {
+              "subcategory_code": "JP",
+              "subcategory_name": "JUMPER",
+              "stock_price": 2712.67493796526,
+              "yoy": 2971.9660722053063
+            },
+            {
+              "subcategory_code": "PT",
+              "subcategory_name": "PANTS",
+              "stock_price": 1064.4317617866004,
+              "yoy": 153.6312128874213
+            },
+            {
+              "subcategory_code": "BQ",
+              "subcategory_name": "Shoulder Bag",
+              "stock_price": 972.5434243176177,
+              "yoy": 0
+            },
+            {
+              "subcategory_code": "HT",
+              "subcategory_name": "Hat",
+              "stock_price": 886.9032258064516,
+              "yoy": 720.2168174582386
+            },
+            {
+              "subcategory_code": "TR",
+              "subcategory_name": "T/SHIRTS",
+              "stock_price": 857.2828784119105,
+              "yoy": 270.37486304586
+            },
+            {
+              "subcategory_code": "KC",
+              "subcategory_name": "Knit Cardigan",
+              "stock_price": 757.8287841191067,
+              "yoy": 107.98335372278362
+            }
+          ],
+          "others": {
+            "stock_price": 5911.565756823821,
+            "yoy": 101.19319364388961,
+            "subcategory_top5": [
+              {
+                "subcategory_code": "OP",
+                "subcategory_name": "ONEPIECE",
+                "stock_price": 593.8511166253102,
+                "yoy": 1495.5755530558683
+              },
+              {
+                "subcategory_code": "HD",
+                "subcategory_name": "SWEAT SHIRTS",
+                "stock_price": 568.1538461538461,
+                "yoy": 59.18911792533308
+              },
+              {
+                "subcategory_code": "DK",
+                "subcategory_name": "DENIM JACKET",
+                "stock_price": 454.56575682382135,
+                "yoy": 0
+              },
+              {
+                "subcategory_code": "CP",
+                "subcategory_name": "CAP",
+                "stock_price": 426.8138957816377,
+                "yoy": 112.17806995232597
+              },
+              {
+                "subcategory_code": "BN",
+                "subcategory_name": "Beanie",
+                "stock_price": 403.4516129032258,
+                "yoy": 117.5325473300708
               }
             ]
           }

@@ -840,7 +840,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     net_acp_p_yoy = (net_acp_p / prev_net_acp_p * 100) if prev_net_acp_p > 0 else 0
     ac_sales_gross_yoy = (ac_sales_gross / prev_ac_sales_gross * 100) if prev_ac_sales_gross > 0 else 0
     
-    # Subcategory별 상세 데이터 생성 (입고YOY/판매율)
+    # Subcategory별 상세 데이터 생성 (입고YOY/판매YOY/판매율)
     subcategory_detail = []
     for subcat_code, subcat_data in subcategory_sales.items():
         # 해당 subcategory의 누적 입고금액, 판매금액 계산 - 마지막 Period만 사용 (이미 누적값)
@@ -858,7 +858,13 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         subcat_prev_net_acp_p = sum(float(row['Net_AcP_P'] or 0) for row in subcat_prev_accumulated) / TWD_TO_HKD_RATE
         subcat_prev_ac_sales_gross = sum(float(row['AC_Sales_Gross'] or 0) for row in subcat_prev_accumulated) / TWD_TO_HKD_RATE
         subcat_net_acp_p_yoy = (subcat_net_acp_p / subcat_prev_net_acp_p * 100) if subcat_prev_net_acp_p > 0 else 0
-        subcat_ac_sales_gross_yoy = (subcat_ac_sales_gross / subcat_prev_ac_sales_gross * 100) if subcat_prev_ac_sales_gross > 0 else 0
+        
+        # 당월 판매 데이터 (Net_Sales) - subcategory_sales에서 가져오기
+        subcat_current_month_sales = subcat_data['net_sales']  # 이미 K HKD 단위로 변환됨
+        # 전년 당월 판매 데이터
+        subcat_prev_month_sales = prev_subcategory_sales.get(subcat_code, {}).get('net_sales', 0)
+        # 당월 판매 YOY 계산
+        subcat_month_sales_yoy = (subcat_current_month_sales / subcat_prev_month_sales * 100) if subcat_prev_month_sales > 0 else 0
         
         subcategory_detail.append({
             'subcategory_code': subcat_code,
@@ -867,7 +873,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'ac_sales_gross': subcat_ac_sales_gross / 1000,  # 1K HKD
             'sales_rate': subcat_sales_rate,
             'net_acp_p_yoy': subcat_net_acp_p_yoy,
-            'ac_sales_gross_yoy': subcat_ac_sales_gross_yoy  # 판매 YOY 추가
+            'ac_sales_gross_yoy': subcat_month_sales_yoy  # 당월 판매 YOY로 변경
         })
     
     # 입고(net_acp_p) 기준으로 정렬하고 TOP 5만 선택
