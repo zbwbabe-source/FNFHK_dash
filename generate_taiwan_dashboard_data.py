@@ -856,7 +856,9 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                                   if row['Period'] == prev_period
                                   and row['Subcategory_Code'].strip() == subcat_code]
         subcat_prev_net_acp_p = sum(float(row['Net_AcP_P'] or 0) for row in subcat_prev_accumulated) / TWD_TO_HKD_RATE
+        subcat_prev_ac_sales_gross = sum(float(row['AC_Sales_Gross'] or 0) for row in subcat_prev_accumulated) / TWD_TO_HKD_RATE
         subcat_net_acp_p_yoy = (subcat_net_acp_p / subcat_prev_net_acp_p * 100) if subcat_prev_net_acp_p > 0 else 0
+        subcat_ac_sales_gross_yoy = (subcat_ac_sales_gross / subcat_prev_ac_sales_gross * 100) if subcat_prev_ac_sales_gross > 0 else 0
         
         subcategory_detail.append({
             'subcategory_code': subcat_code,
@@ -864,7 +866,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'net_acp_p': subcat_net_acp_p / 1000,  # 1K HKD
             'ac_sales_gross': subcat_ac_sales_gross / 1000,  # 1K HKD
             'sales_rate': subcat_sales_rate,
-            'net_acp_p_yoy': subcat_net_acp_p_yoy
+            'net_acp_p_yoy': subcat_net_acp_p_yoy,
+            'ac_sales_gross_yoy': subcat_ac_sales_gross_yoy  # 판매 YOY 추가
         })
     
     # 입고(net_acp_p) 기준으로 정렬하고 TOP 5만 선택
