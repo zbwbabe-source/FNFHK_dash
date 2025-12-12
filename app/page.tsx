@@ -98,25 +98,25 @@ export default function Home() {
         // 디버깅: 로드된 데이터 확인
         console.log('Period별 파일 로드 결과:', {
           hkDashboard: !!hkDashboard,
-          hkHasEndingInventory: !!hkDashboard?.ending_inventory,
+          hkHasEndingInventory: !!(hkDashboard as any)?.ending_inventory,
           hkDefaultData: !!hkDefaultData,
-          hkDefaultHasEndingInventory: !!hkDefaultData?.ending_inventory,
-          hkDefaultEndingInventory: hkDefaultData?.ending_inventory?.total
+          hkDefaultHasEndingInventory: !!(hkDefaultData as any)?.ending_inventory,
+          hkDefaultEndingInventory: (hkDefaultData as any)?.ending_inventory?.total
         });
 
         // period별 파일에 ending_inventory가 없으면 기본 파일에서 가져오기
-        if (hkDashboard && !hkDashboard.ending_inventory && hkDefaultData?.ending_inventory) {
-          console.log('홍콩 ending_inventory 병합:', hkDefaultData.ending_inventory);
-          hkDashboard.ending_inventory = hkDefaultData.ending_inventory;
+        if (hkDashboard && !(hkDashboard as any).ending_inventory && (hkDefaultData as any)?.ending_inventory) {
+          console.log('홍콩 ending_inventory 병합:', (hkDefaultData as any).ending_inventory);
+          (hkDashboard as any).ending_inventory = (hkDefaultData as any).ending_inventory;
         }
-        if (twDashboard && !twDashboard.ending_inventory && twDefaultData?.ending_inventory) {
-          console.log('대만 ending_inventory 병합:', twDefaultData.ending_inventory);
-          twDashboard.ending_inventory = twDefaultData.ending_inventory;
+        if (twDashboard && !(twDashboard as any).ending_inventory && (twDefaultData as any)?.ending_inventory) {
+          console.log('대만 ending_inventory 병합:', (twDefaultData as any).ending_inventory);
+          (twDashboard as any).ending_inventory = (twDefaultData as any).ending_inventory;
         }
 
         console.log('홍콩 데이터 로드 완료:', {
-          hasEndingInventory: !!hkDashboard?.ending_inventory,
-          endingInventoryTotal: hkDashboard?.ending_inventory?.total
+          hasEndingInventory: !!(hkDashboard as any)?.ending_inventory,
+          endingInventoryTotal: (hkDashboard as any)?.ending_inventory?.total
         });
 
         setHkData(hkDashboard);
