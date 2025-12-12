@@ -4,7 +4,7 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-12T11:29:51.843368"
+    "generated_at": "2025-12-12T21:47:59.180889"
   },
   "sales_summary": {
     "total_net_sales": 17682.64374335342,
@@ -1395,493 +1395,436 @@
     {
       "period": "2501",
       "당시즌F": {
-        "net_sales": 0,
-        "gross_sales": 0
+        "gross_sales": 5246131.51364764,
+        "net_sales": 4314307.92863051
       },
       "당시즌S": {
-        "net_sales": 1129071.7239749497,
-        "gross_sales": 1301996.9278033793
+        "gross_sales": 1367096.7741935481,
+        "net_sales": 1129071.7239749501
       },
       "과시즌F": {
-        "net_sales": 8510120.997282287,
-        "gross_sales": 12293366.418527707
+        "gross_sales": 5533330.024813898,
+        "net_sales": 2606144.393241166
       },
       "과시즌S": {
-        "net_sales": 451484.3436133758,
-        "gross_sales": 701564.4570483279
+        "gross_sales": 662503.7220843672,
+        "net_sales": 411550.0413564928
       },
       "모자": {
-        "net_sales": 2279880.656977431,
-        "gross_sales": 2550991.3742171805
+        "gross_sales": 4551436.724565754,
+        "net_sales": 3679014.7701760577
       },
       "신발": {
-        "net_sales": 4503767.458348103,
-        "gross_sales": 5991130.804679191
+        "gross_sales": 6620503.722084365,
+        "net_sales": 4734236.322816971
       },
-      "가방": {
-        "net_sales": 569847.3354602386,
-        "gross_sales": 755438.969632518
-      },
-      "기타ACC": {
-        "net_sales": 246463.19272125722,
-        "gross_sales": 284988.774666194
+      "가방외": {
+        "gross_sales": 1092449.1315136473,
+        "net_sales": 816310.528181497
       }
     },
     {
       "period": "2502",
       "당시즌F": {
-        "net_sales": 0,
-        "gross_sales": 0
+        "gross_sales": 1488253.1017369726,
+        "net_sales": 1232967.978258302
       },
       "당시즌S": {
-        "net_sales": 1216200.6380716055,
-        "gross_sales": 1403710.268226397
+        "gross_sales": 1473895.7816377159,
+        "net_sales": 1216200.6380716055
       },
       "과시즌F": {
-        "net_sales": 2920837.528063334,
-        "gross_sales": 4302828.784119106
+        "gross_sales": 2151729.5285359807,
+        "net_sales": 1044532.1989838114
       },
       "과시즌S": {
-        "net_sales": 355742.64445232187,
-        "gross_sales": 527930.9937374452
+        "gross_sales": 481166.25310173706,
+        "net_sales": 314351.1757060144
       },
       "모자": {
-        "net_sales": 2155667.730119343,
-        "gross_sales": 2395968.332742526
+        "gross_sales": 3332322.580645158,
+        "net_sales": 2753541.297412264
       },
       "신발": {
-        "net_sales": 3339586.1987474887,
-        "gross_sales": 4165789.9090157147
+        "gross_sales": 4508672.456575681,
+        "net_sales": 3426441.451022094
       },
-      "가방": {
-        "net_sales": 613151.3647642678,
-        "gross_sales": 756233.0142975304
-      },
-      "기타ACC": {
-        "net_sales": 172973.88632872503,
-        "gross_sales": 200387.56941982746
+      "가방외": {
+        "gross_sales": 1004451.612903226,
+        "net_sales": 786125.2510929931
       }
     },
     {
       "period": "2503",
       "당시즌F": {
-        "net_sales": 0,
-        "gross_sales": 0
+        "gross_sales": 343369.72704714636,
+        "net_sales": 282783.64646106586
       },
       "당시즌S": {
-        "net_sales": 2185489.070069715,
-        "gross_sales": 2503178.5418882193
+        "gross_sales": 2616141.4392059534,
+        "net_sales": 2174863.050927567
       },
       "과시즌F": {
-        "net_sales": 933944.4641380124,
-        "gross_sales": 1473460.947654496
+        "gross_sales": 923230.7692307694,
+        "net_sales": 459900.9807396903
       },
       "과시즌S": {
-        "net_sales": 910790.4998227578,
-        "gross_sales": 1443417.227933357
+        "gross_sales": 1439000.0000000002,
+        "net_sales": 863580.2906770648
       },
       "모자": {
-        "net_sales": 2649844.735909252,
-        "gross_sales": 3336705.659931466
+        "gross_sales": 3802650.124069477,
+        "net_sales": 2856279.3335696566
       },
       "신발": {
-        "net_sales": 2243347.7490251684,
-        "gross_sales": 2898409.547441805
+        "gross_sales": 3113538.461538462,
+        "net_sales": 2286009.2165898615
       },
-      "가방": {
-        "net_sales": 679218.0077986529,
-        "gross_sales": 987127.4961597541
-      },
-      "기타ACC": {
-        "net_sales": 148414.9828665958,
-        "gross_sales": 170185.51341131981
+      "가방외": {
+        "gross_sales": 1215178.6600496278,
+        "net_sales": 827632.9906652487
       }
     },
     {
       "period": "2504",
       "당시즌F": {
-        "net_sales": 0,
-        "gross_sales": 0
+        "gross_sales": 89411.91066997519,
+        "net_sales": 71075.26881720428
       },
       "당시즌S": {
-        "net_sales": 3306469.337114498,
-        "gross_sales": 3808918.8231123714
+        "gross_sales": 3793888.3374689794,
+        "net_sales": 3131327.6615857272
       },
       "과시즌F": {
-        "net_sales": 339929.57580054353,
-        "gross_sales": 560656.9774311709
+        "gross_sales": 408074.44168734486,
+        "net_sales": 209582.4175824175
       },
       "과시즌S": {
-        "net_sales": 1249433.7705305447,
-        "gross_sales": 2088961.3612194257
+        "gross_sales": 2031595.533498759,
+        "net_sales": 1162201.110717239
       },
       "모자": {
-        "net_sales": 2475478.4355429513,
-        "gross_sales": 2793338.0597896725
+        "gross_sales": 3159394.5409429264,
+        "net_sales": 2633455.039584073
       },
       "신발": {
-        "net_sales": 2381774.311709795,
-        "gross_sales": 3174106.1089448184
+        "gross_sales": 3564915.6327543426,
+        "net_sales": 2545443.9324116744
       },
-      "가방": {
-        "net_sales": 413361.69207136944,
-        "gross_sales": 542831.1473472763
-      },
-      "기타ACC": {
-        "net_sales": 155405.64811532554,
-        "gross_sales": 177549.33238804206
+      "가방외": {
+        "gross_sales": 756399.5037220842,
+        "net_sales": 568767.3401866951
       }
     },
     {
       "period": "2505",
       "당시즌F": {
-        "net_sales": 0.0,
-        "gross_sales": 0.0
+        "gross_sales": 60364.764267990075,
+        "net_sales": 47199.101973295525
       },
       "당시즌S": {
-        "net_sales": 4636428.216944346,
-        "gross_sales": 5392811.059907833
+        "gross_sales": 5123129.032258069,
+        "net_sales": 4176097.3650005893
       },
       "과시즌F": {
-        "net_sales": 185871.4403875694,
-        "gross_sales": 278858.56079404464
+        "gross_sales": 184590.57071960304,
+        "net_sales": 106389.69632518018
       },
       "과시즌S": {
-        "net_sales": 1360191.421481744,
-        "gross_sales": 2308398.9129150417
+        "gross_sales": 2122746.898263026,
+        "net_sales": 1204713.9312300598
       },
       "모자": {
-        "net_sales": 3430122.887864823,
-        "gross_sales": 3903863.878057426
+        "gross_sales": 4401598.014888335,
+        "net_sales": 3653100.555358617
       },
       "신발": {
-        "net_sales": 2733080.704241994,
-        "gross_sales": 3535231.0055535855
+        "gross_sales": 4297692.307692306,
+        "net_sales": 3158194.0210327283
       },
-      "가방": {
-        "net_sales": 582327.0707786835,
-        "gross_sales": 739633.6996336995
-      },
-      "기타ACC": {
-        "net_sales": 220801.84331797232,
-        "gross_sales": 251520.73732718892
+      "가방외": {
+        "gross_sales": 1040712.1588089335,
+        "net_sales": 803128.9140966556
       }
     },
     {
       "period": "2506",
       "당시즌F": {
-        "net_sales": 0.0,
-        "gross_sales": 0.0
+        "gross_sales": 0.0,
+        "net_sales": 0.0
       },
       "당시즌S": {
-        "net_sales": 3543042.4199456456,
-        "gross_sales": 4025603.2139903107
+        "gross_sales": 3912357.3200992574,
+        "net_sales": 3271425.0265863147
       },
       "과시즌F": {
-        "net_sales": 187881.60226869903,
-        "gross_sales": 279023.9867659222
+        "gross_sales": 261620.34739454094,
+        "net_sales": 167074.79617157028
       },
       "과시즌S": {
-        "net_sales": 1370298.4757178305,
-        "gross_sales": 2499683.3274252624
+        "gross_sales": 2166942.9280397017,
+        "net_sales": 1182326.1254874163
       },
       "모자": {
-        "net_sales": 2906222.379770767,
-        "gross_sales": 3265189.6490606163
+        "gross_sales": 3666354.8387096734,
+        "net_sales": 3063479.144511403
       },
       "신발": {
-        "net_sales": 2558758.832565284,
-        "gross_sales": 3276575.682382134
+        "gross_sales": 4006104.2183622853,
+        "net_sales": 2881898.6175115197
       },
-      "가방": {
-        "net_sales": 568597.896726929,
-        "gross_sales": 732844.1451022094
-      },
-      "기타ACC": {
-        "net_sales": 206343.61337587144,
-        "gross_sales": 234051.75469691594
+      "가방외": {
+        "gross_sales": 1015240.6947890819,
+        "net_sales": 774941.5101028002
       }
     },
     {
       "period": "2507",
       "당시즌F": {
-        "net_sales": 366688.8810114616,
-        "gross_sales": 415481.5077395722
+        "gross_sales": 436255.58312655083,
+        "net_sales": 366688.88101146155
       },
       "당시즌S": {
-        "net_sales": 2793109.0629800307,
-        "gross_sales": 3160763.5590216233
+        "gross_sales": 3061101.736972706,
+        "net_sales": 2570950.490369846
       },
       "과시즌F": {
-        "net_sales": 203307.33782346686,
-        "gross_sales": 308037.33900508087
+        "gross_sales": 272548.3870967742,
+        "net_sales": 169809.76013234083
       },
       "과시즌S": {
-        "net_sales": 1141290.558903462,
-        "gross_sales": 2053983.2210799952
+        "gross_sales": 1810900.7444168744,
+        "net_sales": 994502.4223088741
       },
       "모자": {
-        "net_sales": 3142336.5236913622,
-        "gross_sales": 3518808.9330024812
+        "gross_sales": 3885213.3995037205,
+        "net_sales": 3254332.0335578388
       },
       "신발": {
-        "net_sales": 2475611.721611721,
-        "gross_sales": 3193468.0373390047
+        "gross_sales": 3817049.87593052,
+        "net_sales": 2766060.4986411436
       },
-      "가방": {
-        "net_sales": 575721.1390759778,
-        "gross_sales": 779395.0135885619
-      },
-      "기타ACC": {
-        "net_sales": 207636.29918468627,
-        "gross_sales": 236802.55228642325
+      "가방외": {
+        "gross_sales": 1067007.4441687334,
+        "net_sales": 783357.4382606641
       }
     },
     {
       "period": "2508",
       "당시즌F": {
-        "net_sales": 1327083.540115798,
-        "gross_sales": 1499529.7175942336
+        "gross_sales": 1574506.2034739456,
+        "net_sales": 1327083.540115798
       },
       "당시즌S": {
-        "net_sales": 2052860.924022214,
-        "gross_sales": 2310823.5850171335
+        "gross_sales": 2272032.258064516,
+        "net_sales": 1918740.6357083775
       },
       "과시즌F": {
-        "net_sales": 413414.8647051872,
-        "gross_sales": 641351.7665130567
+        "gross_sales": 603952.8535980148,
+        "net_sales": 367460.4750088621
       },
       "과시즌S": {
-        "net_sales": 873226.0427744298,
-        "gross_sales": 1614179.3690180785
+        "gross_sales": 1443493.796526054,
+        "net_sales": 771533.498759305
       },
       "모자": {
-        "net_sales": 3130240.340304856,
-        "gross_sales": 3482657.9227224384
+        "gross_sales": 3826833.002481384,
+        "net_sales": 3229565.1660167812
       },
       "신발": {
-        "net_sales": 2701332.624364882,
-        "gross_sales": 3404282.1694434597
+        "gross_sales": 3879647.642679898,
+        "net_sales": 2883775.0206782455
       },
-      "가방": {
-        "net_sales": 486830.67470164236,
-        "gross_sales": 646002.5995509867
-      },
-      "기타ACC": {
-        "net_sales": 223345.3857969987,
-        "gross_sales": 252957.5800543542
+      "가방외": {
+        "gross_sales": 943908.1885856085,
+        "net_sales": 710176.0604986406
       }
     },
     {
       "period": "2509",
       "당시즌F": {
-        "net_sales": 2025889.400921659,
-        "gross_sales": 2304596.478790027
+        "gross_sales": 2243057.0719603,
+        "net_sales": 1867454.5669384394
       },
       "당시즌S": {
-        "net_sales": 815119.6975067942,
-        "gross_sales": 927890.8188585606
+        "gross_sales": 895593.052109182,
+        "net_sales": 748670.6841545546
       },
       "과시즌F": {
-        "net_sales": 463740.9901926031,
-        "gross_sales": 735261.727519792
+        "gross_sales": 666885.8560794046,
+        "net_sales": 395051.6365355076
       },
       "과시즌S": {
-        "net_sales": 628973.413683091,
-        "gross_sales": 1183436.1337587142
+        "gross_sales": 1083186.1042183624,
+        "net_sales": 561838.5915160109
       },
       "모자": {
-        "net_sales": 2465584.780810587,
-        "gross_sales": 2817138.1306865173
+        "gross_sales": 3300801.488833746,
+        "net_sales": 2721883.9654968665
       },
       "신발": {
-        "net_sales": 2298566.229469455,
-        "gross_sales": 2924275.0797589505
+        "gross_sales": 3247704.7146401964,
+        "net_sales": 2402975.0679428084
       },
-      "가방": {
-        "net_sales": 587717.1215880893,
-        "gross_sales": 1068765.2132813423
-      },
-      "기타ACC": {
-        "net_sales": 199732.24624837525,
-        "gross_sales": 227309.46472881956
+      "가방외": {
+        "gross_sales": 1360878.411910671,
+        "net_sales": 787449.3678364643
       }
     },
     {
       "period": "2510",
       "당시즌F": {
-        "net_sales": 4295185.631572728,
-        "gross_sales": 4893274.252629091
+        "gross_sales": 4142322.580645159,
+        "net_sales": 3411963.369963368
       },
       "당시즌S": {
-        "net_sales": 379838.5915160108,
-        "gross_sales": 437785.65520500997
+        "gross_sales": 379454.09429280396,
+        "net_sales": 316217.1806687935
       },
       "과시즌F": {
-        "net_sales": 1201321.9898381187,
-        "gross_sales": 2083941.8645870257
+        "gross_sales": 1927734.491315136,
+        "net_sales": 1037403.9938556075
       },
       "과시즌S": {
-        "net_sales": 610989.4836346449,
-        "gross_sales": 1134661.4675646932
+        "gross_sales": 1088347.3945409427,
+        "net_sales": 568803.4975776909
       },
       "모자": {
-        "net_sales": 3300476.4267990077,
-        "gross_sales": 3748987.3567292914
+        "gross_sales": 5205903.225806448,
+        "net_sales": 4346035.212099726
       },
       "신발": {
-        "net_sales": 2535784.0009452906,
-        "gross_sales": 3261217.0625073845
+        "gross_sales": 3594099.255583126,
+        "net_sales": 2643172.8701406135
       },
-      "가방": {
-        "net_sales": 549941.8645870257,
-        "gross_sales": 1050783.4101382487
-      },
-      "기타ACC": {
-        "net_sales": 189502.30414746542,
-        "gross_sales": 213924.14037575325
+      "가방외": {
+        "gross_sales": 1327942.928039703,
+        "net_sales": 739444.1687344906
       }
     },
     {
       "period": "2511",
       "당시즌F": {
-        "net_sales": 7350033.321517192,
-        "gross_sales": 8562864.23254165
+        "gross_sales": 6782253.10173697,
+        "net_sales": 5416779.156327541
       },
       "당시즌S": {
-        "net_sales": 240541.88821930756,
-        "gross_sales": 282065.46142030007
+        "gross_sales": 229605.459057072,
+        "net_sales": 188867.0684154555
       },
       "과시즌F": {
-        "net_sales": 2272748.434361337,
-        "gross_sales": 3971534.9166962067
+        "gross_sales": 3573972.7047146424,
+        "net_sales": 1928972.941037457
       },
       "과시즌S": {
-        "net_sales": 569007.9168143683,
-        "gross_sales": 989311.1189885383
+        "gross_sales": 1003942.9280397026,
+        "net_sales": 553881.365945882
       },
       "모자": {
-        "net_sales": 3278172.9883020204,
-        "gross_sales": 3692737.799834573
+        "gross_sales": 6477436.724565752,
+        "net_sales": 5399889.400921661
       },
       "신발": {
-        "net_sales": 3212027.413446768,
-        "gross_sales": 4084622.474299893
+        "gross_sales": 4595081.885856079,
+        "net_sales": 3434142.030012998
       },
-      "가방": {
-        "net_sales": 544083.4219543897,
-        "gross_sales": 877357.910906298
-      },
-      "기타ACC": {
-        "net_sales": 216028.35873803613,
-        "gross_sales": 248250.0295403521
+      "가방외": {
+        "gross_sales": 1181888.3374689827,
+        "net_sales": 760111.7806924256
       }
     }
   ],
   "monthly_item_yoy": {
     "당시즌F": [
+      126,
+      75,
+      75,
+      44,
+      36,
       0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      73.78,
-      118.06,
-      105.05,
-      112.58,
-      122.14
+      74,
+      118,
+      102,
+      100,
+      107
     ],
     "당시즌S": [
-      106.54,
-      51.43,
-      73.6,
-      82.78,
-      126.89,
-      110.74,
-      115.81,
-      128.66,
-      95.95,
-      81.05,
-      61.1
+      107,
+      51,
+      73,
+      79,
+      121,
+      110,
+      115,
+      128,
+      93,
+      70,
+      50
     ],
     "과시즌F": [
-      140.07,
-      83.18,
-      95.62,
-      93.75,
-      72.52,
-      87.45,
-      102.9,
-      116.09,
-      72.99,
-      102.3,
-      111.38
+      204,
+      104,
+      151,
+      145,
+      127,
+      97,
+      109,
+      124,
+      70,
+      107,
+      116
     ],
     "과시즌S": [
-      169.82,
-      51.96,
-      142.88,
-      102.47,
-      97.42,
-      110.03,
-      98.92,
-      90.77,
-      85.06,
-      130.68,
-      147.12
+      201,
+      54,
+      151,
+      107,
+      99,
+      111,
+      102,
+      97,
+      89,
+      146,
+      166
     ],
     "모자": [
-      148.14,
-      89.81,
-      117.72,
-      103.07,
-      145.05,
-      125.45,
-      132.3,
-      129.81,
-      126.09,
-      166.41,
-      134.64
+      130,
+      85,
+      111,
+      103,
+      145,
+      122,
+      128,
+      127,
+      126,
+      168,
+      152
     ],
     "신발": [
-      125.44,
-      71.0,
-      71.16,
-      84.15,
-      103.72,
-      96.56,
-      103.52,
-      98.11,
-      94.91,
-      101.93,
-      106.16
+      126,
+      71,
+      72,
+      87,
+      109,
+      99,
+      105,
+      98,
+      95,
+      102,
+      104
     ],
-    "가방": [
-      101.26,
-      71.06,
-      105.3,
-      62.23,
-      82.04,
-      79.57,
-      94.71,
-      79.01,
-      92.0,
-      95.52,
-      94.58
-    ],
-    "기타ACC": [
-      145.22,
-      82.34,
-      82.7,
-      97.74,
-      128.02,
-      133.36,
-      163.0,
-      159.04,
-      147.85,
-      132.39,
-      111.47
+    "가방외": [
+      111,
+      73,
+      100,
+      69,
+      91,
+      89,
+      107,
+      94,
+      102,
+      103,
+      99
     ]
   },
   "monthly_inventory_data": [
@@ -2380,28 +2323,52 @@
         "ac_sales_gross_yoy": 114.09517373619191,
         "subcategory_detail": [
           {
-            "subcategory_code": "DJ",
-            "subcategory_name": "JUMPER",
-            "net_acp_p": 8873.034739454095,
-            "ac_sales_gross": 1878.2382133995036,
-            "sales_rate": 21.167934856018164,
-            "net_acp_p_yoy": 180.32249784545903
+            "subcategory_code": "GL",
+            "subcategory_name": "GLOVE",
+            "net_acp_p": 101.8957816377171,
+            "ac_sales_gross": 5.315136476426798,
+            "sales_rate": 5.21624780829924,
+            "net_acp_p_yoy": 250.390243902439
           },
           {
-            "subcategory_code": "MT",
-            "subcategory_name": "SWEAT SHIRTS",
-            "net_acp_p": 6887.913151364764,
-            "ac_sales_gross": 1634.5235732009926,
-            "sales_rate": 23.730316240661796,
-            "net_acp_p_yoy": 72.05962522533001
+            "subcategory_code": "MF",
+            "subcategory_name": "MUFFLER",
+            "net_acp_p": 509.87096774193543,
+            "ac_sales_gross": 60.992555831265506,
+            "sales_rate": 11.962351200615151,
+            "net_acp_p_yoy": 139.60051633942524
           },
           {
-            "subcategory_code": "TS",
-            "subcategory_name": "T/SHIRTS",
-            "net_acp_p": 6585.300248138958,
-            "ac_sales_gross": 3826.3498759305207,
-            "sales_rate": 58.10441030402325,
-            "net_acp_p_yoy": 130.97158908927065
+            "subcategory_code": "DP",
+            "subcategory_name": "PANTS",
+            "net_acp_p": 642.5062034739453,
+            "ac_sales_gross": 208.34243176178657,
+            "sales_rate": 32.426524543312865,
+            "net_acp_p_yoy": 111.22757127576861
+          },
+          {
+            "subcategory_code": "PT",
+            "subcategory_name": "PANTS",
+            "net_acp_p": 3329.372208436724,
+            "ac_sales_gross": 954.2630272952853,
+            "sales_rate": 28.661950889034138,
+            "net_acp_p_yoy": 80.84637804114574
+          },
+          {
+            "subcategory_code": "SK",
+            "subcategory_name": "SKIRT",
+            "net_acp_p": 1230.4689826302729,
+            "ac_sales_gross": 310.36972704714634,
+            "sales_rate": 25.223693683338073,
+            "net_acp_p_yoy": 143.3553333391152
+          },
+          {
+            "subcategory_code": "WP",
+            "subcategory_name": "PANTS",
+            "net_acp_p": 2968.45905707196,
+            "ac_sales_gross": 864.7791563275433,
+            "sales_rate": 29.132258175073076,
+            "net_acp_p_yoy": 244.1426052457571
           },
           {
             "subcategory_code": "BN",
@@ -2412,12 +2379,252 @@
             "net_acp_p_yoy": 181.9855145213338
           },
           {
-            "subcategory_code": "PT",
+            "subcategory_code": "CP",
+            "subcategory_name": "CAP",
+            "net_acp_p": 755.8461538461538,
+            "ac_sales_gross": 390.1339950372208,
+            "sales_rate": 51.61552956934532,
+            "net_acp_p_yoy": 85.08975311607846
+          },
+          {
+            "subcategory_code": "WM",
+            "subcategory_name": "Winter Headwear",
+            "net_acp_p": 731.590570719603,
+            "ac_sales_gross": 304.01488833746896,
+            "sales_rate": 41.55533169849846,
+            "net_acp_p_yoy": 205.63340005719186
+          },
+          {
+            "subcategory_code": "HD",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_acp_p": 2974.794044665012,
+            "ac_sales_gross": 754.7816377171215,
+            "sales_rate": 25.372567861319506,
+            "net_acp_p_yoy": 90.4527686043011
+          },
+          {
+            "subcategory_code": "MT",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_acp_p": 6887.913151364764,
+            "ac_sales_gross": 1634.5235732009926,
+            "sales_rate": 23.730316240661796,
+            "net_acp_p_yoy": 72.05962522533001
+          },
+          {
+            "subcategory_code": "PQ",
+            "subcategory_name": "Polo shirt",
+            "net_acp_p": 19.280397022332505,
+            "ac_sales_gross": 0.6426799007444168,
+            "sales_rate": 3.3333333333333335,
+            "net_acp_p_yoy": 113.10043668122269
+          },
+          {
+            "subcategory_code": "TS",
+            "subcategory_name": "T/SHIRTS",
+            "net_acp_p": 6585.300248138958,
+            "ac_sales_gross": 3826.3498759305207,
+            "sales_rate": 58.10441030402325,
+            "net_acp_p_yoy": 130.97158908927065
+          },
+          {
+            "subcategory_code": "WS",
+            "subcategory_name": "WOVEN SHIRTS",
+            "net_acp_p": 382.3771712158809,
+            "ac_sales_gross": 102.34491315136476,
+            "sales_rate": 26.76543498293294,
+            "net_acp_p_yoy": 76.47657285220129
+          },
+          {
+            "subcategory_code": "DJ",
+            "subcategory_name": "JUMPER",
+            "net_acp_p": 8873.034739454095,
+            "ac_sales_gross": 1878.2382133995036,
+            "sales_rate": 21.167934856018164,
+            "net_acp_p_yoy": 180.32249784545903
+          },
+          {
+            "subcategory_code": "DK",
+            "subcategory_name": "DENIM JACKET",
+            "net_acp_p": 58.377171215880885,
+            "ac_sales_gross": 10.54590570719603,
+            "sales_rate": 18.065119442319137,
+            "net_acp_p_yoy": 12.066533654068081
+          },
+          {
+            "subcategory_code": "DV",
+            "subcategory_name": "VEST",
+            "net_acp_p": 2527.181141439206,
+            "ac_sales_gross": 407.6377171215881,
+            "sales_rate": 16.13013449797438,
+            "net_acp_p_yoy": 176.7265672719196
+          },
+          {
+            "subcategory_code": "JP",
+            "subcategory_name": "JUMPER",
+            "net_acp_p": 2414.369727047146,
+            "ac_sales_gross": 800.8263027295285,
+            "sales_rate": 33.16916600461875,
+            "net_acp_p_yoy": 79.76689487478613
+          },
+          {
+            "subcategory_code": "KC",
+            "subcategory_name": "Knit Cardigan",
+            "net_acp_p": 2093.426799007444,
+            "ac_sales_gross": 668.4937965260546,
+            "sales_rate": 31.932991248750962,
+            "net_acp_p_yoy": 81.59045344954144
+          },
+          {
+            "subcategory_code": "PD",
+            "subcategory_name": "Padded Jumper",
+            "net_acp_p": 62.84367245657568,
+            "ac_sales_gross": 3.4913151364764268,
+            "sales_rate": 5.555555555555555,
+            "net_acp_p_yoy": 12.910033490847365
+          },
+          {
+            "subcategory_code": "WJ",
+            "subcategory_name": "Windbreaker",
+            "net_acp_p": 1525.1439205955335,
+            "ac_sales_gross": 635.9230769230769,
+            "sales_rate": 41.695938877346315,
+            "net_acp_p_yoy": 96.6840382373807
+          },
+          {
+            "subcategory_code": "S1",
+            "subcategory_name": "T-Shirt & Sweatpants",
+            "net_acp_p": 27.40198511166253,
+            "ac_sales_gross": 2.029776674937965,
+            "sales_rate": 7.4074074074074066,
+            "net_acp_p_yoy": 25.15489749430524
+          },
+          {
+            "subcategory_code": "S2",
+            "subcategory_name": "Sweatshirt & Sweatpants",
+            "net_acp_p": 155.78411910669973,
+            "ac_sales_gross": 12.178660049627792,
+            "sales_rate": 7.817651837339323,
+            "net_acp_p_yoy": 112.4926087190238
+          },
+          {
+            "subcategory_code": "SO",
+            "subcategory_name": "SOCKS",
+            "net_acp_p": 117.85359801488832,
+            "ac_sales_gross": 25.034739454094293,
+            "sales_rate": 21.242236024844722,
+            "net_acp_p_yoy": 322.0
+          },
+          {
+            "subcategory_code": "DS",
+            "subcategory_name": "SKIRT",
+            "net_acp_p": 419.0297766749379,
+            "ac_sales_gross": 175.11910669975185,
+            "sales_rate": 41.791566243656334,
+            "net_acp_p_yoy": 189.35110951638765
+          },
+          {
+            "subcategory_code": "SM",
+            "subcategory_name": "SHORT PANTS",
+            "net_acp_p": 142.48138957816377,
+            "ac_sales_gross": 23.746898263027294,
+            "sales_rate": 16.666666666666664,
+            "net_acp_p_yoy": 0
+          },
+          {
+            "subcategory_code": "CB",
+            "subcategory_name": "Beret",
+            "net_acp_p": 171.6079404466501,
+            "ac_sales_gross": 60.23325062034739,
+            "sales_rate": 35.099337748344375,
+            "net_acp_p_yoy": 46.08966284796502
+          },
+          {
+            "subcategory_code": "HT",
+            "subcategory_name": "Hat",
+            "net_acp_p": 685.6327543424317,
+            "ac_sales_gross": 162.78411910669973,
+            "sales_rate": 23.74217364554305,
+            "net_acp_p_yoy": 63.21436742164265
+          },
+          {
+            "subcategory_code": "DR",
+            "subcategory_name": "DENIM SHIRT",
+            "net_acp_p": 516.3052109181141,
+            "ac_sales_gross": 73.56327543424317,
+            "sales_rate": 14.24802110817942,
+            "net_acp_p_yoy": 94.28287899659247
+          },
+          {
+            "subcategory_code": "KP",
+            "subcategory_name": "Sweater Pullover",
+            "net_acp_p": 1935.7667493796525,
+            "ac_sales_gross": 408.9975186104218,
+            "sales_rate": 21.128450457240863,
+            "net_acp_p_yoy": 137.15566651429376
+          },
+          {
+            "subcategory_code": "TO",
+            "subcategory_name": "TOP",
+            "net_acp_p": 166.3771712158809,
+            "ac_sales_gross": 88.36476426799007,
+            "sales_rate": 53.11111111111111,
+            "net_acp_p_yoy": 0
+          },
+          {
+            "subcategory_code": "TR",
+            "subcategory_name": "T/SHIRTS",
+            "net_acp_p": 2204.002481389578,
+            "ac_sales_gross": 1072.349875930521,
+            "sales_rate": 48.654658285794056,
+            "net_acp_p_yoy": 77.00610005618016
+          },
+          {
+            "subcategory_code": "FD",
+            "subcategory_name": "Fleece Jumper",
+            "net_acp_p": 317.8138957816377,
+            "ac_sales_gross": 61.33250620347394,
+            "sales_rate": 19.298245614035086,
+            "net_acp_p_yoy": 27.71678796102134
+          },
+          {
+            "subcategory_code": "JK",
+            "subcategory_name": "Jacket",
+            "net_acp_p": 325.6054590570719,
+            "ac_sales_gross": 107.81637717121588,
+            "sales_rate": 33.11258278145696,
+            "net_acp_p_yoy": 0
+          },
+          {
+            "subcategory_code": "WB",
+            "subcategory_name": "Winter Boots",
+            "net_acp_p": 1106.4913151364765,
+            "ac_sales_gross": 160.9925558312655,
+            "sales_rate": 14.549825527677857,
+            "net_acp_p_yoy": 90.51540574170645
+          },
+          {
+            "subcategory_code": "TP",
             "subcategory_name": "PANTS",
-            "net_acp_p": 3329.372208436724,
-            "ac_sales_gross": 954.2630272952853,
-            "sales_rate": 28.661950889034138,
-            "net_acp_p_yoy": 80.84637804114574
+            "net_acp_p": 0.8660049627791563,
+            "ac_sales_gross": 0.0,
+            "sales_rate": 0.0,
+            "net_acp_p_yoy": 32.404828226555246
+          },
+          {
+            "subcategory_code": "RL",
+            "subcategory_name": "Long-sleeve T-shirt",
+            "net_acp_p": 3.7543424317617866,
+            "ac_sales_gross": 0.0,
+            "sales_rate": 0.0,
+            "net_acp_p_yoy": 169.05027932960894
+          },
+          {
+            "subcategory_code": "SS",
+            "subcategory_name": "Softshell Jacket",
+            "net_acp_p": 0.0,
+            "ac_sales_gross": 0.0,
+            "sales_rate": 0,
+            "net_acp_p_yoy": 0
           }
         ]
       }
@@ -2941,6 +3148,95 @@
         "yoy": 74.95106062589012
       },
       "by_year": {
+        "1년차": {
+          "current": {
+            "stock_price": 14093.191066997522
+          },
+          "previous": {
+            "stock_price": 30330.01985111662
+          },
+          "yoy": 46.46614521249208,
+          "subcategory_top5": [
+            {
+              "subcategory_code": "MT",
+              "subcategory_name": "SWEAT SHIRTS",
+              "stock_price": 3830.8610421836224,
+              "yoy": 71.05840798552538
+            },
+            {
+              "subcategory_code": "PT",
+              "subcategory_name": "PANTS",
+              "stock_price": 1337.2307692307693,
+              "yoy": 71.65533362231045
+            },
+            {
+              "subcategory_code": "HD",
+              "subcategory_name": "SWEAT SHIRTS",
+              "stock_price": 1281.109181141439,
+              "yoy": 87.15307963827942
+            },
+            {
+              "subcategory_code": "KC",
+              "subcategory_name": "Knit Cardigan",
+              "stock_price": 1061.057071960298,
+              "yoy": 85.7147438917075
+            },
+            {
+              "subcategory_code": "TR",
+              "subcategory_name": "T/SHIRTS",
+              "stock_price": 1002.7245657568238,
+              "yoy": 62.41204198508652
+            },
+            {
+              "subcategory_code": "JP",
+              "subcategory_name": "JUMPER",
+              "stock_price": 878.4292803970222,
+              "yoy": 24.07863627830544
+            },
+            {
+              "subcategory_code": "DJ",
+              "subcategory_name": "JUMPER",
+              "stock_price": 611.9454094292803,
+              "yoy": 50.757616297497655
+            }
+          ],
+          "others": {
+            "stock_price": 4089.8337468982627,
+            "yoy": 35.05979426179294,
+            "subcategory_top5": [
+              {
+                "subcategory_code": "TS",
+                "subcategory_name": "T/SHIRTS",
+                "stock_price": 339.9578163771712,
+                "yoy": 51.00310106955257
+              },
+              {
+                "subcategory_code": "HT",
+                "subcategory_name": "Hat",
+                "stock_price": 337.0595533498759,
+                "yoy": 20.97539809015553
+              },
+              {
+                "subcategory_code": "WJ",
+                "subcategory_name": "Windbreaker",
+                "stock_price": 335.22828784119105,
+                "yoy": 59.38042556184095
+              },
+              {
+                "subcategory_code": "KP",
+                "subcategory_name": "Sweater Pullover",
+                "stock_price": 316.82133995037213,
+                "yoy": 47.195874764351444
+              },
+              {
+                "subcategory_code": "DK",
+                "subcategory_name": "DENIM JACKET",
+                "stock_price": 289.73945409429285,
+                "yoy": 52.60229663433601
+              }
+            ]
+          }
+        },
         "3년차 이상": {
           "current": {
             "stock_price": -1.5831265508684862
@@ -3038,95 +3334,56 @@
               }
             ]
           }
+        }
+      }
+    }
+  },
+  "acc_sales_data": {
+    "current": {
+      "total": {
+        "net_sales": 7250312.182441213,
+        "gross_sales": 8902968.214581117
+      },
+      "categories": {
+        "신발": {
+          "net_sales": 3212027.413446768,
+          "gross_sales": 4084622.474299892
         },
-        "1년차": {
-          "current": {
-            "stock_price": 14093.191066997522
-          },
-          "previous": {
-            "stock_price": 30330.01985111662
-          },
-          "yoy": 46.46614521249208,
-          "subcategory_top5": [
-            {
-              "subcategory_code": "MT",
-              "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 3830.8610421836224,
-              "yoy": 71.05840798552538
-            },
-            {
-              "subcategory_code": "PT",
-              "subcategory_name": "PANTS",
-              "stock_price": 1337.2307692307693,
-              "yoy": 71.65533362231045
-            },
-            {
-              "subcategory_code": "HD",
-              "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 1281.109181141439,
-              "yoy": 87.15307963827942
-            },
-            {
-              "subcategory_code": "KC",
-              "subcategory_name": "Knit Cardigan",
-              "stock_price": 1061.057071960298,
-              "yoy": 85.7147438917075
-            },
-            {
-              "subcategory_code": "TR",
-              "subcategory_name": "T/SHIRTS",
-              "stock_price": 1002.7245657568238,
-              "yoy": 62.41204198508652
-            },
-            {
-              "subcategory_code": "JP",
-              "subcategory_name": "JUMPER",
-              "stock_price": 878.4292803970222,
-              "yoy": 24.07863627830544
-            },
-            {
-              "subcategory_code": "DJ",
-              "subcategory_name": "JUMPER",
-              "stock_price": 611.9454094292803,
-              "yoy": 50.757616297497655
-            }
-          ],
-          "others": {
-            "stock_price": 4089.8337468982627,
-            "yoy": 35.05979426179294,
-            "subcategory_top5": [
-              {
-                "subcategory_code": "TS",
-                "subcategory_name": "T/SHIRTS",
-                "stock_price": 339.9578163771712,
-                "yoy": 51.00310106955257
-              },
-              {
-                "subcategory_code": "HT",
-                "subcategory_name": "Hat",
-                "stock_price": 337.0595533498759,
-                "yoy": 20.97539809015553
-              },
-              {
-                "subcategory_code": "WJ",
-                "subcategory_name": "Windbreaker",
-                "stock_price": 335.22828784119105,
-                "yoy": 59.38042556184095
-              },
-              {
-                "subcategory_code": "KP",
-                "subcategory_name": "Sweater Pullover",
-                "stock_price": 316.82133995037213,
-                "yoy": 47.195874764351444
-              },
-              {
-                "subcategory_code": "DK",
-                "subcategory_name": "DENIM JACKET",
-                "stock_price": 289.73945409429285,
-                "yoy": 52.60229663433601
-              }
-            ]
-          }
+        "모자": {
+          "net_sales": 3278172.9883020194,
+          "gross_sales": 3692737.7998345764
+        },
+        "가방": {
+          "net_sales": 544083.4219543895,
+          "gross_sales": 877357.9109062988
+        },
+        "기타ACC": {
+          "net_sales": 216028.3587380362,
+          "gross_sales": 248250.02954035206
+        }
+      }
+    },
+    "previous": {
+      "total": {
+        "net_sales": 6229434.006853362,
+        "gross_sales": 7783873.3309701
+      },
+      "categories": {
+        "신발": {
+          "net_sales": 3025580.5269998824,
+          "gross_sales": 4060980.739690416
+        },
+        "모자": {
+          "net_sales": 2434786.4823348694,
+          "gross_sales": 2797556.422072551
+        },
+        "가방": {
+          "net_sales": 575260.3095828901,
+          "gross_sales": 705709.5592579463
+        },
+        "기타ACC": {
+          "net_sales": 193806.68793572014,
+          "gross_sales": 219626.6099491904
         }
       }
     }

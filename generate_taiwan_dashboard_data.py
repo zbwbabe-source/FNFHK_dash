@@ -1525,6 +1525,75 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 yoy = (current_stock / prev_stock * 100) if prev_stock > 0 else 0
                 monthly_inventory_yoy[inv_key].append(round(yoy))
     
+    # ACC 판매 데이터 계산 (Season_Type = '악세')
+    print("ACC 판매 데이터 계산 중...")
+    acc_sales_data = {
+        'current': {
+            'total': {'net_sales': 0, 'gross_sales': 0},
+            'categories': {
+                '신발': {'net_sales': 0, 'gross_sales': 0},
+                '모자': {'net_sales': 0, 'gross_sales': 0},
+                '가방': {'net_sales': 0, 'gross_sales': 0},
+                '기타ACC': {'net_sales': 0, 'gross_sales': 0}
+            }
+        },
+        'previous': {
+            'total': {'net_sales': 0, 'gross_sales': 0},
+            'categories': {
+                '신발': {'net_sales': 0, 'gross_sales': 0},
+                '모자': {'net_sales': 0, 'gross_sales': 0},
+                '가방': {'net_sales': 0, 'gross_sales': 0},
+                '기타ACC': {'net_sales': 0, 'gross_sales': 0}
+            }
+        }
+    }
+    
+    # 카테고리 매핑
+    category_mapping = {
+        'SHO': '신발',
+        'HEA': '모자',
+        'BAG': '가방',
+        'ATC': '기타ACC'
+    }
+    
+    # 당월 ACC 데이터
+    for row in data:
+        if row['Period'] == last_period and row.get('Season_Type') == '악세' and row.get('Brand') == 'MLB':
+            net_sales = float(row['Net_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
+            gross_sales = float(row['Gross_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
+            
+            acc_sales_data['current']['total']['net_sales'] += net_sales
+            acc_sales_data['current']['total']['gross_sales'] += gross_sales
+            
+            # 카테고리별 집계
+            category = row.get('Category', '')
+            if category in category_mapping:
+                korean_cat = category_mapping[category]
+                acc_sales_data['current']['categories'][korean_cat]['net_sales'] += net_sales
+                acc_sales_data['current']['categories'][korean_cat]['gross_sales'] += gross_sales
+    
+    # 전년 ACC 데이터
+    for row in data:
+        if row['Period'] == prev_period and row.get('Season_Type') == '악세' and row.get('Brand') == 'MLB':
+            net_sales = float(row['Net_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
+            gross_sales = float(row['Gross_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
+            
+            acc_sales_data['previous']['total']['net_sales'] += net_sales
+            acc_sales_data['previous']['total']['gross_sales'] += gross_sales
+            
+            # 카테고리별 집계
+            category = row.get('Category', '')
+            if category in category_mapping:
+                korean_cat = category_mapping[category]
+                acc_sales_data['previous']['categories'][korean_cat]['net_sales'] += net_sales
+                acc_sales_data['previous']['categories'][korean_cat]['gross_sales'] += gross_sales
+    
+    print(f"ACC 당월 합계: {acc_sales_data['current']['total']['net_sales']:.2f} HKD")
+    print(f"ACC 전년 합계: {acc_sales_data['previous']['total']['net_sales']:.2f} HKD")
+    print(f"ACC 카테고리별 당월:")
+    for cat, val in acc_sales_data['current']['categories'].items():
+        print(f"  {cat}: {val['net_sales']:.2f} HKD")
+    
     # 결과 정리
     result = {
         'metadata': {
@@ -1556,6 +1625,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         'season_sales': season_sales,
         'acc_stock_summary': acc_stock_summary,
         'ending_inventory': ending_inventory,
+        'acc_sales_data': acc_sales_data,
     }
     
     # Period별 파일명 생성
