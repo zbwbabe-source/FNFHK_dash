@@ -19,7 +19,7 @@ try:
     from generate_taiwan_dashboard_data import generate_dashboard_data
     
     # 2511 데이터 생성
-    csv_file = '../Dashboard_Raw_Data/대만재고수불_2511.csv'
+    csv_file = '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
     output_file = 'components/dashboard/taiwan-dashboard-data-2511.json'
     
     print(f"CSV 파일: {csv_file}")

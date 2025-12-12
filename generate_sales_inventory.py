@@ -23,7 +23,7 @@ print("=" * 80)
 TARGET_PERIOD = 2510  # 2025년 10월
 PREV_PERIOD = 2410    # 2024년 10월 (전년 동월)
 
-csv_path = '../Dashboard_Raw_Data/홍콩재고수불.csv'
+csv_path = '../Dashboard_Raw_Data/HKMC/2511/HKMC_Inventory_2511.csv'
 
 # CSV 로드
 print(f"\nCSV 로드 중: {csv_path}")

@@ -162,7 +162,7 @@ if __name__ == '__main__':
     period = '202511'
     prev_period = '202411'
     
-    csv_file = '../Dashboard_Raw_Data/hmd_pl_database_2511.csv'
+    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_PL_2511.csv'
     
     print("홍콩/마카오 매장별 직접비 데이터 읽는 중...")
     stores = read_store_data(csv_file, period, prev_period)

@@ -218,7 +218,7 @@ if __name__ == '__main__':
     period = '2511'
     prev_period = '2411'
     
-    csv_file = '../Dashboard_Raw_Data/hmd_pl_database_2511.csv'
+    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_PL_2511.csv'
     
     print("홍콩/마카오 매장별 누적 직접비 데이터 읽는 중...")
     cumulative_stores = read_cumulative_store_data(csv_file, period)

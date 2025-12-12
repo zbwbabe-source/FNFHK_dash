@@ -52,6 +52,15 @@
 - **CSV 파일 경로 및 처리 규칙**
   - 대만 데이터: 부가세 제외 (÷ 1.05), 환율 적용
   - 홍콩 데이터: 부가세 없음, 환율 변환 불필요
+  - **CSV 폴더 구조**: `Dashboard_Raw_Data/HKMC/{period}/`, `Dashboard_Raw_Data/TW/{period}/`
+  - 예: `Dashboard_Raw_Data/HKMC/2511/HKMC_Inventory_2511.csv`
+
+- **Period별 데이터 로드 (⚠️ 필수)**
+  - 요약 페이지(`app/page.tsx`): Period 선택에 따라 동적으로 데이터 로드
+  - CEO 대시보드: URL 파라미터 또는 props로 period 전달
+  - 데이터 파일명 규칙: `{dashboard-type}-data-{period}.json`
+  - 예: `hongkong-dashboard-data-2511.json`, `taiwan-pl-data-2510.json`
+  - Fallback: Period별 파일 없으면 기본 파일 사용
 
 ### 5. 새로운 컴포넌트/카드 추가 작업
 새로운 기능, 카드, 섹션을 추가할 때:
@@ -72,13 +81,24 @@
 - README.md의 "매장효율성 카드 계산 규칙" 섹션 필수 확인
 - 온라인 제외, 매출 0인 매장 제외 등 규칙 준수
 
+### 8. Period별 데이터 관리 (⚠️ 필수)
+Period 선택 또는 데이터 로드 관련 작업 시:
+
+- **요약 페이지**: `selectedPeriod` 상태로 동적 데이터 로드 (이미 구현됨)
+- **CEO 대시보드**: `period` props 또는 URL 파라미터로 기간 전달
+- **Python 스크립트**: 새로운 CSV 폴더 구조 사용
+  - `Dashboard_Raw_Data/HKMC/{period}/`
+  - `Dashboard_Raw_Data/TW/{period}/`
+- **JSON 파일 생성**: Period별로 별도 파일 생성 (`-{period}.json`)
+
 ## 작업 시작 전 체크리스트
 
 ```
-[ ] 이 작업이 위 7가지 카테고리에 해당하는가?
+[ ] 이 작업이 위 8가지 카테고리에 해당하는가?
 [ ] 해당한다면 README.md를 읽었는가?
 [ ] 계산 공식, 포맷 규칙을 확인했는가?
 [ ] 기존 코드에 하드코딩된 잘못된 값이 없는가?
+[ ] Period별 데이터를 올바르게 로드하고 있는가?
 ```
 
 ## 중요 원칙

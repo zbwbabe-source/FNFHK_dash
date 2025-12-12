@@ -127,7 +127,7 @@ def validate_taiwan_csv(period):
     # CSV 파일 찾기
     possible_paths = [
         f'../Dashboard_Raw_Data/대만재고수불_{period}.csv',
-        '../Dashboard_Raw_Data/대만재고수불.csv'
+        '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
     ]
     
     csv_path = None

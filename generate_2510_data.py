@@ -45,7 +45,7 @@ try:
     tw_gen.TWD_TO_HKD_RATE = 3.92  # 2510 환율
     
     # 대만 CSV에서 2510 데이터 생성
-    tw_csv = '../Dashboard_Raw_Data/대만재고수불_2511.csv'
+    tw_csv = '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
     tw_output = 'components/dashboard/taiwan-dashboard-data-2510.json'
     
     gen_taiwan(tw_csv, tw_output, target_period='2510')

@@ -65,7 +65,7 @@ def update_hongkong_period(period):
     
     # CSV 파일 경로 (홍콩은 하나의 파일에 모든 Period가 포함되어 있을 수 있음)
     # 실제 파일명 확인 필요 - 여러 파일이면 해당 Period 파일, 하나면 전체 파일
-    csv_file = '../Dashboard_Raw_Data/홍콩재고수불.csv'  # 기본값
+    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_Inventory_2511.csv'  # 기본값
     
     # Period별 파일이 있다면 시도
     period_csv = f'../Dashboard_Raw_Data/2401{period} 홍콩재고수불.csv'
@@ -104,7 +104,7 @@ def update_taiwan_period(period):
     print(f"{'='*80}")
     
     # CSV 파일 경로 (대만은 파일명이 다를 수 있음)
-    csv_file = '../Dashboard_Raw_Data/대만재고수불.csv'
+    csv_file = '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
     
     # 파일 존재 확인
     if not os.path.exists(csv_file):

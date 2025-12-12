@@ -9,7 +9,7 @@ if sys.platform == 'win32':
 
 # CSV 로드
 print("CSV 파일 로딩 중...")
-df = pd.read_csv('../Dashboard_Raw_Data/홍콩재고수불.csv')
+df = pd.read_csv('../Dashboard_Raw_Data/HKMC/2511/HKMC_Inventory_2511.csv')
 
 print(f"✅ 총 {len(df):,}개 레코드 로드 완료\n")
 
