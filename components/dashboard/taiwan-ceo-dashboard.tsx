@@ -2274,7 +2274,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       {(() => {
                         const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
                         // 입고 높은순으로 이미 정렬되어 있음, TOP5만 표시
-                        return subcategoryDetail.map((item: any, idx: number) => (
+                        return subcategoryDetail.slice(0, 5).map((item: any, idx: number) => (
                           <div key={idx} className="flex justify-between text-xs">
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">

@@ -867,6 +867,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'net_acp_p_yoy': subcat_net_acp_p_yoy
         })
     
+    # 입고(net_acp_p) 기준으로 정렬하고 TOP 5만 선택
+    subcategory_detail.sort(key=lambda x: x['net_acp_p'], reverse=True)
+    subcategory_detail = subcategory_detail[:5]
+    
     # 월 이름을 영어로 변환 (10월 -> october)
     month_names = {
         1: 'january', 2: 'february', 3: 'march', 4: 'april', 5: 'may', 6: 'june',

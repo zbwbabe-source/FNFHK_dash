@@ -4,7 +4,7 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-12T21:47:59.180889"
+    "generated_at": "2025-12-12T21:51:42.118346"
   },
   "sales_summary": {
     "total_net_sales": 17682.64374335342,
@@ -2323,84 +2323,12 @@
         "ac_sales_gross_yoy": 114.09517373619191,
         "subcategory_detail": [
           {
-            "subcategory_code": "GL",
-            "subcategory_name": "GLOVE",
-            "net_acp_p": 101.8957816377171,
-            "ac_sales_gross": 5.315136476426798,
-            "sales_rate": 5.21624780829924,
-            "net_acp_p_yoy": 250.390243902439
-          },
-          {
-            "subcategory_code": "MF",
-            "subcategory_name": "MUFFLER",
-            "net_acp_p": 509.87096774193543,
-            "ac_sales_gross": 60.992555831265506,
-            "sales_rate": 11.962351200615151,
-            "net_acp_p_yoy": 139.60051633942524
-          },
-          {
-            "subcategory_code": "DP",
-            "subcategory_name": "PANTS",
-            "net_acp_p": 642.5062034739453,
-            "ac_sales_gross": 208.34243176178657,
-            "sales_rate": 32.426524543312865,
-            "net_acp_p_yoy": 111.22757127576861
-          },
-          {
-            "subcategory_code": "PT",
-            "subcategory_name": "PANTS",
-            "net_acp_p": 3329.372208436724,
-            "ac_sales_gross": 954.2630272952853,
-            "sales_rate": 28.661950889034138,
-            "net_acp_p_yoy": 80.84637804114574
-          },
-          {
-            "subcategory_code": "SK",
-            "subcategory_name": "SKIRT",
-            "net_acp_p": 1230.4689826302729,
-            "ac_sales_gross": 310.36972704714634,
-            "sales_rate": 25.223693683338073,
-            "net_acp_p_yoy": 143.3553333391152
-          },
-          {
-            "subcategory_code": "WP",
-            "subcategory_name": "PANTS",
-            "net_acp_p": 2968.45905707196,
-            "ac_sales_gross": 864.7791563275433,
-            "sales_rate": 29.132258175073076,
-            "net_acp_p_yoy": 244.1426052457571
-          },
-          {
-            "subcategory_code": "BN",
-            "subcategory_name": "Beanie",
-            "net_acp_p": 4722.930521091811,
-            "ac_sales_gross": 2302.9801488833746,
-            "sales_rate": 48.76167749236736,
-            "net_acp_p_yoy": 181.9855145213338
-          },
-          {
-            "subcategory_code": "CP",
-            "subcategory_name": "CAP",
-            "net_acp_p": 755.8461538461538,
-            "ac_sales_gross": 390.1339950372208,
-            "sales_rate": 51.61552956934532,
-            "net_acp_p_yoy": 85.08975311607846
-          },
-          {
-            "subcategory_code": "WM",
-            "subcategory_name": "Winter Headwear",
-            "net_acp_p": 731.590570719603,
-            "ac_sales_gross": 304.01488833746896,
-            "sales_rate": 41.55533169849846,
-            "net_acp_p_yoy": 205.63340005719186
-          },
-          {
-            "subcategory_code": "HD",
-            "subcategory_name": "SWEAT SHIRTS",
-            "net_acp_p": 2974.794044665012,
-            "ac_sales_gross": 754.7816377171215,
-            "sales_rate": 25.372567861319506,
-            "net_acp_p_yoy": 90.4527686043011
+            "subcategory_code": "DJ",
+            "subcategory_name": "JUMPER",
+            "net_acp_p": 8873.034739454095,
+            "ac_sales_gross": 1878.2382133995036,
+            "sales_rate": 21.167934856018164,
+            "net_acp_p_yoy": 180.32249784545903
           },
           {
             "subcategory_code": "MT",
@@ -2411,14 +2339,6 @@
             "net_acp_p_yoy": 72.05962522533001
           },
           {
-            "subcategory_code": "PQ",
-            "subcategory_name": "Polo shirt",
-            "net_acp_p": 19.280397022332505,
-            "ac_sales_gross": 0.6426799007444168,
-            "sales_rate": 3.3333333333333335,
-            "net_acp_p_yoy": 113.10043668122269
-          },
-          {
             "subcategory_code": "TS",
             "subcategory_name": "T/SHIRTS",
             "net_acp_p": 6585.300248138958,
@@ -2427,204 +2347,20 @@
             "net_acp_p_yoy": 130.97158908927065
           },
           {
-            "subcategory_code": "WS",
-            "subcategory_name": "WOVEN SHIRTS",
-            "net_acp_p": 382.3771712158809,
-            "ac_sales_gross": 102.34491315136476,
-            "sales_rate": 26.76543498293294,
-            "net_acp_p_yoy": 76.47657285220129
+            "subcategory_code": "BN",
+            "subcategory_name": "Beanie",
+            "net_acp_p": 4722.930521091811,
+            "ac_sales_gross": 2302.9801488833746,
+            "sales_rate": 48.76167749236736,
+            "net_acp_p_yoy": 181.9855145213338
           },
           {
-            "subcategory_code": "DJ",
-            "subcategory_name": "JUMPER",
-            "net_acp_p": 8873.034739454095,
-            "ac_sales_gross": 1878.2382133995036,
-            "sales_rate": 21.167934856018164,
-            "net_acp_p_yoy": 180.32249784545903
-          },
-          {
-            "subcategory_code": "DK",
-            "subcategory_name": "DENIM JACKET",
-            "net_acp_p": 58.377171215880885,
-            "ac_sales_gross": 10.54590570719603,
-            "sales_rate": 18.065119442319137,
-            "net_acp_p_yoy": 12.066533654068081
-          },
-          {
-            "subcategory_code": "DV",
-            "subcategory_name": "VEST",
-            "net_acp_p": 2527.181141439206,
-            "ac_sales_gross": 407.6377171215881,
-            "sales_rate": 16.13013449797438,
-            "net_acp_p_yoy": 176.7265672719196
-          },
-          {
-            "subcategory_code": "JP",
-            "subcategory_name": "JUMPER",
-            "net_acp_p": 2414.369727047146,
-            "ac_sales_gross": 800.8263027295285,
-            "sales_rate": 33.16916600461875,
-            "net_acp_p_yoy": 79.76689487478613
-          },
-          {
-            "subcategory_code": "KC",
-            "subcategory_name": "Knit Cardigan",
-            "net_acp_p": 2093.426799007444,
-            "ac_sales_gross": 668.4937965260546,
-            "sales_rate": 31.932991248750962,
-            "net_acp_p_yoy": 81.59045344954144
-          },
-          {
-            "subcategory_code": "PD",
-            "subcategory_name": "Padded Jumper",
-            "net_acp_p": 62.84367245657568,
-            "ac_sales_gross": 3.4913151364764268,
-            "sales_rate": 5.555555555555555,
-            "net_acp_p_yoy": 12.910033490847365
-          },
-          {
-            "subcategory_code": "WJ",
-            "subcategory_name": "Windbreaker",
-            "net_acp_p": 1525.1439205955335,
-            "ac_sales_gross": 635.9230769230769,
-            "sales_rate": 41.695938877346315,
-            "net_acp_p_yoy": 96.6840382373807
-          },
-          {
-            "subcategory_code": "S1",
-            "subcategory_name": "T-Shirt & Sweatpants",
-            "net_acp_p": 27.40198511166253,
-            "ac_sales_gross": 2.029776674937965,
-            "sales_rate": 7.4074074074074066,
-            "net_acp_p_yoy": 25.15489749430524
-          },
-          {
-            "subcategory_code": "S2",
-            "subcategory_name": "Sweatshirt & Sweatpants",
-            "net_acp_p": 155.78411910669973,
-            "ac_sales_gross": 12.178660049627792,
-            "sales_rate": 7.817651837339323,
-            "net_acp_p_yoy": 112.4926087190238
-          },
-          {
-            "subcategory_code": "SO",
-            "subcategory_name": "SOCKS",
-            "net_acp_p": 117.85359801488832,
-            "ac_sales_gross": 25.034739454094293,
-            "sales_rate": 21.242236024844722,
-            "net_acp_p_yoy": 322.0
-          },
-          {
-            "subcategory_code": "DS",
-            "subcategory_name": "SKIRT",
-            "net_acp_p": 419.0297766749379,
-            "ac_sales_gross": 175.11910669975185,
-            "sales_rate": 41.791566243656334,
-            "net_acp_p_yoy": 189.35110951638765
-          },
-          {
-            "subcategory_code": "SM",
-            "subcategory_name": "SHORT PANTS",
-            "net_acp_p": 142.48138957816377,
-            "ac_sales_gross": 23.746898263027294,
-            "sales_rate": 16.666666666666664,
-            "net_acp_p_yoy": 0
-          },
-          {
-            "subcategory_code": "CB",
-            "subcategory_name": "Beret",
-            "net_acp_p": 171.6079404466501,
-            "ac_sales_gross": 60.23325062034739,
-            "sales_rate": 35.099337748344375,
-            "net_acp_p_yoy": 46.08966284796502
-          },
-          {
-            "subcategory_code": "HT",
-            "subcategory_name": "Hat",
-            "net_acp_p": 685.6327543424317,
-            "ac_sales_gross": 162.78411910669973,
-            "sales_rate": 23.74217364554305,
-            "net_acp_p_yoy": 63.21436742164265
-          },
-          {
-            "subcategory_code": "DR",
-            "subcategory_name": "DENIM SHIRT",
-            "net_acp_p": 516.3052109181141,
-            "ac_sales_gross": 73.56327543424317,
-            "sales_rate": 14.24802110817942,
-            "net_acp_p_yoy": 94.28287899659247
-          },
-          {
-            "subcategory_code": "KP",
-            "subcategory_name": "Sweater Pullover",
-            "net_acp_p": 1935.7667493796525,
-            "ac_sales_gross": 408.9975186104218,
-            "sales_rate": 21.128450457240863,
-            "net_acp_p_yoy": 137.15566651429376
-          },
-          {
-            "subcategory_code": "TO",
-            "subcategory_name": "TOP",
-            "net_acp_p": 166.3771712158809,
-            "ac_sales_gross": 88.36476426799007,
-            "sales_rate": 53.11111111111111,
-            "net_acp_p_yoy": 0
-          },
-          {
-            "subcategory_code": "TR",
-            "subcategory_name": "T/SHIRTS",
-            "net_acp_p": 2204.002481389578,
-            "ac_sales_gross": 1072.349875930521,
-            "sales_rate": 48.654658285794056,
-            "net_acp_p_yoy": 77.00610005618016
-          },
-          {
-            "subcategory_code": "FD",
-            "subcategory_name": "Fleece Jumper",
-            "net_acp_p": 317.8138957816377,
-            "ac_sales_gross": 61.33250620347394,
-            "sales_rate": 19.298245614035086,
-            "net_acp_p_yoy": 27.71678796102134
-          },
-          {
-            "subcategory_code": "JK",
-            "subcategory_name": "Jacket",
-            "net_acp_p": 325.6054590570719,
-            "ac_sales_gross": 107.81637717121588,
-            "sales_rate": 33.11258278145696,
-            "net_acp_p_yoy": 0
-          },
-          {
-            "subcategory_code": "WB",
-            "subcategory_name": "Winter Boots",
-            "net_acp_p": 1106.4913151364765,
-            "ac_sales_gross": 160.9925558312655,
-            "sales_rate": 14.549825527677857,
-            "net_acp_p_yoy": 90.51540574170645
-          },
-          {
-            "subcategory_code": "TP",
+            "subcategory_code": "PT",
             "subcategory_name": "PANTS",
-            "net_acp_p": 0.8660049627791563,
-            "ac_sales_gross": 0.0,
-            "sales_rate": 0.0,
-            "net_acp_p_yoy": 32.404828226555246
-          },
-          {
-            "subcategory_code": "RL",
-            "subcategory_name": "Long-sleeve T-shirt",
-            "net_acp_p": 3.7543424317617866,
-            "ac_sales_gross": 0.0,
-            "sales_rate": 0.0,
-            "net_acp_p_yoy": 169.05027932960894
-          },
-          {
-            "subcategory_code": "SS",
-            "subcategory_name": "Softshell Jacket",
-            "net_acp_p": 0.0,
-            "ac_sales_gross": 0.0,
-            "sales_rate": 0,
-            "net_acp_p_yoy": 0
+            "net_acp_p": 3329.372208436724,
+            "ac_sales_gross": 954.2630272952853,
+            "sales_rate": 28.661950889034138,
+            "net_acp_p_yoy": 80.84637804114574
           }
         ]
       }
@@ -3148,6 +2884,15 @@
         "yoy": 74.95106062589012
       },
       "by_year": {
+        "3년차 이상": {
+          "current": {
+            "stock_price": -1.5831265508684862
+          },
+          "previous": {
+            "stock_price": 1.6550868486352355
+          },
+          "yoy": -95.65217391304348
+        },
         "1년차": {
           "current": {
             "stock_price": 14093.191066997522
@@ -3236,15 +2981,6 @@
               }
             ]
           }
-        },
-        "3년차 이상": {
-          "current": {
-            "stock_price": -1.5831265508684862
-          },
-          "previous": {
-            "stock_price": 1.6550868486352355
-          },
-          "yoy": -95.65217391304348
         },
         "2년차": {
           "current": {
