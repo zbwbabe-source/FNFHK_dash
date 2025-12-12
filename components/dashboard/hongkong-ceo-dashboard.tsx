@@ -1253,8 +1253,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
                     <span>HK (홍콩)</span>
                     <span className="text-red-600">
-                      {formatNumber(((hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0) + (hkOnline?.current?.net_sales || 0)) / 1000)} 
-                      ({formatPercent(((hkRetail?.yoy || 0) + (hkOutlet?.yoy || 0) + (hkOnline?.yoy || 0)) / 3)}%)
+                      {(() => {
+                        const hkCurrentTotal = ((hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0) + (hkOnline?.current?.net_sales || 0)) / 1000;
+                        const hkPrevTotal = ((hkRetail?.previous?.net_sales || 0) + (hkOutlet?.previous?.net_sales || 0) + (hkOnline?.previous?.net_sales || 0)) / 1000;
+                        const hkYoy = hkPrevTotal > 0 ? (hkCurrentTotal / hkPrevTotal) * 100 : 0;
+                        return `${formatNumber(hkCurrentTotal)} (${formatPercent(hkYoy)}%)`;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
@@ -2909,45 +2913,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       </span>
                     </div>
                   </div>
-              
-                  {/* 핵심 인사이트 */}
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="bg-red-50 rounded p-2">
-                      <div className="text-xs font-semibold text-red-800 mb-2">⚠️ 25년 1년차 과시즌재고</div>
-                      <div className="text-xs text-red-700 space-y-1">
-                        {pastSeasonFW?.['1year_subcategory']?.MT && (
-                          <div className="flex justify-between items-center">
-                            <span>• MT</span>
-                            <span className="font-semibold text-red-600">
-                              YOY {formatPercent(pastSeasonFW['1year_subcategory'].MT.yoy)}% 
-                              (당월 {formatNumber(pastSeasonFW['1year_subcategory'].MT.current.stock_price / 1000)}K, 
-                              전년 {formatNumber(pastSeasonFW['1year_subcategory'].MT.previous.stock_price / 1000)}K)
-                            </span>
-                          </div>
-                        )}
-                        {pastSeasonFW?.['1year_subcategory']?.JP && (
-                          <div className="flex justify-between items-center">
-                            <span>• JP</span>
-                            <span className="font-semibold text-red-600">
-                              YOY {formatPercent(pastSeasonFW['1year_subcategory'].JP.yoy)}% 
-                              (당월 {formatNumber(pastSeasonFW['1year_subcategory'].JP.current.stock_price / 1000)}K, 
-                              전년 {formatNumber(pastSeasonFW['1year_subcategory'].JP.previous.stock_price / 1000)}K)
-                            </span>
-                          </div>
-                        )}
-                        {pastSeasonFW?.['1year_subcategory']?.KC && (
-                          <div className="flex justify-between items-center">
-                            <span>• KC</span>
-                            <span className="font-semibold text-red-600">
-                              YOY {formatPercent(pastSeasonFW['1year_subcategory'].KC.yoy)}% 
-                              (당월 {formatNumber(pastSeasonFW['1year_subcategory'].KC.current.stock_price / 1000)}K, 
-                              전년 {formatNumber(pastSeasonFW['1year_subcategory'].KC.previous.stock_price / 1000)}K)
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
               
@@ -4342,8 +4307,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     
                     const total = Math.round(f25 + s25 + fPast + sPast + cap + shoes + bag + acc);
                     
-                    return {
-                      month: `${item.period.slice(2, 4)}월`,
+                  return {
+                    month: `${item.period.slice(2, 4)}월`,
                       period: item.period,
                       '당시즌F': Math.round(f25),
                       '당시즌S': Math.round(s25),
@@ -5254,8 +5219,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                   <div className="text-[9px] text-slate-400 mt-1">
                     *M10A는 M10 포함, 폐점+저매출 매장 제외
-                  </div>
                 </div>
+                    </div>
                 
                 {/* 전체 직접이익 */}
                 <div className="pt-2 border-t border-slate-600">
@@ -7039,17 +7004,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">131K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 243% (+77K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.current_month?.total?.expense_detail as any)?.fee || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round(((plData?.current_month?.total?.expense_detail as any)?.fee || 0) / ((plData?.prev_month?.total?.expense_detail as any)?.fee || 1) * 100)}% ({((plData?.current_month?.total?.expense_detail as any)?.fee || 0) >= ((plData?.prev_month?.total?.expense_detail as any)?.fee || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round(((plData?.current_month?.total?.expense_detail as any)?.fee || 0) - ((plData?.prev_month?.total?.expense_detail as any)?.fee || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">9.0%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.fee || 0) / (pl?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">0.7%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.current_month?.total?.expense_detail as any)?.fee || 0) / (pl?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
@@ -7117,17 +7082,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">1,964K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 194% (+1,010K)</div>
+                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round((plData?.cumulative?.total?.expense_detail as any)?.fee || 0))}K</div>
+                <div className="text-xs mb-3 text-red-600">YOY {Math.round(((plData?.cumulative?.total?.expense_detail as any)?.fee || 0) / ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.fee || 1) * 100)}% ({((plData?.cumulative?.total?.expense_detail as any)?.fee || 0) >= ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.fee || 0) ? '+' : '△'}{formatNumber(Math.abs(Math.round(((plData?.cumulative?.total?.expense_detail as any)?.fee || 0) - ((plData?.cumulative?.prev_cumulative?.total?.expense_detail as any)?.fee || 0))))}K)</div>
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">14.7%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.fee || 0) / (plData?.cumulative?.total?.sg_a || 1) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">1.0%</span>
+                    <span className="text-xs font-semibold text-gray-800">{(((plData?.cumulative?.total?.expense_detail as any)?.fee || 0) / (plData?.cumulative?.total?.net_sales || 1) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 

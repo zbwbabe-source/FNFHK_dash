@@ -2055,7 +2055,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         
                         <div className="pt-1 mt-1 border-t border-indigo-200">
                           <span className="font-semibold">YOY:</span> <span className={twSalesPerPyeongYoy >= 100 ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}>{formatPercent(twSalesPerPyeongYoy)}%</span>
-                        </div>
+                      </div>
                         
                         <div className="pt-1 mt-1 border-t border-indigo-200 text-[10px]">
                           <span className="font-semibold">※ 참고:</span> 평당매출이 1 K HKD/평 미만인 폐점 매장은 제외됩니다.
@@ -2064,27 +2064,27 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     </div>
                   </div>
                   
-                  {(storeChanges.newStores.length > 0 || storeChanges.closedStores.length > 0 || storeChanges.renovatedStores.length > 0) && (
+                        {(storeChanges.newStores.length > 0 || storeChanges.closedStores.length > 0 || storeChanges.renovatedStores.length > 0) && (
                     <div className="mt-3 pt-3 border-t">
                       <div className="bg-amber-50 rounded p-2">
                         <div className="text-xs font-semibold text-amber-800 mb-1">🏪 매장 변동사항</div>
                         <div className="text-xs text-amber-700 space-y-0.5">
-                          {storeChanges.newStores.length > 0 && (
-                            <div className="mb-1">
-                              <span className="font-semibold text-green-700">신규 매장:</span> {storeChanges.newStores.join(', ')}
-                            </div>
-                          )}
-                          {storeChanges.closedStores.length > 0 && (
-                            <div className="mb-1">
-                              <span className="font-semibold text-red-700">종료 매장:</span> {storeChanges.closedStores.join(', ')}
-                            </div>
-                          )}
-                          {storeChanges.renovatedStores.length > 0 && (
-                            <div>
-                              <span className="font-semibold text-orange-700">리뉴얼 매장:</span> {storeChanges.renovatedStores.join(', ')}
-                            </div>
-                          )}
-                        </div>
+                            {storeChanges.newStores.length > 0 && (
+                              <div className="mb-1">
+                                <span className="font-semibold text-green-700">신규 매장:</span> {storeChanges.newStores.join(', ')}
+                              </div>
+                            )}
+                            {storeChanges.closedStores.length > 0 && (
+                              <div className="mb-1">
+                                <span className="font-semibold text-red-700">종료 매장:</span> {storeChanges.closedStores.join(', ')}
+                              </div>
+                            )}
+                            {storeChanges.renovatedStores.length > 0 && (
+                              <div>
+                                <span className="font-semibold text-orange-700">리뉴얼 매장:</span> {storeChanges.renovatedStores.join(', ')}
+                              </div>
+                            )}
+                          </div>
                       </div>
                     </div>
                   )}
@@ -2108,10 +2108,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div>
                   <div className="text-xs text-gray-500 mb-1">25F</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatNumber(Math.round((seasonSales?.current_season_f?.november?.total_net_sales || 0) / 1000))}
+                    {formatNumber(Math.round(seasonSales?.current_season_f?.november?.total_net_sales || 0))}
               </div>
                   <div className="text-xs font-semibold">
-                    <span className="text-gray-600">전년 {formatNumber(Math.round((seasonSales?.previous_season_f?.november?.total_net_sales || 0) / 1000))}</span>
+                    <span className="text-gray-600">전년 {formatNumber(Math.round(seasonSales?.previous_season_f?.november?.total_net_sales || 0))}</span>
                   </div>
                   <div className="text-xs font-semibold">
                     <span className="text-green-600">YOY {formatPercent(((seasonSales?.current_season_f?.november?.total_net_sales || 0) / (seasonSales?.previous_season_f?.november?.total_net_sales || 1)) * 100)}%</span>
@@ -2122,10 +2122,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div>
                   <div className="text-xs text-gray-500 mb-1">ACC</div>
                   <div className="text-2xl font-bold text-cyan-600">
-                    {formatNumber(dashboardData?.acc_sales_data?.current?.total?.net_sales || 0)}
+                    {formatNumber(Math.round((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / 1000))}
                   </div>
                   <div className="text-xs font-semibold">
-                    <span className="text-gray-600">전년 {formatNumber(dashboardData?.acc_sales_data?.previous?.total?.net_sales || 0)}</span>
+                    <span className="text-gray-600">전년 {formatNumber(Math.round((dashboardData?.acc_sales_data?.previous?.total?.net_sales || 0) / 1000))}</span>
                   </div>
                   <div className="text-xs font-semibold">
                     <span className="text-cyan-600">YOY {formatPercent(((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / (dashboardData?.acc_sales_data?.previous?.total?.net_sales || 1)) * 100)}%</span>
@@ -2163,7 +2163,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <div key={idx} className="flex justify-between text-xs">
                           <span className="text-gray-600">{item.subcategory_code}</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round(item.net_sales / 1000))} 
+                            {formatNumber(Math.round(item.net_sales))} 
                             <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                           </span>
                         </div>
@@ -2187,7 +2187,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <div key={category} className="flex justify-between text-xs">
                             <span className="text-gray-600">{category}</span>
                             <span className="font-semibold">
-                              {formatNumber(categoryData?.net_sales || 0)}
+                              {formatNumber(Math.round((categoryData?.net_sales || 0) / 1000))}
                               <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                       </span>
                     </div>
@@ -2196,7 +2196,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       <div className="flex justify-between text-xs font-semibold border-t pt-1 mt-1">
                         <span className="text-gray-700">악세 합계</span>
                         <span className="text-indigo-600">
-                          {formatNumber(dashboardData?.acc_sales_data?.current?.total?.net_sales || 0)}
+                          {formatNumber(Math.round((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / 1000))}
                           <span className={(() => {
                             const currentTotal = dashboardData?.acc_sales_data?.current?.total?.net_sales || 0;
                             const previousTotal = dashboardData?.acc_sales_data?.previous?.total?.net_sales || 1;
@@ -2223,21 +2223,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               
               <div className="text-3xl font-bold text-indigo-600 mb-1">
-                {formatPercent(seasonSales?.current_season_f?.november?.sell_through?.rate || 0, 1)}%
+                {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0, 1)}%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(seasonSales?.previous_season_f?.november?.sell_through?.rate || 0, 1)}%</span> | 
-                <span className={((() => {
-                  const curr = seasonSales?.current_season_f?.november?.sell_through?.rate || 0;
-                  const prev = seasonSales?.previous_season_f?.november?.sell_through?.rate || 0;
-                  return curr - prev;
-                })()) >= 0 ? 'text-green-600' : 'text-red-600'}> 
-                  전년비 {(() => {
-                    const curr = seasonSales?.current_season_f?.november?.sell_through?.rate || 0;
-                    const prev = seasonSales?.previous_season_f?.november?.sell_through?.rate || 0;
-                    const diff = curr - prev;
-                    return (diff >= 0 ? '+' : '') + formatPercent(Math.abs(diff), 1);
-                  })()}%p
+                <span className="text-gray-600">전년 {formatPercent((seasonSales?.current_season_f?.accumulated?.sales_rate || 0) - (seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)}%</span> | 
+                <span className={(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}> 
+                  전년비 {(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? '+' : ''}{formatPercent(Math.abs(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)}%p
                 </span>
               </div>
               
@@ -2246,15 +2237,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">입고</span>
                   <span className="text-sm font-bold text-red-600">
-                    {formatNumber(seasonSales?.current_season_f?.november?.sell_through?.receiving_tag || 0)} 
-                    ({formatPercent(seasonSales?.current_season_f?.november?.sell_through?.receiving_yoy || 0)}%) 🔽
+                    {formatNumber(Math.round((seasonSales?.current_season_f?.accumulated?.net_acp_p || 0) / 1000))} 
+                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%) 🔽
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">판매금액</span>
                   <span className="text-sm font-bold text-green-600">
-                    {formatNumber(seasonSales?.current_season_f?.november?.sell_through?.sales_tag || 0)} 
-                    ({formatPercent(seasonSales?.current_season_f?.november?.sell_through?.sales_yoy || 0)}%) ✓
+                    {formatNumber(Math.round((seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0) / 1000))} 
+                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0)}%) ✓
                   </span>
                 </div>
               </div>
@@ -2281,14 +2272,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     <div className="text-xs font-semibold text-gray-700 mb-2">카테고리별 입고YOY/판매율</div>
                     <div className="space-y-1">
                       {(() => {
-                        const subcategoryDetail = seasonSales?.current_season_f?.november?.sell_through?.subcategory_detail || [];
-                        // 입고 높은순으로 이미 정렬되어 있음, 상위 10개만 표시
-                        return subcategoryDetail.slice(0, 10).map((item: any, idx: number) => (
+                        const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
+                        // 입고 높은순으로 이미 정렬되어 있음, TOP5만 표시
+                        return subcategoryDetail.map((item: any, idx: number) => (
                           <div key={idx} className="flex justify-between text-xs">
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
-                              <span className={(item.receiving_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.receiving_yoy || 0)}%</span> / 
-                              <span className={(item.sell_through || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sell_through || 0, 1)}%</span>
+                              <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
+                              <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
                             </span>
                           </div>
                         ));
@@ -4099,41 +4090,42 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             ) : (
               <BarChart 
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
+                  // HKD → K HKD 변환 (1000으로 나누기)
                   const 당시즌F = Math.round(
                     (salesPriceType === '실판'
                       ? item.당시즌F?.net_sales
-                      : item.당시즌F?.gross_sales || 0),
+                      : item.당시즌F?.gross_sales || 0) / 1000,
                   );
                   const 당시즌S = Math.round(
                     (salesPriceType === '실판'
                       ? item.당시즌S?.net_sales
-                      : item.당시즌S?.gross_sales || 0),
+                      : item.당시즌S?.gross_sales || 0) / 1000,
                   );
                   const 과시즌F = Math.round(
                     (salesPriceType === '실판'
                       ? item.과시즌F?.net_sales
-                      : item.과시즌F?.gross_sales || 0),
+                      : item.과시즌F?.gross_sales || 0) / 1000,
                   );
                   const 과시즌S = Math.round(
                     (salesPriceType === '실판'
                       ? item.과시즌S?.net_sales
-                      : item.과시즌S?.gross_sales || 0),
+                      : item.과시즌S?.gross_sales || 0) / 1000,
                   );
                   const 모자 = Math.round(
-                    (salesPriceType === '실판' ? item.모자?.net_sales || 0 : item.모자?.gross_sales || 0),
+                    (salesPriceType === '실판' ? item.모자?.net_sales || 0 : item.모자?.gross_sales || 0) / 1000,
                   );
                   const 신발 = Math.round(
-                    (salesPriceType === '실판' ? item.신발?.net_sales || 0 : item.신발?.gross_sales || 0),
+                    (salesPriceType === '실판' ? item.신발?.net_sales || 0 : item.신발?.gross_sales || 0) / 1000,
                   );
                   const 가방 = Math.round(
                     (salesPriceType === '실판'
                       ? item.가방?.net_sales || 0
-                      : item.가방?.gross_sales || 0),
+                      : item.가방?.gross_sales || 0) / 1000,
                   );
                   const 기타ACC = Math.round(
                     (salesPriceType === '실판'
                       ? item.기타ACC?.net_sales || 0
-                      : item.기타ACC?.gross_sales || 0),
+                      : item.기타ACC?.gross_sales || 0) / 1000,
                   );
                   const total =
                     당시즌F + 당시즌S + 과시즌F + 과시즌S + 모자 + 신발 + 가방 + 기타ACC;

@@ -630,17 +630,17 @@ export default function Home() {
   const twOutlet = twData?.country_channel_summary?.TW_Outlet;
   const twOnline = twData?.country_channel_summary?.TW_Online;
 
-  // 대만 오프라인 (PL 데이터 사용, K HKD 단위)
-  const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales || 0;
-  const twOfflinePrevious = (twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0);
+  // 대만 오프라인 (모두 K HKD 단위로 통일)
+  const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales || 0; // PL: K HKD
+  const twOfflinePrevious = ((twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0)) / 1000; // Dashboard: HKD → K HKD
   const twOfflineYoy = twOfflinePrevious > 0 ? (twOfflineCurrent / twOfflinePrevious) * 100 : 0;
 
-  // 대만 온라인
-  const twOnlineCurrent = twOnline?.current?.net_sales || 0;
-  const twOnlinePrevious = twOnline?.previous?.net_sales || 0;
+  // 대만 온라인 (K HKD 단위로 변환)
+  const twOnlineCurrent = (twOnline?.current?.net_sales || 0) / 1000; // Dashboard: HKD → K HKD
+  const twOnlinePrevious = (twOnline?.previous?.net_sales || 0) / 1000; // Dashboard: HKD → K HKD
   const twOnlineYoy = twOnlinePrevious > 0 ? (twOnlineCurrent / twOnlinePrevious) * 100 : 0;
 
-  // 대만법인 합계
+  // 대만법인 합계 (모두 K HKD 단위)
   const twTotalCurrent = twOfflineCurrent + twOnlineCurrent;
   const twTotalPrevious = twOfflinePrevious + twOnlinePrevious;
   const twTotalYoy = twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0;
@@ -1120,7 +1120,7 @@ export default function Home() {
                     <div>
                       <div className="text-xs text-gray-600 mb-1">당월</div>
                       <div className="text-xl font-bold text-gray-900">
-                        {formatNumber(twTotalCurrent)}
+                        {formatPlNumber(twTotalCurrent)}
                       </div>
                       <div className={`text-xs font-semibold ${
                         twTotalYoy >= 100 ? 'text-green-600' : 'text-red-600'
@@ -1366,8 +1366,8 @@ export default function Home() {
           <div className="col-span-2 bg-green-100 rounded-2xl p-4">
             <div className="grid grid-cols-2 gap-4">
               {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-            <div className="p-6">
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 min-h-[800px] flex flex-col">
+            <div className="p-6 flex-1 flex flex-col">
               {/* 헤더: 아이콘 */}
               <div className="flex items-start justify-between mb-4">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -1383,13 +1383,97 @@ export default function Home() {
                 Balance Sheet / Cash Flow / Capital Plan
               </p>
 
-              {/* 정보 카드 */}
-              <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100 mb-6">
-                <div className="text-sm font-semibold text-green-900 mb-2">
-                  재무상태표 / 현금흐름표 / 자본계획
+              {/* 재무상태표 주요 지표 */}
+              <div className="space-y-3 mb-6 flex-1">
+                {/* 총자산 */}
+                <div className="bg-gradient-to-r from-blue-50 to-transparent rounded-xl p-4 border border-blue-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-blue-900">💰 총자산</div>
+                    <div className="text-xs text-gray-500">25.12 E</div>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    390M HKD
+                  </div>
+                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                    <div className="flex justify-between">
+                      <span>• 매출채권 (대만 백화점):</span>
+                      <span><strong>34M</strong> <span className="text-red-600 font-semibold">(+13M)</span></span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>• 재고자산:</span>
+                      <span><strong>161M</strong> <span className="text-green-600 font-semibold">(△25M)</span></span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 italic">
-                  작업중
+
+                {/* 총부채 */}
+                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-4 border border-red-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-red-900">💳 총부채</div>
+                    <div className="text-xs text-gray-500">25.12 E</div>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    374M HKD
+                  </div>
+                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                    <div className="flex justify-between">
+                      <span>• 물대채무 (AP):</span>
+                      <span><strong>133M</strong> <span className="text-green-600 font-semibold">(△1M)</span></span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>• TP채무:</span>
+                      <span><strong>115M</strong> <span className="text-gray-500 font-semibold">(변동없음)</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 총자본 */}
+                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-green-900">💎 총자본</div>
+                    <div className="text-xs text-gray-500">25.12 E</div>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    16M HKD
+                  </div>
+                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                    <div className="flex justify-between">
+                      <span>전년 대비:</span>
+                      <span><span className="text-green-600 font-bold">+4M</span> <span className="text-green-600 font-semibold">(30% ↑)</span></span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>• 이익잉여금:</span>
+                      <span><strong>△3M</strong> <span className="text-green-600 font-semibold">(적자 감소 +2M)</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 부채비율 */}
+                <div className="bg-gradient-to-r from-yellow-50 to-transparent rounded-xl p-4 border border-yellow-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-yellow-900">📊 부채비율</div>
+                    <div className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded">TP채무 제외</div>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600">
+                    198.5%
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    자기자본비율 <span className="text-green-600 font-semibold">33.5%</span> (정상 구조)
+                  </div>
+                </div>
+
+                {/* 현금흐름 */}
+                <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-xl p-4 border border-indigo-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-indigo-900">💧 현금흐름</div>
+                    <div className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">작업중</div>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-400">
+                    -
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1 italic">
+                    영업/투자/재무 현금흐름 분석 예정
+                  </div>
                 </div>
               </div>
 

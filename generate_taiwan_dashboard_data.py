@@ -130,15 +130,17 @@ def calculate_discount_rate(gross_sales, net_sales):
     return ((gross_sales - net_sales) / gross_sales) * 100
 
 def read_csv_data(file_path):
-    """CSV 파일 읽기"""
+    """CSV 파일 읽기 (MLB 브랜드만 필터링)"""
     data = []
     periods = set()
     
     with open(file_path, 'r', encoding='utf-8-sig') as f:  # BOM 제거를 위해 utf-8-sig 사용
         reader = csv.DictReader(f)
         for row in reader:
-            data.append(row)
-            periods.add(row['Period'])
+            # MLB 브랜드만 포함 (DX 제외)
+            if row.get('Brand') == 'MLB':
+                data.append(row)
+                periods.add(row['Period'])
     
     return data, sorted(periods)
 

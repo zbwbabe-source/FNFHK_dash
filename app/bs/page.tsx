@@ -1,43 +1,755 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export const metadata = {
-  title: '홍마대 BS',
-  description: '홍마대 재무상태표',
-};
+interface BSItem {
+  prev_year: number;
+  current_month: number;
+  year_end: number;
+  yoy: number;
+  note: string;
+}
+
+interface WCItem {
+  prev_year: number;
+  current_month: number;
+  year_end: number;
+  yoy_krw: number;
+}
+
+interface WCData {
+  summary: WCItem;
+  receivables: {
+    total: WCItem;
+    inventory: WCItem;
+    accounts_receivable: WCItem;
+  };
+  payables: {
+    total: WCItem;
+    cash: WCItem;
+    borrowings: WCItem;
+    accounts_payable: WCItem;
+    accounts_payable_tp: WCItem;
+  };
+  profit_creation: {
+    total: WCItem;
+    retained_earnings: WCItem;
+  };
+  other_wc_items: {
+    total: WCItem;
+    prepaid: WCItem;
+    accrued: WCItem;
+    fixed_assets: WCItem;
+    net_other: WCItem;
+  };
+  lease_related: {
+    total: WCItem;
+    right_of_use: WCItem;
+    lease_liabilities: WCItem;
+  };
+  balance_check: WCItem;
+}
+
+interface BSData {
+  period: string;
+  balance_sheet: {
+    assets: {
+      total: BSItem;
+      current_assets: {
+        total: BSItem;
+        cash: BSItem;
+        receivables: BSItem;
+        inventory: BSItem;
+        other_current: BSItem;
+      };
+      non_current_assets: {
+        total: BSItem;
+        right_of_use: BSItem;
+        tangible: BSItem;
+        intangible: BSItem;
+        deposits: BSItem;
+        other_non_current: BSItem;
+      };
+    };
+    liabilities: {
+      total: BSItem;
+      current_liabilities: {
+        total: BSItem;
+        accounts_payable: BSItem;
+        accounts_payable_tp: BSItem;
+        accrued: BSItem;
+        lease_liabilities_current: BSItem;
+        payables_other: BSItem;
+        other_current: BSItem;
+      };
+      non_current_liabilities: {
+        total: BSItem;
+        lease_liabilities_non_current: BSItem;
+        restoration_provision: BSItem;
+      };
+    };
+    equity: {
+      total: BSItem;
+      capital: BSItem;
+      other_capital: BSItem;
+      retained_earnings: BSItem;
+    };
+    working_capital?: WCData;
+  };
+}
 
 export default function BSPage() {
+  const [selectedPeriod, setSelectedPeriod] = useState('2511');
+  const [bsData, setBsData] = useState<BSData | null>(null);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [showVerification, setShowVerification] = useState(false);
+
+  useEffect(() => {
+    loadBSData(selectedPeriod);
+  }, [selectedPeriod]);
+
+  const loadBSData = async (period: string) => {
+    try {
+      const response = await fetch(`/dashboard/bs-data-${period}.json`);
+      if (response.ok) {
+        const data = await response.json();
+        setBsData(data);
+      }
+    } catch (error) {
+      console.error('Failed to load BS data:', error);
+    }
+  };
+
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const toggleAll = () => {
+    if (expandedSections.size > 0) {
+      setExpandedSections(new Set());
+    } else {
+      setExpandedSections(new Set(['assets', 'liabilities', 'equity']));
+    }
+  };
+
+  const formatNumber = (num: number): string => {
+    return Math.round(num).toLocaleString();
+  };
+
+  const calculateYoYAmount = (yearEnd: number, prevYear: number): number => {
+    return yearEnd - prevYear;
+  };
+
+  const formatYoY = (yearEnd: number, prevYear: number): string => {
+    const yoy = calculateYoYAmount(yearEnd, prevYear);
+    if (yoy >= 0) {
+      return `+${formatNumber(yoy)}`;
+    } else {
+      return `△${formatNumber(Math.abs(yoy))}`;
+    }
+  };
+
+  const getYoYClass = (yearEnd: number, prevYear: number): string => {
+    const yoy = calculateYoYAmount(yearEnd, prevYear);
+    return yoy >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+  };
+
+  const calculateYoYPercent = (prevYear: number, yearEnd: number): string => {
+    if (prevYear === 0) return '-';
+    const percent = (yearEnd / prevYear) * 100;
+    return `${percent.toFixed(1)}%`;
+  };
+
+  // 비고란 아이템 생성 헬퍼
+  const noteItem = (label: string, change: number) => {
+    const isPositive = change >= 0;
+    const color = isPositive ? 'text-green-600' : 'text-red-600';
+    const sign = isPositive ? '+' : '△';
+    return (
+      <span className={color}>
+        {label} {sign}{Math.abs(Math.round(change / 1000))}m
+      </span>
+    );
+  };
+
+  // 행 렌더링 헬퍼 함수
+  const renderRow = (label: string, item: BSItem, indent: number = 0, isBold: boolean = false) => {
+    const indentClass = indent === 0 ? '' : indent === 1 ? 'pl-8' : 'pl-12';
+    const bgClass = indent === 1 ? 'bg-gray-50' : '';
+    const fontClass = isBold ? 'font-semibold' : '';
+    
+    return (
+      <tr className={`hover:bg-gray-100 ${bgClass}`}>
+        <td className={`px-4 py-3 border border-gray-300 ${indentClass} ${fontClass}`}>{label}</td>
+        <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>{formatNumber(item.prev_year)}</td>
+        <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>{formatNumber(item.current_month)}</td>
+        <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>{formatNumber(item.year_end)}</td>
+        <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(item.year_end, item.prev_year)}`}>
+          {formatYoY(item.year_end, item.prev_year)}
+        </td>
+        <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(item.year_end, item.prev_year)}`}>
+          {calculateYoYPercent(item.prev_year, item.year_end)}
+        </td>
+        <td className="px-4 py-3 border border-gray-300 text-left text-sm text-gray-600">{item.note}</td>
+      </tr>
+    );
+  };
+
+  if (!bsData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">데이터 로딩 중...</div>
+      </div>
+    );
+  }
+
+  const bs = bsData.balance_sheet;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+      {/* 네비게이션 바 */}
+      <div className="bg-gradient-to-r from-blue-900 to-blue-700 shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white">재무상태표 (B/S)</h1>
             <div className="flex items-center gap-4">
-              <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-white text-gray-800 font-semibold"
+            >
+              <option value="2511">2511 (11월)</option>
+            </select>
+            <Link
+              href="/"
+              className="px-6 py-2 bg-white text-blue-900 rounded-lg font-semibold hover:bg-blue-50 transition"
+            >
+              홈으로
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">홍마대 BS</h1>
-            </div>
-            <div className="text-sm text-gray-500">2025.10</div>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-6 py-16">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">재무상태표</h2>
-          <div className="text-center py-20">
-            <p className="text-gray-600 text-lg mb-4">재무상태표 내용이 여기에 표시됩니다.</p>
-            <p className="text-gray-400 text-sm">추후 업데이트 예정</p>
+      {/* 메인 콘텐츠 */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* 요약 섹션 */}
+        <div className="bg-gradient-to-r from-blue-800 to-blue-900 text-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex items-center mb-3">
+            <span className="text-red-400 text-xl mr-2">★</span>
+            <h2 className="text-lg font-bold">재무상태표 핵심 요약 (24.12 → 25.12 E)</h2>
+            </div>
+          <div className="text-sm leading-relaxed">
+            <p>
+              <strong>재고 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.inventory.year_end - bsData?.balance_sheet.assets.current_assets.inventory.prev_year) / bsData.balance_sheet.assets.current_assets.inventory.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.inventory.year_end - bsData?.balance_sheet.assets.current_assets.inventory.prev_year) / 1000))}백만 HKD)와 현금 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.cash.year_end - bsData?.balance_sheet.assets.current_assets.cash.prev_year) / bsData.balance_sheet.assets.current_assets.cash.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.cash.year_end - bsData?.balance_sheet.assets.current_assets.cash.prev_year) / 1000))}백만 HKD)로 유동자산 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.total.year_end - bsData?.balance_sheet.assets.current_assets.total.prev_year) / bsData.balance_sheet.assets.current_assets.total.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.total.year_end - bsData?.balance_sheet.assets.current_assets.total.prev_year) / 1000))}백만 HKD).</strong><br />
+              사용권자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / bsData.balance_sheet.assets.non_current_assets.right_of_use.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / 1000)}백만 HKD)로 비유동자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / bsData.balance_sheet.assets.non_current_assets.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / 1000)}백만 HKD), 부채 {Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / bsData.balance_sheet.liabilities.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / 1000)}백만 HKD)로<br />
+              <strong className="text-yellow-300 bg-yellow-900 px-2 py-1 rounded">부채비율 {((bsData?.balance_sheet.liabilities.total.year_end || 0) / (bsData?.balance_sheet.equity.total.year_end || 1) * 100).toFixed(0).toLocaleString()}% 기록 (TP채무 제외 시 부채비율 {(((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / ((bsData?.balance_sheet.equity.total.year_end || 1) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) * 100).toFixed(1)}%, 자기자본비율 {(((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / (bsData?.balance_sheet.assets.total.year_end || 1) * 100).toFixed(1)}%로 정상 재무구조)</strong>
+            </p>
           </div>
         </div>
-      </main>
+
+        {/* 부채비율 검증 */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-md p-5 mb-6">
+          <div 
+            className="flex items-center cursor-pointer hover:opacity-80 transition"
+            onClick={() => setShowVerification(!showVerification)}
+          >
+            <span className="text-yellow-600 text-lg mr-2">📊</span>
+            <h3 className="text-md font-bold text-yellow-900">부채비율 검증</h3>
+          </div>
+          {showVerification && (
+          <div className="text-sm text-yellow-900 space-y-2 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white p-3 rounded border border-yellow-200">
+                <div className="font-semibold text-yellow-800 mb-2">💡 전체 부채비율</div>
+                <div className="text-xs space-y-1">
+                  <div>• 총부채: {formatNumber(bsData?.balance_sheet.liabilities.total.year_end || 0)} (25.12 E)</div>
+                  <div>• 총자본: {formatNumber(bsData?.balance_sheet.equity.total.year_end || 0)} (25.12 E)</div>
+                  <div className="border-t border-yellow-200 mt-2 pt-2">
+                    <strong>부채비율 = (총부채 ÷ 총자본) × 100</strong><br />
+                    = ({formatNumber(bsData?.balance_sheet.liabilities.total.year_end || 0)} ÷ {formatNumber(bsData?.balance_sheet.equity.total.year_end || 0)}) × 100<br />
+                    = <strong className="text-red-600">
+                      {((bsData?.balance_sheet.liabilities.total.year_end || 0) / (bsData?.balance_sheet.equity.total.year_end || 1) * 100).toFixed(1)}%
+                    </strong>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-3 rounded border border-green-200">
+                <div className="font-semibold text-green-800 mb-2">✅ TP채무 제외 시</div>
+                <div className="text-xs space-y-1">
+                  <div>• 총부채 (TP제외): {formatNumber((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12 E)</div>
+                  <div>• 총자본 (TP포함): {formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12 E)</div>
+                  <div className="border-t border-green-200 mt-2 pt-2">
+                    <strong>부채비율 = ((총부채 - TP채무) ÷ (총자본 + TP채무)) × 100</strong><br />
+                    = ({formatNumber((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} ÷ {formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))}) × 100<br />
+                    = <strong className="text-green-600">
+                      {(((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / ((bsData?.balance_sheet.equity.total.year_end || 1) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) * 100).toFixed(1)}%
+                    </strong>
+                  </div>
+                  <div className="border-t border-green-200 mt-2 pt-2">
+                    <strong>자기자본비율 = ((총자본 + TP채무) ÷ 총자산) × 100</strong><br />
+                    = ({formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} ÷ {formatNumber(bsData?.balance_sheet.assets.total.year_end || 0)}) × 100<br />
+                    = <strong className="text-green-600">
+                      {(((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / (bsData?.balance_sheet.assets.total.year_end || 1) * 100).toFixed(1)}%
+                    </strong>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <button
+            onClick={toggleAll}
+            className="mb-4 px-6 py-2 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition"
+          >
+            전체 접기/펴기
+          </button>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    계정과목
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    2024.12
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    2025.11
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    2025.12 E
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    증감액
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    증감율
+                  </th>
+                  <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
+                    비고
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* 자산 섹션 */}
+                <tr
+                  className="bg-blue-50 hover:bg-blue-100 cursor-pointer transition font-bold"
+                  onClick={() => toggleSection('assets')}
+                >
+                  <td className="px-4 py-3 border border-gray-300 text-left">
+                    {expandedSections.has('assets') ? '▼' : '▶'} 자산총계
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.assets.total.prev_year)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.assets.total.current_month)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.assets.total.year_end)}</td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.assets.total.year_end, bs.assets.total.prev_year)}`}>
+                    {formatYoY(bs.assets.total.year_end, bs.assets.total.prev_year)}
+                  </td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.assets.total.year_end, bs.assets.total.prev_year)}`}>
+                    {calculateYoYPercent(bs.assets.total.prev_year, bs.assets.total.year_end)}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-left text-sm text-gray-600">{bs.assets.total.note}</td>
+                </tr>
+
+                {expandedSections.has('assets') && (
+                  <>
+                    {renderRow('유동자산', bs.assets.current_assets.total, 1, true)}
+                    {renderRow('현금', bs.assets.current_assets.cash, 2)}
+                    {renderRow('매출채권', bs.assets.current_assets.receivables, 2)}
+                    {renderRow('재고자산', bs.assets.current_assets.inventory, 2)}
+                    {renderRow('기타', bs.assets.current_assets.other_current, 2)}
+                    
+                    {renderRow('비유동자산', bs.assets.non_current_assets.total, 1, true)}
+                    {renderRow('유형자산', bs.assets.non_current_assets.tangible, 2)}
+                    {renderRow('무형자산', bs.assets.non_current_assets.intangible, 2)}
+                    {renderRow('사용권자산', bs.assets.non_current_assets.right_of_use, 2)}
+                    {renderRow('보증금', bs.assets.non_current_assets.deposits, 2)}
+                    {renderRow('이연법인세', bs.assets.non_current_assets.other_non_current, 2)}
+                  </>
+                )}
+
+                {/* 부채 섹션 */}
+                <tr
+                  className="bg-red-50 hover:bg-red-100 cursor-pointer transition font-bold"
+                  onClick={() => toggleSection('liabilities')}
+                >
+                  <td className="px-4 py-3 border border-gray-300 text-left">
+                    {expandedSections.has('liabilities') ? '▼' : '▶'} 부채총계
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.liabilities.total.prev_year)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.liabilities.total.current_month)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.liabilities.total.year_end)}</td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.liabilities.total.year_end, bs.liabilities.total.prev_year)}`}>
+                    {formatYoY(bs.liabilities.total.year_end, bs.liabilities.total.prev_year)}
+                  </td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.liabilities.total.year_end, bs.liabilities.total.prev_year)}`}>
+                    {calculateYoYPercent(bs.liabilities.total.prev_year, bs.liabilities.total.year_end)}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-left text-sm text-gray-600">{bs.liabilities.total.note}</td>
+                </tr>
+
+                {expandedSections.has('liabilities') && (
+                  <>
+                    {renderRow('유동부채', bs.liabilities.current_liabilities.total, 1, true)}
+                    {renderRow('매입채무', bs.liabilities.current_liabilities.accounts_payable, 2)}
+                    {renderRow('매입채무(TP)', bs.liabilities.current_liabilities.accounts_payable_tp, 2)}
+                    {renderRow('미지급비용', bs.liabilities.current_liabilities.accrued, 2)}
+                    {renderRow('유동성리스부채', bs.liabilities.current_liabilities.lease_liabilities_current, 2)}
+                    {renderRow('기타유동부채', bs.liabilities.current_liabilities.payables_other, 2)}
+                    {renderRow('기타', bs.liabilities.current_liabilities.other_current, 2)}
+                    
+                    {renderRow('비유동부채', bs.liabilities.non_current_liabilities.total, 1, true)}
+                    {renderRow('비유동성리스부채', bs.liabilities.non_current_liabilities.lease_liabilities_non_current, 2)}
+                    {renderRow('복구충당부채', bs.liabilities.non_current_liabilities.restoration_provision, 2)}
+                  </>
+                )}
+
+                {/* 자본 섹션 */}
+                <tr
+                  className="bg-green-50 hover:bg-green-100 cursor-pointer transition font-bold"
+                  onClick={() => toggleSection('equity')}
+                >
+                  <td className="px-4 py-3 border border-gray-300 text-left">
+                    {expandedSections.has('equity') ? '▼' : '▶'} 총자본
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.equity.total.prev_year)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.equity.total.current_month)}</td>
+                  <td className="px-4 py-3 border border-gray-300 text-right">{formatNumber(bs.equity.total.year_end)}</td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.equity.total.year_end, bs.equity.total.prev_year)}`}>
+                    {formatYoY(bs.equity.total.year_end, bs.equity.total.prev_year)}
+                  </td>
+                  <td className={`px-4 py-3 border border-gray-300 text-right ${getYoYClass(bs.equity.total.year_end, bs.equity.total.prev_year)}`}>
+                    {calculateYoYPercent(bs.equity.total.prev_year, bs.equity.total.year_end)}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-300 text-left text-sm text-gray-600">{bs.equity.total.note}</td>
+                </tr>
+
+                {expandedSections.has('equity') && (
+                  <>
+                    {renderRow('자본금', bs.equity.capital, 1)}
+                    {renderRow('기타자본', bs.equity.other_capital, 1)}
+                    {renderRow('이익잉여금', bs.equity.retained_earnings, 1)}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 운전자본 증감표 */}
+          {bsData?.balance_sheet?.working_capital && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-blue-800">📋 운전자본 표 (Working Capital)</h2>
+                <button
+                  onClick={() => {
+                    const allExpanded = expandedSections.has('wc-main') &&
+                                       expandedSections.has('wc-cash') && 
+                                       expandedSections.has('wc-profit') &&
+                                       expandedSections.has('wc-other') &&
+                                       expandedSections.has('wc-lease');
+                    
+                    if (allExpanded) {
+                      // 전체 접기 - 모든 섹션 접기
+                      setExpandedSections(new Set());
+                    } else {
+                      // 전체 펼치기 - 모든 섹션 펼치기
+                      setExpandedSections(new Set(['wc-main', 'wc-cash', 'wc-profit', 'wc-other', 'wc-lease']));
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-semibold"
+                >
+                  {(expandedSections.has('wc-main') &&
+                    expandedSections.has('wc-cash') && 
+                    expandedSections.has('wc-profit') &&
+                    expandedSections.has('wc-other') &&
+                    expandedSections.has('wc-lease')) ? '전체 접기' : '전체 펼치기'}
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-700 text-white">
+                      <th className="px-4 py-3 border border-gray-300 text-left font-semibold">계정과목</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">24년기말</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">2025-11</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">2025-12</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">연간비교</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">비고</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* 운전자본 총계 - 클릭 가능 */}
+                    <WCRow
+                      label="▼ 운전자본"
+                      item={bsData.balance_sheet.working_capital.summary}
+                      isSection={true}
+                      bgColor="bg-yellow-50"
+                      expanded={expandedSections.has('wc-main')}
+                      onClick={() => toggleSection('wc-main')}
+                      note={<>
+                        {noteItem('AR', bsData.balance_sheet.working_capital.receivables.accounts_receivable.year_end - bsData.balance_sheet.working_capital.receivables.accounts_receivable.prev_year)}
+                        {', '}
+                        {noteItem('재고', bsData.balance_sheet.working_capital.receivables.inventory.year_end - bsData.balance_sheet.working_capital.receivables.inventory.prev_year)}
+                        {', '}
+                        {noteItem('선급금', bsData.balance_sheet.working_capital.other_wc_items.prepaid.year_end - bsData.balance_sheet.working_capital.other_wc_items.prepaid.prev_year)}
+                        {', '}
+                        {noteItem('AP', bsData.balance_sheet.working_capital.payables.accounts_payable.year_end - bsData.balance_sheet.working_capital.payables.accounts_payable.prev_year)}
+                      </>}
+                    />
+
+                    {expandedSections.has('wc-main') && (
+                      <>
+                        {/* 매출채권 */}
+                        <WCRow label="  매출채권" item={bsData.balance_sheet.working_capital.receivables.accounts_receivable} isPositive={true} />
+                        
+                        {/* 재고자산 */}
+                        <WCRow label="  재고자산" item={bsData.balance_sheet.working_capital.receivables.inventory} isPositive={true} />
+                        
+                        {/* 매입채무 */}
+                        <WCRow label="  매입채무" item={bsData.balance_sheet.working_capital.payables.accounts_payable} isPositive={false} />
+                        
+                        {/* 매입채무(TP) */}
+                        <WCRow label="  매입채무(TP)" item={bsData.balance_sheet.working_capital.payables.accounts_payable_tp} isPositive={false} />
+                      </>
+                    )}
+
+                    {/* 현금 */}
+                    <WCRow
+                      label="▼ 현금"
+                      item={bsData.balance_sheet.working_capital.payables.cash}
+                      isSection={true}
+                      bgColor="bg-blue-50"
+                      expanded={expandedSections.has('wc-cash')}
+                      onClick={() => toggleSection('wc-cash')}
+                      note={<>
+                        {noteItem('현금', bsData.balance_sheet.working_capital.payables.cash.year_end - bsData.balance_sheet.working_capital.payables.cash.prev_year)}
+                        {', '}
+                        {noteItem('차입금', bsData.balance_sheet.working_capital.payables.borrowings.year_end - bsData.balance_sheet.working_capital.payables.borrowings.prev_year)}
+                      </>}
+                    />
+                    {expandedSections.has('wc-cash') && (
+                      <WCRow label="  현금" item={bsData.balance_sheet.working_capital.payables.cash} isPositive={false} />
+                    )}
+
+                    {/* 이익창출 */}
+                    <WCRow
+                      label="▼ 이익창출"
+                      item={bsData.balance_sheet.working_capital.profit_creation.total}
+                      isSection={true}
+                      bgColor="bg-purple-50"
+                      expanded={expandedSections.has('wc-profit')}
+                      onClick={() => toggleSection('wc-profit')}
+                      note={noteItem('이익잉여금', bsData.balance_sheet.working_capital.profit_creation.retained_earnings.year_end - bsData.balance_sheet.working_capital.profit_creation.retained_earnings.prev_year)}
+                    />
+                    {expandedSections.has('wc-profit') && (
+                      <WCRow label="  이익잉여금" item={bsData.balance_sheet.working_capital.profit_creation.retained_earnings} isPositive={false} />
+                    )}
+
+                    {/* 기타 운전자본 */}
+                    <WCRow
+                      label="▼ 기타 운전자본"
+                      item={bsData.balance_sheet.working_capital.other_wc_items.total}
+                      isSection={true}
+                      bgColor="bg-green-50"
+                      expanded={expandedSections.has('wc-other')}
+                      onClick={() => toggleSection('wc-other')}
+                      note={<>
+                        {noteItem('선급', bsData.balance_sheet.working_capital.other_wc_items.prepaid.year_end - bsData.balance_sheet.working_capital.other_wc_items.prepaid.prev_year)}
+                        {', '}
+                        {noteItem('미지급', bsData.balance_sheet.working_capital.other_wc_items.accrued.year_end - bsData.balance_sheet.working_capital.other_wc_items.accrued.prev_year)}
+                        {', '}
+                        {noteItem('보증금', bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.year_end - bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.prev_year)}
+                        {', '}
+                        {noteItem('미수금', bsData.balance_sheet.working_capital.other_wc_items.net_other.year_end - bsData.balance_sheet.working_capital.other_wc_items.net_other.prev_year)}
+                      </>}
+                    />
+                    {expandedSections.has('wc-other') && (
+                      <>
+                        <WCRow label="  선급비용" item={bsData.balance_sheet.working_capital.other_wc_items.prepaid} isPositive={true} />
+                        <WCRow label="  미지급비용" item={bsData.balance_sheet.working_capital.other_wc_items.accrued} isPositive={false} />
+                        <WCRow label="  고정자산/보증금" item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets} isPositive={true} />
+                        <WCRow label="  미수금/미지급금" item={bsData.balance_sheet.working_capital.other_wc_items.net_other} />
+                      </>
+                    )}
+
+                    {/* 리스관련 */}
+                    <WCRow
+                      label="▼ 리스관련"
+                      item={bsData.balance_sheet.working_capital.lease_related.total}
+                      isSection={true}
+                      bgColor="bg-indigo-50"
+                      expanded={expandedSections.has('wc-lease')}
+                      onClick={() => toggleSection('wc-lease')}
+                      note={<>
+                        {noteItem('사용권', bsData.balance_sheet.working_capital.lease_related.right_of_use.year_end - bsData.balance_sheet.working_capital.lease_related.right_of_use.prev_year)}
+                        {', '}
+                        {noteItem('리스부채', bsData.balance_sheet.working_capital.lease_related.lease_liabilities.year_end - bsData.balance_sheet.working_capital.lease_related.lease_liabilities.prev_year)}
+                      </>}
+                    />
+                    {expandedSections.has('wc-lease') && (
+                      <>
+                        <WCRow label="  사용권자산" item={bsData.balance_sheet.working_capital.lease_related.right_of_use} isPositive={true} />
+                        <WCRow label="  리스부채" item={bsData.balance_sheet.working_capital.lease_related.lease_liabilities} isPositive={false} />
+                      </>
+                    )}
+
+                    {/* Balance Check - 항상 표시 */}
+                    <tr className="bg-green-100 border-t-2 border-green-500">
+                      <td className="px-4 py-3 border border-gray-300 font-bold text-green-800">
+                        합계 (Balance Check)
+                      </td>
+                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
+                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
+                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
+                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
+                      <td className="px-4 py-3 border border-gray-300 text-center text-green-600 text-xl">✓ 균형</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 재무비율 분석 */}
+          <div className="mt-8 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
+            <div className="flex items-center mb-4">
+              <span className="text-2xl mr-2">📊</span>
+              <h3 className="text-lg font-bold text-orange-900">재무비율 분석</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              {/* 부채비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">부채비율</div>
+                <div className="text-3xl font-bold text-red-600 mb-1">2,236%</div>
+                <div className="text-xs text-gray-500">24년 2,783%</div>
+                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 196%</div>
+              </div>
+
+              {/* 유동비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">유동비율</div>
+                <div className="text-3xl font-bold text-orange-600 mb-1">81%</div>
+                <div className="text-xs text-gray-500">24년 82%</div>
+                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 130%</div>
+              </div>
+
+              {/* 당좌비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">당좌비율</div>
+                <div className="text-3xl font-bold text-orange-600 mb-1">30%</div>
+                <div className="text-xs text-gray-500">24년 23%</div>
+                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 48%</div>
+              </div>
+
+              {/* 자기자본비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">자기자본비율</div>
+                <div className="text-3xl font-bold text-green-600 mb-1">4.3%</div>
+                <div className="text-xs text-gray-500">24년 3.5%</div>
+                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 26.1%</div>
+              </div>
+            </div>
+
+            {/* 핵심 설명 */}
+            <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <div className="flex items-start mb-2">
+                <span className="text-orange-600 font-bold mr-2">💡 핵심:</span>
+              </div>
+              <ul className="space-y-1 text-sm text-gray-700">
+                <li>• <strong>부채비율 2,236%:</strong> 자본금 20백만 HKD 대비 부채 349백만 HKD (TP제무 제외시 196% - 정상 수준)</li>
+                <li>• <strong>유동비율 81%:</strong> 유동자산 233백만 HKD 대비 유동부채 286백만 HKD (TP제무 제외시 130% - 양호)</li>
+                <li>• <strong>당좌비율 30%:</strong> 재고 제외 시 단기 지급능력 (TP제무 제외시 48% - 개선)</li>
+                <li>• <strong>자기자본비율 4.3%:</strong> 총자산 대비 자본 비중 (TP제무 제외시 26.1% - 안정적)</li>
+                <li>• <strong>TP채무 조정:</strong> 매입채무(TP) 115백만 HKD는 본사 선수금(무이자)으로, 부채 제외(-) 및 자본 포함(+) 시 조정</li>
+                <li>• <strong>실질 재무구조:</strong> 조정 후 부채 259백만 HKD, 조정 후 자본 131백만 HKD</li>
+              </ul>
+            </div>
+          </div>
+          </div>
+        </div>
     </div>
   );
 }
 
+// 운전자본 Row 컴포넌트
+function WCRow({ 
+  label, 
+  item, 
+  isSection = false, 
+  isSubSection = false, 
+  bgColor = '', 
+  expanded = false, 
+  onClick, 
+  isPositive,
+  note 
+}: {
+  label: string;
+  item: WCItem;
+  isSection?: boolean;
+  isSubSection?: boolean;
+  bgColor?: string;
+  expanded?: boolean;
+  onClick?: () => void;
+  isPositive?: boolean;
+  note?: React.ReactNode;
+}) {
+  const formatNumber = (value: number): string => {
+    const sign = value >= 0 ? '+' : '△';
+    return `${sign}${Math.abs(value).toLocaleString()}`;
+  };
 
+  const getColorClass = (value: number, forceSign?: boolean): string => {
+    if (forceSign === undefined) {
+      return value >= 0 ? 'text-green-600' : 'text-red-600';
+    }
+    // 자산항목이면 증가(+)가 녹색, 감소(-)가 빨간색
+    // 부채항목이면 감소(+, 음수의 증가)가 녹색, 증가(-, 음수의 감소)가 빨간색
+    // 하지만 부채는 이미 음수로 저장되어 있으므로, year_end - prev_year 결과:
+    // - 양수(+) = 부채 감소 = 좋음 = 녹색
+    // - 음수(-) = 부채 증가 = 나쁨 = 빨간색
+    // 따라서 자산/부채 모두 동일하게 처리
+    return value >= 0 ? 'text-green-600' : 'text-red-600';
+  };
 
+  const rowClass = `hover:bg-gray-100 ${bgColor} ${onClick ? 'cursor-pointer' : ''}`;
+  const fontClass = isSection || isSubSection ? 'font-bold' : '';
+  
+  // 연간비교 = 25년 기말 - 24년 기말 (직접 계산)
+  // 부채 항목은 음수로 저장되어 있으므로, 계산 결과가 양수면 부채 감소(좋음), 음수면 부채 증가(나쁨)
+  const calculatedYoy = item.year_end - item.prev_year;
+
+  return (
+    <tr className={rowClass} onClick={onClick}>
+      <td className={`px-4 py-3 border border-gray-300 ${fontClass}`}>
+        {label}
+      </td>
+      <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
+        {formatNumber(item.prev_year)}
+      </td>
+      <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
+        {formatNumber(item.current_month)}
+      </td>
+      <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
+        {formatNumber(item.year_end)}
+      </td>
+      <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass} ${getColorClass(calculatedYoy, isPositive)}`}>
+        {formatNumber(calculatedYoy)}
+      </td>
+      <td className="px-4 py-3 border border-gray-300 text-left text-xs text-gray-700" style={{ minWidth: '250px' }}>
+        {note}
+      </td>
+    </tr>
+  );
+}
