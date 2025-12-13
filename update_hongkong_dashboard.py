@@ -2399,6 +2399,12 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     if prev_period != prev_period_correct:
         prev_period = prev_period_correct
     
+    # 월 이름 매핑
+    month_names = {
+        1: 'january', 2: 'february', 3: 'march', 4: 'april', 5: 'may', 6: 'june',
+        7: 'july', 8: 'august', 9: 'september', 10: 'october', 11: 'november', 12: 'december'
+    }
+    
     result = {
         'metadata': {
             'last_period': last_period,
@@ -2444,17 +2450,29 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
         'season_sales': {
             'current_season_f': {
                 'season_code': current_season_f,
-                'october': {
-                    'total_net_sales': sum(cat['net_sales'] for cat in current_season_f_oct.values()) / 1000,  # 1K HKD
+                **({  # 현재 월에 맞는 키로 동적 생성
+                    month_names.get(last_month, 'october'): {
+                        'total_net_sales': sum(cat['net_sales'] for cat in current_season_f_oct.values()) / 1000,  # 1K HKD
+                        'subcategory_top5': [
+                            {
+                                'subcategory_code': subcat_code,
+                                'subcategory_name': data['subcategory_name'],
+                                'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            }
+                            for subcat_code, data in current_season_f_oct_sorted
+                        ],
+                    }
+                } if last_month else {'october': {
+                    'total_net_sales': sum(cat['net_sales'] for cat in current_season_f_oct.values()) / 1000,
                     'subcategory_top5': [
                         {
                             'subcategory_code': subcat_code,
                             'subcategory_name': data['subcategory_name'],
-                            'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            'net_sales': data['net_sales'] / 1000,
                         }
                         for subcat_code, data in current_season_f_oct_sorted
                     ],
-                },
+                }}),
                 'accumulated': {
                     'total_net_sales': season_f_accumulated_current['total']['net_sales'] / 1000,  # 1K HKD
                     'periods': f"{last_year}년 7~10월",
@@ -2470,13 +2488,33 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
             },
             'previous_season_f': {
                 'season_code': previous_season_f,
-                'october': {
-                    'total_net_sales': sum(cat['net_sales'] for cat in previous_season_f_oct.values()) / 1000,  # 1K HKD
+                **({  # 전년 동월에 맞는 키로 동적 생성
+                    month_names.get(last_month, 'october'): {
+                        'total_net_sales': sum(cat['net_sales'] for cat in previous_season_f_oct.values()) / 1000,  # 1K HKD
+                        'subcategory_top5': [
+                            {
+                                'subcategory_code': subcat_code,
+                                'subcategory_name': data['subcategory_name'],
+                                'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            }
+                            for subcat_code, data in previous_season_f_oct_sorted
+                        ],
+                        'subcategory_detail': [
+                            {
+                                'subcategory_code': subcat_code,
+                                'subcategory_name': data['subcategory_name'],
+                                'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            }
+                            for subcat_code, data in previous_season_f_oct.items()
+                        ],
+                    }
+                } if last_month else {'october': {
+                    'total_net_sales': sum(cat['net_sales'] for cat in previous_season_f_oct.values()) / 1000,
                     'subcategory_top5': [
                         {
                             'subcategory_code': subcat_code,
                             'subcategory_name': data['subcategory_name'],
-                            'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            'net_sales': data['net_sales'] / 1000,
                         }
                         for subcat_code, data in previous_season_f_oct_sorted
                     ],
@@ -2484,11 +2522,11 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                         {
                             'subcategory_code': subcat_code,
                             'subcategory_name': data['subcategory_name'],
-                            'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                            'net_sales': data['net_sales'] / 1000,
                         }
                         for subcat_code, data in previous_season_f_oct.items()
                     ],
-                },
+                }}),
                 'accumulated': {
                     'total_net_sales': season_f_accumulated_previous['total']['net_sales'] / 1000,  # 1K HKD
                     'periods': f"{prev_year}년 7~10월",

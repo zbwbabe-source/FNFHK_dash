@@ -29,6 +29,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   
   const currentYear = getYearFromPeriod(period);
   const currentMonth = getMonthFromPeriod(period);
+  
+  // 월 이름을 영어로 변환
+  const monthNames: { [key: number]: string } = {
+    1: 'january', 2: 'february', 3: 'march', 4: 'april', 5: 'may', 6: 'june',
+    7: 'july', 8: 'august', 9: 'september', 10: 'october', 11: 'november', 12: 'december'
+  };
+  const currentMonthKey = monthNames[currentMonth] || 'october';
 
   useEffect(() => {
     const loadData = async () => {
@@ -2437,11 +2444,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-xs font-semibold text-gray-700 mb-2">25F 카테고리별 판매금액 TOP 5</div>
                     <div className="space-y-1">
-                      {(seasonSales?.current_season_f?.november?.subcategory_top5 || []).map((item: any, idx: number) => {
+                      {((seasonSales?.current_season_f as any)?.[currentMonthKey]?.subcategory_top5 || []).map((item: any, idx: number) => {
                         // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
-                        const prevItemTop5 = seasonSales?.previous_season_f?.november?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
-                        const prevNovemberData = seasonSales?.previous_season_f?.november as any;
-                        const prevItemDetail = prevNovemberData?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevMonthData = (seasonSales?.previous_season_f as any)?.[currentMonthKey];
+                        const prevItemTop5 = prevMonthData?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevItemDetail = prevMonthData?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
                         const prevItem = prevItemTop5 || prevItemDetail;
                         const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 0;
                         return (
