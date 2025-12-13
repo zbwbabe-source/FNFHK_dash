@@ -2969,6 +2969,46 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
             }
             for p in sorted(monthly_item_data.keys())
         ],
+        'prev_monthly_item_data': [
+            {
+                'period': prev_monthly_item_data[p]['period'],
+                # 세분화된 의류 (F/S)
+                '당시즌F': {
+                    'gross_sales': prev_monthly_item_data[p]['당시즌F']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['당시즌F']['net_sales'] / 1000,  # 1K HKD
+                },
+                '당시즌S': {
+                    'gross_sales': prev_monthly_item_data[p]['당시즌S']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['당시즌S']['net_sales'] / 1000,  # 1K HKD
+                },
+                '과시즌F': {
+                    'gross_sales': prev_monthly_item_data[p]['과시즌F']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['과시즌F']['net_sales'] / 1000,  # 1K HKD
+                },
+                '과시즌S': {
+                    'gross_sales': prev_monthly_item_data[p]['과시즌S']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['과시즌S']['net_sales'] / 1000,  # 1K HKD
+                },
+                # ACC
+                '모자': {
+                    'gross_sales': prev_monthly_item_data[p]['모자']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['모자']['net_sales'] / 1000,  # 1K HKD
+                },
+                '신발': {
+                    'gross_sales': prev_monthly_item_data[p]['신발']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['신발']['net_sales'] / 1000,  # 1K HKD
+                },
+                '가방': {
+                    'gross_sales': prev_monthly_item_data[p]['가방']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['가방']['net_sales'] / 1000,  # 1K HKD
+                },
+                '기타ACC': {
+                    'gross_sales': prev_monthly_item_data[p]['기타ACC']['gross_sales'] / 1000,  # 1K HKD
+                    'net_sales': prev_monthly_item_data[p]['기타ACC']['net_sales'] / 1000,  # 1K HKD
+                },
+            }
+            for p in sorted(prev_monthly_item_data.keys())
+        ],
         'store_monthly_trends': dict(store_monthly_trends),
         'store_item_all': store_item_all,
         'item_store_top5': item_store_top5,

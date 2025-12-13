@@ -2765,6 +2765,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         
                         const calculateCumulative = (data: any[], itemKey: string) => {
                           return data.reduce((sum: number, item: any) => {
+                            // JSON 데이터는 이미 K HKD 단위이므로 그대로 합산
                             return sum + (item?.[itemKey]?.gross_sales || 0);
                           }, 0);
                         };
@@ -2772,8 +2773,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         return (
                           <>
                             {items.map((itemInfo) => {
-                              const currentCumulative = calculateCumulative(currentYearData, itemInfo.key) / 1000; // K HKD
-                              const prevCumulative = calculateCumulative(prevYearData, itemInfo.key) / 1000; // K HKD
+                              // JSON 데이터는 이미 K HKD 단위이므로 / 1000 불필요
+                              const currentCumulative = calculateCumulative(currentYearData, itemInfo.key); // K HKD
+                              const prevCumulative = calculateCumulative(prevYearData, itemInfo.key); // K HKD
                               const yoy = prevCumulative > 0 ? (currentCumulative / prevCumulative) * 100 : 0;
                               
                               return (
