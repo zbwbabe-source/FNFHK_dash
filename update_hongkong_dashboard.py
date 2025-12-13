@@ -1954,7 +1954,9 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                 if subcat_code in season_f_subcat_current:
                     season_f_subcat_current[subcat_code]['gross_sales_total'] += float(row['Gross_Sales'] or 0)
     
-    # 전년 시즌 누적 데이터
+    # 전년 시즌 누적 데이터 (7~10월 기간의 누적값 사용)
+    # 전년도 마지막 Period(2411)의 누적값을 사용 (CSV의 AC_Sales_Gross, Net_AcP_P는 누적값)
+    # 같은 Subcategory_Code가 여러 행에 있을 수 있으므로 합산
     for row in prev_data:
         if row['Season_Code'] == previous_season_f:
             season_f_accumulated_previous['total']['net_sales'] += float(row['Net_Sales'] or 0)
@@ -1962,13 +1964,13 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
             season_f_accumulated_previous['total']['ac_sales_gross'] += float(row['AC_Sales_Gross'] or 0)
             season_f_accumulated_previous['total']['stock_price'] += float(row['Stock_Price'] or 0)
             
-            # Subcategory별
+            # Subcategory별 - 같은 Subcategory_Code의 모든 행을 합산
             subcat_code = row['Subcategory_Code'].strip()
             subcat_name = row['Subcategory'].strip()
             season_f_subcat_previous[subcat_code]['subcategory_code'] = subcat_code
             season_f_subcat_previous[subcat_code]['subcategory_name'] = subcat_name
-            season_f_subcat_previous[subcat_code]['net_acp_p'] += float(row['Net_AcP_P'] or 0)
-            season_f_subcat_previous[subcat_code]['ac_sales_gross'] += float(row['AC_Sales_Gross'] or 0)
+            season_f_subcat_previous[subcat_code]['net_acp_p'] += float(row['Net_AcP_P'] or 0)  # 누적값 합산
+            season_f_subcat_previous[subcat_code]['ac_sales_gross'] += float(row['AC_Sales_Gross'] or 0)  # 누적값 합산
             season_f_subcat_previous[subcat_code]['stock_price'] += float(row['Stock_Price'] or 0)
             season_f_subcat_previous[subcat_code]['gross_sales_total'] += float(row['Gross_Sales'] or 0)  # 10월 Gross_Sales
     
