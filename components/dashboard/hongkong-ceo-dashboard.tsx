@@ -192,7 +192,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showStoreDetail, setShowStoreDetail] = useState(true);
   const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
-  const [showAccCumulativeSales, setShowAccCumulativeSales] = useState(false);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
   const [showEndSalesDetail, setShowEndSalesDetail] = useState(true);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
@@ -2713,88 +2712,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       });
                     })()}
                   </div>
-                  
-                  {/* 아이템별 누적판매(TAG) 토글 */}
-                  <div className="border-t pt-3 mt-3">
-                    <button 
-                      onClick={() => setShowAccCumulativeSales(!showAccCumulativeSales)}
-                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
-                    >
-                      <span>아이템별 누적판매(TAG)</span>
-                      {showAccCumulativeSales ? (
-                        <ChevronDown className="w-4 h-4 ml-2" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 ml-2" />
-                      )}
-                    </button>
-                  </div>
-                  {showAccCumulativeSales && (
-                    <div className="mt-3 pt-3 border-t space-y-1">
-                      {(() => {
-                        // 선택한 period까지의 누적 판매금액 계산
-                        const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
-                        const prevMonthlyData = ((dashboardData as any)?.prev_monthly_item_data || []) as any[];
-                        
-                        // period 파싱 (예: 2511 -> 2025년 11월)
-                        const periodYear = 2000 + parseInt(period.slice(0, 2));
-                        const periodMonth = parseInt(period.slice(2, 4));
-                        
-                        // 현재 연도 1월부터 선택한 period까지의 데이터만 필터링
-                        const currentYearData = monthlyData.filter((item: any) => {
-                          if (!item.period) return false;
-                          const itemYear = 2000 + parseInt(item.period.slice(0, 2));
-                          const itemMonth = parseInt(item.period.slice(2, 4));
-                          return itemYear === periodYear && itemMonth <= periodMonth;
-                        });
-                        
-                        // 전년도 동일 기간 데이터 필터링
-                        const prevYearData = prevMonthlyData.filter((item: any) => {
-                          if (!item.period) return false;
-                          const itemYear = 2000 + parseInt(item.period.slice(0, 2));
-                          const itemMonth = parseInt(item.period.slice(2, 4));
-                          return itemYear === periodYear - 1 && itemMonth <= periodMonth;
-                        });
-                        
-                        // 아이템별 누적 판매금액 계산 (gross_sales)
-                        const items = [
-                          { key: '신발', name: '신발' },
-                          { key: '모자', name: '모자' },
-                          { key: '가방', name: '가방' },
-                          { key: '기타ACC', name: '기타ACC' }
-                        ];
-                        
-                        const calculateCumulative = (data: any[], itemKey: string) => {
-                          return data.reduce((sum: number, item: any) => {
-                            // JSON 데이터는 이미 K HKD 단위이므로 그대로 합산
-                            return sum + (item?.[itemKey]?.gross_sales || 0);
-                          }, 0);
-                        };
-                        
-                        return (
-                          <>
-                            {items.map((itemInfo) => {
-                              // JSON 데이터는 이미 K HKD 단위이므로 / 1000 불필요
-                              const currentCumulative = calculateCumulative(currentYearData, itemInfo.key); // K HKD
-                              const prevCumulative = calculateCumulative(prevYearData, itemInfo.key); // K HKD
-                              const yoy = prevCumulative > 0 ? (currentCumulative / prevCumulative) * 100 : 0;
-                              
-                              return (
-                                <div key={itemInfo.key} className="flex justify-between text-xs">
-                                  <span className="text-gray-600">{itemInfo.name}</span>
-                                  <span className="font-semibold">
-                                    {formatNumber(Math.round(currentCumulative))} 
-                                    <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
-                                      {' '}({formatPercent(yoy)}%)
-                                    </span>
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </>
-                        );
-                      })()}
-                    </div>
-                  )}
                 </>
               )}
             </div>
@@ -2934,7 +2851,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">25F</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.당시즌F?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.당시즌F?.gross_sales || 0)))} 
                             <span className={(monthlyYoy?.당시즌F?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
                               {' '}({formatPercent(monthlyYoy?.당시즌F?.[currentPeriodIndex] || 0)}%)
                             </span>
@@ -2944,7 +2861,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">25S</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.당시즌S?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.당시즌S?.gross_sales || 0)))} 
                             <span className={(monthlyYoy?.당시즌S?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
                               {' '}({formatPercent(monthlyYoy?.당시즌S?.[currentPeriodIndex] || 0)}%)
                             </span>
@@ -2954,7 +2871,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">과시즌F</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.과시즌F?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.과시즌F?.gross_sales || 0)))} 
                             <span className="text-red-600"> ({formatPercent(monthlyYoy?.과시즌F?.[currentPeriodIndex] || 0)}%)</span>
                           </span>
                         </div>
@@ -2962,7 +2879,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">과시즌S</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.과시즌S?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.과시즌S?.gross_sales || 0)))} 
                             <span className="text-red-600"> ({formatPercent(monthlyYoy?.과시즌S?.[currentPeriodIndex] || 0)}%)</span>
                           </span>
                         </div>
@@ -2970,7 +2887,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">신발</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.신발?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.신발?.gross_sales || 0)))} 
                             <span className="text-green-600"> ({formatPercent(monthlyYoy?.신발?.[currentPeriodIndex] || 0)}%)</span>
                           </span>
                         </div>
@@ -2978,7 +2895,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">모자</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.모자?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.모자?.gross_sales || 0)))} 
                             <span className="text-green-600"> ({formatPercent(monthlyYoy?.모자?.[currentPeriodIndex] || 0)}%)</span>
                           </span>
                         </div>
@@ -2986,16 +2903,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">가방</span>
                           <span className="font-semibold">
-                            {formatNumber(Math.round((currentMonthData?.가방?.gross_sales || 0) / 1000))} 
+                            {formatNumber(Math.round((currentMonthData?.가방?.gross_sales || 0)))} 
                             <span className="text-green-600"> ({formatPercent(monthlyYoy?.가방?.[currentPeriodIndex] || 0)}%)</span>
                           </span>
                         </div>
                         {/* 기타ACC */}
-                        {((currentMonthData?.기타ACC?.gross_sales || 0) / 1000) > 0 && (
+                        {(currentMonthData?.기타ACC?.gross_sales || 0) > 0 && (
                           <div className="flex justify-between text-xs">
                             <span className="text-gray-600">기타ACC</span>
                             <span className="font-semibold">
-                              {formatNumber(Math.round((currentMonthData?.기타ACC?.gross_sales || 0) / 1000))} 
+                              {formatNumber(Math.round((currentMonthData?.기타ACC?.gross_sales || 0)))} 
                               <span className="text-green-600"> ({formatPercent(monthlyYoy?.기타ACC?.[currentPeriodIndex] || 0)}%)</span>
                             </span>
                           </div>
