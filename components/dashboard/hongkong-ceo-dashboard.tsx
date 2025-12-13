@@ -193,7 +193,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
-  const [showEndSalesDetail, setShowEndSalesDetail] = useState(false);
+  const [showEndSalesDetail, setShowEndSalesDetail] = useState(true);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
   const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(true);
   const [showSameStoreDetails, setShowSameStoreDetails] = useState(false);
@@ -2789,7 +2789,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   onClick={() => setShowEndInventoryDetail(!showEndInventoryDetail)}
                   className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                 >
-                  <span>아이템별 기말재고</span>
+                  <span>시즌/아이템별 기말재고</span>
                   {showEndInventoryDetail ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
@@ -2879,13 +2879,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               <div className="border-t pt-3 mt-3">
                 <button 
                   onClick={() => setShowEndSalesDetail(!showEndSalesDetail)}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
+                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
                 >
                   <span>시즌/아이템별 판매(TAG)</span>
                   {showEndSalesDetail ? (
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-4 h-4 ml-2" />
                   ) : (
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 ml-2" />
                   )}
                 </button>
               </div>
