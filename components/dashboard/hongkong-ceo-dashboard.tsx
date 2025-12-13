@@ -2950,7 +2950,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       onClick={() => setShowPastSeasonSalesDetail(!showPastSeasonSalesDetail)}
                       className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                     >
-                      <span>시즌별 판매</span>
+                      <span>시즌별판매(TAG)</span>
                       {showPastSeasonSalesDetail ? (
                         <ChevronDown className="w-4 h-4" />
                       ) : (
