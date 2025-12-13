@@ -3801,14 +3801,23 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     ) : (
                       <tr>
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-blue-50">YOY</td>
-                        {((dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[selectedChannel.replace(' ', '_')] : undefined) || []).map((yoy: number, idx: number) => (
-                          <td 
-                            key={idx} 
-                            className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
-                          >
-                            {yoy}%
-                          </td>
-                        ))}
+                        {(() => {
+                          // 한글 채널 이름을 데이터 키로 변환
+                          const channelKey = selectedChannel === 'HK 정상' ? 'HK_Retail' : 
+                                           selectedChannel === 'HK 아울렛' ? 'HK_Outlet' :
+                                           selectedChannel === 'HK 온라인' ? 'HK_Online' :
+                                           selectedChannel === 'MC 정상' ? 'MC_Retail' :
+                                           selectedChannel === 'MC 아울렛' ? 'MC_Outlet' : selectedChannel.replace(' ', '_');
+                          const yoyData = dashboardData?.monthly_channel_yoy ? (dashboardData.monthly_channel_yoy as any)[channelKey] : undefined;
+                          return (yoyData || []).map((yoy: number, idx: number) => (
+                            <td 
+                              key={idx} 
+                              className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
+                            >
+                              {yoy}%
+                            </td>
+                          ));
+                        })()}
                       </tr>
                     )}
                   </tbody>
