@@ -1115,9 +1115,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       총 <span className="font-bold text-red-600">9개</span> 매장
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      * HK Retail 6개 (최대 Yoho <span className="bg-red-100 px-1 rounded font-semibold">-210K</span>)
+                      * HK 정상 6개 (최대 Yoho <span className="bg-red-100 px-1 rounded font-semibold">-210K</span>)
                       <br/>
-                      * Outlet 3개, MC 1개
+                      * 아울렛 3개, MC 1개
                       <br/>
                       * LCX·WTC 비정상운영 제외
                     </div>
@@ -1262,21 +1262,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
+                    <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatNumber((hkRetail?.current?.net_sales || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(hkRetail?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
+                    <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatNumber((hkOutlet?.current?.net_sales || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(hkOutlet?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Online</span>
+                    <span className="text-gray-600">- 온라인</span>
                     <span className="font-semibold">
                       {formatNumber((hkOnline?.current?.net_sales || 0) / 1000)} 
                       <span className="text-green-600"> ({formatPercent(hkOnline?.yoy || 0)}%)</span>
@@ -1295,14 +1295,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
+                    <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatNumber((mcRetail?.current?.net_sales || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(mcRetail?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
+                    <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatNumber((mcOutlet?.current?.net_sales || 0) / 1000)} 
                       <span className="text-red-600"> ({formatPercent(mcOutlet?.yoy || 0)}%)</span>
@@ -1401,21 +1401,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
+                    <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatPercent(hkRetail?.current?.discount_rate || 0, 1)}%
                       <span className="text-gray-500"> (전년 {formatPercent(hkRetail?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
+                    <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatPercent(hkOutlet?.current?.discount_rate || 0, 1)}%
                       <span className="text-gray-500"> (전년 {formatPercent(hkOutlet?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Online</span>
+                    <span className="text-gray-600">- 온라인</span>
                     <span className="font-semibold">
                       {formatPercent(hkOnline?.current?.discount_rate || 0, 1)}%
                       <span className="text-gray-500"> (전년 {formatPercent(hkOnline?.previous?.discount_rate || 0, 1)}%)</span>
@@ -1430,14 +1430,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Retail</span>
+                    <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatPercent(mcRetail?.current?.discount_rate || 0, 1)}%
                       <span className="text-gray-500"> (전년 {formatPercent(mcRetail?.previous?.discount_rate || 0, 1)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- Outlet</span>
+                    <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatPercent(mcOutlet?.current?.discount_rate || 0, 1)}%
                       <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
@@ -3541,7 +3541,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               onClick={(data: any) => {
                 if (data && data.activePayload && data.activePayload[0]) {
-                  const channelName = data.activePayload[0].dataKey;
+                  const dataKey = data.activePayload[0].dataKey;
+                  // dataKey를 한글 채널 이름으로 변환
+                  const channelName = dataKey === 'HK Retail' ? 'HK 정상' :
+                                    dataKey === 'HK Outlet' ? 'HK 아울렛' :
+                                    dataKey === 'HK Online' ? 'HK 온라인' :
+                                    dataKey === 'MC Retail' ? 'MC 정상' :
+                                    dataKey === 'MC Outlet' ? 'MC 아울렛' : dataKey;
                   setSelectedChannel(selectedChannel === channelName ? null : channelName);
                 }
               }}
@@ -3558,7 +3564,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 formatter={(value: any, name: string) => [`${Math.round(value).toLocaleString()}K HKD`, name]}
                 contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
               />
-              <Bar dataKey="HK Retail" stackId="a" fill="#93C5FD">
+              <Bar dataKey="HK Retail" stackId="a" fill="#93C5FD" name="HK 정상">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const hkRetail = (item.HK_Retail || 0) / 1000;
@@ -3578,7 +3584,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   );
                 })}
               </Bar>
-              <Bar dataKey="HK Outlet" stackId="a" fill="#C4B5FD">
+              <Bar dataKey="HK Outlet" stackId="a" fill="#C4B5FD" name="HK 아울렛">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const hkOutlet = (item.HK_Outlet || 0) / 1000;
@@ -3598,7 +3604,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   );
                 })}
               </Bar>
-              <Bar dataKey="HK Online" stackId="a" fill="#F9A8D4">
+              <Bar dataKey="HK Online" stackId="a" fill="#F9A8D4" name="HK 온라인">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const hkOnline = (item.HK_Online || 0) / 1000;
@@ -3618,7 +3624,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   );
                 })}
               </Bar>
-              <Bar dataKey="MC Retail" stackId="a" fill="#A78BFA">
+              <Bar dataKey="MC Retail" stackId="a" fill="#A78BFA" name="MC 정상">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const mcRetail = (item.MC_Retail || 0) / 1000;
@@ -3638,7 +3644,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   );
                 })}
               </Bar>
-              <Bar dataKey="MC Outlet" stackId="a" fill="#F472B6">
+              <Bar dataKey="MC Outlet" stackId="a" fill="#F472B6" name="MC 아울렛">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
                   const total = (item.total || 0) / 1000;
                   const mcOutlet = (item.MC_Outlet || 0) / 1000;
@@ -3665,11 +3671,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
           <div className="mt-3 flex flex-wrap gap-2 justify-center">
             {[
               { name: '전체', color: '#E5E7EB' },
-              { name: 'HK Retail', color: '#93C5FD' },
-              { name: 'HK Outlet', color: '#C4B5FD' },
-              { name: 'HK Online', color: '#F9A8D4' },
-              { name: 'MC Retail', color: '#A78BFA' },
-              { name: 'MC Outlet', color: '#F472B6' },
+              { name: 'HK 정상', color: '#93C5FD' },
+              { name: 'HK 아울렛', color: '#C4B5FD' },
+              { name: 'HK 온라인', color: '#F9A8D4' },
+              { name: 'MC 정상', color: '#A78BFA' },
+              { name: 'MC 아울렛', color: '#F472B6' },
             ].map((channel) => (
               <button
                 key={channel.name}
@@ -3718,11 +3724,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
                     />
                     <Legend />
-                    <Line type="monotone" dataKey="hkRetail" stroke="#93C5FD" strokeWidth={2} name="HK Retail" />
-                    <Line type="monotone" dataKey="hkOutlet" stroke="#C4B5FD" strokeWidth={2} name="HK Outlet" />
-                    <Line type="monotone" dataKey="hkOnline" stroke="#F9A8D4" strokeWidth={2} name="HK Online" />
-                    <Line type="monotone" dataKey="mcRetail" stroke="#A78BFA" strokeWidth={2} name="MC Retail" />
-                    <Line type="monotone" dataKey="mcOutlet" stroke="#F472B6" strokeWidth={2} name="MC Outlet" />
+                    <Line type="monotone" dataKey="hkRetail" stroke="#93C5FD" strokeWidth={2} name="HK 정상" />
+                    <Line type="monotone" dataKey="hkOutlet" stroke="#C4B5FD" strokeWidth={2} name="HK 아울렛" />
+                    <Line type="monotone" dataKey="hkOnline" stroke="#F9A8D4" strokeWidth={2} name="HK 온라인" />
+                    <Line type="monotone" dataKey="mcRetail" stroke="#A78BFA" strokeWidth={2} name="MC 정상" />
+                    <Line type="monotone" dataKey="mcOutlet" stroke="#F472B6" strokeWidth={2} name="MC 아울렛" />
                     <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -3730,8 +3736,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
                     data={(dashboardData?.monthly_channel_data || []).map((item: any, idx: number) => {
-                      // 채널 이름을 언더스코어 형식으로 변환 (예: 'HK Retail' -> 'HK_Retail')
-                      const channelKey = selectedChannel.replace(' ', '_');
+                      // 채널 이름을 언더스코어 형식으로 변환 (예: 'HK 정상' -> 'HK_Retail')
+                      const channelKey = selectedChannel === 'HK 정상' ? 'HK_Retail' : 
+                                       selectedChannel === 'HK 아울렛' ? 'HK_Outlet' :
+                                       selectedChannel === 'HK 온라인' ? 'HK_Online' :
+                                       selectedChannel === 'MC 정상' ? 'MC_Retail' :
+                                       selectedChannel === 'MC 아울렛' ? 'MC_Outlet' : selectedChannel.replace(' ', '_');
                       return {
                         month: `${item.period.slice(2, 4)}월`,
                         yoy: dashboardData?.monthly_channel_yoy ? ((dashboardData.monthly_channel_yoy as any)[channelKey]?.[idx] || 0) : 0
@@ -3767,8 +3777,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <tbody>
                     {selectedChannel === '전체' ? (
                       <>
-                        {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map((channel) => {
-                          const channelKey = channel.replace(' ', '_');
+                        {['HK 정상', 'HK 아울렛', 'HK 온라인', 'MC 정상', 'MC 아울렛'].map((channel) => {
+                          const channelKey = channel === 'HK 정상' ? 'HK_Retail' : 
+                                           channel === 'HK 아울렛' ? 'HK_Outlet' :
+                                           channel === 'HK 온라인' ? 'HK_Online' :
+                                           channel === 'MC 정상' ? 'MC_Retail' :
+                                           channel === 'MC 아울렛' ? 'MC_Outlet' : channel.replace(' ', '_');
                           return (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-1 py-1 font-semibold bg-blue-50">{channel}</td>
@@ -3858,13 +3872,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       
                       return (
                         <>
-                          <div>• HK Retail: 최대 비중 ({hkRetailPct}%)</div>
+                          <div>• HK 정상: 최대 비중 ({hkRetailPct}%)</div>
                           {hkOnlineYoy > 200 ? (
-                            <div>• HK Online: 고성장 (YOY {hkOnlineYoy}%)</div>
+                            <div>• HK 온라인: 고성장 (YOY {hkOnlineYoy}%)</div>
                           ) : (
-                            <div>• HK Online: 성장세 (YOY {hkOnlineYoy}%)</div>
+                            <div>• HK 온라인: 성장세 (YOY {hkOnlineYoy}%)</div>
                           )}
-                          <div>• MC Retail: 안정적 기여 ({mcRetailPct}%)</div>
+                          <div>• MC 정상: 안정적 기여 ({mcRetailPct}%)</div>
                         </>
                       );
                     })()}
@@ -3892,10 +3906,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
               </>
-            ) : selectedChannel === 'HK Retail' ? (
+            ) : selectedChannel === 'HK 정상' ? (
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5">
-                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK Retail 인사이트</h4>
+                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK 정상 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
                       const monthlyData = (dashboardData?.monthly_channel_data || []) as any[];
@@ -3967,10 +3981,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
               </>
-            ) : selectedChannel === 'HK Outlet' ? (
+            ) : selectedChannel === 'HK 아울렛' ? (
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5">
-                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK Outlet 인사이트</h4>
+                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK 아울렛 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
                       const monthlyData = (dashboardData?.monthly_channel_data || []) as any[];
@@ -4027,10 +4041,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
               </>
-            ) : selectedChannel === 'HK Online' ? (
+            ) : selectedChannel === 'HK 온라인' ? (
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5">
-                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK Online 인사이트</h4>
+                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 HK 온라인 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
                       const monthlyData = (dashboardData?.monthly_channel_data || []) as any[];
@@ -4086,10 +4100,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
               </>
-            ) : selectedChannel === 'MC Retail' ? (
+            ) : selectedChannel === 'MC 정상' ? (
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5">
-                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 MC Retail 인사이트</h4>
+                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 MC 정상 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
                       const monthlyData = (dashboardData?.monthly_channel_data || []) as any[];
@@ -4144,10 +4158,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
               </>
-            ) : selectedChannel === 'MC Outlet' ? (
+            ) : selectedChannel === 'MC 아울렛' ? (
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5">
-                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 MC Outlet 인사이트</h4>
+                  <h4 className="text-xs font-bold text-blue-800 mb-1">📈 MC 아울렛 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
                       const monthlyData = (dashboardData?.monthly_channel_data || []) as any[];
