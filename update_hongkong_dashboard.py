@@ -104,10 +104,16 @@ def read_all_csv_files(csv_dir, target_period=None):
     """CSV 디렉토리에서 모든 CSV 파일 읽기 및 통합"""
     # target_period가 지정되면 해당 파일만, 아니면 모든 파일 읽기
     if target_period:
-        csv_pattern = os.path.join(csv_dir, f'*{target_period}*.csv')
+        # HKMC 폴더 구조 지원: HKMC/{period}/HKMC_Inventory_{period}.csv
+        hkmc_dir = os.path.join(csv_dir, 'HKMC', target_period)
+        if os.path.exists(hkmc_dir):
+            csv_pattern = os.path.join(hkmc_dir, f'*{target_period}*.csv')
+        else:
+            csv_pattern = os.path.join(csv_dir, f'*{target_period}*.csv')
     else:
         csv_pattern = os.path.join(csv_dir, '*.csv')
-    csv_files = [f for f in glob.glob(csv_pattern) if '홍콩재고수불' in f]
+    # 홍콩재고수불 또는 HKMC_Inventory 패턴 인식
+    csv_files = [f for f in glob.glob(csv_pattern) if '홍콩재고수불' in f or 'HKMC' in f and 'Inventory' in f]
     
     if not csv_files:
         print(f"CSV 파일을 찾을 수 없습니다: {csv_pattern}")

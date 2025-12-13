@@ -33,10 +33,14 @@ try:
     print(f"✅ CSV 디렉토리 존재: {os.path.exists(csv_dir)}")
     print(f"✅ 출력 디렉토리 존재: {os.path.exists(os.path.dirname(output_file))}")
     
-    # CSV 파일 확인
+    # CSV 파일 확인 (HKMC 폴더 구조 지원)
     import glob
-    csv_pattern = os.path.join(csv_dir, '*홍콩재고수불*.csv')
-    csv_files = glob.glob(csv_pattern)
+    hkmc_dir = os.path.join(csv_dir, 'HKMC', '2511')
+    if os.path.exists(hkmc_dir):
+        csv_pattern = os.path.join(hkmc_dir, '*2511*.csv')
+    else:
+        csv_pattern = os.path.join(csv_dir, '*홍콩재고수불*.csv')
+    csv_files = [f for f in glob.glob(csv_pattern) if 'Inventory' in f or '홍콩재고수불' in f]
     print(f"\n📊 발견된 CSV 파일: {len(csv_files)}개")
     for f in sorted(csv_files):
         print(f"  - {os.path.basename(f)}")
@@ -49,8 +53,8 @@ try:
     print("🚀 대시보드 데이터 생성 시작...")
     print("=" * 80 + "\n")
     
-    # 대시보드 데이터 생성
-    generate_dashboard_data(csv_dir, output_file)
+    # 대시보드 데이터 생성 (2511 기간 지정)
+    generate_dashboard_data(csv_dir, output_file, target_period='2511')
     
     # 결과 확인
     import json
