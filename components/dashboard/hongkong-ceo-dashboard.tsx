@@ -309,6 +309,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   
   // 홍콩 오프라인 매출 및 면적 (PL 데이터 사용)
   const hkOfflineSales = plData?.current_month?.hk?.net_sales || 0; // K HKD
+  const hkOfflineSalesPrev = plData?.prev_month?.hk?.net_sales || 0; // K HKD (전년)
   
   // 면적 계산: M10A 제외, 폐점+저매출 매장 제외
   let totalArea = 0;
@@ -330,8 +331,20 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     });
   }
   
+  // 전년 면적 계산 (전년 매장 수 기준으로 추정, 또는 동일 면적 가정)
+  // 전년 매장이 현재보다 적으면 전년 면적도 비례적으로 작을 것으로 가정
+  const prevStoreCount = offlineEfficiency?.total?.previous?.store_count || 0;
+  const currentStoreCount = offlineEfficiency?.total?.current?.store_count || 0;
+  const prevTotalArea = currentStoreCount > 0 && prevStoreCount > 0 ? (totalArea * prevStoreCount / currentStoreCount) : totalArea;
+  
   const salesPerPyeong = totalArea > 0 ? hkOfflineSales / totalArea : 0; // K HKD/평
   const dailySalesPerPyeong = salesPerPyeong > 0 ? (salesPerPyeong * 1000) / currentMonthDays : 0; // HKD/평/일
+  
+  // 전년 평당매출 계산
+  const prevSalesPerPyeong = prevTotalArea > 0 ? hkOfflineSalesPrev / prevTotalArea : 0; // K HKD/평
+  const prevMonthDays = new Date(currentYear - 1, currentMonth, 0).getDate(); // 전년 동월 일수
+  const prevDailySalesPerPyeong = prevSalesPerPyeong > 0 ? (prevSalesPerPyeong * 1000) / prevMonthDays : 0; // HKD/평/일
+  const dailySalesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
 
   const allHKStores = useMemo(() => {
     if (!storeStatusData?.categories) return [];
@@ -2261,8 +2274,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               <div className="text-3xl font-bold text-green-600 mb-2">
                 {formatNumber(dailySalesPerPyeong)} HKD
               </div>
-              <div className="text-sm text-green-600 font-semibold mb-3">
+              <div className="text-sm text-green-600 font-semibold mb-1">
                 평당매출/1일 ({formatNumber(salesPerPyeong)} K HKD/평)
+              </div>
+              <div className="text-xs text-gray-600 mb-3">
+                전년 {formatNumber(prevDailySalesPerPyeong)} HKD 
+                <span className={dailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                  {' '}({formatPercent(dailySalesPerPyeongYoy)}%)
+                </span>
               </div>
               <div className="text-xs text-gray-600 mb-3">
                 면적: {formatNumber(totalArea)}평 | 일수: {currentMonthDays}일 
@@ -2286,19 +2305,24 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               {showStoreDetail && (
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
-                    {Object.entries(offlineEfficiency?.by_channel || {}).map(([key, channel]: [string, any]) => (
-                      <div key={key} className="flex justify-between text-xs">
-                        <span className="text-gray-600">
-                          {channel?.country === 'HK' ? 'HK' : 'MC'} {channel?.channel}
-                        </span>
-                        <span className="font-semibold">
-                          {formatNumber((channel?.current?.sales_per_store || 0) / 1000)} 
-                          <span className={(channel?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
-                            {' '}({formatPercent(channel?.yoy || 0)}%)
+                    {Object.entries(offlineEfficiency?.by_channel || {}).map(([key, channel]: [string, any]) => {
+                      const channelName = channel?.channel === 'Retail' ? '정상' : 
+                                        channel?.channel === 'Outlet' ? '아울렛' : 
+                                        channel?.channel === 'Online' ? '온라인' : channel?.channel;
+                      return (
+                        <div key={key} className="flex justify-between text-xs">
+                          <span className="text-gray-600">
+                            {channel?.country === 'HK' ? 'HK' : 'MC'} {channelName}
                           </span>
-                        </span>
-                      </div>
-                    ))}
+                          <span className="font-semibold">
+                            {formatNumber((channel?.current?.sales_per_store || 0) / 1000)} 
+                            <span className={(channel?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                              {' '}({formatPercent(channel?.yoy || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                   
                   {/* 평당매출 계산 기준 설명 */}
