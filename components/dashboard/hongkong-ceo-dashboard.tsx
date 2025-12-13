@@ -193,6 +193,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
+  const [showEndSalesDetail, setShowEndSalesDetail] = useState(false);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
   const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(true);
   const [showSameStoreDetails, setShowSameStoreDetails] = useState(false);
@@ -2865,6 +2866,107 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <span className="font-semibold">
                               {formatNumber(otherAccCurrent / 1000)} 
                               <span className="text-green-600"> ({formatPercent(otherAccYoy)}%)</span>
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+              
+              {/* 시즌/아이템별 판매(TAG) 토글 */}
+              <div className="border-t pt-3 mt-3">
+                <button 
+                  onClick={() => setShowEndSalesDetail(!showEndSalesDetail)}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
+                >
+                  <span>시즌/아이템별 판매(TAG)</span>
+                  {showEndSalesDetail ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {showEndSalesDetail && (
+                <div className="mt-3 pt-3 border-t space-y-1">
+                  {(() => {
+                    // 당월 데이터 (마지막 Period)
+                    const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+                    const monthlyYoy = (dashboardData?.monthly_item_yoy || {}) as any;
+                    const currentMonthData = monthlyData[monthlyData.length - 1] || {};
+                    const currentPeriodIndex = monthlyData.length - 1;
+                    
+                    return (
+                      <>
+                        {/* 25F */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">25F</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.당시즌F?.gross_sales || 0) / 1000))} 
+                            <span className={(monthlyYoy?.당시즌F?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                              {' '}({formatPercent(monthlyYoy?.당시즌F?.[currentPeriodIndex] || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                        {/* 25S */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">25S</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.당시즌S?.gross_sales || 0) / 1000))} 
+                            <span className={(monthlyYoy?.당시즌S?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                              {' '}({formatPercent(monthlyYoy?.당시즌S?.[currentPeriodIndex] || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                        {/* 과시즌F */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">과시즌F</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.과시즌F?.gross_sales || 0) / 1000))} 
+                            <span className="text-red-600"> ({formatPercent(monthlyYoy?.과시즌F?.[currentPeriodIndex] || 0)}%)</span>
+                          </span>
+                        </div>
+                        {/* 과시즌S */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">과시즌S</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.과시즌S?.gross_sales || 0) / 1000))} 
+                            <span className="text-red-600"> ({formatPercent(monthlyYoy?.과시즌S?.[currentPeriodIndex] || 0)}%)</span>
+                          </span>
+                        </div>
+                        {/* 신발 */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">신발</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.신발?.gross_sales || 0) / 1000))} 
+                            <span className="text-green-600"> ({formatPercent(monthlyYoy?.신발?.[currentPeriodIndex] || 0)}%)</span>
+                          </span>
+                        </div>
+                        {/* 모자 */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">모자</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.모자?.gross_sales || 0) / 1000))} 
+                            <span className="text-green-600"> ({formatPercent(monthlyYoy?.모자?.[currentPeriodIndex] || 0)}%)</span>
+                          </span>
+                        </div>
+                        {/* 가방 */}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">가방</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round((currentMonthData?.가방?.gross_sales || 0) / 1000))} 
+                            <span className="text-green-600"> ({formatPercent(monthlyYoy?.가방?.[currentPeriodIndex] || 0)}%)</span>
+                          </span>
+                        </div>
+                        {/* 기타ACC */}
+                        {((currentMonthData?.기타ACC?.gross_sales || 0) / 1000) > 0 && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">기타ACC</span>
+                            <span className="font-semibold">
+                              {formatNumber(Math.round((currentMonthData?.기타ACC?.gross_sales || 0) / 1000))} 
+                              <span className="text-green-600"> ({formatPercent(monthlyYoy?.기타ACC?.[currentPeriodIndex] || 0)}%)</span>
                             </span>
                           </div>
                         )}
