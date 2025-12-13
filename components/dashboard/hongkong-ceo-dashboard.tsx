@@ -2455,7 +2455,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <div key={idx} className="flex justify-between text-xs">
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
-                              {formatNumber(Math.round(item.net_sales / 1000))} 
+                              {formatNumber(Math.round(item.net_sales))} 
                               <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                             </span>
                           </div>
