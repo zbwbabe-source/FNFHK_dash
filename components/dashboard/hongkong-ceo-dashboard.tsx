@@ -192,6 +192,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showStoreDetail, setShowStoreDetail] = useState(true);
   const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
+  const [showAccCumulativeSales, setShowAccCumulativeSales] = useState(false);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
   const [showEndSalesDetail, setShowEndSalesDetail] = useState(true);
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
@@ -2713,58 +2714,85 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     })()}
                   </div>
                   
-                  {/* 입고 YOY (2506-2511) - CSV 원본 데이터 기반 */}
-                  <div className="mt-4 pt-3 border-t border-pink-200 bg-pink-50 rounded p-3">
-                    <div className="text-xs font-semibold text-pink-800 mb-2">
-                      📊 6개월 누적 입고 YOY (25.06~25.11)
-                    </div>
-                    {(() => {
-                      // JSON에 저장된 CSV 기반 입고 YOY 데이터 사용
-                      const inboundData = (dashboardData as any)?.acc_inbound_yoy_6months;
-                      
-                      if (!inboundData || !inboundData.items) {
-                        return <div className="text-xs text-gray-500">데이터 없음</div>;
-                      }
-                      
-                      const items = [
-                        { key: '모자', icon: '🧢' },
-                        { key: '신발', icon: '👟' },
-                        { key: '가방', icon: '👜' },
-                        { key: '기타ACC', icon: '✨' }
-                      ];
-                      
-                      const accTotal = inboundData.items['ACC전체'];
-                      
-                      return (
-                        <div className="space-y-1">
-                          {/* ACC 전체 */}
-                          <div className="flex justify-between text-xs font-bold pb-2 mb-2 border-b border-pink-200">
-                            <span className="text-pink-900">📦 ACC 전체</span>
-                            <span className={accTotal.yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
-                              {formatNumber(Math.round(accTotal.current))}K 
-                              <span className="text-gray-500"> (YOY {formatPercent(accTotal.yoy)}%)</span>
-                            </span>
-                          </div>
-                          
-                          {/* 아이템별 */}
-                          {items.map((itemInfo) => {
-                            const itemData = inboundData.items[itemInfo.key];
-                            if (!itemData) return null;
-                            
-                            return (
-                              <div key={itemInfo.key} className="flex justify-between text-xs">
-                                <span className="text-gray-700">{itemInfo.icon} {itemInfo.key}</span>
-                                <span className={itemData.yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
-                                  {formatNumber(Math.round(itemData.current))}K 
-                                  <span className="text-gray-500 text-[10px]"> (YOY {formatPercent(itemData.yoy)}%)</span>
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })()}
+                  {/* 아이템별 누적판매(TAG) 토글 */}
+                  <div className="border-t pt-3 mt-3">
+                    <button 
+                      onClick={() => setShowAccCumulativeSales(!showAccCumulativeSales)}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
+                    >
+                      <span>아이템별 누적판매(TAG)</span>
+                      {showAccCumulativeSales ? (
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      )}
+                    </button>
                   </div>
+                  {showAccCumulativeSales && (
+                    <div className="mt-3 pt-3 border-t space-y-1">
+                      {(() => {
+                        // 선택한 period까지의 누적 판매금액 계산
+                        const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+                        const prevMonthlyData = ((dashboardData as any)?.prev_monthly_item_data || []) as any[];
+                        
+                        // period 파싱 (예: 2511 -> 2025년 11월)
+                        const periodYear = 2000 + parseInt(period.slice(0, 2));
+                        const periodMonth = parseInt(period.slice(2, 4));
+                        
+                        // 현재 연도 1월부터 선택한 period까지의 데이터만 필터링
+                        const currentYearData = monthlyData.filter((item: any) => {
+                          if (!item.period) return false;
+                          const itemYear = 2000 + parseInt(item.period.slice(0, 2));
+                          const itemMonth = parseInt(item.period.slice(2, 4));
+                          return itemYear === periodYear && itemMonth <= periodMonth;
+                        });
+                        
+                        // 전년도 동일 기간 데이터 필터링
+                        const prevYearData = prevMonthlyData.filter((item: any) => {
+                          if (!item.period) return false;
+                          const itemYear = 2000 + parseInt(item.period.slice(0, 2));
+                          const itemMonth = parseInt(item.period.slice(2, 4));
+                          return itemYear === periodYear - 1 && itemMonth <= periodMonth;
+                        });
+                        
+                        // 아이템별 누적 판매금액 계산 (gross_sales)
+                        const items = [
+                          { key: '신발', name: '신발' },
+                          { key: '모자', name: '모자' },
+                          { key: '가방', name: '가방' },
+                          { key: '기타ACC', name: '기타ACC' }
+                        ];
+                        
+                        const calculateCumulative = (data: any[], itemKey: string) => {
+                          return data.reduce((sum: number, item: any) => {
+                            return sum + (item?.[itemKey]?.gross_sales || 0);
+                          }, 0);
+                        };
+                        
+                        return (
+                          <>
+                            {items.map((itemInfo) => {
+                              const currentCumulative = calculateCumulative(currentYearData, itemInfo.key) / 1000; // K HKD
+                              const prevCumulative = calculateCumulative(prevYearData, itemInfo.key) / 1000; // K HKD
+                              const yoy = prevCumulative > 0 ? (currentCumulative / prevCumulative) * 100 : 0;
+                              
+                              return (
+                                <div key={itemInfo.key} className="flex justify-between text-xs">
+                                  <span className="text-gray-600">{itemInfo.name}</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(Math.round(currentCumulative))} 
+                                    <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                      {' '}({formatPercent(yoy)}%)
+                                    </span>
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </>
               )}
             </div>
