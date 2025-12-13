@@ -1950,6 +1950,13 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
             prev_net_acp_p = season_f_subcat_previous.get(subcat_code, {}).get('net_acp_p', 0)
             net_acp_p_yoy_subcat = (subcat_data['net_acp_p'] / prev_net_acp_p * 100) if prev_net_acp_p > 0 else (999 if subcat_data['net_acp_p'] > 0 else 0)
             
+            # 당월 판매 데이터 (current_season_f_oct에서 가져오기)
+            current_month_sales = current_season_f_oct.get(subcat_code, {}).get('net_sales', 0)
+            # 전년 당월 판매 데이터
+            prev_month_sales = previous_season_f_oct.get(subcat_code, {}).get('net_sales', 0)
+            # 당월 판매 YOY 계산
+            month_sales_yoy = (current_month_sales / prev_month_sales * 100) if prev_month_sales > 0 else (999 if current_month_sales > 0 else 0)
+            
             # 재고일수 계산 (해당 Period의 Gross_Sales 합계를 월판매액으로 사용)
             months = 4  # 7~10월 = 4개월
             # Gross_Sales 합계를 월평균 판매액으로 사용
@@ -1962,6 +1969,7 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                 'net_acp_p': subcat_data['net_acp_p'] / 1000,  # 1K HKD
                 'net_acp_p_yoy': net_acp_p_yoy_subcat,
                 'ac_sales_gross': subcat_data['ac_sales_gross'] / 1000,  # 1K HKD
+                'ac_sales_gross_yoy': month_sales_yoy,  # 당월 판매 YOY 추가
                 'sales_rate': sales_rate,
                 'stock_price': subcat_data['stock_price'] / 1000,  # 1K HKD
                 'stock_days': stock_days,

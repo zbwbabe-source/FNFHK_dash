@@ -2559,9 +2559,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               
               {showCurrentSeasonDetail && (
                 <>
-                  {/* 카테고리별 입고/판매율 */}
+                  {/* 카테고리별 입고YOY/판매YOY/판매율 */}
                   <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">카테고리별 입고YOY/판매율</div>
+                    <div className="text-xs font-semibold text-gray-700 mb-2">카테고리별 입고YOY/판매YOY/판매율</div>
                     <div className="space-y-1">
                       {(() => {
                         const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
@@ -2573,13 +2573,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
                               <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
+                              <span className={(item.ac_sales_gross_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.ac_sales_gross_yoy || 0)}%</span> / 
                               <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
                             </span>
                           </div>
                         ));
                       })()}
                       <div className="mt-2 pt-2 border-t text-xs text-gray-500">
-                        * 입고YOY / 판매율 (입고 높은순)
+                        * 입고YOY / 판매YOY / 판매율 (입고 높은순)
                       </div>
                     </div>
                   </div>
