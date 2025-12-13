@@ -248,6 +248,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showStagnantInventoryModal, setShowStagnantInventoryModal] = useState(false);
   const [showPastSeasonDetailModal, setShowPastSeasonDetailModal] = useState(false);
   const [stagnantModalView, setStagnantModalView] = useState<'detail' | 'stagnant'>('detail'); // 'detail' = 과시즌F 상세분석, 'stagnant' = 정체재고
+  const [showPastSeasonSalesDetail, setShowPastSeasonSalesDetail] = useState(false);
 
   // 정체재고 데이터 (매출/재고 비율 기준)
   const filteredStagnantInventory = useMemo(() => {
@@ -2943,42 +2944,57 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </div>
                   </div>
                   
-                  {/* 시즌별 판매 */}
-                  <div className="mt-3 pt-3 border-t space-y-1">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
-                    <div className="flex justify-between text-xs pl-2">
-                      <span className="text-gray-600">1년차 (24FW)</span>
-                      <span className="font-semibold">
-                        {formatNumber(pastSeasonSales?.fw?.by_year?.['1년차']?.current || 0)} 
-                        <span className="text-green-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['1년차']?.yoy || 0)}%)</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs pl-2">
-                      <span className="text-gray-600">2년차 (23FW)</span>
-                      <span className="font-semibold">
-                        {formatNumber(pastSeasonSales?.fw?.by_year?.['2년차']?.current || 0)} 
-                        <span className="text-red-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['2년차']?.yoy || 0)}%)</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs pl-2">
-                      <span className="text-gray-600">3년차 이상 (22FW~)</span>
-                      <span className="font-semibold">
-                        {formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.current || 0)} 
-                        <span className="text-red-600"> ({pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change >= 0 ? '+' : ''}{formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change || 0)})</span>
-                      </span>
-                    </div>
-                    
-                    <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
-                    <div className="flex justify-between text-xs pl-2">
-                      <span className="text-gray-600">전체</span>
-                      <span className="font-semibold">
-                        {formatNumber(pastSeasonSales?.ss?.current || 0)} 
-                        <span className={(pastSeasonSales?.ss?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
-                          {' '}({formatPercent(pastSeasonSales?.ss?.yoy || 0)}%)
-                        </span>
-                      </span>
-                    </div>
+                  {/* 시즌별 판매 토글 */}
+                  <div className="border-t pt-3 mt-3">
+                    <button 
+                      onClick={() => setShowPastSeasonSalesDetail(!showPastSeasonSalesDetail)}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
+                    >
+                      <span>시즌별 판매</span>
+                      {showPastSeasonSalesDetail ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
+                  {showPastSeasonSalesDetail && (
+                    <div className="mt-3 pt-3 border-t space-y-1">
+                      <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                      <div className="flex justify-between text-xs pl-2">
+                        <span className="text-gray-600">1년차 (24FW)</span>
+                        <span className="font-semibold">
+                          {formatNumber(pastSeasonSales?.fw?.by_year?.['1년차']?.current || 0)} 
+                          <span className="text-green-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['1년차']?.yoy || 0)}%)</span>
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs pl-2">
+                        <span className="text-gray-600">2년차 (23FW)</span>
+                        <span className="font-semibold">
+                          {formatNumber(pastSeasonSales?.fw?.by_year?.['2년차']?.current || 0)} 
+                          <span className="text-red-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['2년차']?.yoy || 0)}%)</span>
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs pl-2">
+                        <span className="text-gray-600">3년차 이상 (22FW~)</span>
+                        <span className="font-semibold">
+                          {formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.current || 0)} 
+                          <span className="text-red-600"> ({pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change >= 0 ? '+' : ''}{formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change || 0)})</span>
+                        </span>
+                      </div>
+                      
+                      <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                      <div className="flex justify-between text-xs pl-2">
+                        <span className="text-gray-600">전체</span>
+                        <span className="font-semibold">
+                          {formatNumber(pastSeasonSales?.ss?.current || 0)} 
+                          <span className={(pastSeasonSales?.ss?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
+                            {' '}({formatPercent(pastSeasonSales?.ss?.yoy || 0)}%)
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
               
