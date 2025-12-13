@@ -3010,6 +3010,25 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   {showPastSeasonSalesDetail && (
                     <div className="mt-3 pt-3 border-t space-y-1">
                       <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                      {(() => {
+                        const fw1year = pastSeasonSales?.fw?.by_year?.['1년차'] || {};
+                        const fw2year = pastSeasonSales?.fw?.by_year?.['2년차'] || {};
+                        const fw3year = pastSeasonSales?.fw?.by_year?.['3년차_이상'] || {};
+                        const fwTotalCurrent = (fw1year.current || 0) + (fw2year.current || 0) + (fw3year.current || 0);
+                        const fwTotalPrevious = (fw1year.previous || 0) + (fw2year.previous || 0) + (fw3year.previous || 0);
+                        const fwTotalYoy = fwTotalPrevious > 0 ? (fwTotalCurrent / fwTotalPrevious) * 100 : 0;
+                        return (
+                          <div className="flex justify-between text-xs pl-2 mb-1">
+                            <span className="text-gray-600 font-semibold">전체</span>
+                            <span className="font-semibold">
+                              {formatNumber(Math.round(fwTotalCurrent))} 
+                              <span className={fwTotalYoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                {' '}({formatPercent(fwTotalYoy)}%)
+                              </span>
+                            </span>
+                          </div>
+                        );
+                      })()}
                       <div className="flex justify-between text-xs pl-2">
                         <span className="text-gray-600">1년차 (24FW)</span>
                         <span className="font-semibold">
