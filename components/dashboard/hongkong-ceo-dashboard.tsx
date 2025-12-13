@@ -2440,9 +2440,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </div>
               {showSeasonSalesDetail && (
                 <>
-                  {/* 25F 카테고리별 판매금액 TOP 5 */}
+                  {/* 25F 카테고리별 당월 판매금액 TOP 5 */}
                   <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs font-semibold text-gray-700 mb-2">25F 카테고리별 판매금액 TOP 5</div>
+                    <div className="text-xs font-semibold text-gray-700 mb-2">25F 카테고리별 당월 판매금액 TOP 5</div>
                     <div className="space-y-1">
                       {((seasonSales?.current_season_f as any)?.[currentMonthKey]?.subcategory_top5 || []).map((item: any, idx: number) => {
                         // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
