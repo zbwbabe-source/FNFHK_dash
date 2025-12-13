@@ -4,7 +4,7 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-13T15:43:29.755476"
+    "generated_at": "2025-12-13T15:48:01.094929"
   },
   "sales_summary": {
     "total_net_sales": 21338.977,
@@ -3199,6 +3199,35 @@
           },
           "yoy": 0.0
         }
+      }
+    },
+    "past_season_sales": {
+      "fw": {
+        "by_year": {
+          "1년차": {
+            "current": 3833.115,
+            "previous": 2889.302,
+            "yoy": 132.6657787936325,
+            "change": 943.813
+          },
+          "2년차": {
+            "current": 1568.609,
+            "previous": 599.986,
+            "yoy": 261.4409336217845,
+            "change": 968.623
+          },
+          "3년차_이상": {
+            "current": 760.621,
+            "previous": 0.0,
+            "yoy": 999,
+            "change": 760.621
+          }
+        }
+      },
+      "ss": {
+        "current": 442.965,
+        "previous": 563.087,
+        "yoy": 78.66723969830595
       }
     }
   },

@@ -372,6 +372,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const endingInventory = dashboardData?.ending_inventory || {};
   const pastSeasonFW = endingInventory?.past_season_fw || {};
   const pastSeasonSS = endingInventory?.by_season?.과시즌_SS || {};
+  const pastSeasonSales = endingInventory?.past_season_sales || {};
   const pl = plData?.current_month?.total || {};
   const plYoy = plData?.current_month?.yoy || {};
   const plChange = plData?.current_month?.change || {};
@@ -2937,6 +2938,43 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         {formatNumber((pastSeasonSS?.current?.stock_price || 0) / 1000)} 
                         <span className={(pastSeasonSS?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
                           {' '}({formatPercent(pastSeasonSS?.yoy || 0)}%)
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 시즌별 판매 */}
+                  <div className="mt-3 pt-3 border-t space-y-1">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                    <div className="flex justify-between text-xs pl-2">
+                      <span className="text-gray-600">1년차 (24FW)</span>
+                      <span className="font-semibold">
+                        {formatNumber(pastSeasonSales?.fw?.by_year?.['1년차']?.current || 0)} 
+                        <span className="text-green-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['1년차']?.yoy || 0)}%)</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs pl-2">
+                      <span className="text-gray-600">2년차 (23FW)</span>
+                      <span className="font-semibold">
+                        {formatNumber(pastSeasonSales?.fw?.by_year?.['2년차']?.current || 0)} 
+                        <span className="text-red-600"> ({formatPercent(pastSeasonSales?.fw?.by_year?.['2년차']?.yoy || 0)}%)</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs pl-2">
+                      <span className="text-gray-600">3년차 이상 (22FW~)</span>
+                      <span className="font-semibold">
+                        {formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.current || 0)} 
+                        <span className="text-red-600"> ({pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change >= 0 ? '+' : ''}{formatNumber(pastSeasonSales?.fw?.by_year?.['3년차_이상']?.change || 0)})</span>
+                      </span>
+                    </div>
+                    
+                    <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                    <div className="flex justify-between text-xs pl-2">
+                      <span className="text-gray-600">전체</span>
+                      <span className="font-semibold">
+                        {formatNumber(pastSeasonSales?.ss?.current || 0)} 
+                        <span className={(pastSeasonSales?.ss?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
+                          {' '}({formatPercent(pastSeasonSales?.ss?.yoy || 0)}%)
                         </span>
                       </span>
                     </div>

@@ -1474,6 +1474,82 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
     
     total_ending_inventory_yoy = (total_ending_inventory_current / total_ending_inventory_previous * 100) if total_ending_inventory_previous > 0 else 0
     
+    # 과시즌 판매 데이터 계산 (택가 기준, Gross_Sales)
+    print("과시즌 판매 데이터 계산 중...")
+    past_season_sales_by_year = {
+        '1년차': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+        '2년차': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+        '3년차_이상': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+    }
+    past_season_sales_ss = {
+        'current': {'gross_sales': 0},
+        'previous': {'gross_sales': 0},
+    }
+    
+    # 현재 Period 과시즌 판매 계산
+    for row in current_data:
+        season_code = row['Season_Code']
+        gross_sales = float(row['Gross_Sales'] or 0)
+        
+        if season_code.endswith('F') and season_code != current_season_f:
+            # 과시즌F
+            if len(season_code) >= 2:
+                season_year = int(season_code[:2])
+                year_diff = last_year % 100 - season_year
+                
+                if season_code == previous_season_f:  # 24F (1년차)
+                    past_season_sales_by_year['1년차']['current']['gross_sales'] += gross_sales
+                elif season_code == prev_prev_season_f:  # 23F (2년차)
+                    past_season_sales_by_year['2년차']['current']['gross_sales'] += gross_sales
+                elif season_year < prev_year % 100 - 1:  # 22F 이하 (3년차 이상)
+                    past_season_sales_by_year['3년차_이상']['current']['gross_sales'] += gross_sales
+        elif season_code.endswith('S') and season_code != current_season_s:
+            # 과시즌S
+            past_season_sales_ss['current']['gross_sales'] += gross_sales
+    
+    # 전년 동월 과시즌 판매 계산
+    for row in prev_data:
+        season_code = row['Season_Code']
+        gross_sales = float(row['Gross_Sales'] or 0)
+        
+        if season_code.endswith('F') and season_code != previous_season_f:
+            # 과시즌F (전년 동월 기준)
+            if len(season_code) >= 2:
+                season_year = int(season_code[:2])
+                # 전년 동월(2411) 기준으로 시즌별 분류
+                if season_code == prev_prev_season_f:  # 23F (전년 기준 1년차)
+                    past_season_sales_by_year['1년차']['previous']['gross_sales'] += gross_sales
+                elif season_code == prev_prev_prev_season_f:  # 22F (전년 기준 2년차)
+                    past_season_sales_by_year['2년차']['previous']['gross_sales'] += gross_sales
+                elif season_year < prev_year % 100 - 2:  # 21F 이하 (전년 기준 3년차 이상)
+                    past_season_sales_by_year['3년차_이상']['previous']['gross_sales'] += gross_sales
+        elif season_code.endswith('S') and season_code != previous_season_s:
+            # 과시즌S
+            past_season_sales_ss['previous']['gross_sales'] += gross_sales
+    
+    # YOY 및 증감 계산
+    for year_key in past_season_sales_by_year:
+        year_data = past_season_sales_by_year[year_key]
+        if year_data['previous']['gross_sales'] > 0:
+            year_data['yoy'] = (year_data['current']['gross_sales'] / year_data['previous']['gross_sales']) * 100
+        else:
+            year_data['yoy'] = 999 if year_data['current']['gross_sales'] > 0 else 0
+        year_data['change'] = year_data['current']['gross_sales'] - year_data['previous']['gross_sales']
+    
+    if past_season_sales_ss['previous']['gross_sales'] > 0:
+        past_season_sales_ss['yoy'] = (past_season_sales_ss['current']['gross_sales'] / past_season_sales_ss['previous']['gross_sales']) * 100
+    else:
+        past_season_sales_ss['yoy'] = 999 if past_season_sales_ss['current']['gross_sales'] > 0 else 0
+    
     # 월별 아이템별 재고 추세 데이터 생성
     print("월별 아이템별 재고 추세 데이터 생성 중...")
     monthly_inventory_data = defaultdict(lambda: {
@@ -2722,6 +2798,35 @@ def generate_dashboard_data(csv_dir, output_file_path, target_period=None):
                 },
                 'by_year': past_season_fw_by_year,
                 '1year_subcategory': dict(past_season_fw_1year_subcat),
+            },
+            'past_season_sales': {
+                'fw': {
+                    'by_year': {
+                        '1년차': {
+                            'current': past_season_sales_by_year['1년차']['current']['gross_sales'] / 1000,  # 1K HKD
+                            'previous': past_season_sales_by_year['1년차']['previous']['gross_sales'] / 1000,  # 1K HKD
+                            'yoy': past_season_sales_by_year['1년차'].get('yoy', 0),
+                            'change': past_season_sales_by_year['1년차'].get('change', 0) / 1000,  # 1K HKD
+                        },
+                        '2년차': {
+                            'current': past_season_sales_by_year['2년차']['current']['gross_sales'] / 1000,  # 1K HKD
+                            'previous': past_season_sales_by_year['2년차']['previous']['gross_sales'] / 1000,  # 1K HKD
+                            'yoy': past_season_sales_by_year['2년차'].get('yoy', 0),
+                            'change': past_season_sales_by_year['2년차'].get('change', 0) / 1000,  # 1K HKD
+                        },
+                        '3년차_이상': {
+                            'current': past_season_sales_by_year['3년차_이상']['current']['gross_sales'] / 1000,  # 1K HKD
+                            'previous': past_season_sales_by_year['3년차_이상']['previous']['gross_sales'] / 1000,  # 1K HKD
+                            'yoy': past_season_sales_by_year['3년차_이상'].get('yoy', 0),
+                            'change': past_season_sales_by_year['3년차_이상'].get('change', 0) / 1000,  # 1K HKD
+                        },
+                    },
+                },
+                'ss': {
+                    'current': past_season_sales_ss['current']['gross_sales'] / 1000,  # 1K HKD
+                    'previous': past_season_sales_ss['previous']['gross_sales'] / 1000,  # 1K HKD
+                    'yoy': past_season_sales_ss.get('yoy', 0),
+                },
             },
         },
         'stagnant_inventory': stagnant_inventory,
