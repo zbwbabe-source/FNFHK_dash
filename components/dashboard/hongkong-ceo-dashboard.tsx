@@ -2283,10 +2283,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   {' '}({formatPercent(dailySalesPerPyeongYoy)}%)
                 </span>
               </div>
-              <div className="text-xs text-gray-600 mb-3">
-                면적: {formatNumber(totalArea)}평 | 일수: {currentMonthDays}일 
-                (전년 {offlineEfficiency?.total?.previous?.store_count || 0}개)
-              </div>
               
               {/* 매장효율성 상세보기 */}
               <div className="border-t pt-3">
