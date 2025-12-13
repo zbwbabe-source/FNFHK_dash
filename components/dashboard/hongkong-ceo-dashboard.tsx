@@ -249,7 +249,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [showStagnantInventoryModal, setShowStagnantInventoryModal] = useState(false);
   const [showPastSeasonDetailModal, setShowPastSeasonDetailModal] = useState(false);
   const [stagnantModalView, setStagnantModalView] = useState<'detail' | 'stagnant'>('detail'); // 'detail' = 과시즌F 상세분석, 'stagnant' = 정체재고
-  const [showPastSeasonSalesDetail, setShowPastSeasonSalesDetail] = useState(false);
+  const [showPastSeasonSalesDetail, setShowPastSeasonSalesDetail] = useState(true);
 
   // 정체재고 데이터 (매출/재고 비율 기준)
   const filteredStagnantInventory = useMemo(() => {
