@@ -4,7 +4,7 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-13T15:38:26.739116"
+    "generated_at": "2025-12-13T15:43:29.755476"
   },
   "sales_summary": {
     "total_net_sales": 21338.977,
@@ -412,7 +412,7 @@
         "sales_rate": 36.01841052036902,
         "sales_rate_change": 14.641303747936028,
         "net_acp_p_yoy": 60.99648783773597,
-        "ac_sales_gross_yoy": 102.77333423218073,
+        "ac_sales_gross_yoy": 12.838507797107795,
         "subcategory_detail": [
           {
             "subcategory_code": "DJ",
@@ -420,7 +420,7 @@
             "net_acp_p": 12644.396,
             "net_acp_p_yoy": 63.061513672309445,
             "ac_sales_gross": 2831.7,
-            "ac_sales_gross_yoy": 119.36021937331888,
+            "ac_sales_gross_yoy": 121.01338937918085,
             "sales_rate": 22.3949012669328,
             "stock_price": 9762.015,
             "stock_days": 417.6799161389697
@@ -431,7 +431,7 @@
             "net_acp_p": 9696.354,
             "net_acp_p_yoy": 97.08103717929811,
             "ac_sales_gross": 6395.711,
-            "ac_sales_gross_yoy": 90.82828328003757,
+            "ac_sales_gross_yoy": 98.10690822877429,
             "sales_rate": 65.95995773256628,
             "stock_price": 3283.514,
             "stock_days": 62.130028155653335
@@ -442,7 +442,7 @@
             "net_acp_p": 8468.109,
             "net_acp_p_yoy": 49.58646950931049,
             "ac_sales_gross": 2542.446,
-            "ac_sales_gross_yoy": 96.05337974763052,
+            "ac_sales_gross_yoy": 88.77038619866134,
             "sales_rate": 30.0237750836698,
             "stock_price": 5897.092,
             "stock_days": 280.64062031539254
@@ -453,7 +453,7 @@
             "net_acp_p": 6685.131,
             "net_acp_p_yoy": 67.58227993982919,
             "ac_sales_gross": 3002.962,
-            "ac_sales_gross_yoy": 92.33352522283221,
+            "ac_sales_gross_yoy": 95.32891909034173,
             "sales_rate": 44.920017274156635,
             "stock_price": 3661.042,
             "stock_days": 147.46122692294526
@@ -464,7 +464,7 @@
             "net_acp_p": 5042.784,
             "net_acp_p_yoy": 60.572839647348395,
             "ac_sales_gross": 1611.806,
-            "ac_sales_gross_yoy": 144.4744700142098,
+            "ac_sales_gross_yoy": 137.98421208979642,
             "sales_rate": 31.962622234067535,
             "stock_price": 3414.151,
             "stock_days": 256.0958979462227
@@ -475,7 +475,7 @@
             "net_acp_p": 4527.72,
             "net_acp_p_yoy": 59.74049278398941,
             "ac_sales_gross": 2161.136,
-            "ac_sales_gross_yoy": 121.26629698454887,
+            "ac_sales_gross_yoy": 117.18447449513805,
             "sales_rate": 47.731220128453174,
             "stock_price": 2355.948,
             "stock_days": 131.72691781003823
@@ -486,7 +486,7 @@
             "net_acp_p": 4470.582,
             "net_acp_p_yoy": 138.57006253438618,
             "ac_sales_gross": 2178.392,
-            "ac_sales_gross_yoy": 138.50897688366953,
+            "ac_sales_gross_yoy": 227.69378710594532,
             "sales_rate": 48.72725743538537,
             "stock_price": 2281.436,
             "stock_days": 126.77132918684036
@@ -497,7 +497,7 @@
             "net_acp_p": 3922.774,
             "net_acp_p_yoy": 66.45272276200407,
             "ac_sales_gross": 1239.886,
-            "ac_sales_gross_yoy": 238.1336898678321,
+            "ac_sales_gross_yoy": 239.48228440749725,
             "sales_rate": 31.607377840273237,
             "stock_price": 2677.853,
             "stock_days": 261.29643844527567
@@ -508,7 +508,7 @@
             "net_acp_p": 3833.306,
             "net_acp_p_yoy": 46.93535266169426,
             "ac_sales_gross": 641.616,
-            "ac_sales_gross_yoy": 72.04774842520132,
+            "ac_sales_gross_yoy": 72.88473684449674,
             "sales_rate": 16.73792804435649,
             "stock_price": 3180.39,
             "stock_days": 599.4298575586281
@@ -519,7 +519,7 @@
             "net_acp_p": 3665.139,
             "net_acp_p_yoy": 49.14068733482685,
             "ac_sales_gross": 1446.803,
-            "ac_sales_gross_yoy": 96.59071617490032,
+            "ac_sales_gross_yoy": 96.51362915308599,
             "sales_rate": 39.474710236092,
             "stock_price": 2207.575,
             "stock_days": 184.6126506590845
@@ -530,7 +530,7 @@
             "net_acp_p": 3495.909,
             "net_acp_p_yoy": 42.72691073460911,
             "ac_sales_gross": 891.812,
-            "ac_sales_gross_yoy": 80.052143695993,
+            "ac_sales_gross_yoy": 78.86000282965479,
             "sales_rate": 25.510160590564574,
             "stock_price": 2590.59,
             "stock_days": 350.7892088051961
@@ -541,7 +541,7 @@
             "net_acp_p": 3218.054,
             "net_acp_p_yoy": 43.75268861062392,
             "ac_sales_gross": 1250.334,
-            "ac_sales_gross_yoy": 93.2069356165325,
+            "ac_sales_gross_yoy": 88.76903143359188,
             "sales_rate": 38.853729614232705,
             "stock_price": 1959.173,
             "stock_days": 190.1040757826303
@@ -552,7 +552,7 @@
             "net_acp_p": 2096.252,
             "net_acp_p_yoy": 126.23613436269254,
             "ac_sales_gross": 459.833,
-            "ac_sales_gross_yoy": 95.10977459616254,
+            "ac_sales_gross_yoy": 92.25554436495102,
             "sales_rate": 21.935959989543242,
             "stock_price": 1630.044,
             "stock_days": 429.09539217514345
@@ -563,7 +563,7 @@
             "net_acp_p": 797.33,
             "net_acp_p_yoy": 52.15953820298736,
             "ac_sales_gross": 211.053,
-            "ac_sales_gross_yoy": 80.29446167383863,
+            "ac_sales_gross_yoy": 46.501784691314505,
             "sales_rate": 26.469968519935282,
             "stock_price": 584.693,
             "stock_days": 335.64626696453774
@@ -574,7 +574,7 @@
             "net_acp_p": 772.8,
             "net_acp_p_yoy": 84.54309750681006,
             "ac_sales_gross": 71.059,
-            "ac_sales_gross_yoy": 95.89266325422678,
+            "ac_sales_gross_yoy": 96.48200950441276,
             "sales_rate": 9.195005175983436,
             "stock_price": 699.316,
             "stock_days": 1189.1275453089795
@@ -585,7 +585,7 @@
             "net_acp_p": 696.193,
             "net_acp_p_yoy": 221.47769930648343,
             "ac_sales_gross": 145.21,
-            "ac_sales_gross_yoy": 377.7859654999163,
+            "ac_sales_gross_yoy": 362.4631820677949,
             "sales_rate": 20.85772192481108,
             "stock_price": 549.088,
             "stock_days": 457.45896859118557
@@ -596,7 +596,7 @@
             "net_acp_p": 682.998,
             "net_acp_p_yoy": 28.904120139925126,
             "ac_sales_gross": 156.308,
-            "ac_sales_gross_yoy": 66.26084275084658,
+            "ac_sales_gross_yoy": 68.91947900775139,
             "sales_rate": 22.885572139303484,
             "stock_price": 523.374,
             "stock_days": 403.71595518329724
@@ -607,7 +607,7 @@
             "net_acp_p": 668.391,
             "net_acp_p_yoy": 174.8259302465487,
             "ac_sales_gross": 225.013,
-            "ac_sales_gross_yoy": 125.52847342294606,
+            "ac_sales_gross_yoy": 119.51548565631455,
             "sales_rate": 33.66487579874654,
             "stock_price": 440.691,
             "stock_days": 236.85742310844765
@@ -618,7 +618,7 @@
             "net_acp_p": 631.89,
             "net_acp_p_yoy": 37.63705369693562,
             "ac_sales_gross": 101.598,
-            "ac_sales_gross_yoy": 39.79029710969922,
+            "ac_sales_gross_yoy": 17.171251109139305,
             "sales_rate": 16.07843137254902,
             "stock_price": 527.874,
             "stock_days": 627.5000990609027
@@ -629,7 +629,7 @@
             "net_acp_p": 630.348,
             "net_acp_p_yoy": 127.48983678174868,
             "ac_sales_gross": 224.783,
-            "ac_sales_gross_yoy": 92.70075838808415,
+            "ac_sales_gross_yoy": 102.30010603971256,
             "sales_rate": 35.66014328593094,
             "stock_price": 403.225,
             "stock_days": 218.3134813210612
@@ -640,7 +640,7 @@
             "net_acp_p": 622.281,
             "net_acp_p_yoy": 30.198814528096968,
             "ac_sales_gross": 165.699,
-            "ac_sales_gross_yoy": 20.681248197698295,
+            "ac_sales_gross_yoy": 43.80384640803648,
             "sales_rate": 26.62768106369952,
             "stock_price": 454.132,
             "stock_days": 330.7830140578338
@@ -651,7 +651,7 @@
             "net_acp_p": 567.746,
             "net_acp_p_yoy": 127.88195359502299,
             "ac_sales_gross": 199.158,
-            "ac_sales_gross_yoy": 220.22291649075405,
+            "ac_sales_gross_yoy": 182.9840406471945,
             "sales_rate": 35.07871477738284,
             "stock_price": 366.166,
             "stock_days": 221.7485566635714
@@ -662,7 +662,7 @@
             "net_acp_p": 464.64,
             "net_acp_p_yoy": 65.87713539946095,
             "ac_sales_gross": 185.129,
-            "ac_sales_gross_yoy": 156.30598431880628,
+            "ac_sales_gross_yoy": 153.51427102509246,
             "sales_rate": 39.84353477961432,
             "stock_price": 278.494,
             "stock_days": 182.40969379400687
@@ -673,7 +673,7 @@
             "net_acp_p": 322.766,
             "net_acp_p_yoy": 34.07346413094541,
             "ac_sales_gross": 43.403,
-            "ac_sales_gross_yoy": 40.86648814078042,
+            "ac_sales_gross_yoy": 31.052936589135083,
             "sales_rate": 13.447203237020009,
             "stock_price": 277.446,
             "stock_days": 773.0633663826131
@@ -684,7 +684,7 @@
             "net_acp_p": 227.221,
             "net_acp_p_yoy": 242.99112394396323,
             "ac_sales_gross": 72.403,
-            "ac_sales_gross_yoy": 294.1238379231714,
+            "ac_sales_gross_yoy": 290.3553095925569,
             "sales_rate": 31.86457237667293,
             "stock_price": 153.936,
             "stock_days": 256.58138178181514
@@ -728,7 +728,7 @@
             "net_acp_p": 119.76,
             "net_acp_p_yoy": 20.038819356134127,
             "ac_sales_gross": 21.457,
-            "ac_sales_gross_yoy": 28.67561317864695,
+            "ac_sales_gross_yoy": 25.231952398311364,
             "sales_rate": 17.916666666666668,
             "stock_price": 98.056,
             "stock_days": 552.8954045672399
@@ -761,7 +761,7 @@
             "net_acp_p": 31.488,
             "net_acp_p_yoy": 6.744056543156993,
             "ac_sales_gross": 9.97,
-            "ac_sales_gross_yoy": 15.525221991309277,
+            "ac_sales_gross_yoy": 12.838507797107795,
             "sales_rate": 31.66285569105691,
             "stock_price": 21.518,
             "stock_days": 258.9929789368104

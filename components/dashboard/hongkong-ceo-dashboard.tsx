@@ -2580,7 +2580,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         ));
                       })()}
                       <div className="mt-2 pt-2 border-t text-xs text-gray-500">
-                        * 입고YOY / 판매YOY / 판매율 (입고 높은순)
+                        * 누적입고YOY / 누적판매YOY / 판매율 (입고 높은순)
                       </div>
                     </div>
                   </div>
