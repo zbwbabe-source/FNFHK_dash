@@ -375,7 +375,7 @@ export default function Home() {
     Object.values(twData.store_summary).forEach((store: any) => {
       if (store.channel === 'Online') return;
       if ((store.previous?.net_sales || 0) === 0) return;
-      const area = storeAreas[store.store_code] || 0;
+      const area = (storeAreas as Record<string, number>)[store.store_code] || 0;
       if (store.closed === true && area > 0) {
         const salesPerPyeong = (store.previous.net_sales / 1000) / area;
         if (salesPerPyeong < 1) return;
