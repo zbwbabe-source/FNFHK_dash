@@ -330,6 +330,28 @@ export default function Home() {
     return totalArea;
   }, [hkData]);
 
+  // 전년도 홍콩 오프라인 매장 총 면적 계산 (평당매출 계산용, 마카오 제외)
+  const hkOfflineTotalAreaPrevious = useMemo(() => {
+    if (!hkData?.store_summary) return 0;
+    const storeAreas = hkStoreAreas?.store_areas || {};
+    let totalArea = 0;
+    Object.keys(hkData.store_summary).forEach(storeCode => {
+      const store = hkData.store_summary[storeCode];
+      if (storeCode === 'M10A') return;
+      if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.previous?.net_sales > 0) {
+        const area = (storeAreas as Record<string, number>)[storeCode] || 0;
+        if (store.closed === true && area > 0) {
+          const salesPerPyeong = (store.previous.net_sales / 1000) / area;
+          if (salesPerPyeong < 1) return;
+        }
+        if (area > 0) {
+          totalArea += area;
+        }
+      }
+    });
+    return totalArea;
+  }, [hkData, hkStoreAreas]);
+
   // 대만 오프라인 매장 총 면적 계산 (온라인 제외)
   const twOfflineTotalArea = useMemo(() => {
     if (!twData?.store_summary) return 0;
@@ -344,6 +366,26 @@ export default function Home() {
     });
     return totalArea;
   }, [twData]);
+
+  // 전년도 대만 오프라인 매장 총 면적 계산 (온라인 제외)
+  const twOfflineTotalAreaPrevious = useMemo(() => {
+    if (!twData?.store_summary) return 0;
+    const storeAreas = twStoreAreas?.store_areas || {};
+    let totalArea = 0;
+    Object.values(twData.store_summary).forEach((store: any) => {
+      if (store.channel === 'Online') return;
+      if ((store.previous?.net_sales || 0) === 0) return;
+      const area = storeAreas[store.store_code] || 0;
+      if (store.closed === true && area > 0) {
+        const salesPerPyeong = (store.previous.net_sales / 1000) / area;
+        if (salesPerPyeong < 1) return;
+      }
+      if (area > 0) {
+        totalArea += area;
+      }
+    });
+    return totalArea;
+  }, [twData, twStoreAreas]);
 
   // 대만 누적 오프라인 매출 계산 (온라인 제외)
   // PL 데이터에 cumulative.offline.net_sales가 있음!
@@ -660,26 +702,6 @@ export default function Home() {
   
   // 전년도 평당매출/1일 계산 (홍콩)
   const hkOnlyOfflinePreviousKHKD = hkPlData?.prev_month?.hk?.net_sales || 0; // K HKD 단위
-  const hkOfflineTotalAreaPrevious = useMemo(() => {
-    if (!hkData?.store_summary) return 0;
-    const storeAreas = hkStoreAreas?.store_areas || {};
-    let totalArea = 0;
-    Object.keys(hkData.store_summary).forEach(storeCode => {
-      const store = hkData.store_summary[storeCode];
-      if (storeCode === 'M10A') return;
-      if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.previous?.net_sales > 0) {
-        const area = (storeAreas as Record<string, number>)[storeCode] || 0;
-        if (store.closed === true && area > 0) {
-          const salesPerPyeong = (store.previous.net_sales / 1000) / area;
-          if (salesPerPyeong < 1) return;
-        }
-        if (area > 0) {
-          totalArea += area;
-        }
-      }
-    });
-    return totalArea;
-  }, [hkData, hkStoreAreas]);
   const hkSalesPerPyeongPrevious = hkOfflineTotalAreaPrevious > 0 ? hkOnlyOfflinePreviousKHKD / hkOfflineTotalAreaPrevious : 0; // K HKD/평 단위
   const hkDailySalesPerPyeongPrevious = currentMonthDays > 0 && hkSalesPerPyeongPrevious > 0 ? (hkSalesPerPyeongPrevious * 1000) / currentMonthDays : 0;
   const hkDailySalesPerPyeongYoy = hkDailySalesPerPyeongPrevious > 0 ? (hkDailySalesPerPyeongCurrent / hkDailySalesPerPyeongPrevious) * 100 : 0;
@@ -727,24 +749,6 @@ export default function Home() {
   const twDailySalesPerPyeongCumulative = cumulativeDays > 0 ? (twSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 1월부터 해당 월까지 누적 일수 기준
   
   // 전년도 평당매출/1일 계산 (대만)
-  const twOfflineTotalAreaPrevious = useMemo(() => {
-    if (!twData?.store_summary) return 0;
-    const storeAreas = twStoreAreas?.store_areas || {};
-    let totalArea = 0;
-    Object.values(twData.store_summary).forEach((store: any) => {
-      if (store.channel === 'Online') return;
-      if ((store.previous?.net_sales || 0) === 0) return;
-      const area = storeAreas[store.store_code] || 0;
-      if (store.closed === true && area > 0) {
-        const salesPerPyeong = (store.previous.net_sales / 1000) / area;
-        if (salesPerPyeong < 1) return;
-      }
-      if (area > 0) {
-        totalArea += area;
-      }
-    });
-    return totalArea;
-  }, [twData]);
   const twSalesPerPyeongPrevious = twOfflineTotalAreaPrevious > 0 ? twOfflinePrevious / twOfflineTotalAreaPrevious : 0; // K HKD/평 단위
   const twDailySalesPerPyeongPrevious = currentMonthDays > 0 && twSalesPerPyeongPrevious > 0 ? (twSalesPerPyeongPrevious * 1000) / currentMonthDays : 0;
   const twDailySalesPerPyeongYoy = twDailySalesPerPyeongPrevious > 0 ? (twDailySalesPerPyeongCurrent / twDailySalesPerPyeongPrevious) * 100 : 0;
