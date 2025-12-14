@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface CFItem {
@@ -47,7 +47,7 @@ interface CFData {
   };
 }
 
-export default function CashFlowPage() {
+function CashFlowPageContent() {
   const searchParams = useSearchParams();
   const periodParam = searchParams.get('period') || '2511';
   const [selectedPeriod, setSelectedPeriod] = useState(periodParam || '2511');
@@ -594,6 +594,18 @@ export default function CashFlowPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CashFlowPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl text-gray-600">데이터 로딩 중...</div>
+      </div>
+    }>
+      <CashFlowPageContent />
+    </Suspense>
   );
 }
 
