@@ -2477,21 +2477,20 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                             <div className="flex justify-between text-xs">
                               <span className="text-gray-600">가방</span>
                               <span className="font-semibold">
-                                {formatNumber(Math.round((currentMonthData?.가방외?.gross_sales || 0) / 1000))} 
-                                <span className="text-green-600"> ({formatPercent(monthlyYoy?.가방외?.[currentPeriodIndex] || 0)}%)</span>
+                                {formatNumber(Math.round((currentMonthData?.가방?.gross_sales || 0) / 1000))} 
+                                <span className={(monthlyYoy?.가방?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                  {' '}({formatPercent(monthlyYoy?.가방?.[currentPeriodIndex] || 0)}%)
+                                </span>
                               </span>
                             </div>
                             {/* 기타ACC */}
                             <div className="flex justify-between text-xs">
                               <span className="text-gray-600">기타ACC</span>
                               <span className="font-semibold">
-                                {formatNumber(Math.round((currentMonthData?.기타ACC?.gross_sales || dashboardData?.acc_sales_data?.current?.categories?.기타ACC?.gross_sales || 0) / 1000))} 
-                                <span className="text-green-600"> ({formatPercent(
-                                  monthlyYoy?.기타ACC?.[currentPeriodIndex] || 
-                                  (dashboardData?.acc_sales_data?.current?.categories?.기타ACC && dashboardData?.acc_sales_data?.previous?.categories?.기타ACC && dashboardData.acc_sales_data.previous.categories.기타ACC.gross_sales > 0
-                                    ? (dashboardData.acc_sales_data.current.categories.기타ACC.gross_sales / dashboardData.acc_sales_data.previous.categories.기타ACC.gross_sales) * 100
-                                    : 0)
-                                )}%)</span>
+                                {formatNumber(Math.round((currentMonthData?.기타ACC?.gross_sales || 0) / 1000))} 
+                                <span className={(monthlyYoy?.기타ACC?.[currentPeriodIndex] || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                  {' '}({formatPercent(monthlyYoy?.기타ACC?.[currentPeriodIndex] || 0)}%)
+                                </span>
                               </span>
                             </div>
                           </>
@@ -4123,11 +4122,28 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     if (gross === 0) return "0";
                     return ((gross - net) / gross * 100).toFixed(1);
                   };
+                  
+                  const month = parseInt(item.period.slice(2, 4));
+                  
+                  // 1~6월: 24F(당시즌F)를 과시즌F로 이동
+                  let 당시즌F_gross = item.당시즌F?.gross_sales || 0;
+                  let 당시즌F_net = item.당시즌F?.net_sales || 0;
+                  let 과시즌F_gross = item.과시즌F?.gross_sales || 0;
+                  let 과시즌F_net = item.과시즌F?.net_sales || 0;
+                  
+                  if (month >= 1 && month <= 6) {
+                    // 24F를 과시즌F로 이동
+                    과시즌F_gross += 당시즌F_gross;
+                    과시즌F_net += 당시즌F_net;
+                    당시즌F_gross = 0;
+                    당시즌F_net = 0;
+                  }
+                  
                   return {
                     month: `${item.period.slice(2, 4)}월`,
-                    당시즌F: parseFloat(calc(item.당시즌F?.gross_sales || 0, item.당시즌F?.net_sales || 0)),
+                    당시즌F: parseFloat(calc(당시즌F_gross, 당시즌F_net)),
                     당시즌S: parseFloat(calc(item.당시즌S?.gross_sales || 0, item.당시즌S?.net_sales || 0)),
-                    과시즌F: parseFloat(calc(item.과시즌F?.gross_sales || 0, item.과시즌F?.net_sales || 0)),
+                    과시즌F: parseFloat(calc(과시즌F_gross, 과시즌F_net)),
                     과시즌S: parseFloat(calc(item.과시즌S?.gross_sales || 0, item.과시즌S?.net_sales || 0)),
                     모자: parseFloat(calc(item.모자?.gross_sales || 0, item.모자?.net_sales || 0)),
                     신발: parseFloat(calc(item.신발?.gross_sales || 0, item.신발?.net_sales || 0)),
@@ -4222,11 +4238,25 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             ) : (
               <BarChart 
                 data={(dashboardData?.monthly_item_data || []).map((item: any) => {
+                  const month = parseInt(item.period.slice(2, 4));
+                  
+                  // 1~6월: 24F(당시즌F)를 과시즌F로 이동
+                  let 당시즌F_gross = item.당시즌F?.gross_sales || 0;
+                  let 당시즌F_net = item.당시즌F?.net_sales || 0;
+                  let 과시즌F_gross = item.과시즌F?.gross_sales || 0;
+                  let 과시즌F_net = item.과시즌F?.net_sales || 0;
+                  
+                  if (month >= 1 && month <= 6) {
+                    // 24F를 과시즌F로 이동
+                    과시즌F_gross += 당시즌F_gross;
+                    과시즌F_net += 당시즌F_net;
+                    당시즌F_gross = 0;
+                    당시즌F_net = 0;
+                  }
+                  
                   // HKD → K HKD 변환 (1000으로 나누기)
                   const 당시즌F = Math.round(
-                    (salesPriceType === '실판'
-                      ? item.당시즌F?.net_sales
-                      : item.당시즌F?.gross_sales || 0) / 1000,
+                    (salesPriceType === '실판' ? 당시즌F_net : 당시즌F_gross) / 1000,
                   );
                   const 당시즌S = Math.round(
                     (salesPriceType === '실판'
@@ -4234,9 +4264,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       : item.당시즌S?.gross_sales || 0) / 1000,
                   );
                   const 과시즌F = Math.round(
-                    (salesPriceType === '실판'
-                      ? item.과시즌F?.net_sales
-                      : item.과시즌F?.gross_sales || 0) / 1000,
+                    (salesPriceType === '실판' ? 과시즌F_net : 과시즌F_gross) / 1000,
                   );
                   const 과시즌S = Math.round(
                     (salesPriceType === '실판'
@@ -4249,11 +4277,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   const 신발 = Math.round(
                     (salesPriceType === '실판' ? item.신발?.net_sales || 0 : item.신발?.gross_sales || 0) / 1000,
                   );
+                  // 가방은 가방 데이터 사용 (Python 스크립트에서 BAG만 분리)
                   const 가방 = Math.round(
                     (salesPriceType === '실판'
                       ? item.가방?.net_sales || 0
                       : item.가방?.gross_sales || 0) / 1000,
                   );
+                  // 기타ACC는 기타ACC 데이터 사용 (Python 스크립트에서 ATC+BOT+WTC 분리)
                   const 기타ACC = Math.round(
                     (salesPriceType === '실판'
                       ? item.기타ACC?.net_sales || 0
@@ -4805,22 +4835,31 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           
           <ResponsiveContainer width="100%" height={250}>
             <BarChart 
-              data={(dashboardData?.monthly_inventory_data || []).map((item: any) => ({
-                month: `${item.period.slice(2, 4)}월`,
-                'F당시즌': Math.round(item.F당시즌?.stock_price || 0),
-                'S당시즌': Math.round(item.S당시즌?.stock_price || 0),
-                '과시즌FW': Math.round(item.과시즌FW?.stock_price || 0),
-                '과시즌SS': Math.round(item.과시즌SS?.stock_price || 0),
-                '모자': Math.round(item.모자?.stock_price || 0),
-                '신발': Math.round(item.신발?.stock_price || 0),
-                '가방': Math.round(item.가방?.stock_price || 0),
-                '기타ACC': Math.round(item.기타ACC?.stock_price || 0),
-                // 재고주수는 레이블용으로만 저장
-                '모자_weeks': item.모자?.stock_weeks || 0,
-                '신발_weeks': item.신발?.stock_weeks || 0,
-                '가방_weeks': item.가방?.stock_weeks || 0,
-                '기타ACC_weeks': item.기타ACC?.stock_weeks || 0,
-              }))} 
+              data={(dashboardData?.monthly_inventory_data || []).map((item: any) => {
+                // 1~6월 (2501~2506)의 경우: F당시즌(24F)을 과시즌FW로 이동
+                const periodMonth = parseInt(item.period.slice(2, 4));
+                const isFirstHalf = periodMonth >= 1 && periodMonth <= 6;
+                
+                const f당시즌Value = Math.round(item.F당시즌?.stock_price || 0);
+                const 과시즌FWValue = Math.round(item.과시즌FW?.stock_price || 0);
+                
+                return {
+                  month: `${item.period.slice(2, 4)}월`,
+                  'F당시즌': isFirstHalf ? 0 : f당시즌Value, // 1~6월은 0 (24F는 과시즌으로 이동)
+                  'S당시즌': Math.round(item.S당시즌?.stock_price || 0),
+                  '과시즌FW': isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue, // 1~6월은 F당시즌(24F)을 과시즌에 포함
+                  '과시즌SS': Math.round(item.과시즌SS?.stock_price || 0),
+                  '모자': Math.round(item.모자?.stock_price || 0),
+                  '신발': Math.round(item.신발?.stock_price || 0),
+                  '가방': Math.round(item.가방?.stock_price || 0),
+                  '기타ACC': Math.round(item.기타ACC?.stock_price || 0),
+                  // 재고주수는 레이블용으로만 저장
+                  '모자_weeks': item.모자?.stock_weeks || 0,
+                  '신발_weeks': item.신발?.stock_weeks || 0,
+                  '가방_weeks': item.가방?.stock_weeks || 0,
+                  '기타ACC_weeks': item.기타ACC?.stock_weeks || 0,
+                };
+              })} 
               margin={{ top: 40, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -4853,16 +4892,25 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   const chartData = (dashboardData?.monthly_inventory_data || []);
                   if (chartData.length === 0) return null;
                   
-                  const mappedData = chartData.map((d: any) => ({
-                    F당시즌: Math.round(d.F당시즌?.stock_price || 0),
-                    S당시즌: Math.round(d.S당시즌?.stock_price || 0),
-                    과시즌FW: Math.round(d.과시즌FW?.stock_price || 0),
-                    과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
-                    모자: Math.round(d.모자?.stock_price || 0),
-                    신발: Math.round(d.신발?.stock_price || 0),
-                    가방: Math.round(d.가방?.stock_price || 0),
-                    기타ACC: Math.round(d.기타ACC?.stock_price || 0),
-                  }));
+                  const mappedData = chartData.map((d: any) => {
+                    // 1~6월: 24F(F당시즌)를 과시즌FW로 이동
+                    const periodMonth = parseInt(d.period.slice(2, 4));
+                    const isFirstHalf = periodMonth >= 1 && periodMonth <= 6;
+                    
+                    const f당시즌Value = Math.round(d.F당시즌?.stock_price || 0);
+                    const 과시즌FWValue = Math.round(d.과시즌FW?.stock_price || 0);
+                    
+                    return {
+                      F당시즌: isFirstHalf ? 0 : f당시즌Value,
+                      S당시즌: Math.round(d.S당시즌?.stock_price || 0),
+                      과시즌FW: isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue,
+                      과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
+                      모자: Math.round(d.모자?.stock_price || 0),
+                      신발: Math.round(d.신발?.stock_price || 0),
+                      가방: Math.round(d.가방?.stock_price || 0),
+                      기타ACC: Math.round(d.기타ACC?.stock_price || 0),
+                    };
+                  });
                   
                   const maxValue = Math.max(...mappedData.map((d: any) => 
                     d.F당시즌 + d.S당시즌 + d.과시즌FW + d.과시즌SS + d.모자 + d.신발 + d.가방 + d.기타ACC

@@ -588,7 +588,9 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         '과시즌S': [],
         '모자': [],
         '신발': [],
-        '가방외': []
+        '가방외': [],
+        '가방': [],
+        '기타ACC': []
     }
     
     # Category를 아이템으로 매핑
@@ -654,7 +656,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             '과시즌S': {'gross_sales': 0, 'net_sales': 0},
             '모자': {'gross_sales': 0, 'net_sales': 0},
             '신발': {'gross_sales': 0, 'net_sales': 0},
-            '가방외': {'gross_sales': 0, 'net_sales': 0}
+            '가방외': {'gross_sales': 0, 'net_sales': 0},
+            # 그래프용: 가방(BAG)과 기타ACC(ATC+BOT+WTC) 분리
+            '가방': {'gross_sales': 0, 'net_sales': 0},
+            '기타ACC': {'gross_sales': 0, 'net_sales': 0}
         }
         
         for row in period_data:
@@ -666,8 +671,24 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             gross_sales = float(row['Gross_Sales'] or 0) / TWD_TO_HKD_RATE
             net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
             
-            item_sales[item]['gross_sales'] += gross_sales
-            item_sales[item]['net_sales'] += net_sales
+            # 그래프용: 가방(BAG)과 기타ACC(ATC+BOT+WTC) 분리
+            # BAG, ATC, BOT, WTC는 가방외에도 추가하되, 그래프용으로도 별도 추가
+            if category == 'BAG':
+                item_sales['가방']['gross_sales'] += gross_sales
+                item_sales['가방']['net_sales'] += net_sales
+                # 가방외에도 추가 (다른 섹션 호환성)
+                item_sales[item]['gross_sales'] += gross_sales
+                item_sales[item]['net_sales'] += net_sales
+            elif category in ['ATC', 'BOT', 'WTC']:
+                item_sales['기타ACC']['gross_sales'] += gross_sales
+                item_sales['기타ACC']['net_sales'] += net_sales
+                # 가방외에도 추가 (다른 섹션 호환성)
+                item_sales[item]['gross_sales'] += gross_sales
+                item_sales[item]['net_sales'] += net_sales
+            else:
+                # BAG, ATC, BOT, WTC가 아닌 경우만 일반 로직 적용
+                item_sales[item]['gross_sales'] += gross_sales
+                item_sales[item]['net_sales'] += net_sales
         
         monthly_item_data.append({
             'period': period,
@@ -698,6 +719,15 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             '가방외': {
                 'gross_sales': item_sales['가방외']['gross_sales'],
                 'net_sales': item_sales['가방외']['net_sales']
+            },
+            # 그래프용: 가방(BAG)과 기타ACC(ATC+BOT+WTC) 분리
+            '가방': {
+                'gross_sales': item_sales['가방']['gross_sales'],
+                'net_sales': item_sales['가방']['net_sales']
+            },
+            '기타ACC': {
+                'gross_sales': item_sales['기타ACC']['gross_sales'],
+                'net_sales': item_sales['기타ACC']['net_sales']
             }
         })
         
@@ -715,7 +745,9 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 '과시즌S': {'net_sales': 0},
                 '모자': {'net_sales': 0},
                 '신발': {'net_sales': 0},
-                '가방외': {'net_sales': 0}
+                '가방외': {'net_sales': 0},
+                '가방': {'net_sales': 0},
+                '기타ACC': {'net_sales': 0}
             }
             
             for row in prev_period_data:
@@ -724,12 +756,35 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 # YOY 계산 시 전년도 데이터는 전년도 기준으로 분류
                 item = get_item_from_category_and_season(category, season_code, prev_year, prev_month)
                 net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE
-                prev_item_sales[item]['net_sales'] += net_sales
+                
+                # BAG와 기타ACC 분리 (그래프용)
+                if category == 'BAG':
+                    prev_item_sales['가방']['net_sales'] += net_sales
+                    prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
+                elif category in ['ATC', 'BOT', 'WTC']:
+                    prev_item_sales['기타ACC']['net_sales'] += net_sales
+                    prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
+                else:
+                    prev_item_sales[item]['net_sales'] += net_sales
             
             # YOY 계산
-            for item in ['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방외']:
-                current_net = item_sales[item]['net_sales']
-                prev_net = prev_item_sales[item]['net_sales']
+            # 1~6월의 경우 24F(당시즌F)를 과시즌F로 이동시킨 후 계산
+            period_month = int(period[2:4])
+            
+            # 현재와 전년 데이터를 복사 (원본 유지)
+            current_sales = {k: v['net_sales'] for k, v in item_sales.items()}
+            prev_sales = {k: v['net_sales'] for k, v in prev_item_sales.items()}
+            
+            # 1~6월: 24F를 과시즌F로 이동
+            if period_month >= 1 and period_month <= 6:
+                current_sales['과시즌F'] += current_sales['당시즌F']
+                current_sales['당시즌F'] = 0
+                prev_sales['과시즌F'] += prev_sales['당시즌F']
+                prev_sales['당시즌F'] = 0
+            
+            for item in ['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방외', '가방', '기타ACC']:
+                current_net = current_sales[item]
+                prev_net = prev_sales[item]
                 yoy = (current_net / prev_net * 100) if prev_net > 0 else 0
                 monthly_item_yoy[item].append(round(yoy))
     
@@ -1735,7 +1790,9 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         '과시즌SS': [],
         '모자': [],
         '신발': [],
-        '가방외': []
+        '가방외': [],
+        '가방': [],
+        '기타ACC': []
     }
     
     for period in recent_periods:
@@ -1747,13 +1804,15 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         
         # 아이템별 재고 집계
         inv_items = {}
-        for key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']:
+        for key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외', '가방', '기타ACC']:
             inv_items[key] = {'stock_price': 0, 'stock_weeks': 0}
         
         for row in period_rows:
             cat = row.get('Category', '')
             sc = row.get('Season_Code', '')
             item = get_item_from_category_and_season(cat, sc, p_year, p_month)
+            
+            stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
             
             # 대시보드 키로 매핑
             inv_key = None
@@ -1769,8 +1828,13 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 inv_key = item
             
             if inv_key:
-                stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
                 inv_items[inv_key]['stock_price'] += stock_price
+            
+            # BAG와 기타ACC 분리 (그래프용)
+            if cat == 'BAG':
+                inv_items['가방']['stock_price'] += stock_price
+            elif cat in ['ATC', 'BOT', 'WTC']:
+                inv_items['기타ACC']['stock_price'] += stock_price
         
         # 재고주수 계산은 생략 (복잡하므로 추후 구현)
         
@@ -1782,7 +1846,9 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             '과시즌SS': {'stock_price': inv_items['과시즌SS']['stock_price'] / 1000, 'stock_weeks': 0},
             '모자': {'stock_price': inv_items['모자']['stock_price'] / 1000, 'stock_weeks': 0},
             '신발': {'stock_price': inv_items['신발']['stock_price'] / 1000, 'stock_weeks': 0},
-            '가방외': {'stock_price': inv_items['가방외']['stock_price'] / 1000, 'stock_weeks': 0}
+            '가방외': {'stock_price': inv_items['가방외']['stock_price'] / 1000, 'stock_weeks': 0},
+            '가방': {'stock_price': inv_items['가방']['stock_price'] / 1000, 'stock_weeks': 0},
+            '기타ACC': {'stock_price': inv_items['기타ACC']['stock_price'] / 1000, 'stock_weeks': 0}
         })
         
         # 전년 동월 대비 YOY 계산
@@ -1793,7 +1859,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             prev_period_rows = [row for row in data if row['Period'] == prev_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
             
             prev_inv_items = {}
-            for key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']:
+            for key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외', '가방', '기타ACC']:
                 prev_inv_items[key] = {'stock_price': 0}
             
             for row in prev_period_rows:
@@ -1801,6 +1867,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 sc = row.get('Season_Code', '')
                 # YOY 계산 시 전년도 데이터는 전년도 기준으로 분류
                 item = get_item_from_category_and_season(cat, sc, prev_year, prev_month)
+                
+                stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
                 
                 inv_key = None
                 if item == '당시즌F':
@@ -1815,13 +1883,29 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     inv_key = item
                 
                 if inv_key:
-                    stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
                     prev_inv_items[inv_key]['stock_price'] += stock_price
+                
+                # BAG와 기타ACC 분리 (그래프용)
+                if cat == 'BAG':
+                    prev_inv_items['가방']['stock_price'] += stock_price
+                elif cat in ['ATC', 'BOT', 'WTC']:
+                    prev_inv_items['기타ACC']['stock_price'] += stock_price
             
             # YOY 계산
-            for inv_key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외']:
-                current_stock = inv_items[inv_key]['stock_price']
-                prev_stock = prev_inv_items[inv_key]['stock_price']
+            # 1~6월: 24F(F당시즌)를 과시즌FW로 이동시킨 후 계산
+            current_stocks = {k: inv_items[k]['stock_price'] for k in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외', '가방', '기타ACC']}
+            prev_stocks = {k: prev_inv_items[k]['stock_price'] for k in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외', '가방', '기타ACC']}
+            
+            # 1~6월: 24F를 과시즌FW로 이동
+            if p_month >= 1 and p_month <= 6:
+                current_stocks['과시즌FW'] += current_stocks['F당시즌']
+                current_stocks['F당시즌'] = 0
+                prev_stocks['과시즌FW'] += prev_stocks['F당시즌']
+                prev_stocks['F당시즌'] = 0
+            
+            for inv_key in ['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외', '가방', '기타ACC']:
+                current_stock = current_stocks[inv_key]
+                prev_stock = prev_stocks[inv_key]
                 yoy = (current_stock / prev_stock * 100) if prev_stock > 0 else 0
                 monthly_inventory_yoy[inv_key].append(round(yoy))
     
