@@ -687,8 +687,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 item_sales[item]['net_sales'] += net_sales
             else:
                 # BAG, ATC, BOT, WTC가 아닌 경우만 일반 로직 적용
-                item_sales[item]['gross_sales'] += gross_sales
-                item_sales[item]['net_sales'] += net_sales
+            item_sales[item]['gross_sales'] += gross_sales
+            item_sales[item]['net_sales'] += net_sales
         
         monthly_item_data.append({
             'period': period,
@@ -765,7 +765,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     prev_item_sales['기타ACC']['net_sales'] += net_sales
                     prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
                 else:
-                    prev_item_sales[item]['net_sales'] += net_sales
+                prev_item_sales[item]['net_sales'] += net_sales
             
             # YOY 계산
             # 1~6월의 경우 24F(당시즌F)를 과시즌F로 이동시킨 후 계산

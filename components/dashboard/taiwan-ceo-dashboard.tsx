@@ -5702,20 +5702,20 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       const smallPrevAvgSalesPerPyeong = smallTotalPrevArea > 0 ? (smallTotalPrevSales / smallTotalPrevArea / 30) : 0; // 1K HKD/평/1일
                       const smallYoy = smallPrevAvgSalesPerPyeong > 0 ? (smallAvgSalesPerPyeong / smallPrevAvgSalesPerPyeong) * 100 : 0;
                       
-                      // 매장 분류 (대형 정상: 50평 이상, 소형 정상: 50평 미만, 아울렛: TU로 시작)
+                      // 매장 분류 (대형: 40평 이상, 중소형: 40평 미만, 아울렛: TU로 시작)
                       const outletStores = activeTWStores.filter((s: any) => s.shop_cd?.startsWith('TU'));
                       const regularStores = activeTWStores.filter((s: any) => !s.shop_cd?.startsWith('TU'));
                       
                       const largeRegularStores = regularStores.filter((s: any) => {
                         const area = storeAreas[s.shop_cd] || 0;
-                        return area >= 50;
+                        return area >= 40;
                       });
                       const smallRegularStores = regularStores.filter((s: any) => {
                         const area = storeAreas[s.shop_cd] || 0;
-                        return area > 0 && area < 50;
+                        return area > 0 && area < 40;
                       });
                       
-                      // 대형 정상 매장 평당매출
+                      // 대형 매장 평당매출
                       let largeRegularTotalSales = 0, largeRegularTotalArea = 0, largeRegularPrevTotalSales = 0, largeRegularPrevTotalArea = 0;
                       largeRegularStores.forEach((s: any) => {
                         const area = storeAreas[s.shop_cd] || 0;
@@ -5728,7 +5728,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       const largeRegularPrevAvgSalesPerPyeong = largeRegularPrevTotalArea > 0 ? (largeRegularPrevTotalSales / largeRegularPrevTotalArea / 30) : 0;
                       const largeRegularYoy = largeRegularPrevAvgSalesPerPyeong > 0 ? (largeRegularAvgSalesPerPyeong / largeRegularPrevAvgSalesPerPyeong) * 100 : 0;
                       
-                      // 소형 정상 매장 평당매출
+                      // 중소형 매장 평당매출
                       let smallRegularTotalSales = 0, smallRegularTotalArea = 0, smallRegularPrevTotalSales = 0, smallRegularPrevTotalArea = 0;
                       smallRegularStores.forEach((s: any) => {
                         const area = storeAreas[s.shop_cd] || 0;
@@ -5777,30 +5777,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                               </div>
                         </div>
                           
-                          {/* 2. 매장 규모별 평당매출 */}
-                          <div className="bg-green-900 rounded px-3 py-2.5">
-                            <div className="text-white text-xs font-semibold mb-1.5">2️⃣ 매장 규모별 평당매출</div>
-                            <div className="text-slate-100 text-[11px] space-y-1">
-                              <div>• 대형 흑자({largeStores.length}개): {formatNumber(Math.round(largeAvgSalesPerPyeong))} · YOY {formatYoy(Math.round(largeYoy))}%</div>
-                              <div>• 중소형 흑자({smallMediumStores.length}개): {formatNumber(Math.round(smallAvgSalesPerPyeong))} · YOY {formatYoy(Math.round(smallYoy))}%</div>
-                  </div>
-                            <div className="text-yellow-200 text-[10px] mt-1.5 font-medium leading-relaxed">
-                              {largeDiff >= 25 && yoyDiff >= 10
-                                ? `💡 대형매장의 규모 경제 효과가 뚜렷함 (평당 ${Math.round(largeDiff)}% 높고 성장률도 ${Math.round(yoyDiff)}%p 우수)`
-                                : largeDiff >= 15 && yoyDiff >= 5
-                                  ? `💡 대형매장의 효율성이 높으나(+${Math.round(largeDiff)}%), 중소형도 ${Math.round(smallYoy)}% 성장 중`
-                                  : largeDiff >= 10
-                                    ? `💡 대형·중소형 모두 안정적 성장, 규모 차이는 ${Math.round(largeDiff)}% 수준`
-                                    : `💡 중소형 매장의 효율성 개선으로 대형과 격차 축소 중`}
-                    </div>
-                        </div>
-                          
-                          {/* 3. 매장 유형별 평당매출 특성 */}
+                          {/* 2. 매장 유형별 평당매출 특성 */}
                           <div className="bg-blue-900 rounded px-3 py-2.5">
-                            <div className="text-white text-xs font-semibold mb-1.5">3️⃣ 매장 유형별 평당매출 (대형 정상→소형 정상→아울렛)</div>
+                            <div className="text-white text-xs font-semibold mb-1.5">2️⃣ 매장 유형별 평당매출 (대형→중소형→아울렛)</div>
                             <div className="text-slate-100 text-[11px] space-y-1">
-                              <div>• 대형 정상({largeRegularStores.length}개, 50평 이상): {formatNumber(Math.round(largeRegularAvgSalesPerPyeong * 10) / 10)} · YOY {formatYoy(Math.round(largeRegularYoy))}%</div>
-                              <div>• 소형 정상({smallRegularStores.length}개, 50평 미만): {formatNumber(Math.round(smallRegularAvgSalesPerPyeong * 10) / 10)} · YOY {formatYoy(Math.round(smallRegularYoy))}%</div>
+                              <div>• 대형({largeRegularStores.length}개, 40평 이상): {formatNumber(Math.round(largeRegularAvgSalesPerPyeong * 10) / 10)} · YOY {formatYoy(Math.round(largeRegularYoy))}%</div>
+                              <div>• 중소형({smallRegularStores.length}개, 40평 미만): {formatNumber(Math.round(smallRegularAvgSalesPerPyeong * 10) / 10)} · YOY {formatYoy(Math.round(smallRegularYoy))}%</div>
                               <div>• 아울렛({outletStores.length}개): {formatNumber(Math.round(outletAvgSalesPerPyeong * 10) / 10)} · YOY {formatYoy(Math.round(outletYoy))}%</div>
                         </div>
                             <div className="text-yellow-200 text-[10px] mt-1.5 font-medium leading-relaxed">
@@ -5809,11 +5791,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                 const maxSales = Math.max(largeRegularAvgSalesPerPyeong, smallRegularAvgSalesPerPyeong, outletAvgSalesPerPyeong);
                                 
                                 if (smallRegularYoy < 100) {
-                                  return `⚠️ 소형 정상 매장 성장률 ${Math.round(smallRegularYoy)}%로 집중 관리 필요`;
+                                  return `⚠️ 중소형 매장 성장률 ${Math.round(smallRegularYoy)}%로 집중 관리 필요`;
                                 } else if (largeRegularYoy === maxYoy && largeRegularYoy >= 120) {
-                                  return `💡 대형 정상 매장 규모 경제 효과로 최고 성장률(${Math.round(largeRegularYoy)}%) 달성`;
+                                  return `💡 대형 매장 규모 경제 효과로 최고 성장률(${Math.round(largeRegularYoy)}%) 달성`;
                                 } else if (largeRegularAvgSalesPerPyeong === maxSales && largeRegularAvgSalesPerPyeong > smallRegularAvgSalesPerPyeong * 1.1) {
-                                  return `💡 대형 정상 매장 평당매출 최고, 소형 정상 대비 ${Math.round((largeRegularAvgSalesPerPyeong / smallRegularAvgSalesPerPyeong - 1) * 100)}% 높음`;
+                                  return `💡 대형 매장 평당매출 최고, 중소형 대비 ${Math.round((largeRegularAvgSalesPerPyeong / smallRegularAvgSalesPerPyeong - 1) * 100)}% 높음`;
                                 } else {
                                   return `💡 전 유형 균형적 성장 (평균 YOY ${Math.round((largeRegularYoy + smallRegularYoy + outletYoy) / 3)}%)`;
                                 }
@@ -5828,13 +5810,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 </div>
             </div>
             
-            {/* 대형 정상 매장 (50평 이상) */}
+            {/* 대형 매장 (40평 이상) */}
             {(() => {
               const storeAreas = (storeAreasData as any)?.store_areas || {};
               const largeRegularStores = activeTWStores.filter((s: any) => {
                 if (s.shop_cd?.startsWith('TU')) return false; // 아울렛 제외
                 const area = storeAreas[s.shop_cd] || 0;
-                return area >= 50;
+                return area >= 40;
               });
               
               if (largeRegularStores.length === 0) return null;
@@ -5853,7 +5835,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               return (
                 <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-500 min-w-0">
-                  <h4 className="text-sm font-bold text-blue-800 mb-2">🏢 대형 정상 (50평 이상)</h4>
+                  <h4 className="text-sm font-bold text-blue-800 mb-2">🏢 대형 (40평 이상)</h4>
                   <div className="text-xs text-blue-700 mb-2 font-semibold">{largeRegularStores.length}개 매장</div>
                   <div className="mb-2 text-left pl-2">
                     <span className="text-[10px] font-bold text-gray-600">전년→당년</span>
@@ -5918,13 +5900,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               );
             })()}
             
-            {/* 소형 정상 매장 (50평 미만) */}
+            {/* 중소형 매장 (40평 미만) */}
                       {(() => {
               const storeAreas = (storeAreasData as any)?.store_areas || {};
               const smallRegularStores = activeTWStores.filter((s: any) => {
                 if (s.shop_cd?.startsWith('TU')) return false; // 아울렛 제외
                 const area = storeAreas[s.shop_cd] || 0;
-                return area > 0 && area < 50;
+                return area > 0 && area < 40;
               });
               
               if (smallRegularStores.length === 0) return null;
@@ -5943,7 +5925,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               return (
                 <div className="bg-green-50 rounded-lg p-4 border-2 border-green-500 min-w-0">
-                  <h4 className="text-sm font-bold text-green-800 mb-2">🏪 소형 정상 (50평 미만)</h4>
+                  <h4 className="text-sm font-bold text-green-800 mb-2">🏪 중소형 (40평 미만)</h4>
                   <div className="text-xs text-green-700 mb-2 font-semibold">{smallRegularStores.length}개 매장</div>
                   <div className="mb-2 text-left pl-2">
                     <span className="text-[10px] font-bold text-gray-600">전년→당년</span>
