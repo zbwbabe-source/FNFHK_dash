@@ -975,6 +975,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <div className="leading-relaxed">
                       평당매출/1일 <span className="font-bold text-blue-600">{formatNumber(dailySalesPerPyeong)} HKD</span>
                       {' '}(면적: <span className="font-semibold">{formatNumber(totalArea)}평</span>)
+                      {' '}
+                      <span className={dailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                        (YOY {formatPercent(dailySalesPerPyeongYoy)}%)
+                      </span>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       * LCX(리뉴얼 10/13-11/7), WTC(10/11 영업종료) 계산제외
@@ -6717,7 +6721,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   
                   // 기타 직접비 상세 항목
                   const otherDetailItems = [
-                    { label: '기타 수수료', value: Math.round(current.other_fee || 0) },
+                    { label: '매장관리비', value: Math.round(current.other_fee || 0) },
                     { label: '감가상각비', value: Math.round(current.depreciation || 0) },
                     { label: '지급수수료', value: Math.round(current.fee || 0) },
                     { label: '유니폼', value: Math.round(current.uniform || 0) },
@@ -6798,7 +6802,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   
                   // 기타 직접비 상세 항목
                   const otherDetailItems = [
-                    { label: '기타 수수료', value: Math.round(current.other_fee || 0) },
+                    { label: '매장관리비', value: Math.round(current.other_fee || 0) },
                     { label: '감가상각비', value: Math.round(current.depreciation || 0) },
                     { label: '지급수수료', value: Math.round(current.fee || 0) },
                     { label: '소모품비', value: Math.round(current.supplies || 0) },
