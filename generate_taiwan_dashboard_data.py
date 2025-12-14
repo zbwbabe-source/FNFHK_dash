@@ -672,7 +672,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
             
             # 그래프용: 가방(BAG)과 기타ACC(ATC+BOT+WTC) 분리
-            # BAG, ATC, BOT, WTC는 가방외에도 추가하되, 그래프용으로도 별도 추가
+            # BAG는 항상 가방으로 분리
+            # 기타ACC: 악세(N으로 끝나는 시즌) 중 모자(HEA), 신발(SHO), 가방(BAG) 제외한 나머지
             if category == 'BAG':
                 item_sales['가방']['gross_sales'] += gross_sales
                 item_sales['가방']['net_sales'] += net_sales
@@ -680,15 +681,23 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 item_sales[item]['gross_sales'] += gross_sales
                 item_sales[item]['net_sales'] += net_sales
             elif category in ['ATC', 'BOT', 'WTC']:
-                item_sales['기타ACC']['gross_sales'] += gross_sales
-                item_sales['기타ACC']['net_sales'] += net_sales
-                # 가방외에도 추가 (다른 섹션 호환성)
-                item_sales[item]['gross_sales'] += gross_sales
-                item_sales[item]['net_sales'] += net_sales
+                # Season Code가 'N'으로 끝나면 악세 → 기타ACC
+                season_code = row.get('Season_Code', '')
+                if season_code and season_code.endswith('N'):
+                    # 악세 (N으로 끝남) → 기타ACC
+                    item_sales['기타ACC']['gross_sales'] += gross_sales
+                    item_sales['기타ACC']['net_sales'] += net_sales
+                    # 가방외에도 추가 (다른 섹션 호환성)
+                    item_sales[item]['gross_sales'] += gross_sales
+                    item_sales[item]['net_sales'] += net_sales
+                else:
+                    # Season Code가 'F'나 'S'로 끝나면 의류 → 의류로만 분류 (기타ACC 제외)
+                    item_sales[item]['gross_sales'] += gross_sales
+                    item_sales[item]['net_sales'] += net_sales
             else:
                 # BAG, ATC, BOT, WTC가 아닌 경우만 일반 로직 적용
-            item_sales[item]['gross_sales'] += gross_sales
-            item_sales[item]['net_sales'] += net_sales
+                item_sales[item]['gross_sales'] += gross_sales
+                item_sales[item]['net_sales'] += net_sales
         
         monthly_item_data.append({
             'period': period,
@@ -762,10 +771,17 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     prev_item_sales['가방']['net_sales'] += net_sales
                     prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
                 elif category in ['ATC', 'BOT', 'WTC']:
-                    prev_item_sales['기타ACC']['net_sales'] += net_sales
-                    prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
+                    # Season Code가 'N'으로 끝나면 악세 → 기타ACC
+                    season_code = row.get('Season_Code', '')
+                    if season_code and season_code.endswith('N'):
+                        # 악세 (N으로 끝남) → 기타ACC
+                        prev_item_sales['기타ACC']['net_sales'] += net_sales
+                        prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
+                    else:
+                        # Season Code가 'F'나 'S'로 끝나면 의류 → 의류로만 분류 (기타ACC 제외)
+                        prev_item_sales[item]['net_sales'] += net_sales
                 else:
-                prev_item_sales[item]['net_sales'] += net_sales
+                    prev_item_sales[item]['net_sales'] += net_sales
             
             # YOY 계산
             # 1~6월의 경우 24F(당시즌F)를 과시즌F로 이동시킨 후 계산

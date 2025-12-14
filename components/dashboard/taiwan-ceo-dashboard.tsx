@@ -2706,7 +2706,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       <ChevronRight className="w-4 h-4" />
                     )}
                   </button>
-                </div>
+            </div>
                 {showPastSeasonSalesDetail && (
                   endingInventory?.past_season_sales ? (
                     <div className="mt-3 pt-3 border-t space-y-1">
@@ -2728,7 +2728,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                 {' '}({formatPercent(fwTotalYoy)}%)
                               </span>
                             </span>
-                          </div>
+          </div>
                         );
                       })()}
                       <div className="flex justify-between text-xs pl-2">
@@ -4844,20 +4844,20 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 const 과시즌FWValue = Math.round(item.과시즌FW?.stock_price || 0);
                 
                 return {
-                  month: `${item.period.slice(2, 4)}월`,
+                month: `${item.period.slice(2, 4)}월`,
                   'F당시즌': isFirstHalf ? 0 : f당시즌Value, // 1~6월은 0 (24F는 과시즌으로 이동)
-                  'S당시즌': Math.round(item.S당시즌?.stock_price || 0),
+                'S당시즌': Math.round(item.S당시즌?.stock_price || 0),
                   '과시즌FW': isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue, // 1~6월은 F당시즌(24F)을 과시즌에 포함
-                  '과시즌SS': Math.round(item.과시즌SS?.stock_price || 0),
-                  '모자': Math.round(item.모자?.stock_price || 0),
-                  '신발': Math.round(item.신발?.stock_price || 0),
-                  '가방': Math.round(item.가방?.stock_price || 0),
-                  '기타ACC': Math.round(item.기타ACC?.stock_price || 0),
-                  // 재고주수는 레이블용으로만 저장
-                  '모자_weeks': item.모자?.stock_weeks || 0,
-                  '신발_weeks': item.신발?.stock_weeks || 0,
-                  '가방_weeks': item.가방?.stock_weeks || 0,
-                  '기타ACC_weeks': item.기타ACC?.stock_weeks || 0,
+                '과시즌SS': Math.round(item.과시즌SS?.stock_price || 0),
+                '모자': Math.round(item.모자?.stock_price || 0),
+                '신발': Math.round(item.신발?.stock_price || 0),
+                '가방': Math.round(item.가방?.stock_price || 0),
+                '기타ACC': Math.round(item.기타ACC?.stock_price || 0),
+                // 재고주수는 레이블용으로만 저장
+                '모자_weeks': item.모자?.stock_weeks || 0,
+                '신발_weeks': item.신발?.stock_weeks || 0,
+                '가방_weeks': item.가방?.stock_weeks || 0,
+                '기타ACC_weeks': item.기타ACC?.stock_weeks || 0,
                 };
               })} 
               margin={{ top: 40, right: 30, left: 20, bottom: 5 }}
@@ -4902,13 +4902,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     
                     return {
                       F당시즌: isFirstHalf ? 0 : f당시즌Value,
-                      S당시즌: Math.round(d.S당시즌?.stock_price || 0),
+                    S당시즌: Math.round(d.S당시즌?.stock_price || 0),
                       과시즌FW: isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue,
-                      과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
-                      모자: Math.round(d.모자?.stock_price || 0),
-                      신발: Math.round(d.신발?.stock_price || 0),
-                      가방: Math.round(d.가방?.stock_price || 0),
-                      기타ACC: Math.round(d.기타ACC?.stock_price || 0),
+                    과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
+                    모자: Math.round(d.모자?.stock_price || 0),
+                    신발: Math.round(d.신발?.stock_price || 0),
+                    가방: Math.round(d.가방?.stock_price || 0),
+                    기타ACC: Math.round(d.기타ACC?.stock_price || 0),
                     };
                   });
                   
