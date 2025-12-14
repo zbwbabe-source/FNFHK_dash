@@ -4979,17 +4979,25 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               <Bar dataKey="기타ACC" stackId="a" fill="#F9A8D4" name="✨ 기타ACC" />
               <Layer>
                 {(dashboardData?.monthly_inventory_data || []).map((item: any, dataIndex: number) => {
-                  // 차트 데이터 매핑
-                  const chartData = (dashboardData?.monthly_inventory_data || []).map((d: any) => ({
-                    F당시즌: Math.round(d.F당시즌?.stock_price || 0),
-                    S당시즌: Math.round(d.S당시즌?.stock_price || 0),
-                    과시즌FW: Math.round(d.과시즌FW?.stock_price || 0),
-                    과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
-                    모자: Math.round(d.모자?.stock_price || 0),
-                    신발: Math.round(d.신발?.stock_price || 0),
-                    가방: Math.round(d.가방?.stock_price || 0),
-                    기타ACC: Math.round(d.기타ACC?.stock_price || 0),
-                  }));
+                  // 차트 데이터 매핑 (1~6월: 24F를 과시즌FW로 이동)
+                  const chartData = (dashboardData?.monthly_inventory_data || []).map((d: any) => {
+                    const periodMonth = parseInt(d.period.slice(2, 4));
+                    const isFirstHalf = periodMonth >= 1 && periodMonth <= 6;
+                    
+                    const f당시즌Value = Math.round(d.F당시즌?.stock_price || 0);
+                    const 과시즌FWValue = Math.round(d.과시즌FW?.stock_price || 0);
+                    
+                    return {
+                      F당시즌: isFirstHalf ? 0 : f당시즌Value,
+                      S당시즌: Math.round(d.S당시즌?.stock_price || 0),
+                      과시즌FW: isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue,
+                      과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
+                      모자: Math.round(d.모자?.stock_price || 0),
+                      신발: Math.round(d.신발?.stock_price || 0),
+                      가방: Math.round(d.가방?.stock_price || 0),
+                      기타ACC: Math.round(d.기타ACC?.stock_price || 0),
+                    };
+                  });
                   
                   if (chartData.length === 0) return null;
                   
@@ -5192,16 +5200,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   if (selectedInventoryItem === '전체') {
                     return (
                       <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={months.map((month: string, idx: number) => ({
-                          month,
-                          fSeason: inventoryYOY['F당시즌']?.[idx] ?? null,
-                          sSeason: inventoryYOY['S당시즌']?.[idx] ?? null,
-                          pastFW: inventoryYOY['과시즌FW']?.[idx] ?? null,
-                          pastSS: inventoryYOY['과시즌SS']?.[idx] ?? null,
-                          cap: inventoryYOY['모자']?.[idx] ?? null,
-                          shoes: inventoryYOY['신발']?.[idx] ?? null,
-                          bagEtc: inventoryYOY['가방외']?.[idx] ?? null
-                        }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                        <LineChart data={months.map((month: string, idx: number) => {
+                          // 1~6월: F당시즌을 0으로, 과시즌FW는 원본 데이터 유지 (이미 프론트엔드에서 합산됨)
+                          const monthNum = idx + 1;
+                          const isFirstHalf = monthNum >= 1 && monthNum <= 6;
+                          
+                          return {
+                            month,
+                            fSeason: isFirstHalf ? 0 : (inventoryYOY['F당시즌']?.[idx] ?? null),
+                            sSeason: inventoryYOY['S당시즌']?.[idx] ?? null,
+                            pastFW: inventoryYOY['과시즌FW']?.[idx] ?? null,
+                            pastSS: inventoryYOY['과시즌SS']?.[idx] ?? null,
+                            cap: inventoryYOY['모자']?.[idx] ?? null,
+                            shoes: inventoryYOY['신발']?.[idx] ?? null,
+                            bagEtc: inventoryYOY['가방외']?.[idx] ?? null
+                          };
+                        })} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                           <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
@@ -5303,10 +5317,20 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               {itemKey === '기타ACC' && '✨ 기타ACC'}
                             </td>
                             {months.map((month: string, idx: number) => {
-                              const yoyValue =
+                              // 1~6월: F당시즌을 0으로 표시
+                              const monthNum = idx + 1;
+                              const isFirstHalf = monthNum >= 1 && monthNum <= 6;
+                              
+                              let yoyValue =
                                 itemKey === '전체합계'
                                   ? overallInventoryYoy[idx]
                                   : (inventoryYOY as any)[itemKey]?.[idx];
+                              
+                              // 1~6월의 F당시즌은 0으로 표시
+                              if (itemKey === 'F당시즌' && isFirstHalf) {
+                                yoyValue = 0;
+                              }
+                              
                               const displayValue = yoyValue !== null && yoyValue !== undefined ? `${yoyValue}%` : '-';
                               const isPositive = yoyValue !== null && yoyValue !== undefined && yoyValue < 100;
                               const isNegative = yoyValue !== null && yoyValue !== undefined && yoyValue > 100;
