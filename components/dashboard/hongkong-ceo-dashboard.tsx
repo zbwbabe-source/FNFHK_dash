@@ -7288,6 +7288,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   </div>
                 </div>
 
+                <div className="mt-3 text-xs text-gray-600">판매불가재고 소각 895</div>
+
                 {/* 누적 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">
                   <button
@@ -7326,6 +7328,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
                             <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-orange-600 mr-1">•</span>
+                            <span className="text-gray-700">판매불가재고 소각 895K 포함</span>
                           </div>
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
