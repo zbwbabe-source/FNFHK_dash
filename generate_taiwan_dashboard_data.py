@@ -175,12 +175,23 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     prev_year = last_year - 1
     prev_period = f"{prev_year % 100:02d}{last_month:02d}"
     
+    # 전전년 동월 Period 찾기
+    prev_prev_year = last_year - 2
+    prev_prev_period = f"{prev_prev_year % 100:02d}{last_month:02d}"
+    
     print(f"처리 Period: {last_period} ({last_year}년 {last_month}월)")
     print(f"전년 동월 Period: {prev_period} ({prev_year}년 {last_month}월)")
+    print(f"전전년 동월 Period: {prev_prev_period} ({prev_prev_year}년 {last_month}월)")
+    print(f"CSV에 포함된 Period: {sorted(periods)}")
     
     # 데이터 필터링 (MLB Brand만, TW Country만)
     current_data = [row for row in data if row['Period'] == last_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
     prev_data = [row for row in data if row['Period'] == prev_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
+    prev_prev_data = [row for row in data if row['Period'] == prev_prev_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
+    
+    print(f"현재 Period 데이터 건수: {len(current_data)}건")
+    print(f"전년 동월 Period 데이터 건수: {len(prev_data)}건")
+    print(f"전전년 동월 Period 데이터 건수: {len(prev_prev_data)}건")
     
     # 1. Store별 집계
     store_summary = defaultdict(lambda: {
@@ -198,6 +209,14 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'discount_rate': 0,
         },
         'previous': {
+            'gross_sales': 0,
+            'net_sales': 0,
+            'sales_qty': 0,
+            'stock_price': 0,
+            'stock_cost': 0,
+            'discount_rate': 0,
+        },
+        'previous_previous': {
             'gross_sales': 0,
             'net_sales': 0,
             'sales_qty': 0,
@@ -370,6 +389,29 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             store_summary[store_code]['previous']['discount_rate'] = calculate_discount_rate(
                 store_summary[store_code]['previous']['gross_sales'],
                 store_summary[store_code]['previous']['net_sales']
+            )
+    
+    # 전전년 동월 데이터 집계
+    print("전전년 동월 데이터 집계 중...")
+    for row in prev_prev_data:
+        store_code = row['Store_Code']
+        
+        # CSV는 TWD 단위이므로 HKD로 환산
+        gross_sales = float(row['Gross_Sales'] or 0) / TWD_TO_HKD_RATE
+        net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
+        sales_qty = float(row['Sales_Qty'] or 0)  # 수량은 환율 적용 안 함
+        stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
+        stock_cost = float(row['Stock_Cost'] or 0) / TWD_TO_HKD_RATE
+        
+        if store_code in store_summary:
+            store_summary[store_code]['previous_previous']['gross_sales'] += gross_sales
+            store_summary[store_code]['previous_previous']['net_sales'] += net_sales
+            store_summary[store_code]['previous_previous']['sales_qty'] += sales_qty
+            store_summary[store_code]['previous_previous']['stock_price'] += stock_price
+            store_summary[store_code]['previous_previous']['stock_cost'] += stock_cost
+            store_summary[store_code]['previous_previous']['discount_rate'] = calculate_discount_rate(
+                store_summary[store_code]['previous_previous']['gross_sales'],
+                store_summary[store_code]['previous_previous']['net_sales']
             )
         
         # 전년 데이터는 prev_year 기준으로 분류
@@ -859,12 +901,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         subcat_prev_ac_sales_gross = sum(float(row['AC_Sales_Gross'] or 0) for row in subcat_prev_accumulated) / TWD_TO_HKD_RATE
         subcat_net_acp_p_yoy = (subcat_net_acp_p / subcat_prev_net_acp_p * 100) if subcat_prev_net_acp_p > 0 else 0
         
-        # 당월 판매 데이터 (Net_Sales) - subcategory_sales에서 가져오기
-        subcat_current_month_sales = subcat_data['net_sales']  # 이미 K HKD 단위로 변환됨
-        # 전년 당월 판매 데이터
-        subcat_prev_month_sales = prev_subcategory_sales.get(subcat_code, {}).get('net_sales', 0)
-        # 당월 판매 YOY 계산
-        subcat_month_sales_yoy = (subcat_current_month_sales / subcat_prev_month_sales * 100) if subcat_prev_month_sales > 0 else 0
+        # 누적 판매 YOY 계산 (누적 판매금액 기준)
+        subcat_ac_sales_gross_yoy = (subcat_ac_sales_gross / subcat_prev_ac_sales_gross * 100) if subcat_prev_ac_sales_gross > 0 else 0
         
         subcategory_detail.append({
             'subcategory_code': subcat_code,
@@ -873,7 +911,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'ac_sales_gross': subcat_ac_sales_gross / 1000,  # 1K HKD
             'sales_rate': subcat_sales_rate,
             'net_acp_p_yoy': subcat_net_acp_p_yoy,
-            'ac_sales_gross_yoy': subcat_month_sales_yoy  # 당월 판매 YOY로 변경
+            'ac_sales_gross_yoy': subcat_ac_sales_gross_yoy  # 누적 판매 YOY
         })
     
     # 입고(net_acp_p) 기준으로 정렬하고 TOP 5만 선택
@@ -1436,6 +1474,203 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             'yoy': past_season_fw_yoy
         },
         'by_year': by_year
+    }
+    
+    # past_season_sales 생성 (과시즌 판매 데이터)
+    print("past_season_sales 데이터 생성 중...")
+    # prev_data를 로컬 변수로 저장 (다른 곳에서 재정의될 수 있으므로)
+    prev_data_for_sales = [row for row in data if row['Period'] == prev_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
+    current_data_for_sales = [row for row in data if row['Period'] == last_period and row['Brand'] == 'MLB' and row['Country'] == 'TW']
+    past_season_sales_by_year = {
+        '1년차': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+        '2년차': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+        '3년차_이상': {
+            'current': {'gross_sales': 0},
+            'previous': {'gross_sales': 0},
+        },
+    }
+    past_season_sales_ss = {
+        'current': {'gross_sales': 0},
+        'previous': {'gross_sales': 0},
+    }
+    
+    # 현재 시즌 코드 계산
+    current_season_f = f"{last_year % 100:02d}F"
+    current_season_s = f"{last_year % 100:02d}S"
+    previous_season_f = f"{prev_year % 100:02d}F"
+    previous_season_s = f"{prev_year % 100:02d}S"
+    prev_prev_season_f = f"{(prev_year - 1) % 100:02d}F" if prev_year > 0 else None
+    prev_prev_prev_season_f = f"{(prev_year - 2) % 100:02d}F" if prev_year > 1 else None
+    
+    # 현재 Period 과시즌 판매 계산
+    current_fw_count = 0
+    current_ss_count = 0
+    current_season_codes = {}
+    
+    for row in current_data_for_sales:
+        season_code = row.get('Season_Code', '')
+        if season_code:
+            current_season_codes[season_code] = current_season_codes.get(season_code, 0) + 1
+        gross_sales = float(row.get('Gross_Sales', 0) or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # TWD → HKD, V- 적용
+        
+        if season_code.endswith('F') and season_code != current_season_f:
+            # 과시즌F
+            if len(season_code) >= 2:
+                try:
+                    season_year = int(season_code[:2])
+                    year_diff = last_year % 100 - season_year
+                    
+                    if season_code == previous_season_f:  # 24F (1년차)
+                        past_season_sales_by_year['1년차']['current']['gross_sales'] += gross_sales
+                        current_fw_count += 1
+                    elif prev_prev_season_f and season_code == prev_prev_season_f:  # 23F (2년차)
+                        past_season_sales_by_year['2년차']['current']['gross_sales'] += gross_sales
+                        current_fw_count += 1
+                    elif season_year < prev_year % 100 - 1:  # 22F 이하 (3년차 이상)
+                        past_season_sales_by_year['3년차_이상']['current']['gross_sales'] += gross_sales
+                        current_fw_count += 1
+                except ValueError:
+                    continue
+        elif season_code.endswith('S') and season_code != current_season_s:
+            # 과시즌S
+            past_season_sales_ss['current']['gross_sales'] += gross_sales
+            current_ss_count += 1
+    
+    print(f"현재 Period 과시즌 판매 계산:")
+    print(f"  현재 Period 당시즌: {current_season_f}, {current_season_s}")
+    print(f"  현재 Period 기준 1년차: {previous_season_f}")
+    print(f"  현재 Period 기준 2년차: {prev_prev_season_f}")
+    print(f"  현재 Period 데이터의 시즌 코드 분포:")
+    for sc, count in sorted(current_season_codes.items()):
+        print(f"    {sc}: {count}건")
+    print(f"  현재 Period 과시즌F 데이터 건수: {current_fw_count}")
+    print(f"  현재 Period 과시즌S 데이터 건수: {current_ss_count}")
+    print(f"  현재 Period 1년차 판매: {past_season_sales_by_year['1년차']['current']['gross_sales']:.2f} HKD")
+    print(f"  현재 Period 2년차 판매: {past_season_sales_by_year['2년차']['current']['gross_sales']:.2f} HKD")
+    print(f"  현재 Period 3년차 이상 판매: {past_season_sales_by_year['3년차_이상']['current']['gross_sales']:.2f} HKD")
+    print(f"  현재 Period 과시즌S 판매: {past_season_sales_ss['current']['gross_sales']:.2f} HKD")
+    
+    # 전년 동월 과시즌 판매 계산
+    # 전년 동월 기준으로 시즌 코드 재계산
+    prev_year_for_prev_period = prev_year  # 2024
+    prev_prev_year_for_prev_period = prev_year - 1  # 2023
+    prev_prev_prev_year_for_prev_period = prev_year - 2  # 2022
+    prev_period_previous_season_f = f"{prev_year_for_prev_period % 100:02d}F"  # 24F (전년 동월의 당시즌)
+    prev_period_previous_season_s = f"{prev_year_for_prev_period % 100:02d}S"  # 24S (전년 동월의 당시즌)
+    prev_period_prev_prev_season_f = f"{prev_prev_year_for_prev_period % 100:02d}F" if prev_prev_year_for_prev_period > 0 else None  # 23F (전년 동월 기준 1년차)
+    prev_period_prev_prev_prev_season_f = f"{prev_prev_prev_year_for_prev_period % 100:02d}F" if prev_prev_prev_year_for_prev_period > 0 else None  # 22F (전년 동월 기준 2년차)
+    
+    print(f"전년 동월 과시즌 판매 계산:")
+    print(f"  전년 동월 당시즌: {prev_period_previous_season_f}, {prev_period_previous_season_s}")
+    print(f"  전년 동월 기준 1년차: {prev_period_prev_prev_season_f}")
+    print(f"  전년 동월 기준 2년차: {prev_period_prev_prev_prev_season_f}")
+    print(f"  전년 동월 데이터 건수: {len(prev_data)}건")
+    
+    # 전년 동월 데이터의 시즌 코드 확인
+    prev_season_codes = {}
+    prev_gross_sales_by_season = {}
+    for row in prev_data:
+        sc = row.get('Season_Code', '')
+        gross_sales = float(row.get('Gross_Sales', 0) or 0)
+        if sc:
+            prev_season_codes[sc] = prev_season_codes.get(sc, 0) + 1
+            if gross_sales > 0:
+                if sc not in prev_gross_sales_by_season:
+                    prev_gross_sales_by_season[sc] = 0
+                prev_gross_sales_by_season[sc] += gross_sales
+    print(f"  전년 동월 데이터의 시즌 코드 분포:")
+    if prev_season_codes:
+        for sc, count in sorted(prev_season_codes.items()):
+            gross = prev_gross_sales_by_season.get(sc, 0)
+            print(f"    {sc}: {count}건 (Gross_Sales 합계: {gross:.2f})")
+    else:
+        print(f"    (시즌 코드 없음)")
+    
+    prev_fw_count = 0
+    prev_ss_count = 0
+    
+    for row in prev_data_for_sales:
+        season_code = row.get('Season_Code', '')
+        gross_sales = float(row.get('Gross_Sales', 0) or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # TWD → HKD, V- 적용
+        
+        if season_code.endswith('F') and season_code != prev_period_previous_season_f:
+            # 과시즌F (전년 동월 기준)
+            if len(season_code) >= 2:
+                try:
+                    season_year = int(season_code[:2])
+                    # 전년 동월 기준으로 시즌별 분류
+                    if prev_period_prev_prev_season_f and season_code == prev_period_prev_prev_season_f:  # 23F (전년 동월 기준 1년차)
+                        past_season_sales_by_year['1년차']['previous']['gross_sales'] += gross_sales
+                        prev_fw_count += 1
+                    elif prev_period_prev_prev_prev_season_f and season_code == prev_period_prev_prev_prev_season_f:  # 22F (전년 동월 기준 2년차)
+                        past_season_sales_by_year['2년차']['previous']['gross_sales'] += gross_sales
+                        prev_fw_count += 1
+                    elif season_year < prev_year_for_prev_period % 100 - 2:  # 21F 이하 (전년 동월 기준 3년차 이상)
+                        past_season_sales_by_year['3년차_이상']['previous']['gross_sales'] += gross_sales
+                        prev_fw_count += 1
+                except ValueError:
+                    continue
+        elif season_code.endswith('S') and season_code != prev_period_previous_season_s:
+            # 과시즌S (전년 동월 기준)
+            past_season_sales_ss['previous']['gross_sales'] += gross_sales
+            prev_ss_count += 1
+    
+    print(f"  전년 동월 과시즌F 데이터 건수: {prev_fw_count}")
+    print(f"  전년 동월 과시즌S 데이터 건수: {prev_ss_count}")
+    print(f"  전년 동월 1년차 판매: {past_season_sales_by_year['1년차']['previous']['gross_sales']:.2f} HKD")
+    print(f"  전년 동월 2년차 판매: {past_season_sales_by_year['2년차']['previous']['gross_sales']:.2f} HKD")
+    print(f"  전년 동월 3년차 이상 판매: {past_season_sales_by_year['3년차_이상']['previous']['gross_sales']:.2f} HKD")
+    print(f"  전년 동월 과시즌S 판매: {past_season_sales_ss['previous']['gross_sales']:.2f} HKD")
+    
+    # YOY 및 증감 계산
+    for year_key in past_season_sales_by_year:
+        year_data = past_season_sales_by_year[year_key]
+        if year_data['previous']['gross_sales'] > 0:
+            year_data['yoy'] = (year_data['current']['gross_sales'] / year_data['previous']['gross_sales']) * 100
+        else:
+            year_data['yoy'] = 999 if year_data['current']['gross_sales'] > 0 else 0
+        year_data['change'] = year_data['current']['gross_sales'] - year_data['previous']['gross_sales']
+    
+    if past_season_sales_ss['previous']['gross_sales'] > 0:
+        past_season_sales_ss['yoy'] = (past_season_sales_ss['current']['gross_sales'] / past_season_sales_ss['previous']['gross_sales']) * 100
+    else:
+        past_season_sales_ss['yoy'] = 999 if past_season_sales_ss['current']['gross_sales'] > 0 else 0
+    
+    # ending_inventory에 past_season_sales 추가
+    ending_inventory['past_season_sales'] = {
+        'fw': {
+            'by_year': {
+                '1년차': {
+                    'current': past_season_sales_by_year['1년차']['current']['gross_sales'] / 1000,  # 1K HKD
+                    'previous': past_season_sales_by_year['1년차']['previous']['gross_sales'] / 1000,  # 1K HKD
+                    'yoy': past_season_sales_by_year['1년차'].get('yoy', 0),
+                    'change': past_season_sales_by_year['1년차'].get('change', 0) / 1000,  # 1K HKD
+                },
+                '2년차': {
+                    'current': past_season_sales_by_year['2년차']['current']['gross_sales'] / 1000,  # 1K HKD
+                    'previous': past_season_sales_by_year['2년차']['previous']['gross_sales'] / 1000,  # 1K HKD
+                    'yoy': past_season_sales_by_year['2년차'].get('yoy', 0),
+                    'change': past_season_sales_by_year['2년차'].get('change', 0) / 1000,  # 1K HKD
+                },
+                '3년차_이상': {
+                    'current': past_season_sales_by_year['3년차_이상']['current']['gross_sales'] / 1000,  # 1K HKD
+                    'previous': past_season_sales_by_year['3년차_이상']['previous']['gross_sales'] / 1000,  # 1K HKD
+                    'yoy': past_season_sales_by_year['3년차_이상'].get('yoy', 0),
+                    'change': past_season_sales_by_year['3년차_이상'].get('change', 0) / 1000,  # 1K HKD
+                },
+            },
+        },
+        'ss': {
+            'current': past_season_sales_ss['current']['gross_sales'] / 1000,  # 1K HKD
+            'previous': past_season_sales_ss['previous']['gross_sales'] / 1000,  # 1K HKD
+            'yoy': past_season_sales_ss.get('yoy', 0),
+        },
     }
     
     # monthly_inventory_data 생성

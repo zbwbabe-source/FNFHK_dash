@@ -11,6 +11,8 @@ export default function Home() {
   const [twData, setTwData] = useState<any>(null);
   const [hkPlData, setHkPlData] = useState<any>(null);
   const [twPlData, setTwPlData] = useState<any>(null);
+  const [bsData, setBsData] = useState<any>(null);
+  const [cfData, setCfData] = useState<any>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('2511'); // 기본값: 25년 11월
   const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
@@ -73,12 +75,19 @@ export default function Home() {
           throw new Error(`파일을 찾을 수 없습니다: ${defaultPath}`);
         };
 
+        // BS 데이터 경로
+        const bsPath = `/dashboard/bs-data-${selectedPeriod}.json`;
+        // CF 데이터 경로
+        const cfPath = `/dashboard/cf-data-${selectedPeriod}.json`;
+
         // 모든 데이터 병렬 로드
-        const [hkDashboard, twDashboard, hkPl, twPl] = await Promise.all([
+        const [hkDashboard, twDashboard, hkPl, twPl, bs, cf] = await Promise.all([
           loadWithFallback(hkDashboardPath, '/dashboard/hongkong-dashboard-data.json'),
           loadWithFallback(twDashboardPath, '/dashboard/taiwan-dashboard-data.json'),
           loadWithFallback(hkPlPath, '/dashboard/hongkong-pl-data.json'),
-          loadWithFallback(twPlPath, '/dashboard/taiwan-pl-data.json')
+          loadWithFallback(twPlPath, '/dashboard/taiwan-pl-data.json'),
+          fetch(bsPath).then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch(cfPath).then(res => res.ok ? res.json() : null).catch(() => null)
         ]);
 
         // ending_inventory는 components 폴더에서 import
@@ -123,6 +132,8 @@ export default function Home() {
         setTwData(twDashboard);
         setHkPlData(hkPl);
         setTwPlData(twPl);
+        setBsData(bs);
+        setCfData(cf);
       } catch (e) {
         console.error('데이터 로드 오류:', e);
         // 에러 발생 시 components 폴더에서 동적 import 시도
@@ -711,7 +722,8 @@ export default function Home() {
   const hkCumulativeAvgAreaPrevious = hkPlData?.cumulative?.prev_cumulative?.offline?.average_area || hkOfflineTotalAreaPrevious;
   const hkSalesPerPyeongCumulativePrevious = hkCumulativeAvgAreaPrevious > 0 ? hkOfflineCumulativePrevious / hkCumulativeAvgAreaPrevious : 0;
   const hkDailySalesPerPyeongCumulativePrevious = cumulativeDays > 0 && hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulativePrevious * 1000) / cumulativeDays : 0;
-  const hkDailySalesPerPyeongCumulativeYoy = hkDailySalesPerPyeongCumulativePrevious > 0 ? (hkDailySalesPerPyeongCumulative / hkDailySalesPerPyeongCumulativePrevious) * 100 : 0;
+  // 평당매출 YOY 계산 (평당매출/1일이 아닌 평당매출 자체의 YOY)
+  const hkSalesPerPyeongCumulativeYoy = hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulative / hkSalesPerPyeongCumulativePrevious) * 100 : 0;
   
   // 디버깅: 평당매출 계산 확인 (면적: 홍콩만, 매출: 홍콩만 오프라인)
   console.log('=== 홍콩 평당매출 계산 (면적: 홍콩만, 매출: PL 데이터, M10A는 M10에 포함) ===');
@@ -758,7 +770,8 @@ export default function Home() {
   const twCumulativeAvgAreaPrevious = twPlData?.cumulative?.prev_cumulative?.offline?.average_area || twOfflineTotalAreaPrevious;
   const twSalesPerPyeongCumulativePrevious = twCumulativeAvgAreaPrevious > 0 ? twOfflineCumulativePrevious / twCumulativeAvgAreaPrevious : 0;
   const twDailySalesPerPyeongCumulativePrevious = cumulativeDays > 0 && twSalesPerPyeongCumulativePrevious > 0 ? (twSalesPerPyeongCumulativePrevious * 1000) / cumulativeDays : 0;
-  const twDailySalesPerPyeongCumulativeYoy = twDailySalesPerPyeongCumulativePrevious > 0 ? (twDailySalesPerPyeongCumulative / twDailySalesPerPyeongCumulativePrevious) * 100 : 0;
+  // 평당매출 YOY 계산 (평당매출/1일이 아닌 평당매출 자체의 YOY)
+  const twSalesPerPyeongCumulativeYoy = twSalesPerPyeongCumulativePrevious > 0 ? (twSalesPerPyeongCumulative / twSalesPerPyeongCumulativePrevious) * 100 : 0;
 
   // HKD 포맷 함수 (소수점 1자리)
   const formatHKD = (num: number) => {
@@ -823,12 +836,9 @@ export default function Home() {
         </div>
 
         {/* 대시보드 선택 카드 */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          {/* 법인 섹션 */}
-          <div className="col-span-2 bg-blue-100 rounded-2xl p-4">
-            <div className="grid grid-cols-2 gap-4">
-              {/* 1. 홍콩마카오법인 카드 - 브랜드 스타일 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {/* 1. 홍콩마카오법인 카드 - 브랜드 스타일 */}
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -913,9 +923,9 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
-                        {hkDailySalesPerPyeongCumulativeYoy > 0 && (
-                          <span className={`ml-2 font-semibold ${hkDailySalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                            ({formatPercent(hkDailySalesPerPyeongCumulativeYoy)}%)
+                        {hkSalesPerPyeongCumulativeYoy > 0 && (
+                          <span className={`ml-2 font-semibold ${hkSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                            ({formatPercent(hkSalesPerPyeongCumulativeYoy)}%)
                           </span>
                         )}
                       </div>
@@ -1137,8 +1147,8 @@ export default function Home() {
             </div>
               </div>
 
-              {/* 2. 대만법인 카드 - 브랜드 스타일 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+          {/* 2. 대만법인 카드 - 브랜드 스타일 */}
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -1223,9 +1233,9 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
-                        {twDailySalesPerPyeongCumulativeYoy > 0 && (
-                          <span className={`ml-2 font-semibold ${twDailySalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                            ({formatPercent(twDailySalesPerPyeongCumulativeYoy)}%)
+                        {twSalesPerPyeongCumulativeYoy > 0 && (
+                          <span className={`ml-2 font-semibold ${twSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                            ({formatPercent(twSalesPerPyeongCumulativeYoy)}%)
                           </span>
                         )}
                       </div>
@@ -1446,14 +1456,9 @@ export default function Home() {
               </Link>
             </div>
               </div>
-            </div>
-          </div>
 
-          {/* 기타 섹션 */}
-          <div className="col-span-2 bg-green-100 rounded-2xl p-4">
-            <div className="grid grid-cols-2 gap-4">
-              {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 min-h-[800px] flex flex-col">
+          {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 min-h-[800px] flex flex-col">
             <div className="p-6 flex-1 flex flex-col">
               {/* 헤더: 아이콘 */}
               <div className="flex items-start justify-between mb-4">
@@ -1473,149 +1478,345 @@ export default function Home() {
               {/* 재무상태표 주요 지표 */}
               <div className="space-y-3 mb-6 flex-1">
                 {/* 총자산 */}
-                <div className="bg-gradient-to-r from-blue-50 to-transparent rounded-xl p-4 border border-blue-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-blue-900">💰 총자산</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    390M HKD
-                  </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span>• 매출채권 (대만 백화점):</span>
-                      <span><strong>34M</strong> <span className="text-red-600 font-semibold">(+13M)</span></span>
+                {bsData && (() => {
+                  const assets = bsData.balance_sheet?.assets;
+                  const totalAssets = assets?.total?.year_end || 0;
+                  const receivables = assets?.current_assets?.receivables?.year_end || 0;
+                  const prevReceivables = assets?.current_assets?.receivables?.prev_year || 0;
+                  const inventory = assets?.current_assets?.inventory?.year_end || 0;
+                  const prevInventory = assets?.current_assets?.inventory?.prev_year || 0;
+                  
+                  const receivablesChange = receivables - prevReceivables;
+                  const inventoryChange = inventory - prevInventory;
+                  
+                  // 현금 데이터 (cfData에서 가져오기)
+                  const endingCash = cfData?.summary?.ending_cash;
+                  const cash = endingCash?.current_total || 0;
+                  const prevCash = endingCash?.prev_year || 0;
+                  const cashChange = cash - prevCash;
+                  
+                  const formatM = (value: number) => {
+                    const m = Math.round(value / 1000);
+                    return `${Math.abs(m).toLocaleString()}M`;
+                  };
+                  
+                  const formatChange = (change: number, prevValue: number, currentValue: number) => {
+                    const m = Math.round(change / 1000);
+                    if (m === 0) return '변동없음';
+                    const yoyPercent = prevValue !== 0 ? Math.round((currentValue / prevValue) * 100) : 0;
+                    return `${m >= 0 ? '+' : '△'}${Math.abs(m).toLocaleString()}M (${yoyPercent}%)`;
+                  };
+                  
+                  return (
+                    <div className="bg-gradient-to-r from-blue-50 to-transparent rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-blue-900">💰 총자산</div>
+                        <div className="text-xs text-gray-500">25.12 E</div>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(totalAssets / 1000).toLocaleString()}M HKD
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 space-y-1">
+                        <div className="flex justify-between">
+                          <span>• 매출채권:</span>
+                          <span>
+                            <strong>{formatM(receivables)}</strong>
+                            {' '}
+                            <span className={receivablesChange === 0 ? 'text-gray-500 font-semibold' : receivablesChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              ({formatChange(receivablesChange, prevReceivables, receivables)})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• 재고자산:</span>
+                          <span>
+                            <strong>{formatM(inventory)}</strong>
+                            {' '}
+                            <span className={inventoryChange === 0 ? 'text-gray-500 font-semibold' : inventoryChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              ({formatChange(inventoryChange, prevInventory, inventory)})
+                            </span>
+                          </span>
+                        </div>
+                        {endingCash && (
+                          <div className="flex justify-between">
+                            <span>• 현금:</span>
+                            <span>
+                              <strong>{formatM(cash)}</strong>
+                              {' '}
+                              <span className={cashChange === 0 ? 'text-gray-500 font-semibold' : cashChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                                ({formatChange(cashChange, prevCash, cash)})
+                              </span>
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span>• 재고자산:</span>
-                      <span><strong>161M</strong> <span className="text-green-600 font-semibold">(△25M)</span></span>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* 총부채 */}
-                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-4 border border-red-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-red-900">💳 총부채</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    374M HKD
-                  </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span>• 물대채무 (AP):</span>
-                      <span><strong>133M</strong> <span className="text-green-600 font-semibold">(△1M)</span></span>
+                {bsData && (() => {
+                  const liabilities = bsData.balance_sheet?.liabilities;
+                  const totalLiabilities = liabilities?.total?.year_end || 0;
+                  const accountsPayable = liabilities?.current_liabilities?.accounts_payable?.year_end || 0;
+                  const prevAccountsPayable = liabilities?.current_liabilities?.accounts_payable?.prev_year || 0;
+                  const tpPayable = liabilities?.current_liabilities?.accounts_payable_tp?.year_end || 0;
+                  const prevTpPayable = liabilities?.current_liabilities?.accounts_payable_tp?.prev_year || 0;
+                  
+                  const apChange = accountsPayable - prevAccountsPayable;
+                  const tpChange = tpPayable - prevTpPayable;
+                  
+                  const formatM = (value: number) => {
+                    const m = Math.round(value / 1000);
+                    return `${m >= 0 ? '' : ''}${Math.abs(m).toLocaleString()}M`;
+                  };
+                  
+                  const formatChange = (change: number, prevValue: number, currentValue: number) => {
+                    const m = Math.round(change / 1000);
+                    if (m === 0) return '변동없음';
+                    const yoyPercent = prevValue !== 0 ? Math.round((currentValue / prevValue) * 100) : 0;
+                    return `${m >= 0 ? '+' : '△'}${Math.abs(m).toLocaleString()}M (${yoyPercent}%)`;
+                  };
+                  
+                  return (
+                    <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-4 border border-red-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-red-900">💳 총부채</div>
+                        <div className="text-xs text-gray-500">25.12 E</div>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(totalLiabilities / 1000).toLocaleString()}M HKD
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 space-y-1">
+                        <div className="flex justify-between">
+                          <span>• 물대채무 (AP):</span>
+                          <span>
+                            <strong>{formatM(accountsPayable)}</strong>
+                            {' '}
+                            <span className={apChange === 0 ? 'text-gray-500 font-semibold' : apChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              ({formatChange(apChange, prevAccountsPayable, accountsPayable)})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• TP채무:</span>
+                          <span>
+                            <strong>{formatM(tpPayable)}</strong>
+                            {' '}
+                            <span className={tpChange === 0 ? 'text-gray-500 font-semibold' : tpChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              ({formatChange(tpChange, prevTpPayable, tpPayable)})
+                            </span>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span>• TP채무:</span>
-                      <span><strong>115M</strong> <span className="text-gray-500 font-semibold">(변동없음)</span></span>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* 총자본 */}
-                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-green-900">💎 총자본</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    16M HKD
-                  </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span>전년 대비:</span>
-                      <span><span className="text-green-600 font-bold">+4M</span> <span className="text-green-600 font-semibold">(30% ↑)</span></span>
+                {bsData && (() => {
+                  const equity = bsData.balance_sheet?.equity;
+                  const totalEquity = equity?.total?.year_end || 0;
+                  const prevTotalEquity = equity?.total?.prev_year || 0;
+                  const retainedEarnings = equity?.retained_earnings?.year_end || 0;
+                  const prevRetainedEarnings = equity?.retained_earnings?.prev_year || 0;
+                  
+                  const equityChange = totalEquity - prevTotalEquity;
+                  const equityChangePercent = prevTotalEquity !== 0 ? ((equityChange / prevTotalEquity) * 100) : 0;
+                  const retainedEarningsChange = retainedEarnings - prevRetainedEarnings;
+                  
+                  const formatM = (value: number) => {
+                    const m = Math.round(value / 1000);
+                    return `${m >= 0 ? '+' : ''}${Math.abs(m).toLocaleString()}M`;
+                  };
+                  
+                  return (
+                    <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-green-900">💎 총자본</div>
+                        <div className="text-xs text-gray-500">25.12 E</div>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {Math.round(totalEquity / 1000).toLocaleString()}M HKD
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 space-y-1">
+                        <div className="flex justify-between">
+                          <span>전년 대비:</span>
+                          <span>
+                            <span className={equityChange >= 0 ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
+                              {formatM(equityChange)}
+                            </span>
+                            {' '}
+                            <span className={equityChangePercent >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              ({Math.abs(equityChangePercent).toFixed(0)}% {equityChangePercent >= 0 ? '↑' : '↓'})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• 이익잉여금:</span>
+                          <span>
+                            <strong className={retainedEarningsChange >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              {retainedEarningsChange >= 0 ? '+' : '△'}{Math.abs(Math.round(retainedEarningsChange / 1000)).toLocaleString()}M
+                            </strong>
+                            {' '}
+                            {retainedEarningsChange !== 0 && (
+                              <span className={retainedEarningsChange >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                                ({retainedEarningsChange >= 0 ? '적자 감소' : '적자 증가'} {formatM(Math.abs(retainedEarningsChange))})
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span>• 이익잉여금:</span>
-                      <span><strong>△3M</strong> <span className="text-green-600 font-semibold">(적자 감소 +2M)</span></span>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* 부채비율 */}
-                <div className="bg-gradient-to-r from-yellow-50 to-transparent rounded-xl p-4 border border-yellow-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-yellow-900">📊 부채비율</div>
-                    <div className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded">TP채무 제외</div>
-                  </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    198.5%
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    자기자본비율 <span className="text-green-600 font-semibold">33.5%</span> (정상 구조)
-                  </div>
-                </div>
+                {bsData && (() => {
+                  const liabilities = bsData.balance_sheet?.liabilities;
+                  const assets = bsData.balance_sheet?.assets;
+                  const equity = bsData.balance_sheet?.equity;
+                  
+                  const totalLiabilities = liabilities?.total?.year_end || 0;
+                  const totalEquity = equity?.total?.year_end || 0;
+                  const totalAssets = assets?.total?.year_end || 0;
+                  const tpPayable = liabilities?.current_liabilities?.accounts_payable_tp?.year_end || 0;
+                  
+                  // TP 포함시
+                  const debtRatioWithTp = totalEquity !== 0 ? (totalLiabilities / totalEquity) * 100 : 0;
+                  const equityRatioWithTp = totalAssets !== 0 ? (totalEquity / totalAssets) * 100 : 0;
+                  
+                  // TP 제외시
+                  const adjustedLiabilities = totalLiabilities - tpPayable;
+                  const adjustedEquity = totalEquity + tpPayable;
+                  const debtRatioExclTp = adjustedEquity !== 0 ? (adjustedLiabilities / adjustedEquity) * 100 : 0;
+                  const equityRatioExclTp = totalAssets !== 0 ? (adjustedEquity / totalAssets) * 100 : 0;
+                  
+                  return (
+                    <div className="bg-gradient-to-r from-yellow-50 to-transparent rounded-xl p-4 border border-yellow-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-yellow-900">📊 부채비율</div>
+                        <div className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">TP 포함</div>
+                      </div>
+                      <div className="flex items-baseline justify-between">
+                        <div className="text-2xl font-bold text-red-600">
+                          {debtRatioWithTp.toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          누적 TP 제외시: <span className="text-green-600 font-semibold">{debtRatioExclTp.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        자기자본비율 <span className="text-red-600 font-semibold">{equityRatioWithTp.toFixed(1)}%</span>
+                        {' '}
+                        <span className="text-gray-400">(누적 TP 제외시: <span className="text-green-600 font-semibold">{equityRatioExclTp.toFixed(1)}%</span>)</span>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* 현금흐름 */}
-                <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-xl p-4 border border-indigo-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-indigo-900">💧 현금흐름</div>
-                    <div className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">작업중</div>
+                {cfData && (() => {
+                  const summary = cfData.summary;
+                  const opcf = summary.operating_cash_flow;
+                  const invcf = summary.investing_cash_flow;
+                  const endingCash = summary.ending_cash;
+                  
+                  const opcfYoy = opcf.current_total - opcf.prev_year;
+                  const opcfYoyPercent = opcf.prev_year !== 0
+                    ? Math.round((opcf.current_total / opcf.prev_year) * 100)
+                    : 0;
+                  
+                  const invcfYoy = invcf.current_total - invcf.prev_year;
+                  const invcfYoyPercent = invcf.prev_year !== 0
+                    ? Math.round((Math.abs(invcf.current_total) / Math.abs(invcf.prev_year)) * 100)
+                    : 0;
+                  
+                  const endingCashYoy = endingCash.current_total - endingCash.prev_year;
+                  const endingCashYoyPercent = endingCash.prev_year !== 0
+                    ? Math.round((endingCash.current_total / endingCash.prev_year) * 100)
+                    : 0;
+                  
+                  const hkCapex = cfData.investing_activities?.hk_capex?.current_total || 0;
+                  const twCapex = cfData.investing_activities?.tw_capex?.current_total || 0;
+                  
+                  return (
+                    <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-xl p-4 border border-indigo-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-indigo-900">💧 현금흐름</div>
+                        <div className="text-xs text-gray-500">25.12 E</div>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 space-y-1.5">
+                        <div className="flex justify-between">
+                          <span>• 영업활동:</span>
+                          <span>
+                            <strong>{opcf.current_total > 0 ? '순유입' : '순유출'} {Math.round(Math.abs(opcf.current_total) / 1000)}M HKD</strong>
+                            {' '}
+                            <span className={opcfYoy === 0 ? 'text-gray-500 font-semibold' : opcfYoy > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              (전년비 {opcfYoy > 0 ? '+' : opcfYoy < 0 ? '△' : ''}{Math.round(Math.abs(opcfYoy) / 1000)}M, YOY {opcfYoyPercent}%)
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• 투자활동:</span>
+                          <span>
+                            <strong>순유출 {Math.round(Math.abs(invcf.current_total) / 1000)}M HKD</strong>
+                            {' '}
+                            <span className={invcfYoy === 0 ? 'text-gray-500 font-semibold' : invcfYoy > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              (전년비 {invcfYoy > 0 ? '+' : invcfYoy < 0 ? '△' : ''}{Math.round(Math.abs(invcfYoy) / 1000)}M {invcfYoy < 0 ? '유출 증가' : '유출 감소'})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• 기말현금:</span>
+                          <span>
+                            <strong>{Math.round(endingCash.current_total / 1000)}M HKD</strong>
+                            {' '}
+                            <span className={endingCashYoy === 0 ? 'text-gray-500 font-semibold' : endingCashYoy < 0 ? 'text-red-600 font-semibold' : 'text-green-600 font-semibold'}>
+                              (전년비 {endingCashYoy > 0 ? '+' : endingCashYoy < 0 ? '△' : ''}{Math.round(Math.abs(endingCashYoy) / 1000)}M, YOY {endingCashYoyPercent}%)
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+                {!cfData && (
+                  <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-xl p-4 border border-indigo-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold text-indigo-900">💧 현금흐름</div>
+                      <div className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">작업중</div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-400">
+                      -
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1 italic">
+                      영업/투자/재무 현금흐름 분석 예정
+                    </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-400">
-                    -
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1 italic">
-                    영업/투자/재무 현금흐름 분석 예정
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* 대시보드 버튼 */}
-              <Link
-                href="/bs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                전체 대시보드 보기
-              </Link>
-            </div>
-              </div>
-
-              {/* 4. 2026년 계획 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-            <div className="p-6">
-              {/* 헤더: 아이콘 */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-2xl">🎯</span>
-                </div>
-              </div>
-
-              {/* 제목 */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                2026년 계획
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Business Plan 2026
-              </p>
-
-              {/* 정보 카드 */}
-              <div className="bg-gradient-to-r from-orange-50 to-transparent rounded-xl p-4 border border-orange-100 mb-6">
-                <div className="text-sm font-semibold text-orange-900 mb-2">
-                  연간 예상 PL / 예상 물량표
-                </div>
-                <div className="text-xs text-gray-500 italic">
-                  작업중 (매출계획 수신완료)
-                </div>
-              </div>
-
-              {/* 대시보드 버튼 */}
-              <Link
-                href="/plan-2026"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                전체 대시보드 보기
-              </Link>
-            </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href="/bs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  B/S 보기
+                </Link>
+                <Link
+                  href="/cashflow"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  현금흐름표 보기
+                </Link>
               </div>
             </div>
           </div>

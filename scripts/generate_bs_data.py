@@ -120,44 +120,44 @@ def parse_bs_csv(csv_path):
     # 비유동자산 (assets_start + 6)
     bs_data['assets']['non_current_assets'] = {
         'total': {
-            'prev_year': clean_number(df.iloc[assets_start+6, 1]),
-            'current_month': clean_number(df.iloc[assets_start+6, 12]),
-            'year_end': clean_number(df.iloc[assets_start+6, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+6, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+6, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+6, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'right_of_use': {
             'prev_year': clean_number(df.iloc[assets_start+7, 1]),
-            'current_month': clean_number(df.iloc[assets_start+7, 12]),
-            'year_end': clean_number(df.iloc[assets_start+7, 14]),
+            'current_month': clean_number(df.iloc[assets_start+7, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+7, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'tangible': {
             'prev_year': clean_number(df.iloc[assets_start+8, 1]),
-            'current_month': clean_number(df.iloc[assets_start+8, 12]),
-            'year_end': clean_number(df.iloc[assets_start+8, 14]),
+            'current_month': clean_number(df.iloc[assets_start+8, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+8, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'intangible': {
             'prev_year': clean_number(df.iloc[assets_start+9, 1]),
-            'current_month': clean_number(df.iloc[assets_start+9, 12]),
-            'year_end': clean_number(df.iloc[assets_start+9, 14]),
+            'current_month': clean_number(df.iloc[assets_start+9, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+9, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'deposits': {
             'prev_year': clean_number(df.iloc[assets_start+10, 1]),
-            'current_month': clean_number(df.iloc[assets_start+10, 12]),
-            'year_end': clean_number(df.iloc[assets_start+10, 14]),
+            'current_month': clean_number(df.iloc[assets_start+10, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+10, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'other_non_current': {
             'prev_year': clean_number(df.iloc[assets_start+11, 1]),
-            'current_month': clean_number(df.iloc[assets_start+11, 12]),
-            'year_end': clean_number(df.iloc[assets_start+11, 14]),
+            'current_month': clean_number(df.iloc[assets_start+11, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+11, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         }
@@ -165,9 +165,9 @@ def parse_bs_csv(csv_path):
     
     # 총부채 (assets_start + 12)
     bs_data['liabilities']['total'] = {
-        'prev_year': clean_number(df.iloc[assets_start+12, 1]),
-        'current_month': clean_number(df.iloc[assets_start+12, 12]),
-        'year_end': clean_number(df.iloc[assets_start+12, 14]),
+        'prev_year': clean_number(df.iloc[assets_start+12, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+12, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+12, year_end_col]),
         'yoy_krw': 0,
         'note': ''
     }
@@ -175,51 +175,51 @@ def parse_bs_csv(csv_path):
     # 유동부채 (assets_start + 13)
     bs_data['liabilities']['current_liabilities'] = {
         'total': {
-            'prev_year': clean_number(df.iloc[assets_start+13, 1]),
-            'current_month': clean_number(df.iloc[assets_start+13, 12]),
-            'year_end': clean_number(df.iloc[assets_start+13, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+13, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+13, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+13, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'accounts_payable': {
-            'prev_year': clean_number(df.iloc[assets_start+14, 1]),
-            'current_month': clean_number(df.iloc[assets_start+14, 12]),
-            'year_end': clean_number(df.iloc[assets_start+14, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+14, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+14, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+14, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'accounts_payable_tp': {
-            'prev_year': clean_number(df.iloc[assets_start+15, 1]),
-            'current_month': clean_number(df.iloc[assets_start+15, 12]),
-            'year_end': clean_number(df.iloc[assets_start+15, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+15, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+15, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+15, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'accrued_expenses': {
-            'prev_year': clean_number(df.iloc[assets_start+16, 1]),
-            'current_month': clean_number(df.iloc[assets_start+16, 12]),
-            'year_end': clean_number(df.iloc[assets_start+16, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+16, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+16, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+16, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'borrowings': {
-            'prev_year': clean_number(df.iloc[assets_start+17, 1]),
-            'current_month': clean_number(df.iloc[assets_start+17, 12]),
-            'year_end': clean_number(df.iloc[assets_start+17, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+17, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+17, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+17, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'lease_liabilities_current': {
-            'prev_year': clean_number(df.iloc[assets_start+18, 1]),
-            'current_month': clean_number(df.iloc[assets_start+18, 12]),
-            'year_end': clean_number(df.iloc[assets_start+18, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+18, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+18, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+18, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'other_current': {
-            'prev_year': clean_number(df.iloc[assets_start+19, 1]),
-            'current_month': clean_number(df.iloc[assets_start+19, 12]),
-            'year_end': clean_number(df.iloc[assets_start+19, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+19, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+19, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+19, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         }
@@ -228,23 +228,23 @@ def parse_bs_csv(csv_path):
     # 비유동부채 (assets_start + 20)
     bs_data['liabilities']['non_current_liabilities'] = {
         'total': {
-            'prev_year': clean_number(df.iloc[assets_start+20, 1]),
-            'current_month': clean_number(df.iloc[assets_start+20, 12]),
-            'year_end': clean_number(df.iloc[assets_start+20, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+20, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+20, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+20, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'lease_liabilities_non_current': {
-            'prev_year': clean_number(df.iloc[assets_start+21, 1]),
-            'current_month': clean_number(df.iloc[assets_start+21, 12]),
-            'year_end': clean_number(df.iloc[assets_start+21, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+21, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+21, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+21, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         },
         'restoration_provision': {
-            'prev_year': clean_number(df.iloc[assets_start+22, 1]),
-            'current_month': clean_number(df.iloc[assets_start+22, 12]),
-            'year_end': clean_number(df.iloc[assets_start+22, 14]),
+            'prev_year': clean_number(df.iloc[assets_start+22, prev_year_col]),
+            'current_month': clean_number(df.iloc[assets_start+22, current_month_col]),
+            'year_end': clean_number(df.iloc[assets_start+22, year_end_col]),
             'yoy_krw': 0,
             'note': ''
         }
@@ -252,33 +252,33 @@ def parse_bs_csv(csv_path):
     
     # 총자본 (assets_start + 23)
     bs_data['equity']['total'] = {
-        'prev_year': clean_number(df.iloc[assets_start+23, 1]),
-        'current_month': clean_number(df.iloc[assets_start+23, 12]),
-        'year_end': clean_number(df.iloc[assets_start+23, 14]),
+        'prev_year': clean_number(df.iloc[assets_start+23, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+23, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+23, year_end_col]),
         'yoy_krw': 0,
         'note': ''
     }
     
     bs_data['equity']['capital'] = {
-        'prev_year': clean_number(df.iloc[assets_start+24, 1]),
-        'current_month': clean_number(df.iloc[assets_start+24, 12]),
-        'year_end': clean_number(df.iloc[assets_start+24, 14]),
+        'prev_year': clean_number(df.iloc[assets_start+24, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+24, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+24, year_end_col]),
         'yoy_krw': 0,
         'note': ''
     }
     
     bs_data['equity']['other_capital'] = {
-        'prev_year': clean_number(df.iloc[assets_start+25, 1]),
-        'current_month': clean_number(df.iloc[assets_start+25, 12]),
-        'year_end': clean_number(df.iloc[assets_start+25, 14]),
+        'prev_year': clean_number(df.iloc[assets_start+25, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+25, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+25, year_end_col]),
         'yoy_krw': 0,
         'note': ''
     }
     
     bs_data['equity']['retained_earnings'] = {
-        'prev_year': clean_number(df.iloc[assets_start+26, 1]),
-        'current_month': clean_number(df.iloc[assets_start+26, 12]),
-        'year_end': clean_number(df.iloc[assets_start+26, 14]),
+        'prev_year': clean_number(df.iloc[assets_start+26, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+26, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+26, year_end_col]),
         'yoy_krw': 0,
         'note': ''
     }
@@ -289,6 +289,11 @@ def parse_working_capital(df, bs_start_idx):
     """운전자본 증감 데이터 파싱"""
     # Financial Position 시작점 기준
     assets_start = bs_start_idx + 1
+    
+    # 컬럼 인덱스 정의
+    prev_year_col = 1   # 2412 (24년 12월)
+    current_month_col = 12  # 2511
+    year_end_col = 13   # 2512 (25년 12월)
     
     wc_data = {
         'summary': {},
@@ -303,18 +308,18 @@ def parse_working_capital(df, bs_start_idx):
     # ▼ 외상매출금 (회수자산) - 자산이므로 + 표시
     # 재고자산 (assets_start + 4)
     inventory = {
-        'prev_year': clean_number(df.iloc[assets_start+4, 1]),
-        'current_month': clean_number(df.iloc[assets_start+4, 13]),
-        'year_end': clean_number(df.iloc[assets_start+4, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+4, 16])
+        'prev_year': clean_number(df.iloc[assets_start+4, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+4, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+4, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 매출채권 (assets_start + 3)
     receivables_ar = {
-        'prev_year': clean_number(df.iloc[assets_start+3, 1]),
-        'current_month': clean_number(df.iloc[assets_start+3, 13]),
-        'year_end': clean_number(df.iloc[assets_start+3, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+3, 16])
+        'prev_year': clean_number(df.iloc[assets_start+3, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+3, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+3, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     wc_data['receivables'] = {
@@ -331,56 +336,55 @@ def parse_working_capital(df, bs_start_idx):
     # ▼ 외상매입금 (지급부채) - 부채이므로 △ 표시
     # 현금 (assets_start + 2)
     cash = {
-        'prev_year': clean_number(df.iloc[assets_start+2, 1]),
-        'current_month': clean_number(df.iloc[assets_start+2, 13]),
-        'year_end': clean_number(df.iloc[assets_start+2, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+2, 16])
+        'prev_year': clean_number(df.iloc[assets_start+2, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+2, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+2, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 차입금 (assets_start + 17)
     borrowings = {
-        'prev_year': clean_number(df.iloc[assets_start+17, 1]),
-        'current_month': clean_number(df.iloc[assets_start+17, 13]),
-        'year_end': clean_number(df.iloc[assets_start+17, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+17, 16])
+        'prev_year': clean_number(df.iloc[assets_start+17, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+17, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+17, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 매입채무 (assets_start + 14)
     accounts_payable = {
-        'prev_year': clean_number(df.iloc[assets_start+14, 1]),
-        'current_month': clean_number(df.iloc[assets_start+14, 13]),
-        'year_end': clean_number(df.iloc[assets_start+14, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+14, 16])
+        'prev_year': clean_number(df.iloc[assets_start+14, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+14, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+14, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 매입채무(TP) (assets_start + 15)
     accounts_payable_tp = {
-        'prev_year': clean_number(df.iloc[assets_start+15, 1]),
-        'current_month': clean_number(df.iloc[assets_start+15, 13]),
-        'year_end': clean_number(df.iloc[assets_start+15, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+15, 16])
+        'prev_year': clean_number(df.iloc[assets_start+15, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+15, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+15, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     wc_data['payables'] = {
         'total': {
-            'prev_year': -(cash['prev_year'] + borrowings['prev_year'] + accounts_payable['prev_year'] + accounts_payable_tp['prev_year']),
-            'current_month': -(cash['current_month'] + borrowings['current_month'] + accounts_payable['current_month'] + accounts_payable_tp['current_month']),
-            'year_end': -(cash['year_end'] + borrowings['year_end'] + accounts_payable['year_end'] + accounts_payable_tp['year_end']),
-            'yoy_krw': -(cash['yoy_krw'] + borrowings['yoy_krw'] + accounts_payable['yoy_krw'] + accounts_payable_tp['yoy_krw'])
+            'prev_year': -(cash['prev_year'] + borrowings['prev_year'] + accounts_payable['prev_year']),
+            'current_month': -(cash['current_month'] + borrowings['current_month'] + accounts_payable['current_month']),
+            'year_end': -(cash['year_end'] + borrowings['year_end'] + accounts_payable['year_end']),
+            'yoy_krw': -(cash['yoy_krw'] + borrowings['yoy_krw'] + accounts_payable['yoy_krw'])
         },
         'cash': cash,
         'borrowings': borrowings,
-        'accounts_payable': accounts_payable,
-        'accounts_payable_tp': accounts_payable_tp
+        'accounts_payable': accounts_payable
     }
     
     # ▼ 이익창출 - 자본이므로 △ 표시
     # 이익잉여금 (assets_start + 26)
     retained_earnings = {
-        'prev_year': clean_number(df.iloc[assets_start+26, 1]),
-        'current_month': clean_number(df.iloc[assets_start+26, 13]),
-        'year_end': clean_number(df.iloc[assets_start+26, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+26, 16])
+        'prev_year': clean_number(df.iloc[assets_start+26, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+26, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+26, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     wc_data['profit_creation'] = {
@@ -396,32 +400,32 @@ def parse_working_capital(df, bs_start_idx):
     # ▼ 기타 운전자본
     # 선급비용 = 기타유동자산 (assets_start + 5)
     prepaid = {
-        'prev_year': clean_number(df.iloc[assets_start+5, 1]),
-        'current_month': clean_number(df.iloc[assets_start+5, 13]),
-        'year_end': clean_number(df.iloc[assets_start+5, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+5, 16])
+        'prev_year': clean_number(df.iloc[assets_start+5, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+5, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+5, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 미지급비용 = 기타유동부채 (assets_start + 19)
     accrued = {
-        'prev_year': clean_number(df.iloc[assets_start+19, 1]),
-        'current_month': clean_number(df.iloc[assets_start+19, 13]),
-        'year_end': clean_number(df.iloc[assets_start+19, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+19, 16])
+        'prev_year': clean_number(df.iloc[assets_start+19, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+19, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+19, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 고정자산/보증금 = 유형자산 + 비유동보증금 (assets_start + 8, 10)
     tangible = {
-        'prev_year': clean_number(df.iloc[assets_start+8, 1]),
-        'current_month': clean_number(df.iloc[assets_start+8, 13]),
-        'year_end': clean_number(df.iloc[assets_start+8, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+8, 16])
+        'prev_year': clean_number(df.iloc[assets_start+8, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+8, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+8, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     deposits = {
-        'prev_year': clean_number(df.iloc[assets_start+10, 1]),
-        'current_month': clean_number(df.iloc[assets_start+10, 13]),
-        'year_end': clean_number(df.iloc[assets_start+10, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+10, 16])
+        'prev_year': clean_number(df.iloc[assets_start+10, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+10, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+10, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     fixed_assets = {
         'prev_year': tangible['prev_year'] + deposits['prev_year'],
@@ -434,10 +438,10 @@ def parse_working_capital(df, bs_start_idx):
     # 미수금 = 기타유동자산 (prepaid 이미 정의됨)
     # 미지급금 = 미지급금 + 기타유동부채 (assets_start + 16, accrued 이미 정의됨)
     payables_other = {
-        'prev_year': clean_number(df.iloc[assets_start+16, 1]),
-        'current_month': clean_number(df.iloc[assets_start+16, 13]),
-        'year_end': clean_number(df.iloc[assets_start+16, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+16, 16])
+        'prev_year': clean_number(df.iloc[assets_start+16, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+16, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+16, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 미수금/미지급금 순액 = 미수금(기타유동자산) - 미지급금(미지급금 + 기타유동부채)
@@ -449,41 +453,42 @@ def parse_working_capital(df, bs_start_idx):
     }
     
     # 기타운전자본 합계
-    # 선급비용(자산 +) + 미지급비용(부채 -) + 고정자산/보증금(자산 +) + 미수금/미지급금순액
+    # 선급비용(자산 +) + 미지급비용(부채 -) + 고정자산/보증금(자산 +) + 미수금/미지급금순액 + 매입채무(TP)(부채 -)
     wc_data['other_wc_items'] = {
         'total': {
-            'prev_year': prepaid['prev_year'] - accrued['prev_year'] + fixed_assets['prev_year'] + net_other['prev_year'],
-            'current_month': prepaid['current_month'] - accrued['current_month'] + fixed_assets['current_month'] + net_other['current_month'],
-            'year_end': prepaid['year_end'] - accrued['year_end'] + fixed_assets['year_end'] + net_other['year_end'],
-            'yoy_krw': prepaid['yoy_krw'] - accrued['yoy_krw'] + fixed_assets['yoy_krw'] + net_other['yoy_krw']
+            'prev_year': prepaid['prev_year'] - accrued['prev_year'] + fixed_assets['prev_year'] + net_other['prev_year'] - accounts_payable_tp['prev_year'],
+            'current_month': prepaid['current_month'] - accrued['current_month'] + fixed_assets['current_month'] + net_other['current_month'] - accounts_payable_tp['current_month'],
+            'year_end': prepaid['year_end'] - accrued['year_end'] + fixed_assets['year_end'] + net_other['year_end'] - accounts_payable_tp['year_end'],
+            'yoy_krw': prepaid['yoy_krw'] - accrued['yoy_krw'] + fixed_assets['yoy_krw'] + net_other['yoy_krw'] - accounts_payable_tp['yoy_krw']
         },
         'prepaid': prepaid,
         'accrued': accrued,
         'fixed_assets': fixed_assets,
-        'net_other': net_other
+        'net_other': net_other,
+        'accounts_payable_tp': accounts_payable_tp
     }
     
     # ▼ 리스관련
     # 사용권자산 (assets_start + 7)
     right_of_use = {
-        'prev_year': clean_number(df.iloc[assets_start+7, 1]),
-        'current_month': clean_number(df.iloc[assets_start+7, 13]),
-        'year_end': clean_number(df.iloc[assets_start+7, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+7, 16])
+        'prev_year': clean_number(df.iloc[assets_start+7, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+7, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+7, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     
     # 리스부채 = 유동성 + 비유동성 (assets_start + 18, 21)
     lease_current = {
-        'prev_year': clean_number(df.iloc[assets_start+18, 1]),
-        'current_month': clean_number(df.iloc[assets_start+18, 13]),
-        'year_end': clean_number(df.iloc[assets_start+18, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+18, 16])
+        'prev_year': clean_number(df.iloc[assets_start+18, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+18, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+18, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     lease_non_current = {
-        'prev_year': clean_number(df.iloc[assets_start+21, 1]),
-        'current_month': clean_number(df.iloc[assets_start+21, 13]),
-        'year_end': clean_number(df.iloc[assets_start+21, 14]),
-        'yoy_krw': clean_number(df.iloc[assets_start+21, 16])
+        'prev_year': clean_number(df.iloc[assets_start+21, prev_year_col]),
+        'current_month': clean_number(df.iloc[assets_start+21, current_month_col]),
+        'year_end': clean_number(df.iloc[assets_start+21, year_end_col]),
+        'yoy_krw': 0  # CSV에 yoy_krw 컬럼이 없으므로 0
     }
     lease_total = {
         'prev_year': lease_current['prev_year'] + lease_non_current['prev_year'],
@@ -571,11 +576,13 @@ def generate_bs_json(period='2511'):
     bs_data = parse_bs_csv(csv_path)
     wc_data = parse_working_capital(df, bs_start_idx)
     
+    # working_capital을 balance_sheet 안에 포함
+    bs_data['working_capital'] = wc_data
+    
     # JSON 구조 생성
     output_data = {
         'period': period,
-        'balance_sheet': bs_data,
-        'working_capital': wc_data
+        'balance_sheet': bs_data
     }
     
     # JSON 저장

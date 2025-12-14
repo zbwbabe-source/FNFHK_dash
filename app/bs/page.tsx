@@ -30,7 +30,6 @@ interface WCData {
     cash: WCItem;
     borrowings: WCItem;
     accounts_payable: WCItem;
-    accounts_payable_tp: WCItem;
   };
   profit_creation: {
     total: WCItem;
@@ -42,6 +41,7 @@ interface WCData {
     accrued: WCItem;
     fixed_assets: WCItem;
     net_other: WCItem;
+    accounts_payable_tp: WCItem;
   };
   lease_related: {
     total: WCItem;
@@ -78,9 +78,9 @@ interface BSData {
         total: BSItem;
         accounts_payable: BSItem;
         accounts_payable_tp: BSItem;
-        accrued: BSItem;
+        accrued_expenses: BSItem;
+        borrowings: BSItem;
         lease_liabilities_current: BSItem;
-        payables_other: BSItem;
         other_current: BSItem;
       };
       non_current_liabilities: {
@@ -102,12 +102,25 @@ interface BSData {
 export default function BSPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('2511');
   const [bsData, setBsData] = useState<BSData | null>(null);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['wc-main']));
   const [showVerification, setShowVerification] = useState(false);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [editingNote, setEditingNote] = useState<string | null>(null);
 
   useEffect(() => {
     loadBSData(selectedPeriod);
+    // 로컬 스토리지에서 비고 불러오기
+    const savedNotes = localStorage.getItem(`bs-notes-${selectedPeriod}`);
+    if (savedNotes) {
+      setNotes(JSON.parse(savedNotes));
+    }
   }, [selectedPeriod]);
+
+  const saveNote = (key: string, value: string) => {
+    const newNotes = { ...notes, [key]: value };
+    setNotes(newNotes);
+    localStorage.setItem(`bs-notes-${selectedPeriod}`, JSON.stringify(newNotes));
+  };
 
   const loadBSData = async (period: string) => {
     try {
@@ -180,7 +193,22 @@ export default function BSPage() {
   };
 
   // 행 렌더링 헬퍼 함수
-  const renderRow = (label: string, item: BSItem, indent: number = 0, isBold: boolean = false) => {
+  const renderRow = (label: string, item: BSItem | undefined, indent: number = 0, isBold: boolean = false) => {
+    // item이 undefined인 경우 빈 행 반환
+    if (!item) {
+      return (
+        <tr className={`hover:bg-gray-100 ${indent === 1 ? 'bg-gray-50' : ''}`}>
+          <td className={`px-4 py-3 border border-gray-300 ${indent === 0 ? '' : indent === 1 ? 'pl-8' : 'pl-12'}`}>{label}</td>
+          <td className="px-4 py-3 border border-gray-300 text-right">-</td>
+          <td className="px-4 py-3 border border-gray-300 text-right">-</td>
+          <td className="px-4 py-3 border border-gray-300 text-right">-</td>
+          <td className="px-4 py-3 border border-gray-300 text-right">-</td>
+          <td className="px-4 py-3 border border-gray-300 text-right">-</td>
+          <td className="px-4 py-3 border border-gray-300 text-left text-sm text-gray-600">-</td>
+        </tr>
+      );
+    }
+    
     const indentClass = indent === 0 ? '' : indent === 1 ? 'pl-8' : 'pl-12';
     const bgClass = indent === 1 ? 'bg-gray-50' : '';
     const fontClass = isBold ? 'font-semibold' : '';
@@ -224,7 +252,7 @@ export default function BSPage() {
               onChange={(e) => setSelectedPeriod(e.target.value)}
               className="px-4 py-2 rounded-lg bg-white text-gray-800 font-semibold"
             >
-              <option value="2511">2511 (11월)</option>
+              <option value="2511">2511</option>
             </select>
             <Link
               href="/"
@@ -306,12 +334,14 @@ export default function BSPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <button
-            onClick={toggleAll}
-            className="mb-4 px-6 py-2 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition"
-          >
-            전체 접기/펴기
-          </button>
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={toggleAll}
+              className="px-6 py-2 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition"
+            >
+              전체 접기/펴기
+            </button>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
@@ -403,9 +433,8 @@ export default function BSPage() {
                     {renderRow('유동부채', bs.liabilities.current_liabilities.total, 1, true)}
                     {renderRow('매입채무', bs.liabilities.current_liabilities.accounts_payable, 2)}
                     {renderRow('매입채무(TP)', bs.liabilities.current_liabilities.accounts_payable_tp, 2)}
-                    {renderRow('미지급비용', bs.liabilities.current_liabilities.accrued, 2)}
+                    {renderRow('미지급비용', bs.liabilities.current_liabilities.accrued_expenses, 2)}
                     {renderRow('유동성리스부채', bs.liabilities.current_liabilities.lease_liabilities_current, 2)}
-                    {renderRow('기타유동부채', bs.liabilities.current_liabilities.payables_other, 2)}
                     {renderRow('기타', bs.liabilities.current_liabilities.other_current, 2)}
                     
                     {renderRow('비유동부채', bs.liabilities.non_current_liabilities.total, 1, true)}
@@ -511,16 +540,40 @@ export default function BSPage() {
                     {expandedSections.has('wc-main') && (
                       <>
                         {/* 매출채권 */}
-                        <WCRow label="  매출채권" item={bsData.balance_sheet.working_capital.receivables.accounts_receivable} isPositive={true} />
+                        <WCRow 
+                          label="  매출채권" 
+                          item={bsData.balance_sheet.working_capital.receivables.accounts_receivable} 
+                          isPositive={true}
+                          noteKey="receivables_accounts_receivable"
+                          noteValue={notes['receivables_accounts_receivable']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'receivables_accounts_receivable'}
+                          onNoteEdit={setEditingNote}
+                        />
                         
                         {/* 재고자산 */}
-                        <WCRow label="  재고자산" item={bsData.balance_sheet.working_capital.receivables.inventory} isPositive={true} />
+                        <WCRow 
+                          label="  재고자산" 
+                          item={bsData.balance_sheet.working_capital.receivables.inventory} 
+                          isPositive={true}
+                          noteKey="receivables_inventory"
+                          noteValue={notes['receivables_inventory']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'receivables_inventory'}
+                          onNoteEdit={setEditingNote}
+                        />
                         
                         {/* 매입채무 */}
-                        <WCRow label="  매입채무" item={bsData.balance_sheet.working_capital.payables.accounts_payable} isPositive={false} />
-                        
-                        {/* 매입채무(TP) */}
-                        <WCRow label="  매입채무(TP)" item={bsData.balance_sheet.working_capital.payables.accounts_payable_tp} isPositive={false} />
+                        <WCRow 
+                          label="  매입채무" 
+                          item={bsData.balance_sheet.working_capital.payables.accounts_payable} 
+                          isPositive={false}
+                          noteKey="payables_accounts_payable"
+                          noteValue={notes['payables_accounts_payable']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'payables_accounts_payable'}
+                          onNoteEdit={setEditingNote}
+                        />
                       </>
                     )}
 
@@ -532,14 +585,19 @@ export default function BSPage() {
                       bgColor="bg-blue-50"
                       expanded={expandedSections.has('wc-cash')}
                       onClick={() => toggleSection('wc-cash')}
-                      note={<>
-                        {noteItem('현금', bsData.balance_sheet.working_capital.payables.cash.year_end - bsData.balance_sheet.working_capital.payables.cash.prev_year)}
-                        {', '}
-                        {noteItem('차입금', bsData.balance_sheet.working_capital.payables.borrowings.year_end - bsData.balance_sheet.working_capital.payables.borrowings.prev_year)}
-                      </>}
+                      note={noteItem('현금', bsData.balance_sheet.working_capital.payables.cash.year_end - bsData.balance_sheet.working_capital.payables.cash.prev_year)}
                     />
                     {expandedSections.has('wc-cash') && (
-                      <WCRow label="  현금" item={bsData.balance_sheet.working_capital.payables.cash} isPositive={false} />
+                      <WCRow 
+                        label="  현금" 
+                        item={bsData.balance_sheet.working_capital.payables.cash} 
+                        isPositive={false}
+                        noteKey="payables_cash"
+                        noteValue={notes['payables_cash']}
+                        onNoteChange={saveNote}
+                        isEditingNote={editingNote === 'payables_cash'}
+                        onNoteEdit={setEditingNote}
+                      />
                     )}
 
                     {/* 이익창출 */}
@@ -553,7 +611,16 @@ export default function BSPage() {
                       note={noteItem('이익잉여금', bsData.balance_sheet.working_capital.profit_creation.retained_earnings.year_end - bsData.balance_sheet.working_capital.profit_creation.retained_earnings.prev_year)}
                     />
                     {expandedSections.has('wc-profit') && (
-                      <WCRow label="  이익잉여금" item={bsData.balance_sheet.working_capital.profit_creation.retained_earnings} isPositive={false} />
+                      <WCRow 
+                        label="  이익잉여금" 
+                        item={bsData.balance_sheet.working_capital.profit_creation.retained_earnings} 
+                        isPositive={false}
+                        noteKey="profit_creation_retained_earnings"
+                        noteValue={notes['profit_creation_retained_earnings']}
+                        onNoteChange={saveNote}
+                        isEditingNote={editingNote === 'profit_creation_retained_earnings'}
+                        onNoteEdit={setEditingNote}
+                      />
                     )}
 
                     {/* 기타 운전자본 */}
@@ -572,14 +639,61 @@ export default function BSPage() {
                         {noteItem('보증금', bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.year_end - bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.prev_year)}
                         {', '}
                         {noteItem('미수금', bsData.balance_sheet.working_capital.other_wc_items.net_other.year_end - bsData.balance_sheet.working_capital.other_wc_items.net_other.prev_year)}
+                        {', '}
+                        {noteItem('매입채무(TP)', bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp.year_end - bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp.prev_year)}
                       </>}
                     />
                     {expandedSections.has('wc-other') && (
                       <>
-                        <WCRow label="  선급비용" item={bsData.balance_sheet.working_capital.other_wc_items.prepaid} isPositive={true} />
-                        <WCRow label="  미지급비용" item={bsData.balance_sheet.working_capital.other_wc_items.accrued} isPositive={false} />
-                        <WCRow label="  고정자산/보증금" item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets} isPositive={true} />
-                        <WCRow label="  미수금/미지급금" item={bsData.balance_sheet.working_capital.other_wc_items.net_other} />
+                        <WCRow 
+                          label="  선급비용" 
+                          item={bsData.balance_sheet.working_capital.other_wc_items.prepaid} 
+                          isPositive={true}
+                          noteKey="other_wc_items_prepaid"
+                          noteValue={notes['other_wc_items_prepaid']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_prepaid'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow 
+                          label="  미지급비용" 
+                          item={bsData.balance_sheet.working_capital.other_wc_items.accrued} 
+                          isPositive={false}
+                          noteKey="other_wc_items_accrued"
+                          noteValue={notes['other_wc_items_accrued']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_accrued'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow 
+                          label="  고정자산/보증금" 
+                          item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets} 
+                          isPositive={true}
+                          noteKey="other_wc_items_fixed_assets"
+                          noteValue={notes['other_wc_items_fixed_assets']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_fixed_assets'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow 
+                          label="  미수금/미지급금" 
+                          item={bsData.balance_sheet.working_capital.other_wc_items.net_other}
+                          noteKey="other_wc_items_net_other"
+                          noteValue={notes['other_wc_items_net_other']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_net_other'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow 
+                          label="  매입채무(TP)" 
+                          item={bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp} 
+                          isPositive={false}
+                          noteKey="other_wc_items_accounts_payable_tp"
+                          noteValue={notes['other_wc_items_accounts_payable_tp']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_accounts_payable_tp'}
+                          onNoteEdit={setEditingNote}
+                        />
                       </>
                     )}
 
@@ -599,8 +713,26 @@ export default function BSPage() {
                     />
                     {expandedSections.has('wc-lease') && (
                       <>
-                        <WCRow label="  사용권자산" item={bsData.balance_sheet.working_capital.lease_related.right_of_use} isPositive={true} />
-                        <WCRow label="  리스부채" item={bsData.balance_sheet.working_capital.lease_related.lease_liabilities} isPositive={false} />
+                        <WCRow 
+                          label="  사용권자산" 
+                          item={bsData.balance_sheet.working_capital.lease_related.right_of_use} 
+                          isPositive={true}
+                          noteKey="lease_related_right_of_use"
+                          noteValue={notes['lease_related_right_of_use']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'lease_related_right_of_use'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow 
+                          label="  리스부채" 
+                          item={bsData.balance_sheet.working_capital.lease_related.lease_liabilities} 
+                          isPositive={false}
+                          noteKey="lease_related_lease_liabilities"
+                          noteValue={notes['lease_related_lease_liabilities']}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'lease_related_lease_liabilities'}
+                          onNoteEdit={setEditingNote}
+                        />
                       </>
                     )}
 
@@ -622,61 +754,109 @@ export default function BSPage() {
           )}
 
           {/* 재무비율 분석 */}
-          <div className="mt-8 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
-            <div className="flex items-center mb-4">
-              <span className="text-2xl mr-2">📊</span>
-              <h3 className="text-lg font-bold text-orange-900">재무비율 분석</h3>
-            </div>
+          {bsData && (() => {
+            const bs = bsData.balance_sheet;
+            
+            // 기본 값 (year_end 기준)
+            const totalAssets = bs.assets.total.year_end;
+            const totalLiabilities = bs.liabilities.total.year_end;
+            const totalEquity = bs.equity.total.year_end;
+            const currentAssets = bs.assets.current_assets.total.year_end;
+            const currentLiabilities = bs.liabilities.current_liabilities.total.year_end;
+            const inventory = bs.assets.current_assets.inventory.year_end;
+            const tpPayable = bs.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0;
+            
+            // 전년도 값 (prev_year 기준)
+            const prevTotalAssets = bs.assets.total.prev_year;
+            const prevTotalLiabilities = bs.liabilities.total.prev_year;
+            const prevTotalEquity = bs.equity.total.prev_year;
+            const prevCurrentAssets = bs.assets.current_assets.total.prev_year;
+            const prevCurrentLiabilities = bs.liabilities.current_liabilities.total.prev_year;
+            const prevInventory = bs.assets.current_assets.inventory.prev_year;
+            const prevTpPayable = bs.liabilities.current_liabilities.accounts_payable_tp?.prev_year || 0;
+            
+            // 부채비율 = (총부채 ÷ 총자본) × 100
+            const debtRatio = (totalLiabilities / (totalEquity || 1)) * 100;
+            const prevDebtRatio = (prevTotalLiabilities / (prevTotalEquity || 1)) * 100;
+            const debtRatioExclTp = ((totalLiabilities - tpPayable) / ((totalEquity + tpPayable) || 1)) * 100;
+            
+            // 유동비율 = (유동자산 ÷ 유동부채) × 100
+            const currentRatio = (currentAssets / (currentLiabilities || 1)) * 100;
+            const prevCurrentRatio = (prevCurrentAssets / (prevCurrentLiabilities || 1)) * 100;
+            const currentRatioExclTp = (currentAssets / ((currentLiabilities - tpPayable) || 1)) * 100;
+            
+            // 당좌비율 = ((유동자산 - 재고) ÷ 유동부채) × 100
+            const quickRatio = ((currentAssets - inventory) / (currentLiabilities || 1)) * 100;
+            const prevQuickRatio = ((prevCurrentAssets - prevInventory) / (prevCurrentLiabilities || 1)) * 100;
+            const quickRatioExclTp = ((currentAssets - inventory) / ((currentLiabilities - tpPayable) || 1)) * 100;
+            
+            // 자기자본비율 = (총자본 ÷ 총자산) × 100
+            const equityRatio = (totalEquity / (totalAssets || 1)) * 100;
+            const prevEquityRatio = (prevTotalEquity / (prevTotalAssets || 1)) * 100;
+            const equityRatioExclTp = ((totalEquity + tpPayable) / (totalAssets || 1)) * 100;
+            
+            // 조정 후 값
+            const adjustedLiabilities = totalLiabilities - tpPayable;
+            const adjustedEquity = totalEquity + tpPayable;
+            
+            return (
+              <div className="mt-8 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
+                <div className="flex items-center mb-4">
+                  <span className="text-2xl mr-2">📊</span>
+                  <h3 className="text-lg font-bold text-orange-900">재무비율 분석</h3>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              {/* 부채비율 */}
-              <div className="bg-white rounded-lg p-4 shadow">
-                <div className="text-sm text-gray-600 mb-2">부채비율</div>
-                <div className="text-3xl font-bold text-red-600 mb-1">2,236%</div>
-                <div className="text-xs text-gray-500">24년 2,783%</div>
-                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 196%</div>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  {/* 부채비율 */}
+                  <div className="bg-white rounded-lg p-4 shadow">
+                    <div className="text-sm text-gray-600 mb-2">부채비율</div>
+                    <div className="text-3xl font-bold text-red-600 mb-1">{debtRatio.toFixed(0)}%</div>
+                    <div className="text-xs text-gray-500">24년 {prevDebtRatio.toFixed(0)}%</div>
+                    <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {debtRatioExclTp.toFixed(0)}%</div>
+                  </div>
 
-              {/* 유동비율 */}
-              <div className="bg-white rounded-lg p-4 shadow">
-                <div className="text-sm text-gray-600 mb-2">유동비율</div>
-                <div className="text-3xl font-bold text-orange-600 mb-1">81%</div>
-                <div className="text-xs text-gray-500">24년 82%</div>
-                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 130%</div>
-              </div>
+                  {/* 유동비율 */}
+                  <div className="bg-white rounded-lg p-4 shadow">
+                    <div className="text-sm text-gray-600 mb-2">유동비율</div>
+                    <div className="text-3xl font-bold text-orange-600 mb-1">{currentRatio.toFixed(0)}%</div>
+                    <div className="text-xs text-gray-500">24년 {prevCurrentRatio.toFixed(0)}%</div>
+                    <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {currentRatioExclTp.toFixed(0)}%</div>
+                  </div>
 
-              {/* 당좌비율 */}
-              <div className="bg-white rounded-lg p-4 shadow">
-                <div className="text-sm text-gray-600 mb-2">당좌비율</div>
-                <div className="text-3xl font-bold text-orange-600 mb-1">30%</div>
-                <div className="text-xs text-gray-500">24년 23%</div>
-                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 48%</div>
-              </div>
+                  {/* 당좌비율 */}
+                  <div className="bg-white rounded-lg p-4 shadow">
+                    <div className="text-sm text-gray-600 mb-2">당좌비율</div>
+                    <div className="text-3xl font-bold text-orange-600 mb-1">{quickRatio.toFixed(0)}%</div>
+                    <div className="text-xs text-gray-500">24년 {prevQuickRatio.toFixed(0)}%</div>
+                    <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {quickRatioExclTp.toFixed(0)}%</div>
+                  </div>
 
-              {/* 자기자본비율 */}
-              <div className="bg-white rounded-lg p-4 shadow">
-                <div className="text-sm text-gray-600 mb-2">자기자본비율</div>
-                <div className="text-3xl font-bold text-green-600 mb-1">4.3%</div>
-                <div className="text-xs text-gray-500">24년 3.5%</div>
-                <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: 26.1%</div>
-              </div>
-            </div>
+                  {/* 자기자본비율 */}
+                  <div className="bg-white rounded-lg p-4 shadow">
+                    <div className="text-sm text-gray-600 mb-2">자기자본비율</div>
+                    <div className="text-3xl font-bold text-green-600 mb-1">{equityRatio.toFixed(1)}%</div>
+                    <div className="text-xs text-gray-500">24년 {prevEquityRatio.toFixed(1)}%</div>
+                    <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {equityRatioExclTp.toFixed(1)}%</div>
+                  </div>
+                </div>
 
-            {/* 핵심 설명 */}
-            <div className="bg-white rounded-lg p-4 border border-orange-200">
-              <div className="flex items-start mb-2">
-                <span className="text-orange-600 font-bold mr-2">💡 핵심:</span>
+                {/* 핵심 설명 */}
+                <div className="bg-white rounded-lg p-4 border border-orange-200">
+                  <div className="flex items-start mb-2">
+                    <span className="text-orange-600 font-bold mr-2">💡 핵심:</span>
+                  </div>
+                  <ul className="space-y-1 text-sm text-gray-700">
+                    <li>• <strong>부채비율 {debtRatio.toFixed(0)}%:</strong> 자본금 {formatNumber(totalEquity)} 대비 부채 {formatNumber(totalLiabilities)} (TP제무 제외시 {debtRatioExclTp.toFixed(0)}% - 정상 수준)</li>
+                    <li>• <strong>유동비율 {currentRatio.toFixed(0)}%:</strong> 유동자산 {formatNumber(currentAssets)} 대비 유동부채 {formatNumber(currentLiabilities)} (TP제무 제외시 {currentRatioExclTp.toFixed(0)}% - 양호)</li>
+                    <li>• <strong>당좌비율 {quickRatio.toFixed(0)}%:</strong> 재고 제외 시 단기 지급능력 (TP제무 제외시 {quickRatioExclTp.toFixed(0)}% - 개선)</li>
+                    <li>• <strong>자기자본비율 {equityRatio.toFixed(1)}%:</strong> 총자산 대비 자본 비중 (TP제무 제외시 {equityRatioExclTp.toFixed(1)}% - 안정적)</li>
+                    <li>• <strong>TP채무 조정:</strong> 매입채무(TP) {formatNumber(tpPayable)}는 본사 선수금(무이자)으로, 부채 제외(-) 및 자본 포함(+) 시 조정</li>
+                    <li>• <strong>실질 재무구조:</strong> 조정 후 부채 {formatNumber(adjustedLiabilities)}, 조정 후 자본 {formatNumber(adjustedEquity)}</li>
+                  </ul>
+                </div>
               </div>
-              <ul className="space-y-1 text-sm text-gray-700">
-                <li>• <strong>부채비율 2,236%:</strong> 자본금 20백만 HKD 대비 부채 349백만 HKD (TP제무 제외시 196% - 정상 수준)</li>
-                <li>• <strong>유동비율 81%:</strong> 유동자산 233백만 HKD 대비 유동부채 286백만 HKD (TP제무 제외시 130% - 양호)</li>
-                <li>• <strong>당좌비율 30%:</strong> 재고 제외 시 단기 지급능력 (TP제무 제외시 48% - 개선)</li>
-                <li>• <strong>자기자본비율 4.3%:</strong> 총자산 대비 자본 비중 (TP제무 제외시 26.1% - 안정적)</li>
-                <li>• <strong>TP채무 조정:</strong> 매입채무(TP) 115백만 HKD는 본사 선수금(무이자)으로, 부채 제외(-) 및 자본 포함(+) 시 조정</li>
-                <li>• <strong>실질 재무구조:</strong> 조정 후 부채 259백만 HKD, 조정 후 자본 131백만 HKD</li>
-              </ul>
-            </div>
-          </div>
+            );
+          })()}
           </div>
         </div>
     </div>
@@ -693,7 +873,12 @@ function WCRow({
   expanded = false, 
   onClick, 
   isPositive,
-  note 
+  note,
+  noteKey,
+  noteValue,
+  onNoteChange,
+  isEditingNote,
+  onNoteEdit
 }: {
   label: string;
   item: WCItem;
@@ -704,6 +889,11 @@ function WCRow({
   onClick?: () => void;
   isPositive?: boolean;
   note?: React.ReactNode;
+  noteKey?: string;
+  noteValue?: string;
+  onNoteChange?: (key: string, value: string) => void;
+  isEditingNote?: boolean;
+  onNoteEdit?: (key: string | null) => void;
 }) {
   const formatNumber = (value: number): string => {
     const sign = value >= 0 ? '+' : '△';
@@ -748,7 +938,35 @@ function WCRow({
         {formatNumber(calculatedYoy)}
       </td>
       <td className="px-4 py-3 border border-gray-300 text-left text-xs text-gray-700" style={{ minWidth: '250px' }}>
-        {note}
+        {noteKey && onNoteChange ? (
+          isEditingNote ? (
+            <input
+              type="text"
+              value={noteValue || ''}
+              onChange={(e) => onNoteChange(noteKey, e.target.value)}
+              onBlur={() => onNoteEdit?.(null)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  onNoteEdit?.(null);
+                }
+              }}
+              className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
+            />
+          ) : (
+            <div 
+              className={`cursor-pointer hover:bg-blue-50 px-2 py-1 rounded ${noteValue || note ? '' : 'min-h-[24px]'}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onNoteEdit?.(noteKey);
+              }}
+            >
+              {noteValue || note || null}
+            </div>
+          )
+        ) : (
+          note
+        )}
       </td>
     </tr>
   );
