@@ -488,7 +488,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     'net_sales': 0,
                 },
             }
-        country_channel_summary[country_channel_key]['previous']['net_sales'] += float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
+            country_channel_summary[country_channel_key]['previous']['net_sales'] += float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
     
     # 추세 데이터 생성 (가장 최근 월이 속하는 년도의 1월부터)
     print("추세 데이터 생성 중...")

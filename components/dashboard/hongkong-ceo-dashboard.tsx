@@ -7552,29 +7552,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <>
                       <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round(otherTotal))}K</div>
                       <div className="text-xs mb-3 text-red-600">YOY {formatPercent(otherYoy)}% ({otherChange >= 0 ? '+' : '△'}{formatNumber(Math.abs(Math.round(otherChange)))})K</div>
-                      
-                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">물류비</span>
+                
+                <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">물류비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(logistics))}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">임차료</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">임차료</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(rent))}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">감가상각비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">감가상각비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(depreciation))}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">여비교통비</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">여비교통비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(travel))}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">보험료</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">보험료</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(insurance))}K</span>
-                        </div>
-                      </div>
+                  </div>
+                </div>
                     </>
                   );
                 })()}

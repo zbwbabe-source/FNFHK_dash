@@ -550,8 +550,8 @@ def main(target_period_short=None):
     pl_csv_path = f'../Dashboard_Raw_Data/HKMC/{latest_period_short}/HKMC_PL_{latest_period_short}.csv'
     if not os.path.exists(pl_csv_path):
         pl_csv_path = f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv'
-        if not os.path.exists(pl_csv_path):
-            pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    if not os.path.exists(pl_csv_path):
+        pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
     print(f"PL CSV 파일: {pl_csv_path}")
     pl_data = read_pl_database(pl_csv_path, brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")

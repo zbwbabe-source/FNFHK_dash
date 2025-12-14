@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface CFItem {
   prev_year: number;
@@ -296,6 +297,12 @@ function CashFlowPageContent() {
             >
               <option value="2511">2511</option>
             </select>
+            <Link
+              href="/"
+              className="px-4 py-2 rounded-lg bg-white text-gray-800 font-semibold hover:bg-gray-100 transition"
+            >
+              홈으로
+            </Link>
           </div>
         </div>
       </div>
