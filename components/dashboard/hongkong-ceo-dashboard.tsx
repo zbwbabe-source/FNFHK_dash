@@ -6701,16 +6701,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const current = (directCostCurrent?.current || {}) as any;
                   const totalRent = Math.round(current.rent || 0);
                   const totalSalary = Math.round(current.labor_cost || 0);
-                  const totalLogistics = Math.round(current.logistics || 0);
                   const totalDirectCost = Math.round(directCostCurrent?.totalDirectCost || 0);
-                  const otherDirectCost = totalDirectCost - totalRent - totalSalary - totalLogistics;
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCost = totalDirectCost - totalRent - totalSalary;
                   
                   const prev = (directCostCurrent?.prev || {}) as any;
                   const totalRentPrev = Math.round(prev.rent || 0);
                   const totalSalaryPrev = Math.round(prev.labor_cost || 0);
-                  const totalLogisticsPrev = Math.round(prev.logistics || 0);
                   const totalDirectCostPrev = Math.round(directCostCurrent?.totalDirectCostPrev || 0);
-                  const otherDirectCostPrev = totalDirectCostPrev - totalRentPrev - totalSalaryPrev - totalLogisticsPrev;
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCostPrev = totalDirectCostPrev - totalRentPrev - totalSalaryPrev;
                   
                   const change = otherDirectCost - otherDirectCostPrev;
                   const yoy = otherDirectCostPrev !== 0 ? Math.round((otherDirectCost / otherDirectCostPrev) * 100) : 0;
@@ -6782,16 +6782,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const current = (directCostCumulative?.current || {}) as any;
                   const totalRent = Math.round(current.rent || 0);
                   const totalSalary = Math.round(current.labor_cost || 0);
-                  const totalLogistics = Math.round(current.logistics || 0);
                   const totalDirectCost = Math.round(directCostCumulative?.totalDirectCost || 0);
-                  const otherDirectCost = totalDirectCost - totalRent - totalSalary - totalLogistics;
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCost = totalDirectCost - totalRent - totalSalary;
                   
                   const prev = (directCostCumulative?.prev || {}) as any;
                   const totalRentPrev = Math.round(prev.rent || 0);
                   const totalSalaryPrev = Math.round(prev.labor_cost || 0);
-                  const totalLogisticsPrev = Math.round(prev.logistics || 0);
                   const totalDirectCostPrev = Math.round(directCostCumulative?.totalDirectCostPrev || 0);
-                  const otherDirectCostPrev = totalDirectCostPrev - totalRentPrev - totalSalaryPrev - totalLogisticsPrev;
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCostPrev = totalDirectCostPrev - totalRentPrev - totalSalaryPrev;
                   
                   const change = otherDirectCost - otherDirectCostPrev;
                   const yoy = otherDirectCostPrev !== 0 ? Math.round((otherDirectCost / otherDirectCostPrev) * 100) : 0;
