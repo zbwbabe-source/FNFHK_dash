@@ -390,6 +390,31 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 store_summary[store_code]['previous']['gross_sales'],
                 store_summary[store_code]['previous']['net_sales']
             )
+        
+        # Country & Channel별 집계 (전년)
+        country = row['Country']
+        channel = row['Channel']
+        if channel == 'Outlet':
+            channel_key = 'Outlet'
+        elif channel == 'Online':
+            channel_key = 'Online'
+        else:
+            channel_key = 'Retail'
+        
+        country_channel_key = f"{country}_{channel_key}"
+        # 전년 데이터에만 존재하는 채널도 처리하기 위해 키가 없으면 생성
+        if country_channel_key not in country_channel_summary:
+            country_channel_summary[country_channel_key] = {
+                'country': country,
+                'channel': channel_key,
+                'current': {
+                    'net_sales': 0,
+                },
+                'previous': {
+                    'net_sales': 0,
+                },
+            }
+        country_channel_summary[country_channel_key]['previous']['net_sales'] += net_sales
     
     # 전전년 동월 데이터 집계
     print("전전년 동월 데이터 집계 중...")
@@ -451,8 +476,19 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             channel_key = 'Retail'
         
         country_channel_key = f"{country}_{channel_key}"
-        if country_channel_key in country_channel_summary:
-            country_channel_summary[country_channel_key]['previous']['net_sales'] += float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
+        # 전년 데이터에만 존재하는 채널도 처리하기 위해 키가 없으면 생성
+        if country_channel_key not in country_channel_summary:
+            country_channel_summary[country_channel_key] = {
+                'country': country,
+                'channel': channel_key,
+                'current': {
+                    'net_sales': 0,
+                },
+                'previous': {
+                    'net_sales': 0,
+                },
+            }
+        country_channel_summary[country_channel_key]['previous']['net_sales'] += float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
     
     # 추세 데이터 생성 (가장 최근 월이 속하는 년도의 1월부터)
     print("추세 데이터 생성 중...")
@@ -747,7 +783,7 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     # 전체 실판매출 계산
     total_net_sales_current = sum(store['current']['net_sales'] for store in store_summary.values())
     total_net_sales_previous = sum(store['previous']['net_sales'] for store in store_summary.values())
-    total_yoy = ((total_net_sales_current - total_net_sales_previous) / total_net_sales_previous * 100) if total_net_sales_previous > 0 else 0
+    total_yoy = (total_net_sales_current / total_net_sales_previous * 100) if total_net_sales_previous > 0 else 0
     total_change = total_net_sales_current - total_net_sales_previous
     
     # Country & Channel별 YOY 계산
@@ -1169,13 +1205,28 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         '당시즌F': '당시즌_의류'
     }
     
+    # 전년 데이터에서 24F와 24S 재고 직접 집계
+    prev_24f_stock = 0
+    prev_24s_stock = 0
+    prev_past_season_s_stock = 0
+    for row in prev_data:
+        season_code = row['Season_Code']
+        stock_price = float(row['Stock_Price'] or 0) / TWD_TO_HKD_RATE
+        if season_code == f"{prev_year % 100}F":
+            prev_24f_stock += stock_price
+        elif season_code == f"{prev_year % 100}S":
+            prev_24s_stock += stock_price
+        elif season_code.endswith('S') and season_code != f"{prev_year % 100}S":
+            # 전년 데이터에서 과시즌S 재고 집계 (24S 제외)
+            prev_past_season_s_stock += stock_price
+    
     # 시즌 타입별로 재고 합산
     season_stock_aggregated = {}
     for season_key, season_data in season_summary.items():
         season_type = season_data['season_type']
         season_code = season_data['season_code']
         
-        # 25S는 당시즌 SS로 표시 (10월이지만 당시즌으로 표시)
+        # 25S는 당시즌 SS로 표시 (11월이지만 당시즌으로 표시)
         if season_code == f"{last_year % 100}S" and season_type == '과시즌S':
             # 25S를 당시즌 SS로 매핑
             key = '당시즌_SS'
@@ -1186,21 +1237,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     'previous': 0
                 }
             season_stock_aggregated[key]['current'] += season_data['current'].get('stock_price', 0)
-            season_stock_aggregated[key]['previous'] += season_data['previous'].get('stock_price', 0)
-        # 전년 24S도 당시즌 SS로 매핑 (전년 10월에는 24S가 당시즌이었음)
-        elif season_code == f"{prev_year % 100}S" and season_type == '과시즌S':
-            # 24S를 당시즌 SS의 previous로 매핑
-            key = '당시즌_SS'
-            if key not in season_stock_aggregated:
-                season_stock_aggregated[key] = {
-                    'season_type': '당시즌S',
-                    'current': 0,
-                    'previous': 0
-                }
-            season_stock_aggregated[key]['previous'] += season_data['previous'].get('stock_price', 0)
-        # 전년 24F도 당시즌 의류로 매핑 (전년 10월에는 24F가 당시즌이었음)
-        elif season_code == f"{prev_year % 100}F" and season_type == '과시즌F':
-            # 24F를 당시즌 의류의 previous로 매핑
+            season_stock_aggregated[key]['previous'] = prev_24s_stock
+        # 25F는 당시즌 의류로 표시
+        elif season_code == f"{last_year % 100}F" and season_type == '당시즌F':
+            # 25F를 당시즌 의류로 매핑
             key = '당시즌_의류'
             if key not in season_stock_aggregated:
                 season_stock_aggregated[key] = {
@@ -1208,7 +1248,19 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                     'current': 0,
                     'previous': 0
                 }
-            season_stock_aggregated[key]['previous'] += season_data['previous'].get('stock_price', 0)
+            season_stock_aggregated[key]['current'] += season_data['current'].get('stock_price', 0)
+            season_stock_aggregated[key]['previous'] = prev_24f_stock
+        elif season_type == '과시즌S':
+            # 과시즌S는 전년 데이터에서 직접 집계한 값 사용
+            key = '과시즌_SS'
+            if key not in season_stock_aggregated:
+                season_stock_aggregated[key] = {
+                    'season_type': '과시즌S',
+                    'current': 0,
+                    'previous': 0
+                }
+            season_stock_aggregated[key]['current'] += season_data['current'].get('stock_price', 0)
+            season_stock_aggregated[key]['previous'] = prev_past_season_s_stock
         elif season_type in season_types_map:
             key = season_types_map[season_type]
             if key not in season_stock_aggregated:

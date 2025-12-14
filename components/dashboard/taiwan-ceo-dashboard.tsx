@@ -514,10 +514,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const pastSeasonFW = endingInventory?.past_season_fw || {};
 
   // 아이템별 기말재고 YOY는 ending_inventory 기준 사용 (TAG 재고 기준)
-  const yoySeasonF = endingInventory?.by_season?.['당시즌_의류']?.yoy || 0;      // 당시즌 의류 (25F)
-  const yoySeasonS = endingInventory?.by_season?.['당시즌_SS']?.yoy || 0;      // 당시즌 SS (25S)
+  const seasonFCurrent = endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0;
+  const seasonFPrevious = endingInventory?.by_season?.['당시즌_의류']?.previous?.stock_price || 0;
+  const yoySeasonF = seasonFPrevious > 0 ? (seasonFCurrent / seasonFPrevious * 100) : 0;      // 당시즌 의류 (25F)
+  const seasonSCurrent = endingInventory?.by_season?.['당시즌_SS']?.current?.stock_price || 0;
+  const seasonSPrevious = endingInventory?.by_season?.['당시즌_SS']?.previous?.stock_price || 0;
+  const yoySeasonS = seasonSPrevious > 0 ? (seasonSCurrent / seasonSPrevious * 100) : 0;      // 당시즌 SS (25S)
   const yoyPastF = endingInventory?.by_season?.['과시즌_FW']?.yoy || 0;         // 과시즌 FW
-  const yoyPastS = endingInventory?.by_season?.['과시즌_SS']?.yoy || 0;         // 과시즌 SS
+  const pastSCurrent = endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0;
+  const pastSPrevious = endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0;
+  const yoyPastS = pastSPrevious > 0 ? (pastSCurrent / pastSPrevious * 100) : 0;         // 과시즌 SS
   const yoyShoes = endingInventory?.acc_by_category?.SHO?.yoy || 0;             // 신발
   const yoyHat = endingInventory?.acc_by_category?.HEA?.yoy || 0;               // 모자
   const yoyBag = endingInventory?.acc_by_category?.BAG?.yoy || 0;               // 가방
@@ -1103,8 +1109,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               <div className="text-3xl font-bold text-gray-900 mb-2">
                 {formatNumber(pl?.net_sales)}K
               </div>
-              <div className={`text-sm font-semibold mb-3 ${(plYoy?.net_sales || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                YOY {formatPercent(plYoy?.net_sales)}% ({(plChange?.net_sales || 0) >= 0 ? '+' : '△'}{formatNumber(Math.abs(plChange?.net_sales || 0))}K)
+              <div className={`text-sm font-semibold mb-3 ${(salesSummary?.total_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                YOY {formatPercent(salesSummary?.total_yoy || 0)}% ({(salesSummary?.total_change || 0) >= 0 ? '+' : '△'}{formatNumber(Math.abs(salesSummary?.total_change || 0))}K)
               </div>
               
               {/* 채널별 상세보기 */}
@@ -1127,7 +1133,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     <span>TW (대만)</span>
                     <span className="text-red-600">
                       {formatNumber(((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0) + (twOnline?.current?.net_sales || 0)) / 1000)} 
-                      ({formatPercent(((twRetail?.yoy || 0) + (twOutlet?.yoy || 0) + (twOnline?.yoy || 0)) / 3)}%)
+                      ({formatPercent(salesSummary?.total_yoy || 0)}%)
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
@@ -1372,7 +1378,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700">택매출</td>
                           <td className="text-right py-1 px-2 font-semibold">{formatNumber(pl?.tag_sales)}</td>
-                          <td className="text-right py-1 px-2 text-red-600 font-semibold">{formatPercent(plYoy?.tag_sales)}%</td>
+                          <td className="text-right py-1 px-2 text-red-600 font-semibold">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
                           <td className="text-right py-1 px-2 text-red-600 font-semibold">△{formatNumber(Math.abs(plChange?.tag_sales || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
@@ -2852,7 +2858,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   const offlineChange = (plData?.current_month?.offline?.operating_profit || 0) - (plData?.prev_month?.offline?.operating_profit || 0);
                   const onlineChange = (plData?.current_month?.online?.operating_profit || 0) - (plData?.prev_month?.online?.operating_profit || 0);
                   return (offlineChange + onlineChange) >= 0;
-                })() ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(plYoy?.net_sales || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({(() => {
+                })() ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(salesSummary?.total_yoy || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({(() => {
                   const offlineChange = (plData?.current_month?.offline?.sg_a || 0) - (plData?.prev_month?.offline?.sg_a || 0);
                   const onlineChange = (plData?.current_month?.online?.sg_a || 0) - (plData?.prev_month?.online?.sg_a || 0);
                   const change = offlineChange + onlineChange;
@@ -2947,7 +2953,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.tag_sales || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.tag_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.tag_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.tag_sales || 0)}</td>
@@ -2997,7 +3003,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.net_sales || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.net_sales || 0)}</td>
@@ -5737,8 +5743,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         if (area > 0) {
                           if (s.current?.net_sales > 0) { largeRegularTotalSales += s.current.net_sales; largeRegularTotalArea += area; }
                           if (s.previous?.net_sales > 0) { largeRegularPrevTotalSales += s.previous.net_sales; largeRegularPrevTotalArea += area; }
-                        }
-                      });
+                }
+              });
                       const largeRegularAvgSalesPerPyeong = largeRegularTotalArea > 0 ? (largeRegularTotalSales / largeRegularTotalArea / 30) : 0; // 1K HKD/평/1일
                       const largeRegularPrevAvgSalesPerPyeong = largeRegularPrevTotalArea > 0 ? (largeRegularPrevTotalSales / largeRegularPrevTotalArea / 30) : 0;
                       const largeRegularYoy = largeRegularPrevAvgSalesPerPyeong > 0 ? (largeRegularAvgSalesPerPyeong / largeRegularPrevAvgSalesPerPyeong) * 100 : 0;
@@ -5893,18 +5899,18 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
                           <div className="flex items-center gap-1">
                             {!isNewStore && (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                                {prevCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                              {prevCategory}
+                          </span>
                             )}
                             {isNewStore ? (
                               <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
                                 신규
                               </span>
                             ) : (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                                {currentCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                              {currentCategory}
+                            </span>
                             )}
                             <span className="font-semibold text-blue-900 text-xs">{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
@@ -5913,7 +5919,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           </div>
                           <div className="text-right">
                             {!isNewStore && (
-                              <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
+                            <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
                             <div className="font-bold text-blue-600 text-xs">+{Math.round(store.direct_profit)}K</div>
                             </div>
@@ -5982,18 +5988,18 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
                           <div className="flex items-center gap-1">
                             {!isNewStore && (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                                {prevCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                              {prevCategory}
+                            </span>
                             )}
                             {isNewStore ? (
                               <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
                                 신규
                               </span>
                             ) : (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                                {currentCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                              {currentCategory}
+                            </span>
                             )}
                             <span className="font-semibold text-green-900 text-xs">{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
@@ -6002,7 +6008,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           </div>
                           <div className="text-right">
                             {!isNewStore && (
-                              <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
+                            <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
                             <div className="font-bold text-green-600 text-xs">+{Math.round(store.direct_profit)}K</div>
                           </div>
@@ -6067,18 +6073,18 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
                           <div className="flex items-center gap-1">
                             {!isNewStore && (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                                {prevCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                              {prevCategory}
+                            </span>
                             )}
                             {isNewStore ? (
                               <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
                                 신규
                               </span>
                             ) : (
-                              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                                {currentCategory}
-                              </span>
+                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                              {currentCategory}
+                            </span>
                             )}
                             <span className="font-semibold text-purple-900 text-xs">{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
@@ -6087,7 +6093,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         </div>
                           <div className="text-right">
                             {!isNewStore && (
-                              <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
+                            <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
                             <div className="font-bold text-purple-600 text-xs">+{Math.round(store.direct_profit)}K</div>
                         </div>

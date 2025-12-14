@@ -492,26 +492,30 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
     def calculate_metrics(current, prev, cumulative, prev_cumulative):
         metrics = {}
         
-        # 할인율 = (TAG - 실판) / TAG * 100
+        # 할인율 = (TAG / 1.05 - 실판) / (TAG / 1.05) * 100 (대만 부가세 5% 제외)
         if current['TAG'] > 0:
-            metrics['할인율_당월'] = ((current['TAG'] - current['실판']) / current['TAG']) * 100
+            tag_excl_vat = current['TAG'] / 1.05
+            metrics['할인율_당월'] = ((tag_excl_vat - current['실판']) / tag_excl_vat) * 100
         else:
             metrics['할인율_당월'] = 0
         
         if prev['TAG'] > 0:
-            metrics['할인율_전년'] = ((prev['TAG'] - prev['실판']) / prev['TAG']) * 100
+            tag_excl_vat_prev = prev['TAG'] / 1.05
+            metrics['할인율_전년'] = ((tag_excl_vat_prev - prev['실판']) / tag_excl_vat_prev) * 100
         else:
             metrics['할인율_전년'] = 0
         
         metrics['할인율_당월_변화'] = metrics['할인율_당월'] - metrics['할인율_전년']
         
         if cumulative['TAG'] > 0:
-            metrics['할인율_누적'] = ((cumulative['TAG'] - cumulative['실판']) / cumulative['TAG']) * 100
+            tag_excl_vat_cum = cumulative['TAG'] / 1.05
+            metrics['할인율_누적'] = ((tag_excl_vat_cum - cumulative['실판']) / tag_excl_vat_cum) * 100
         else:
             metrics['할인율_누적'] = 0
         
         if prev_cumulative['TAG'] > 0:
-            metrics['할인율_누적_전년'] = ((prev_cumulative['TAG'] - prev_cumulative['실판']) / prev_cumulative['TAG']) * 100
+            tag_excl_vat_cum_prev = prev_cumulative['TAG'] / 1.05
+            metrics['할인율_누적_전년'] = ((tag_excl_vat_cum_prev - prev_cumulative['실판']) / tag_excl_vat_cum_prev) * 100
         else:
             metrics['할인율_누적_전년'] = 0
         
@@ -1003,11 +1007,14 @@ def main(target_period_short=None):
     tag_sales_yoy = (tag_sales / tag_sales_prev * 100) if tag_sales_prev > 0 else 0
     tag_sales_change = tag_sales - tag_sales_prev
     
-    discount = tag_sales - current_month_total['실판']
-    discount_prev = tag_sales_prev - prev_month_total['실판']
+    # 대만 부가세 5% 제외하여 할인율 계산
+    tag_sales_excl_vat = tag_sales / 1.05
+    tag_sales_prev_excl_vat = tag_sales_prev / 1.05
+    discount = tag_sales_excl_vat - current_month_total['실판']
+    discount_prev = tag_sales_prev_excl_vat - prev_month_total['실판']
     discount_yoy = (discount / discount_prev * 100) if discount_prev > 0 else 0
     discount_change = discount - discount_prev
-    discount_rate = (discount / tag_sales * 100) if tag_sales > 0 else 0
+    discount_rate = (discount / tag_sales_excl_vat * 100) if tag_sales_excl_vat > 0 else 0
     
     net_sales = current_month_total['실판']
     net_sales_prev = prev_month_total['실판']
@@ -1255,7 +1262,7 @@ def main(target_period_short=None):
             'offline': {
                 'tag_sales': current_tw_offline.get('TAG', 0),
                 'net_sales': current_tw_offline.get('실판', 0),
-                'discount_rate': ((current_tw_offline.get('TAG', 0) - current_tw_offline.get('실판', 0)) / current_tw_offline.get('TAG', 1) * 100) if current_tw_offline.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((current_tw_offline.get('TAG', 0) / 1.05 - current_tw_offline.get('실판', 0)) / (current_tw_offline.get('TAG', 0) / 1.05) * 100) if current_tw_offline.get('TAG', 0) > 0 else 0,
                 'cogs': current_tw_offline.get('매출원가', 0),
                 'cogs_rate': (current_tw_offline.get('매출원가', 0) / current_tw_offline.get('TAG', 1) * 100) if current_tw_offline.get('TAG', 0) > 0 else 0,
                 'gross_profit': current_tw_offline.get('매출총이익', 0),
@@ -1270,7 +1277,7 @@ def main(target_period_short=None):
             'online': {
                 'tag_sales': current_tw_online.get('TAG', 0),
                 'net_sales': current_tw_online.get('실판', 0),
-                'discount_rate': ((current_tw_online.get('TAG', 0) - current_tw_online.get('실판', 0)) / current_tw_online.get('TAG', 1) * 100) if current_tw_online.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((current_tw_online.get('TAG', 0) / 1.05 - current_tw_online.get('실판', 0)) / (current_tw_online.get('TAG', 0) / 1.05) * 100) if current_tw_online.get('TAG', 0) > 0 else 0,
                 'cogs': current_tw_online.get('매출원가', 0),
                 'cogs_rate': (current_tw_online.get('매출원가', 0) / current_tw_online.get('TAG', 1) * 100) if current_tw_online.get('TAG', 0) > 0 else 0,
                 'gross_profit': current_tw_online.get('매출총이익', 0),
@@ -1333,7 +1340,7 @@ def main(target_period_short=None):
             'offline': {
                 'tag_sales': cumulative_tw_offline.get('TAG', 0),
                 'net_sales': cumulative_tw_offline.get('실판', 0),
-                'discount_rate': ((cumulative_tw_offline.get('TAG', 0) - cumulative_tw_offline.get('실판', 0)) / cumulative_tw_offline.get('TAG', 1) * 100) if cumulative_tw_offline.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((cumulative_tw_offline.get('TAG', 0) / 1.05 - cumulative_tw_offline.get('실판', 0)) / (cumulative_tw_offline.get('TAG', 0) / 1.05) * 100) if cumulative_tw_offline.get('TAG', 0) > 0 else 0,
                 'cogs': cumulative_tw_offline.get('매출원가', 0),
                 'cogs_rate': (cumulative_tw_offline.get('매출원가', 0) / cumulative_tw_offline.get('TAG', 1) * 100) if cumulative_tw_offline.get('TAG', 0) > 0 else 0,
                 'gross_profit': cumulative_tw_offline.get('매출총이익', 0),
@@ -1348,7 +1355,7 @@ def main(target_period_short=None):
             'online': {
                 'tag_sales': cumulative_tw_online.get('TAG', 0),
                 'net_sales': cumulative_tw_online.get('실판', 0),
-                'discount_rate': ((cumulative_tw_online.get('TAG', 0) - cumulative_tw_online.get('실판', 0)) / cumulative_tw_online.get('TAG', 1) * 100) if cumulative_tw_online.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((cumulative_tw_online.get('TAG', 0) / 1.05 - cumulative_tw_online.get('실판', 0)) / (cumulative_tw_online.get('TAG', 0) / 1.05) * 100) if cumulative_tw_online.get('TAG', 0) > 0 else 0,
                 'cogs': cumulative_tw_online.get('매출원가', 0),
                 'cogs_rate': (cumulative_tw_online.get('매출원가', 0) / cumulative_tw_online.get('TAG', 1) * 100) if cumulative_tw_online.get('TAG', 0) > 0 else 0,
                 'gross_profit': cumulative_tw_online.get('매출총이익', 0),
@@ -1383,7 +1390,7 @@ def main(target_period_short=None):
                 'offline': {
                     'tag_sales': prev_cumulative_tw_offline.get('TAG', 0),
                     'net_sales': prev_cumulative_tw_offline.get('실판', 0),
-                    'discount_rate': ((prev_cumulative_tw_offline.get('TAG', 0) - prev_cumulative_tw_offline.get('실판', 0)) / prev_cumulative_tw_offline.get('TAG', 1) * 100) if prev_cumulative_tw_offline.get('TAG', 0) > 0 else 0,
+                    'discount_rate': ((prev_cumulative_tw_offline.get('TAG', 0) / 1.05 - prev_cumulative_tw_offline.get('실판', 0)) / (prev_cumulative_tw_offline.get('TAG', 0) / 1.05) * 100) if prev_cumulative_tw_offline.get('TAG', 0) > 0 else 0,
                     'cogs': prev_cumulative_tw_offline.get('매출원가', 0),
                     'cogs_rate': (prev_cumulative_tw_offline.get('매출원가', 0) / prev_cumulative_tw_offline.get('TAG', 1) * 100) if prev_cumulative_tw_offline.get('TAG', 0) > 0 else 0,
                     'gross_profit': prev_cumulative_tw_offline.get('매출총이익', 0),
@@ -1398,7 +1405,7 @@ def main(target_period_short=None):
                 'online': {
                     'tag_sales': prev_cumulative_tw_online.get('TAG', 0),
                     'net_sales': prev_cumulative_tw_online.get('실판', 0),
-                    'discount_rate': ((prev_cumulative_tw_online.get('TAG', 0) - prev_cumulative_tw_online.get('실판', 0)) / prev_cumulative_tw_online.get('TAG', 1) * 100) if prev_cumulative_tw_online.get('TAG', 0) > 0 else 0,
+                    'discount_rate': ((prev_cumulative_tw_online.get('TAG', 0) / 1.05 - prev_cumulative_tw_online.get('실판', 0)) / (prev_cumulative_tw_online.get('TAG', 0) / 1.05) * 100) if prev_cumulative_tw_online.get('TAG', 0) > 0 else 0,
                     'cogs': prev_cumulative_tw_online.get('매출원가', 0),
                     'cogs_rate': (prev_cumulative_tw_online.get('매출원가', 0) / prev_cumulative_tw_online.get('TAG', 1) * 100) if prev_cumulative_tw_online.get('TAG', 0) > 0 else 0,
                     'gross_profit': prev_cumulative_tw_online.get('매출총이익', 0),
@@ -1487,7 +1494,7 @@ def main(target_period_short=None):
             'offline': {
                 'tag_sales': prev_tw_offline.get('TAG', 0),
                 'net_sales': prev_tw_offline.get('실판', 0),
-                'discount_rate': ((prev_tw_offline.get('TAG', 0) - prev_tw_offline.get('실판', 0)) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((prev_tw_offline.get('TAG', 0) / 1.05 - prev_tw_offline.get('실판', 0)) / (prev_tw_offline.get('TAG', 0) / 1.05) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
                 'cogs': prev_tw_offline.get('매출원가', 0),
                 'cogs_rate': (prev_tw_offline.get('매출원가', 0) / prev_tw_offline.get('TAG', 1) * 100) if prev_tw_offline.get('TAG', 0) > 0 else 0,
                 'gross_profit': prev_tw_offline.get('매출총이익', 0),
@@ -1502,7 +1509,7 @@ def main(target_period_short=None):
             'online': {
                 'tag_sales': prev_tw_online.get('TAG', 0),
                 'net_sales': prev_tw_online.get('실판', 0),
-                'discount_rate': ((prev_tw_online.get('TAG', 0) - prev_tw_online.get('실판', 0)) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
+                'discount_rate': ((prev_tw_online.get('TAG', 0) / 1.05 - prev_tw_online.get('실판', 0)) / (prev_tw_online.get('TAG', 0) / 1.05) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
                 'cogs': prev_tw_online.get('매출원가', 0),
                 'cogs_rate': (prev_tw_online.get('매출원가', 0) / prev_tw_online.get('TAG', 1) * 100) if prev_tw_online.get('TAG', 0) > 0 else 0,
                 'gross_profit': prev_tw_online.get('매출총이익', 0),

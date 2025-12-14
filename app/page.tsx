@@ -684,7 +684,9 @@ export default function Home() {
   const twOnline = twData?.country_channel_summary?.TW_Online;
 
   // 대만 오프라인 (모두 K HKD 단위로 통일)
-  const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales || 0; // PL: K HKD
+  // PL 데이터 우선, 없으면 Dashboard 데이터 사용
+  const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales ?? 
+    ((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0)) / 1000; // PL: K HKD 또는 Dashboard: HKD → K HKD
   const twOfflinePrevious = ((twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0)) / 1000; // Dashboard: HKD → K HKD
   const twOfflineYoy = twOfflinePrevious > 0 ? (twOfflineCurrent / twOfflinePrevious) * 100 : 0;
 
@@ -694,9 +696,11 @@ export default function Home() {
   const twOnlineYoy = twOnlinePrevious > 0 ? (twOnlineCurrent / twOnlinePrevious) * 100 : 0;
 
   // 대만법인 합계 (모두 K HKD 단위)
-  const twTotalCurrent = twOfflineCurrent + twOnlineCurrent;
-  const twTotalPrevious = twOfflinePrevious + twOnlinePrevious;
-  const twTotalYoy = twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0;
+  // PL 데이터의 total 우선, 없으면 오프라인+온라인 합계 사용
+  const twTotalCurrent = twPlData?.current_month?.total?.net_sales ?? (twOfflineCurrent + twOnlineCurrent);
+  const twTotalPrevious = twPlData?.prev_month?.total?.net_sales ?? (twOfflinePrevious + twOnlinePrevious);
+  // 전체 YOY는 Dashboard 데이터의 sales_summary.total_yoy 사용 (전년 동월 기준)
+  const twTotalYoy = twData?.sales_summary?.total_yoy ?? (twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0);
 
   // 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인)
   // PL 데이터 사용 (이미 K HKD 단위)

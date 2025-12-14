@@ -335,12 +335,12 @@ export default function BSPage() {
 
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex justify-end mb-4">
-            <button
-              onClick={toggleAll}
+          <button
+            onClick={toggleAll}
               className="px-6 py-2 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition"
-            >
-              전체 접기/펴기
-            </button>
+          >
+            전체 접기/펴기
+          </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -800,61 +800,61 @@ export default function BSPage() {
             const adjustedEquity = totalEquity + tpPayable;
             
             return (
-              <div className="mt-8 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
-                <div className="flex items-center mb-4">
-                  <span className="text-2xl mr-2">📊</span>
-                  <h3 className="text-lg font-bold text-orange-900">재무비율 분석</h3>
-                </div>
+          <div className="mt-8 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
+            <div className="flex items-center mb-4">
+              <span className="text-2xl mr-2">📊</span>
+              <h3 className="text-lg font-bold text-orange-900">재무비율 분석</h3>
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  {/* 부채비율 */}
-                  <div className="bg-white rounded-lg p-4 shadow">
-                    <div className="text-sm text-gray-600 mb-2">부채비율</div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              {/* 부채비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">부채비율</div>
                     <div className="text-3xl font-bold text-red-600 mb-1">{debtRatio.toFixed(0)}%</div>
                     <div className="text-xs text-gray-500">24년 {prevDebtRatio.toFixed(0)}%</div>
                     <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {debtRatioExclTp.toFixed(0)}%</div>
-                  </div>
+              </div>
 
-                  {/* 유동비율 */}
-                  <div className="bg-white rounded-lg p-4 shadow">
-                    <div className="text-sm text-gray-600 mb-2">유동비율</div>
+              {/* 유동비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">유동비율</div>
                     <div className="text-3xl font-bold text-orange-600 mb-1">{currentRatio.toFixed(0)}%</div>
                     <div className="text-xs text-gray-500">24년 {prevCurrentRatio.toFixed(0)}%</div>
                     <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {currentRatioExclTp.toFixed(0)}%</div>
-                  </div>
+              </div>
 
-                  {/* 당좌비율 */}
-                  <div className="bg-white rounded-lg p-4 shadow">
-                    <div className="text-sm text-gray-600 mb-2">당좌비율</div>
+              {/* 당좌비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">당좌비율</div>
                     <div className="text-3xl font-bold text-orange-600 mb-1">{quickRatio.toFixed(0)}%</div>
                     <div className="text-xs text-gray-500">24년 {prevQuickRatio.toFixed(0)}%</div>
                     <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {quickRatioExclTp.toFixed(0)}%</div>
-                  </div>
+              </div>
 
-                  {/* 자기자본비율 */}
-                  <div className="bg-white rounded-lg p-4 shadow">
-                    <div className="text-sm text-gray-600 mb-2">자기자본비율</div>
+              {/* 자기자본비율 */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                <div className="text-sm text-gray-600 mb-2">자기자본비율</div>
                     <div className="text-3xl font-bold text-green-600 mb-1">{equityRatio.toFixed(1)}%</div>
                     <div className="text-xs text-gray-500">24년 {prevEquityRatio.toFixed(1)}%</div>
                     <div className="text-xs font-semibold text-blue-600 mt-2">TP제무 제외시: {equityRatioExclTp.toFixed(1)}%</div>
-                  </div>
-                </div>
+              </div>
+            </div>
 
-                {/* 핵심 설명 */}
-                <div className="bg-white rounded-lg p-4 border border-orange-200">
-                  <div className="flex items-start mb-2">
-                    <span className="text-orange-600 font-bold mr-2">💡 핵심:</span>
-                  </div>
-                  <ul className="space-y-1 text-sm text-gray-700">
+            {/* 핵심 설명 */}
+            <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <div className="flex items-start mb-2">
+                <span className="text-orange-600 font-bold mr-2">💡 핵심:</span>
+              </div>
+              <ul className="space-y-1 text-sm text-gray-700">
                     <li>• <strong>부채비율 {debtRatio.toFixed(0)}%:</strong> 자본금 {formatNumber(totalEquity)} 대비 부채 {formatNumber(totalLiabilities)} (TP제무 제외시 {debtRatioExclTp.toFixed(0)}% - 정상 수준)</li>
                     <li>• <strong>유동비율 {currentRatio.toFixed(0)}%:</strong> 유동자산 {formatNumber(currentAssets)} 대비 유동부채 {formatNumber(currentLiabilities)} (TP제무 제외시 {currentRatioExclTp.toFixed(0)}% - 양호)</li>
                     <li>• <strong>당좌비율 {quickRatio.toFixed(0)}%:</strong> 재고 제외 시 단기 지급능력 (TP제무 제외시 {quickRatioExclTp.toFixed(0)}% - 개선)</li>
                     <li>• <strong>자기자본비율 {equityRatio.toFixed(1)}%:</strong> 총자산 대비 자본 비중 (TP제무 제외시 {equityRatioExclTp.toFixed(1)}% - 안정적)</li>
                     <li>• <strong>TP채무 조정:</strong> 매입채무(TP) {formatNumber(tpPayable)}는 본사 선수금(무이자)으로, 부채 제외(-) 및 자본 포함(+) 시 조정</li>
                     <li>• <strong>실질 재무구조:</strong> 조정 후 부채 {formatNumber(adjustedLiabilities)}, 조정 후 자본 {formatNumber(adjustedEquity)}</li>
-                  </ul>
-                </div>
-              </div>
+              </ul>
+            </div>
+          </div>
             );
           })()}
           </div>

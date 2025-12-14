@@ -4,11 +4,11 @@
     "previous_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-14T17:47:22.893651"
+    "generated_at": "2025-12-14T18:22:02.202306"
   },
   "sales_summary": {
     "total_net_sales": 17682.64374335342,
-    "total_yoy": 17.351758963495495,
+    "total_yoy": 117.3517589634955,
     "total_change": 2614.5749734136834,
     "same_store_yoy": 117.3517589634955,
     "same_store_count": 28
@@ -21,9 +21,9 @@
         "net_sales": 9730553.704360161
       },
       "previous": {
-        "net_sales": 0
+        "net_sales": 8230392.059553355
       },
-      "yoy": 999
+      "yoy": 118.22709822268438
     },
     "TW_Online": {
       "country": "TW",
@@ -32,9 +32,9 @@
         "net_sales": 5674738.9814486625
       },
       "previous": {
-        "net_sales": 0
+        "net_sales": 4794651.778329199
       },
-      "yoy": 999
+      "yoy": 118.35560211269708
     },
     "TW_Outlet": {
       "country": "TW",
@@ -43,9 +43,9 @@
         "net_sales": 2277351.0575446077
       },
       "previous": {
-        "net_sales": 0
+        "net_sales": 2043024.9320571884
       },
-      "yoy": 999
+      "yoy": 111.46956759120255
     }
   },
   "store_summary": {
@@ -2984,7 +2984,7 @@
       "과시즌_FW": {
         "season_type": "과시즌F",
         "current": {
-          "stock_price": 16076.193548387091
+          "stock_price": 30169.384615384617
         },
         "previous": {
           "stock_price": 0.0
@@ -2994,12 +2994,12 @@
       "과시즌_SS": {
         "season_type": "과시즌S",
         "current": {
-          "stock_price": 4181.486352357319
+          "stock_price": 17259.158808932996
         },
         "previous": {
-          "stock_price": 0.0
+          "stock_price": 14429.605459057077
         },
-        "yoy": 0
+        "yoy": 119.60936047700382
       },
       "당시즌_의류": {
         "season_type": "당시즌F",
@@ -3007,9 +3007,9 @@
           "stock_price": 39134.22332506203
         },
         "previous": {
-          "stock_price": 0.0
+          "stock_price": 37569.25558312657
         },
-        "yoy": 0
+        "yoy": 104.16555430136958
       },
       "당시즌_SS": {
         "season_type": "당시즌S",
@@ -3017,9 +3017,9 @@
           "stock_price": 19964.392059553345
         },
         "previous": {
-          "stock_price": 0.0
+          "stock_price": 24735.38213399503
         },
-        "yoy": 0
+        "yoy": 80.71188046096654
       }
     },
     "acc_by_category": {
@@ -3097,6 +3097,95 @@
         "yoy": 74.95106062589012
       },
       "by_year": {
+        "1년차": {
+          "current": {
+            "stock_price": 14093.191066997522
+          },
+          "previous": {
+            "stock_price": 30330.01985111662
+          },
+          "yoy": 46.46614521249208,
+          "subcategory_top5": [
+            {
+              "subcategory_code": "MT",
+              "subcategory_name": "SWEAT SHIRTS",
+              "stock_price": 3830.8610421836224,
+              "yoy": 71.05840798552538
+            },
+            {
+              "subcategory_code": "PT",
+              "subcategory_name": "PANTS",
+              "stock_price": 1337.2307692307693,
+              "yoy": 71.65533362231045
+            },
+            {
+              "subcategory_code": "HD",
+              "subcategory_name": "SWEAT SHIRTS",
+              "stock_price": 1281.109181141439,
+              "yoy": 87.15307963827942
+            },
+            {
+              "subcategory_code": "KC",
+              "subcategory_name": "Knit Cardigan",
+              "stock_price": 1061.057071960298,
+              "yoy": 85.7147438917075
+            },
+            {
+              "subcategory_code": "TR",
+              "subcategory_name": "T/SHIRTS",
+              "stock_price": 1002.7245657568238,
+              "yoy": 62.41204198508652
+            },
+            {
+              "subcategory_code": "JP",
+              "subcategory_name": "JUMPER",
+              "stock_price": 878.4292803970222,
+              "yoy": 24.07863627830544
+            },
+            {
+              "subcategory_code": "DJ",
+              "subcategory_name": "JUMPER",
+              "stock_price": 611.9454094292803,
+              "yoy": 50.757616297497655
+            }
+          ],
+          "others": {
+            "stock_price": 4089.8337468982627,
+            "yoy": 35.05979426179294,
+            "subcategory_top5": [
+              {
+                "subcategory_code": "TS",
+                "subcategory_name": "T/SHIRTS",
+                "stock_price": 339.9578163771712,
+                "yoy": 51.00310106955257
+              },
+              {
+                "subcategory_code": "HT",
+                "subcategory_name": "Hat",
+                "stock_price": 337.0595533498759,
+                "yoy": 20.97539809015553
+              },
+              {
+                "subcategory_code": "WJ",
+                "subcategory_name": "Windbreaker",
+                "stock_price": 335.22828784119105,
+                "yoy": 59.38042556184095
+              },
+              {
+                "subcategory_code": "KP",
+                "subcategory_name": "Sweater Pullover",
+                "stock_price": 316.82133995037213,
+                "yoy": 47.195874764351444
+              },
+              {
+                "subcategory_code": "DK",
+                "subcategory_name": "DENIM JACKET",
+                "stock_price": 289.73945409429285,
+                "yoy": 52.60229663433601
+              }
+            ]
+          }
+        },
         "3년차 이상": {
           "current": {
             "stock_price": -1.5831265508684862
@@ -3191,95 +3280,6 @@
                 "subcategory_name": "Beanie",
                 "stock_price": 403.4516129032258,
                 "yoy": 117.5325473300708
-              }
-            ]
-          }
-        },
-        "1년차": {
-          "current": {
-            "stock_price": 14093.191066997522
-          },
-          "previous": {
-            "stock_price": 30330.01985111662
-          },
-          "yoy": 46.46614521249208,
-          "subcategory_top5": [
-            {
-              "subcategory_code": "MT",
-              "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 3830.8610421836224,
-              "yoy": 71.05840798552538
-            },
-            {
-              "subcategory_code": "PT",
-              "subcategory_name": "PANTS",
-              "stock_price": 1337.2307692307693,
-              "yoy": 71.65533362231045
-            },
-            {
-              "subcategory_code": "HD",
-              "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 1281.109181141439,
-              "yoy": 87.15307963827942
-            },
-            {
-              "subcategory_code": "KC",
-              "subcategory_name": "Knit Cardigan",
-              "stock_price": 1061.057071960298,
-              "yoy": 85.7147438917075
-            },
-            {
-              "subcategory_code": "TR",
-              "subcategory_name": "T/SHIRTS",
-              "stock_price": 1002.7245657568238,
-              "yoy": 62.41204198508652
-            },
-            {
-              "subcategory_code": "JP",
-              "subcategory_name": "JUMPER",
-              "stock_price": 878.4292803970222,
-              "yoy": 24.07863627830544
-            },
-            {
-              "subcategory_code": "DJ",
-              "subcategory_name": "JUMPER",
-              "stock_price": 611.9454094292803,
-              "yoy": 50.757616297497655
-            }
-          ],
-          "others": {
-            "stock_price": 4089.8337468982627,
-            "yoy": 35.05979426179294,
-            "subcategory_top5": [
-              {
-                "subcategory_code": "TS",
-                "subcategory_name": "T/SHIRTS",
-                "stock_price": 339.9578163771712,
-                "yoy": 51.00310106955257
-              },
-              {
-                "subcategory_code": "HT",
-                "subcategory_name": "Hat",
-                "stock_price": 337.0595533498759,
-                "yoy": 20.97539809015553
-              },
-              {
-                "subcategory_code": "WJ",
-                "subcategory_name": "Windbreaker",
-                "stock_price": 335.22828784119105,
-                "yoy": 59.38042556184095
-              },
-              {
-                "subcategory_code": "KP",
-                "subcategory_name": "Sweater Pullover",
-                "stock_price": 316.82133995037213,
-                "yoy": 47.195874764351444
-              },
-              {
-                "subcategory_code": "DK",
-                "subcategory_name": "DENIM JACKET",
-                "stock_price": 289.73945409429285,
-                "yoy": 52.60229663433601
               }
             ]
           }
