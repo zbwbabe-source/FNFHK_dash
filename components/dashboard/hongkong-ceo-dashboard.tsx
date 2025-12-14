@@ -2104,6 +2104,26 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                 </div>
                               );
                             })}
+                            
+                            {/* 당월 급여 증가 사유 */}
+                            {(() => {
+                              const salaryCurrent = (expenseDetail as any).salary || 0;
+                              const salaryPrev = (expenseDetailPrev as any).salary || 0;
+                              const salaryChange = salaryCurrent - salaryPrev;
+                              
+                              if (salaryChange > 0) {
+                                return (
+                                  <div className="mt-3 pt-3 border-t border-blue-200">
+                                    <div className="text-xs font-semibold text-blue-700 mb-2">당월 급여 증가 {formatNumber(salaryChange)}K</div>
+                                    <div className="text-xs text-gray-600 space-y-1">
+                                      <div>인원수 11명 → 15명 (136%)</div>
+                                      <div>MD+1, VM+1, Logi+1, Ecom+1</div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         );
                       })()}
@@ -2266,6 +2286,25 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                 </div>
                               );
                             })}
+                            
+                            {/* 누적 지급수수료 증가 사유 */}
+                            {(() => {
+                              const feeCurrent = (expenseDetail as any).fee || 0;
+                              const feePrev = (expenseDetailPrev as any).fee || 0;
+                              const feeChange = feeCurrent - feePrev;
+                              
+                              if (feeChange > 0) {
+                                return (
+                                  <div className="mt-3 pt-3 border-t border-orange-200">
+                                    <div className="text-xs font-semibold text-orange-700 mb-2">누적 지급수수료 증가 {formatNumber(feeChange)}K</div>
+                                    <div className="text-xs text-gray-600 space-y-1">
+                                      <div>3월 재고소각 895, 물류담당자 외주비 88 (1-4월)</div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         );
                       })()}
@@ -7333,9 +7372,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <span className="text-orange-600 mr-1">•</span>
                             <span className="text-gray-700">판매불가재고 소각 895K 포함</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">지급수수료 변화는 다양한 수수료 항목의 종합 결과</span>
+                        </div>
+                        
+                        {/* 누적 지급수수료 증가 사유 */}
+                        <div className="mt-4 pt-3 border-t border-orange-200">
+                          <div className="text-xs font-semibold text-orange-700 mb-2">누적 지급수수료 증가 {change >= 0 ? '+' : ''}{formatNumber(change)}K</div>
+                          <div className="text-xs text-gray-600 space-y-1">
+                            <div>3월 재고소각 895, 물류담당자 외주비 88 (1-4월)</div>
                           </div>
                         </div>
                       </div>
@@ -7475,31 +7518,62 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">3,052K</div>
-                <div className="text-xs mb-3 text-red-600">YOY 95% (+152K)</div>
-                
-                <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">물류비</span>
-                    <span className="text-xs font-semibold text-gray-800">1,204K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">임차료</span>
-                    <span className="text-xs font-semibold text-gray-800">1,001K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">감가상각비</span>
-                    <span className="text-xs font-semibold text-gray-800">708K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">여비교통비</span>
-                    <span className="text-xs font-semibold text-gray-800">430K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">보험료</span>
-                    <span className="text-xs font-semibold text-gray-800">184K</span>
-                  </div>
-                </div>
+                {(() => {
+                  const cumulativeData = plData?.cumulative?.total;
+                  const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
+                  const expenseDetail = cumulativeData?.expense_detail || {};
+                  const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
+                  
+                  // 기타 영업비 = other + rent + travel + insurance
+                  const other = (expenseDetail as any).other || 0;
+                  const rent = (expenseDetail as any).rent || 0;
+                  const travel = (expenseDetail as any).travel || 0;
+                  const insurance = (expenseDetail as any).insurance || 0;
+                  const otherTotal = other + rent + travel + insurance;
+                  
+                  const otherPrev = (expenseDetailPrev as any).other || 0;
+                  const rentPrev = (expenseDetailPrev as any).rent || 0;
+                  const travelPrev = (expenseDetailPrev as any).travel || 0;
+                  const insurancePrev = (expenseDetailPrev as any).insurance || 0;
+                  const otherTotalPrev = otherPrev + rentPrev + travelPrev + insurancePrev;
+                  
+                  const otherYoy = otherTotalPrev > 0 ? (otherTotal / otherTotalPrev * 100) : 0;
+                  const otherChange = otherTotal - otherTotalPrev;
+                  
+                  const otherDetail = expenseDetail.other_detail || {};
+                  const logistics = (otherDetail as any).logistics || 0;
+                  const depreciation = (otherDetail as any).depreciation || 0;
+                  
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(Math.round(otherTotal))}K</div>
+                      <div className="text-xs mb-3 text-red-600">YOY {formatPercent(otherYoy)}% ({otherChange >= 0 ? '+' : '△'}{formatNumber(Math.abs(Math.round(otherChange)))})K</div>
+                      
+                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">물류비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(logistics))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">임차료</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(rent))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">감가상각비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(depreciation))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">여비교통비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(travel))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">보험료</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(insurance))}K</span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* 누적 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">

@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2511",
     "previous_period": "2411",
-    "generated_at": "2025-12-10T16:28:30.313799"
+    "generated_at": "2025-12-14T19:14:56.701564"
   },
   "current_month": {
     "hk": {
@@ -51,18 +51,17 @@
       "expense_detail": {
         "salary": 593.4363099999999,
         "marketing": 408.4461500000001,
-        "fee": 0.65544,
+        "fee": 23.18829,
         "rent": 83.705,
         "insurance": 17.4444,
         "travel": 13.52205,
-        "other": 194.78433,
+        "other": 172.25148000000002,
         "other_detail": {
           "depreciation": 58.95232000000001,
           "duty_free": 0.0,
           "govt_license": 0.0,
           "logistics": 96.06666,
           "maintenance": 3.95215,
-          "other_fee": 22.53285,
           "rent_free": 0.0,
           "retirement": 0.0,
           "supplies": 8.06168,
@@ -143,18 +142,17 @@
       "expense_detail": {
         "salary": 5991.373209999999,
         "marketing": 3545.6168000000002,
-        "fee": 845.2338199999999,
+        "fee": 1986.72645,
         "rent": 1099.1137,
         "insurance": 196.01454,
         "travel": 293.42045,
-        "other": 2892.104585,
+        "other": 1750.6119549999999,
         "other_detail": {
           "depreciation": 484.47265999999996,
           "duty_free": 0.0,
           "govt_license": 0.0,
           "logistics": 1110.78318,
           "maintenance": 60.07715,
-          "other_fee": 1141.49263,
           "rent_free": 0.0,
           "retirement": 0.0,
           "supplies": 45.01588,
@@ -223,18 +221,17 @@
         "expense_detail": {
           "salary": 5330.85269,
           "marketing": 4270.554730000001,
-          "fee": 65.39630999999999,
+          "fee": 1061.89665,
           "rent": 1315.4005000000002,
           "insurance": 217.53439000000003,
           "travel": 153.95448999999996,
-          "other": 2800.98075,
+          "other": 1804.48041,
           "other_detail": {
             "depreciation": 409.92892000000006,
             "duty_free": 0.0,
             "govt_license": 0.0,
             "logistics": 1225.03566,
             "maintenance": 92.76214999999999,
-            "other_fee": 996.5003400000002,
             "rent_free": 0.0,
             "retirement": 0.0,
             "supplies": 27.29614,
@@ -323,18 +320,17 @@
       "expense_detail": {
         "salary": 445.60046,
         "marketing": 398.54038,
-        "fee": 5.701,
+        "fee": 51.71342,
         "rent": 118.88387,
         "insurance": 13.7826,
         "travel": 4.7326,
-        "other": 205.42893,
+        "other": 159.41651000000002,
         "other_detail": {
           "depreciation": 38.88249,
           "duty_free": 0.0,
           "govt_license": 0.0,
           "logistics": 106.81251,
           "maintenance": 8.38851,
-          "other_fee": 46.01242,
           "rent_free": 0.0,
           "retirement": 0.0,
           "supplies": 0.786,

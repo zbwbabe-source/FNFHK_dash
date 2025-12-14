@@ -96,35 +96,39 @@ def get_dx_sg_a(pl_data, period):
     return sg_a
 
 def get_mlb_expense_detail(pl_data, period):
-    """MLB 영업비 상세 항목 추출 (M99 오피스, BRD_CD='M'만)"""
+    """MLB 영업비 상세 항목 추출 (M99 오피스, BRD_CD='M'만)
+    
+    주의: 한글 계정명만 본계정으로 계산 (예: '1. 급 여', '9. 광고선전비')
+    영문 하위항목은 제외 (예: '- Payroll', '- KOL / other')
+    """
     expense_detail = {
-        'salary': 0.0,      # 급여 (SAL_EXP)
-        'marketing': 0.0,   # 광고선전비 (AD_EXP)
-        'fee': 0.0,         # 지급수수료 (COMM_EXP)
-        'rent': 0.0,        # 임차료 (FIX_RENT)
-        'insurance': 0.0,    # 보험료 (INS_EXP)
-        'travel': 0.0,      # 여비교통비 (TRVL_MEAL_EXP)
+        'salary': 0.0,      # 급여 (1. 급 여)
+        'marketing': 0.0,   # 광고선전비 (9. 광고선전비)
+        'fee': 0.0,         # 지급수수료 (10. 지급수수료)
+        'rent': 0.0,        # 임차료 (4. 임차료)
+        'insurance': 0.0,    # 보험료 (13. 보험료)
+        'travel': 0.0,      # 여비교통비 (2. TRAVEL & MEAL)
         'other': 0.0,       # 기타
         'other_detail': {}  # 기타 상세 항목
     }
     
-    # 기타 항목 계정 정의
+    # 기타 항목 계정 정의 (한글 계정명만 사용)
+    # 주의: '12. 기타 수수료(매장관리비 외)'는 fee에 포함되므로 other_accounts에서 제외
     other_accounts = {
-        'depreciation': {'code': 'DEPR_EXP', 'name': '14. 감가상각비', 'label': '감가상각비'},
-        'duty_free': {'code': 'DUTY_FREE_EXP', 'name': '15. 면세점 직접비', 'label': '면세점 직접비'},
-        'govt_license': {'code': 'GOVT_LICEN_FEES', 'name': ' - Government Rate & License Fee', 'label': '정부세금 및 라이센스'},
-        'logistics': {'code': 'LGT_EXP', 'name': '11. 운반비', 'label': '운반비'},
-        'maintenance': {'code': 'MAINT_EXP', 'name': '5. 유지보수비', 'label': '유지보수비'},
-        'other_fee': {'code': 'OTHER_FEE_EXP', 'name': '12. 기타 수수료(매장관리비 외)', 'label': '기타 수수료'},
-        'rent_free': {'code': 'RENT_FREE_CONC', 'name': ' - Rent free / Rent concession', 'label': '임대료 면제/할인'},
-        'retirement': {'code': 'RET_PEN_EXP', 'name': ' - EMPLOYEE BENEFIT PROGRAMS', 'label': '퇴직연금'},
-        'supplies': {'code': 'SUPPLIES_EXP', 'name': '7. 소모품비', 'label': '소모품비'},
-        'transport': {'code': 'TRANS_EXP', 'name': '운반비', 'label': '운반비(기타)'},
-        'uniform': {'code': 'UNIFORM_EXP', 'name': '3. 피복비(유니폼)', 'label': '피복비(유니폼)'},
-        'utilities': {'code': 'UTILITIES_EXP', 'name': '6. 수도광열비', 'label': '수도광열비'},
-        'var_rent': {'code': 'VAR_RENT', 'name': ' - Turnover Rates', 'label': '매출연동 임대료'},
-        'communication': {'code': 'COMMUNI_EXP', 'name': '8. 통신비', 'label': '통신비'},
-        'bonus': {'code': 'BON_EXP', 'name': ' - Final Payment', 'label': '최종지급금'}
+        'depreciation': {'name': '14. 감가상각비', 'label': '감가상각비'},
+        'duty_free': {'name': '15. 면세점 직접비', 'label': '면세점 직접비'},
+        'govt_license': {'name': ' - Government Rate & License Fee', 'label': '정부세금 및 라이센스'},
+        'logistics': {'name': '11. 운반비', 'label': '운반비'},
+        'maintenance': {'name': '5. 유지보수비', 'label': '유지보수비'},
+        'rent_free': {'name': ' - Rent free / Rent concession', 'label': '임대료 면제/할인'},
+        'retirement': {'name': ' - EMPLOYEE BENEFIT PROGRAMS', 'label': '퇴직연금'},
+        'supplies': {'name': '7. 소모품비', 'label': '소모품비'},
+        'transport': {'name': '운반비', 'label': '운반비(기타)'},
+        'uniform': {'name': '3. 피복비(유니폼)', 'label': '피복비(유니폼)'},
+        'utilities': {'name': '6. 수도광열비', 'label': '수도광열비'},
+        'var_rent': {'name': ' - Turnover Rates', 'label': '매출연동 임대료'},
+        'communication': {'name': '8. 통신비', 'label': '통신비'},
+        'bonus': {'name': ' - Final Payment', 'label': '최종지급금'}
     }
     
     # 기타 상세 초기화
@@ -136,32 +140,40 @@ def get_mlb_expense_detail(pl_data, period):
             row['SHOP_CD'] == 'M99' and 
             row['BRD_CD'] == 'M'):  # MLB M99(오피스)만
             
-            account_cd = row['ACCOUNT_CD'].strip()
             account_nm = row['ACCOUNT_NM'].strip()
             value = float(row['VALUE'] or 0)
             
-            # 계정 코드 또는 계정명으로 매핑
-            if account_cd == 'SAL_EXP' or account_nm == ' - Payroll' or account_nm == '1. 급 여':
+            # 한글 계정명만 본계정으로 계산 (하위항목 제외)
+            # 급여: '1. 급 여'만 (하위항목 '- Payroll' 제외)
+            if account_nm == '1. 급 여':
                 expense_detail['salary'] += value
-            elif account_cd == 'AD_EXP' or account_nm == '9. 광고선전비':
+            # 광고선전비: '9. 광고선전비'만 (하위항목 '- KOL / other' 제외)
+            elif account_nm == '9. 광고선전비':
                 expense_detail['marketing'] += value
-            elif account_cd == 'COMM_EXP' or account_nm == '10. 지급수수료':
+            # 지급수수료 (10. 지급수수료 + 12. 기타 수수료(매장관리비 외))
+            elif account_nm == '10. 지급수수료':
                 expense_detail['fee'] += value
-            elif account_cd == 'FIX_RENT' or account_nm == ' - Base Rent' or account_nm == '4. 임차료':
+            elif account_nm == '12. 기타 수수료(매장관리비 외)':
+                expense_detail['fee'] += value  # 기타 수수료도 지급수수료에 합산
+            # 임차료: '4. 임차료'만 (하위항목 '- Base Rent' 제외)
+            elif account_nm == '4. 임차료':
                 expense_detail['rent'] += value
-            elif account_cd == 'INS_EXP' or account_nm == '13. 보험료':
+            # 보험료
+            elif account_nm == '13. 보험료':
                 expense_detail['insurance'] += value
-            elif account_cd == 'TRVL_MEAL_EXP' or account_nm == '2. TRAVEL & MEAL':
+            # 여비교통비
+            elif account_nm == '2. TRAVEL & MEAL':
                 expense_detail['travel'] += value
             else:
-                # 기타 항목들 분류
+                # 기타 항목들 분류 (한글 계정명 우선, 영문 하위항목도 포함)
+                # 단, '12. 기타 수수료(매장관리비 외)'는 이미 fee에 포함되므로 제외
                 for key, account_info in other_accounts.items():
-                    if account_cd == account_info['code'] or account_nm == account_info['name']:
+                    if key == 'other_fee':  # 기타 수수료는 fee에 포함되므로 건너뛰기
+                        continue
+                    if account_nm == account_info['name']:
                         expense_detail['other_detail'][key] += value
+                        expense_detail['other'] += value
                         break
-    
-    # 기타 항목 합계 계산
-    expense_detail['other'] = sum(expense_detail['other_detail'].values())
     
     return expense_detail
 
@@ -534,10 +546,12 @@ def main(target_period_short=None):
     # 손익 데이터 읽기 (MLB만, 오피스 제외)
     print("\n손익 데이터 읽는 중...")
     # Period별 파일 찾기
-    pl_csv_path = f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv'
     import os
+    pl_csv_path = f'../Dashboard_Raw_Data/HKMC/{latest_period_short}/HKMC_PL_{latest_period_short}.csv'
     if not os.path.exists(pl_csv_path):
-        pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
+        pl_csv_path = f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv'
+        if not os.path.exists(pl_csv_path):
+            pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
     print(f"PL CSV 파일: {pl_csv_path}")
     pl_data = read_pl_database(pl_csv_path, brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")
@@ -590,9 +604,9 @@ def main(target_period_short=None):
     print(f"  전년 누적 (1~{prev_month}월): {cum_sg_a_prev:,.2f}")
     
     # 누적 영업비 상세 항목 계산
-    # 기타 상세 항목 키 초기화
+    # 기타 상세 항목 키 초기화 (other_fee는 fee에 포함되므로 제외)
     other_accounts = ['depreciation', 'duty_free', 'govt_license', 'logistics', 'maintenance', 
-                     'other_fee', 'rent_free', 'retirement', 'supplies', 'transport', 
+                     'rent_free', 'retirement', 'supplies', 'transport', 
                      'uniform', 'utilities', 'var_rent', 'communication', 'bonus']
     
     cum_expense_detail = {
