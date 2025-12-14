@@ -740,8 +740,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       <div key="store_efficiency" className="flex items-start">
                   <span className="text-green-600 font-bold mr-2">✓</span>
                   <span>
-                          <span className="font-semibold">점당매출:</span> {formatNumber(salesPerStoreHKD)}K, 
-                          YOY <span className="bg-green-100 px-1.5 py-0.5 rounded font-bold">{formatPercent(offlineEfficiency?.total?.yoy)}%</span>
+                          <span className="font-semibold">평당매출:</span> {formatNumber(Math.round(twDailySalesPerPyeong))} HKD/평/1일, 
+                          YOY <span className="bg-green-100 px-1.5 py-0.5 rounded font-bold">{formatPercent(twSalesPerPyeongYoy)}%</span>
                   </span>
                 </div>
                     );
@@ -1972,7 +1972,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 (면적: {formatNumber(twTotalArea)}평 | {period ? parseInt(period.slice(2, 4)) : 11}월: {period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30}일)
               </div>
               <div className="text-[9px] text-gray-500 mb-3">
-                *폐점+저매출 매장 제외
+                *폐점 매장 제외
               </div>
               
               {/* 평당매출 상세보기 */}
