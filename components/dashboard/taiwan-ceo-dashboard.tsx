@@ -561,6 +561,26 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const pl = plData?.current_month?.total || {};
   const plYoy = plData?.current_month?.yoy || {};
   const plChange = plData?.current_month?.change || {};
+  
+  // 손익구조 테이블용 YOY 직접 계산
+  const prevMonthTotal = plData?.prev_month?.total || {};
+  const calculateYoy = (current: number, previous: number) => {
+    if (!previous || previous === 0) return 0;
+    return (current / previous) * 100;
+  };
+  
+  const profitStructureYoy = useMemo(() => {
+    return {
+      discount: calculateYoy((pl as any)?.discount || 0, (prevMonthTotal as any)?.discount || 0),
+      net_sales: calculateYoy(pl?.net_sales || 0, prevMonthTotal?.net_sales || 0),
+      cogs: calculateYoy(pl?.cogs || 0, prevMonthTotal?.cogs || 0),
+      gross_profit: calculateYoy(pl?.gross_profit || 0, prevMonthTotal?.gross_profit || 0),
+      direct_cost: calculateYoy(pl?.direct_cost || 0, prevMonthTotal?.direct_cost || 0),
+      direct_profit: calculateYoy(pl?.direct_profit || 0, prevMonthTotal?.direct_profit || 0),
+      sg_a: calculateYoy(pl?.sg_a || 0, prevMonthTotal?.sg_a || 0),
+      operating_profit: calculateYoy(pl?.operating_profit || 0, prevMonthTotal?.operating_profit || 0),
+    };
+  }, [pl, prevMonthTotal]);
 
   // 전년 할인율 계산 (prev_month에 discount_rate가 없는 경우)
   const prevMonthDiscountRate = useMemo(() => {
@@ -1577,8 +1597,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 {formatNumber(pl?.operating_profit || 0)}
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>
-                  {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'}{(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'}
+                <span className={(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
+                  YOY {formatPercent(plYoy?.operating_profit || 0)}%
                 </span> | <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>이익률 {formatPercent((pl as any)?.operating_profit_rate, 1)}%</span>
               </div>
               
@@ -1602,7 +1622,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     <span className="text-gray-600">TW 오프라인</span>
                     <span className="font-semibold text-red-600">
                       {formatNumber(plData?.channel_direct_profit?.tw_offline?.direct_profit || 0)} 
-                      <span className="text-green-600"> ({plData?.channel_direct_profit?.tw_offline?.status || ''})</span> 
+                      <span className="text-green-600"> ({formatPercent(plData?.channel_direct_profit?.tw_offline?.yoy || 0)}%)</span> 
                       <span className="text-red-600"> [{formatPercent(plData?.channel_direct_profit?.tw_offline?.direct_profit_rate || 0, 1)}%]</span>
                     </span>
                   </div>
@@ -1665,49 +1685,49 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent((pl as any)?.discount_rate, 1)}%)</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber((pl as any)?.discount)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.discount)}%</td>
+                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.discount)}%</td>
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.discount || 0))}</td>
                         </tr>
                         <tr className="bg-blue-50 font-semibold">
                           <td className="py-1.5 px-2 text-blue-800 border-t border-blue-200">= 실판매출</td>
                           <td className="text-right py-1.5 px-2 text-blue-800 border-t border-blue-200">{formatNumber(pl?.net_sales)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(plYoy?.net_sales)}%</td>
+                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(profitStructureYoy.net_sales)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">△{formatNumber(Math.abs(plChange?.net_sales || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent((pl as any)?.cogs_rate)}%)</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.cogs)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.cogs)}%</td>
+                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(profitStructureYoy.cogs)}%</td>
                           <td className="text-right py-1 px-2 text-red-600">△{formatNumber(Math.abs(plChange?.cogs || 0))}</td>
                         </tr>
                         <tr className="bg-green-50 font-semibold">
                           <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent((pl as any)?.gross_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-green-800 border-t border-green-200">{formatNumber(pl?.gross_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(plYoy?.gross_profit)}%</td>
+                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(profitStructureYoy.gross_profit)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">△{formatNumber(Math.abs(plChange?.gross_profit || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 직접비</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.direct_cost)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(plYoy?.direct_cost)}%</td>
+                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.direct_cost)}%</td>
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.direct_cost || 0))}</td>
                         </tr>
                         <tr className="bg-yellow-50 font-semibold">
                           <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent((pl as any)?.direct_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(plYoy?.direct_profit)}%</td>
+                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(profitStructureYoy.direct_profit)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">△{formatNumber(Math.abs(plChange?.direct_profit || 0))}</td>
                         </tr>
                         <tr className="hover:bg-gray-50">
                           <td className="py-1 px-2 text-gray-700 pl-4">- 영업비</td>
                           <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.sg_a)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(plYoy?.sg_a)}%</td>
+                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(profitStructureYoy.sg_a)}%</td>
                           <td className="text-right py-1 px-2 text-red-600">+{formatNumber(plChange?.sg_a || 0)}</td>
                         </tr>
                         <tr className="bg-red-50 font-bold">
                           <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent((pl as any)?.operating_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-red-800 border-t-2 border-red-300">{formatNumber(pl?.operating_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">적자악화</td>
+                          <td className="text-right py-1.5 px-2 text-red-600 border-t-2 border-red-300">{formatPercent(profitStructureYoy.operating_profit)}%</td>
                           <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">△{formatNumber(Math.abs(plChange?.operating_profit || 0))}</td>
                         </tr>
                       </tbody>
@@ -3129,11 +3149,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <strong>당월:</strong> {(pl?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(pl?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((pl as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(pl?.operating_profit || 0) >= 0 && (() => {
-                  const offlineChange = (plData?.current_month?.offline?.operating_profit || 0) - (plData?.prev_month?.offline?.operating_profit || 0);
-                  const onlineChange = (plData?.current_month?.online?.operating_profit || 0) - (plData?.prev_month?.online?.operating_profit || 0);
-                  return (offlineChange + onlineChange) >= 0;
-                })() ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'} 원인: ① 매출 YOY {formatPercent(salesSummary?.total_yoy || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({(() => {
+                YOY {formatPercent(plYoy?.operating_profit || 0)}% 원인: ① 매출 YOY {formatPercent(salesSummary?.total_yoy || 0)}% (오프라인 YOY {formatPercent((plData?.current_month?.offline?.net_sales || 0) / (plData?.prev_month?.offline?.net_sales || 1) * 100)}%) ② 영업비 YOY {formatPercent(plYoy?.sg_a || 0)}% ({(() => {
                   const offlineChange = (plData?.current_month?.offline?.sg_a || 0) - (plData?.prev_month?.offline?.sg_a || 0);
                   const onlineChange = (plData?.current_month?.online?.sg_a || 0) - (plData?.prev_month?.online?.sg_a || 0);
                   const change = offlineChange + onlineChange;
@@ -3152,7 +3168,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <strong>누적:</strong> {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'} {formatNumber(Math.abs(plData?.cumulative?.total?.operating_profit || 0))}K HKD, 영업이익률 {formatPercent((plData?.cumulative?.total as any)?.operating_profit_rate || 0, 2)}%
               </p>
               <p className="text-xs text-gray-700">
-                {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자' : '적자'} {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '유지' : '지속'}: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {(() => {
+                YOY {formatPercent(plData?.cumulative?.yoy?.operating_profit || 0)}%: ① 매출 YOY {formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}% (전년비 {(() => {
                   const offlineChange = (plData?.cumulative?.offline?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.offline?.net_sales || 0);
                   const onlineChange = (plData?.cumulative?.online?.net_sales || 0) - (plData?.cumulative?.prev_cumulative?.online?.net_sales || 0);
                   const change = offlineChange + onlineChange;
@@ -3716,8 +3732,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className={`p-2 text-right border-r border-gray-300 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(pl?.operating_profit || 0) >= 0 ? '흑자' : '적자'}{(pl?.operating_profit || 0) >= 0 && (plChange?.operating_profit || 0) >= 0 ? '개선' : (pl?.operating_profit || 0) < 0 ? '악화' : '전환'}
+                  <td className={`p-2 text-right border-r border-gray-300 ${(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatPercent(plYoy?.operating_profit || 0)}%
                   </td>
                   <td className={`p-2 text-right border-r border-gray-300 ${(plData?.cumulative?.offline?.operating_profit || 0) < 0 ? 'text-red-600' : ''}`}>
                     {(plData?.cumulative?.offline?.operating_profit || 0) < 0 ? '(' : ''}{formatNumber(Math.abs(plData?.cumulative?.offline?.operating_profit || 0))}{(plData?.cumulative?.offline?.operating_profit || 0) < 0 ? ')' : ''}
@@ -3748,8 +3764,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className={`p-2 text-right ${(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(plData?.cumulative?.total?.operating_profit || 0) >= 0 ? '흑자유지' : '적자전환'}
+                  <td className={`p-2 text-right ${(plData?.cumulative?.yoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatPercent(plData?.cumulative?.yoy?.operating_profit || 0)}%
                   </td>
                 </tr>
                 {/* 영업이익율 */}

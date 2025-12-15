@@ -1547,7 +1547,7 @@ export default function Home() {
                             <span>
                               <strong>{formatM(cash)}</strong>
                               {' '}
-                              <span className={cashChange === 0 ? 'text-gray-500 font-semibold' : cashChange < 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              <span className={cashChange === 0 ? 'text-gray-500 font-semibold' : cashChange > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
                                 ({formatChange(cashChange, prevCash, cash)})
                               </span>
                             </span>
@@ -1722,9 +1722,15 @@ export default function Home() {
                 {/* 현금흐름 */}
                 {cfData && (() => {
                   const summary = cfData.summary;
+                  const beginningCash = summary.beginning_cash;
                   const opcf = summary.operating_cash_flow;
                   const invcf = summary.investing_cash_flow;
                   const endingCash = summary.ending_cash;
+                  
+                  const beginningCashYoy = beginningCash.current - beginningCash.prev_year;
+                  const beginningCashYoyPercent = beginningCash.prev_year !== 0
+                    ? Math.round((beginningCash.current / beginningCash.prev_year) * 100)
+                    : 0;
                   
                   const opcfYoy = opcf.current_total - opcf.prev_year;
                   const opcfYoyPercent = opcf.prev_year !== 0
@@ -1751,6 +1757,16 @@ export default function Home() {
                         <div className="text-xs text-gray-500">25.12 E</div>
                       </div>
                       <div className="text-xs text-gray-600 mt-2 space-y-1.5">
+                        <div className="flex justify-between">
+                          <span>• 기초현금:</span>
+                          <span>
+                            <strong>{Math.round(beginningCash.current / 1000)}M HKD</strong>
+                            {' '}
+                            <span className={beginningCashYoy === 0 ? 'text-gray-500 font-semibold' : beginningCashYoy < 0 ? 'text-red-600 font-semibold' : 'text-green-600 font-semibold'}>
+                              (전년비 {beginningCashYoy > 0 ? '+' : beginningCashYoy < 0 ? '△' : ''}{Math.round(Math.abs(beginningCashYoy) / 1000)}M, YOY {beginningCashYoyPercent}%)
+                            </span>
+                          </span>
+                        </div>
                         <div className="flex justify-between">
                           <span>• 영업활동:</span>
                           <span>
