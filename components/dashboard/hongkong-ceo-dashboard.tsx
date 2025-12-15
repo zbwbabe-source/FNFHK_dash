@@ -1349,95 +1349,26 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </div>
                   ) : (
                     <>
-                      {/* 과시즌 재고 급증 */}
-                      {editingItemId === 'risk-1' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['risk-1'] || `과시즌 재고 급증: ${formatNumber(pastSeasonFW?.total?.current)}K (전년 ${formatNumber(pastSeasonFW?.total?.previous)}K, YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-1': e.target.value })}
-                              onBlur={() => saveInsightItem('risk-1', ceoInsights['risk-1'] || '')}
-                              className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">과시즌 재고 급증</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년 {formatNumber(pastSeasonFW?.total?.previous)}K, YOY {formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-orange-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('risk-1')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-1'] || (
-                              <>
-                                <span className="font-semibold">과시즌 재고 급증</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년 {formatNumber(pastSeasonFW?.total?.previous)}K, YOY {formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 누적 영업손실 지속 */}
-                      {editingItemId === 'risk-2' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['risk-2'] || `누적 영업손실 지속: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-2': e.target.value })}
-                              onBlur={() => saveInsightItem('risk-2', ceoInsights['risk-2'] || '')}
-                              className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">누적 영업손실 지속</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-orange-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('risk-2')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-2'] || (
-                              <>
-                                <span className="font-semibold">누적 영업손실 지속</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* Discovery 영업손실 지속 */}
-                      {editingItemId === 'risk-3' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['risk-3'] || 'Discovery 영업손실 지속: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중'}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-3': e.target.value })}
-                              onBlur={() => saveInsightItem('risk-3', ceoInsights['risk-3'] || '')}
-                              className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">Discovery 영업손실 지속</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-orange-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('risk-3')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-3'] || (
-                              <>
-                                <span className="font-semibold">Discovery 영업손실 지속</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
                     </>
                   )}
                 </div>
@@ -1453,158 +1384,89 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
                 <button
                   onClick={() => {
-                    if (editingCard === 'strategy-full') {
+                    if (editingCard === 'strategy') {
                       setEditingCard(null);
                     } else {
-                      setEditingCard('strategy-full');
-                      setEditingItemId(null);
+                      setEditingCard('strategy');
+                      if (!ceoInsights['strategy-text']) {
+                        const defaultText = `• 재고 정상화: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
+• 수익성 개선: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
+• 성장 모멘텀 유지: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
+• 채널 효율화: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행`;
+                        setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
+                      }
                     }
                   }}
-                  className="text-xs px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-                  title="전체 편집"
+                  className="text-xs px-3 py-1.5 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
                 >
-                  {editingCard === 'strategy-full' ? '취소' : '전체 편집'}
+                  {editingCard === 'strategy' ? '취소' : '편집'}
                 </button>
               </h4>
-              {editingCard === 'strategy-full' ? (
-                <div className="mb-3">
+              {editingCard === 'strategy' ? (
+                <div className="space-y-3">
                   <textarea
-                    value={ceoInsights['strategy-full'] || ''}
-                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-full': e.target.value })}
-                    onBlur={() => saveCardFull('strategy-full', ceoInsights['strategy-full'] || '')}
-                    className="w-full h-96 p-3 border-2 border-purple-300 rounded text-sm font-mono"
-                    placeholder="CEO 전략 방향 전체 내용을 입력하세요..."
+                    value={ceoInsights['strategy-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-purple-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
                     autoFocus
                   />
-                  <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('strategy-text', ceoInsights['strategy-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['strategy-full'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-purple-200">
-                      {ceoInsights['strategy-full']}
+                  {ceoInsights['strategy-text'] ? (
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {ceoInsights['strategy-text']}
                     </div>
                   ) : (
                     <>
-                      {/* 재고 정상화 */}
-                      {editingItemId === 'strategy-1' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['strategy-1'] || '재고 정상화: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립'}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-1': e.target.value })}
-                              onBlur={() => saveInsightItem('strategy-1', ceoInsights['strategy-1'] || '')}
-                              className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">재고 정상화</span>: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('strategy-1')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-1'] || (
-                              <>
-                                <span className="font-semibold">재고 정상화</span>: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 수익성 개선 */}
-                      {editingItemId === 'strategy-2' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['strategy-2'] || '수익성 개선: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토'}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-2': e.target.value })}
-                              onBlur={() => saveInsightItem('strategy-2', ceoInsights['strategy-2'] || '')}
-                              className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">수익성 개선</span>: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('strategy-2')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-2'] || (
-                              <>
-                                <span className="font-semibold">수익성 개선</span>: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 성장 모멘텀 유지 */}
-                      {editingItemId === 'strategy-3' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['strategy-3'] || '성장 모멘텀 유지: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중'}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-3': e.target.value })}
-                              onBlur={() => saveInsightItem('strategy-3', ceoInsights['strategy-3'] || '')}
-                              className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">성장 모멘텀 유지</span>: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('strategy-3')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-3'] || (
-                              <>
-                                <span className="font-semibold">성장 모멘텀 유지</span>: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 채널 효율화 */}
-                      {editingItemId === 'strategy-4' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['strategy-4'] || '채널 효율화: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행'}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-4': e.target.value })}
-                              onBlur={() => saveInsightItem('strategy-4', ceoInsights['strategy-4'] || '')}
-                              className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">채널 효율화</span>: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('strategy-4')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-4'] || (
-                              <>
-                                <span className="font-semibold">채널 효율화</span>: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
                     </>
                   )}
                 </div>
