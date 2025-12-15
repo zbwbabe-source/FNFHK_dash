@@ -1902,7 +1902,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.discount)}%</td>
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.discount || 0))}</td>
                         </tr>
-                        <tr className="bg-blue-50 font-semibold">
+                        <tr className="bg-gray-100 font-semibold">
                           <td className="py-1.5 px-2 text-blue-800 border-t border-blue-200">= 실판매출</td>
                           <td className="text-right py-1.5 px-2 text-blue-800 border-t border-blue-200">{formatNumber(pl?.net_sales)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(profitStructureYoy.net_sales)}%</td>
@@ -1926,7 +1926,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.direct_cost)}%</td>
                           <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.direct_cost || 0))}</td>
                         </tr>
-                        <tr className="bg-yellow-50 font-semibold">
+                        <tr className="bg-gray-100 font-semibold">
                           <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent((pl as any)?.direct_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(profitStructureYoy.direct_profit)}%</td>
@@ -1938,7 +1938,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <td className="text-right py-1 px-2 text-red-600">{formatPercent(profitStructureYoy.sg_a)}%</td>
                           <td className="text-right py-1 px-2 text-red-600">+{formatNumber(plChange?.sg_a || 0)}</td>
                         </tr>
-                        <tr className="bg-red-50 font-bold">
+                        <tr className="bg-gray-100 font-bold">
                           <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent((pl as any)?.operating_profit_rate)}%)</td>
                           <td className="text-right py-1.5 px-2 text-red-800 border-t-2 border-red-300">{formatNumber(pl?.operating_profit)}</td>
                           <td className="text-right py-1.5 px-2 text-red-600 border-t-2 border-red-300">{formatPercent(profitStructureYoy.operating_profit)}%</td>
