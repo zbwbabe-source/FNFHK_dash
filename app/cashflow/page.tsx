@@ -649,9 +649,9 @@ function CashFlowPageContent() {
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-gray-600 text-xs mb-2">순현금흐름</div>
                 <div className={`text-2xl font-bold ${currentNetCashFlow < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                  {Math.abs(currentNetCashFlow).toLocaleString()}k HKD
+                  {currentNetCashFlow < 0 ? '-' : '+'}{Math.abs(currentNetCashFlow).toLocaleString()}k HKD
                 </div>
-                <div className="text-gray-500 text-xs mt-1">전년: {Math.abs(prevNetCashFlow).toLocaleString()}k HKD</div>
+                <div className="text-gray-500 text-xs mt-1">전년: {prevNetCashFlow < 0 ? '-' : '+'}{Math.abs(prevNetCashFlow).toLocaleString()}k HKD</div>
                 <div className={`text-xs mt-2 font-semibold ${getChangeClass(netCashFlowYoy)}`}>
                   {netCashFlowYoy > 0 ? '+' : '△'}{Math.abs(netCashFlowYoy).toLocaleString()}k HKD
                 </div>
@@ -659,9 +659,9 @@ function CashFlowPageContent() {
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-gray-600 text-xs mb-2">영업활동 현금흐름</div>
                 <div className="text-2xl font-bold text-green-600">
-                  {summary.operating_cash_flow.current_total.toLocaleString()}k HKD
+                  +{summary.operating_cash_flow.current_total.toLocaleString()}k HKD
                 </div>
-                <div className="text-gray-500 text-xs mt-1">전년: {summary.operating_cash_flow.prev_year.toLocaleString()}k HKD</div>
+                <div className="text-gray-500 text-xs mt-1">전년: +{summary.operating_cash_flow.prev_year.toLocaleString()}k HKD</div>
                 <div className={`text-xs mt-2 font-semibold ${getChangeClass(opcfYoy)}`}>
                   {opcfYoy > 0 ? '+' : '△'}{Math.abs(opcfYoy).toLocaleString()}k HKD ({opcfYoyPercent}%)
                 </div>
@@ -669,9 +669,9 @@ function CashFlowPageContent() {
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-gray-600 text-xs mb-2">투자활동 현금흐름</div>
                 <div className="text-2xl font-bold text-red-600">
-                  △{Math.abs(summary.investing_cash_flow.current_total).toLocaleString()}k HKD
+                  -{Math.abs(summary.investing_cash_flow.current_total).toLocaleString()}k HKD
                 </div>
-                <div className="text-gray-500 text-xs mt-1">전년: △{Math.abs(summary.investing_cash_flow.prev_year).toLocaleString()}k HKD</div>
+                <div className="text-gray-500 text-xs mt-1">전년: -{Math.abs(summary.investing_cash_flow.prev_year).toLocaleString()}k HKD</div>
                 <div className={`text-xs mt-2 font-semibold ${getChangeClass(invcfYoy)}`}>
                   △{Math.abs(invcfYoy).toLocaleString()}k HKD ({Math.abs(invcfYoyPercent)}%)
                 </div>
