@@ -1192,150 +1192,90 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
                 <button
                   onClick={() => {
-                    if (editingCard === 'key-performance-full') {
+                    if (editingCard === 'executive-summary') {
                       setEditingCard(null);
                     } else {
-                      setEditingCard('key-performance-full');
-                      setEditingItemId(null);
+                      setEditingCard('executive-summary');
+                      // 현재 표시된 텍스트를 편집용으로 준비
+                      if (!ceoInsights['executive-summary-text']) {
+                        const defaultText = `• 11월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
+• 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
+• 평당매출/1일 증가: ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%), 홍콩 오프라인 매장 효율성 개선
+• 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승), 매출총이익률 ${formatPercent(pl?.gross_profit_rate || 0, 1)}% 유지`;
+                        setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
+                      }
                     }
                   }}
-                  className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                  title="전체 편집"
+                  className="text-xs px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >
-                  {editingCard === 'key-performance-full' ? '취소' : '✏️ 편집'}
+                  {editingCard === 'executive-summary' ? '취소' : '편집'}
                 </button>
               </h4>
-              {editingCard === 'key-performance-full' ? (
-                <div className="mb-3">
+              {editingCard === 'executive-summary' ? (
+                <div className="space-y-3">
                   <textarea
-                    value={ceoInsights['key-performance-full'] || ''}
-                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'key-performance-full': e.target.value })}
-                    onBlur={() => saveCardFull('key-performance-full', ceoInsights['key-performance-full'] || '')}
-                    className="w-full h-96 p-3 border-2 border-blue-300 rounded text-sm font-mono"
-                    placeholder="핵심 성과 전체 내용을 입력하세요..."
+                    value={ceoInsights['executive-summary-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'executive-summary-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-blue-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
                     autoFocus
                   />
-                  <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('executive-summary-text', ceoInsights['executive-summary-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['key-performance-full'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-blue-200">
-                      {ceoInsights['key-performance-full']}
+                  {ceoInsights['executive-summary-text'] ? (
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {ceoInsights['executive-summary-text']}
                     </div>
                   ) : generateExecutiveSummary ? (
                     <>
-                      {/* 영업이익 */}
-                      {editingItemId === 'perf-profit' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['perf-profit'] || `영업이익 흑자전환: ${formatNumber(pl?.operating_profit)}백만원, 영업이익률 ${formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-profit': e.target.value })}
-                              onBlur={() => saveInsightItem('perf-profit', ceoInsights['perf-profit'] || '')}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">11월 매출 성장</span>: 실판매출 {formatNumber(pl?.net_sales)}K (YOY {formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +{formatNumber(plChange?.net_sales)}K
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('perf-profit')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['perf-profit'] || (
-                              <>
-                                영업이익 <span className="font-semibold">흑자전환</span>: {formatNumber(pl?.operating_profit)}백만원, 영업이익률 {formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 평당매출 및 직접이익 */}
-                      {editingItemId === 'perf-efficiency' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['perf-efficiency'] || `폴더리코 목업 강화: 매출 ${formatPercent((pl?.net_sales || 0) / ((plPrev?.net_sales || 1) === 0 ? 1 : (plPrev?.net_sales || 1)) * 100)}%, 직접이익률 ${formatPercent((pl?.direct_profit_margin || 0) * 100, 0)}% 달성`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-efficiency': e.target.value })}
-                              onBlur={() => saveInsightItem('perf-efficiency', ceoInsights['perf-efficiency'] || '')}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">당월 영업이익 흑자 전환</span>: {formatNumber(pl?.operating_profit)}K (영업이익률 {formatPercent(pl?.operating_profit_rate || 0, 1)}%)
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('perf-efficiency')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['perf-efficiency'] || (
-                              <>
-                                폴더리코 목업 강화: 매출 <span className="font-semibold">{formatPercent((pl?.net_sales || 0) / ((plPrev?.net_sales || 1) === 0 ? 1 : (plPrev?.net_sales || 1)) * 100)}%</span>, 직접이익률 {formatPercent((pl?.direct_profit_margin || 0) * 100, 0)}% 달성
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 스토랜드 입점 */}
-                      {editingItemId === 'perf-sales-rate' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['perf-sales-rate'] || `직영점 스토랜드 입점 성과 (미니멈 보장): 매출 YOY 94%에도 직접이익 ${formatPercent(119)}%`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-sales-rate': e.target.value })}
-                              onBlur={() => saveInsightItem('perf-sales-rate', ceoInsights['perf-sales-rate'] || '')}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">평당매출/1일 증가</span>: {Math.round(dailySalesPerPyeong)} HKD (YOY {formatPercent(dailySalesPerPyeongYoy)}%), 홍콩 오프라인 매장 효율성 개선
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('perf-sales-rate')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['perf-sales-rate'] || `직영점 스토랜드 입점 성과 (미니멈 보장): 매출 YOY 94%에도 직접이익 ${formatPercent(119)}%`}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
-                      {/* 26SS 물류 대응 */}
-                      {editingItemId === 'perf-online' ? (
-                        <div className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights['perf-online'] || `조달할 입고 감소로 재고 부족 우려 (26SS 물류센터 주입량 목표 1.5-1.6배 성수기 대응)`}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-online': e.target.value })}
-                              onBlur={() => saveInsightItem('perf-online', ceoInsights['perf-online'] || '')}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
+                      <div className="flex items-start">
+                        <span className="text-gray-600 mr-2">•</span>
+                        <div className="flex-1 leading-relaxed">
+                          <span className="font-semibold">할인율 관리</span>: {formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승), 매출총이익률 {formatPercent(pl?.gross_profit_rate || 0, 1)}% 유지
                         </div>
-                      ) : (
-                        <div 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId('perf-online')}
-                        >
-                          <span className="text-gray-600 mr-2">•</span>
-                          <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['perf-online'] || '조달할 입고 감소로 재고 부족 우려 (26SS 물류센터 주입량 목표 1.5-1.6배 성수기 대응)'}
-                          </div>
-                        </div>
-                      )}
+                      </div>
 
                     </>
                   ) : (
@@ -1354,46 +1294,68 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
                 <button
                   onClick={() => {
-                    if (editingCard === 'risk-full') {
+                    if (editingCard === 'risk') {
                       setEditingCard(null);
                     } else {
-                      setEditingCard('risk-full');
-                      setEditingItemId(null);
+                      setEditingCard('risk');
+                      if (!ceoInsights['risk-text']) {
+                        const defaultText = `• 과시즌 재고 급증: ${formatNumber(pastSeasonFW?.total?.current)}K (전년 ${formatNumber(pastSeasonFW?.total?.previous)}K, YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
+• 누적 영업손실 지속: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
+• Discovery 영업손실 지속: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
+                        setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
+                      }
                     }
                   }}
-                  className="text-xs px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-                  title="전체 편집"
+                  className="text-xs px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
                 >
-                  {editingCard === 'risk-full' ? '취소' : '전체 편집'}
+                  {editingCard === 'risk' ? '취소' : '편집'}
                 </button>
               </h4>
-              {editingCard === 'risk-full' ? (
-                <div className="mb-3">
+              {editingCard === 'risk' ? (
+                <div className="space-y-3">
                   <textarea
-                    value={ceoInsights['risk-full'] || ''}
-                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-full': e.target.value })}
-                    onBlur={() => saveCardFull('risk-full', ceoInsights['risk-full'] || '')}
-                    className="w-full h-96 p-3 border-2 border-orange-300 rounded text-sm font-mono"
-                    placeholder="주요 리스크 전체 내용을 입력하세요..."
+                    value={ceoInsights['risk-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-orange-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
                     autoFocus
                   />
-                  <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('risk-text', ceoInsights['risk-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['risk-full'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-orange-200">
-                      {ceoInsights['risk-full']}
+                  {ceoInsights['risk-text'] ? (
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {ceoInsights['risk-text']}
                     </div>
                   ) : (
                     <>
-                      {/* 신발 재고 압박 */}
+                      {/* 과시즌 재고 급증 */}
                       {editingItemId === 'risk-1' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['risk-1'] || '신발 재고 압박: 재고주수 66.8주로 전년비 8.1주 악화, 26시즌 정상판 50주 관리 목표'}
+                              value={ceoInsights['risk-1'] || `과시즌 재고 급증: ${formatNumber(pastSeasonFW?.total?.current)}K (전년 ${formatNumber(pastSeasonFW?.total?.previous)}K, YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려`}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-1': e.target.value })}
                               onBlur={() => saveInsightItem('risk-1', ceoInsights['risk-1'] || '')}
                               className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
@@ -1408,18 +1370,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-1'] || '신발 재고 압박: 재고주수 66.8주로 전년비 8.1주 악화, 26시즌 정상판 50주 관리 목표'}
+                            {ceoInsights['risk-1'] || (
+                              <>
+                                <span className="font-semibold">과시즌 재고 급증</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년 {formatNumber(pastSeasonFW?.total?.previous)}K, YOY {formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* 25FW 당시즌 관리 */}
+                      {/* 누적 영업손실 지속 */}
                       {editingItemId === 'risk-2' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['risk-2'] || '25FW 당시즌 관리: 판매율 30.8%, 잔량 37.4%에도 6.6%p 부진 → DJ 판촉 22.4%로 부진, 그 외 재고는 매출 증가율 12월 DJ 프로모션 강화: 국광 10% 할인 & 서증을 제공, 단계 2,000pcs 확정'}
+                              value={ceoInsights['risk-2'] || `누적 영업손실 지속: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급`}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-2': e.target.value })}
                               onBlur={() => saveInsightItem('risk-2', ceoInsights['risk-2'] || '')}
                               className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
@@ -1434,18 +1400,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-2'] || '25FW 당시즌 관리: 판매율 30.8%, 잔량 37.4%에도 6.6%p 부진 → DJ 판촉 22.4%로 부진, 그 외 재고는 매출 증가율 12월 DJ 프로모션 강화: 국광 10% 할인 & 서증을 제공, 단계 2,000pcs 확정'}
+                            {ceoInsights['risk-2'] || (
+                              <>
+                                <span className="font-semibold">누적 영업손실 지속</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* 직영점 매출 관리 */}
+                      {/* Discovery 영업손실 지속 */}
                       {editingItemId === 'risk-3' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['risk-3'] || '직영점 매출 관리: 충성도 83% 유입예외 전년비 상당증대 (전년 드림팔만)'}
+                              value={ceoInsights['risk-3'] || 'Discovery 영업손실 지속: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중'}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-3': e.target.value })}
                               onBlur={() => saveInsightItem('risk-3', ceoInsights['risk-3'] || '')}
                               className="w-full h-20 p-2 border border-orange-300 rounded text-sm"
@@ -1460,7 +1430,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['risk-3'] || '직영점 매출 관리: 충성도 83% 유입예외 전년비 상당증대 (전년 드림팔만)'}
+                            {ceoInsights['risk-3'] || (
+                              <>
+                                <span className="font-semibold">Discovery 영업손실 지속</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
@@ -1512,13 +1486,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     </div>
                   ) : (
                     <>
-                      {/* 플러그인 확대 */}
+                      {/* 재고 정상화 */}
                       {editingItemId === 'strategy-1' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['strategy-1'] || '플러그인 확대: 창구 · 혁신 상품 모델 기반 시간관 연계 (도구 · 부품)'}
+                              value={ceoInsights['strategy-1'] || '재고 정상화: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립'}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-1': e.target.value })}
                               onBlur={() => saveInsightItem('strategy-1', ceoInsights['strategy-1'] || '')}
                               className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
@@ -1533,18 +1507,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-1'] || '플러그인 확대: 창구 · 혁신 상품 모델 기반 시간관 연계 (도구 · 부품)'}
+                            {ceoInsights['strategy-1'] || (
+                              <>
+                                <span className="font-semibold">재고 정상화</span>: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* 신발 재고 압박 감소 */}
+                      {/* 수익성 개선 */}
                       {editingItemId === 'strategy-2' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['strategy-2'] || '신발 재고 압박 감소 (태만 150% 신발 성과 비율 감소 역시 성과 각성 및 DT 재고 스토리 검증)'}
+                              value={ceoInsights['strategy-2'] || '수익성 개선: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토'}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-2': e.target.value })}
                               onBlur={() => saveInsightItem('strategy-2', ceoInsights['strategy-2'] || '')}
                               className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
@@ -1559,18 +1537,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-2'] || '신발 재고 압박 감소 (태만 150% 신발 성과 비율 감소 역시 성과 각성 및 DT 재고 스토리 검증)'}
+                            {ceoInsights['strategy-2'] || (
+                              <>
+                                <span className="font-semibold">수익성 개선</span>: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* 43평 재고 절임 통제 */}
+                      {/* 성장 모멘텀 유지 */}
                       {editingItemId === 'strategy-3' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['strategy-3'] || '43평 재고 절임 통제 (24, 2년차 홍인, 수치 21일, 2차 일인 초조한 추진 목표 이익 추진)'}
+                              value={ceoInsights['strategy-3'] || '성장 모멘텀 유지: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중'}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-3': e.target.value })}
                               onBlur={() => saveInsightItem('strategy-3', ceoInsights['strategy-3'] || '')}
                               className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
@@ -1585,18 +1567,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-3'] || '43평 재고 절임 통제 (24, 2년차 홍인, 수치 21일, 2차 일인 초조한 추진 목표 이익 추진)'}
+                            {ceoInsights['strategy-3'] || (
+                              <>
+                                <span className="font-semibold">성장 모멘텀 유지</span>: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* 비즈 매장 청산 통원 매력성 시장 장애 예정 */}
+                      {/* 채널 효율화 */}
                       {editingItemId === 'strategy-4' ? (
                         <div className="flex items-start">
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['strategy-4'] || '비즈 매장 청산 통원 매력성 시장 장애 예정'}
+                              value={ceoInsights['strategy-4'] || '채널 효율화: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행'}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-4': e.target.value })}
                               onBlur={() => saveInsightItem('strategy-4', ceoInsights['strategy-4'] || '')}
                               className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
@@ -1611,7 +1597,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         >
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                            {ceoInsights['strategy-4'] || '비즈 매장 청산 통원 매력성 시장 장애 예정'}
+                            {ceoInsights['strategy-4'] || (
+                              <>
+                                <span className="font-semibold">채널 효율화</span>: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
