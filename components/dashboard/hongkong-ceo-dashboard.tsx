@@ -7988,7 +7988,33 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           const highestStore = monthYoyData.reduce((max, d) => d.yoy > max.yoy ? d : max, { store: '', yoy: 0 });
                           const lowestStore = monthYoyData.reduce((min, d) => d.yoy < min.yoy && d.yoy > 0 ? d : min, { store: '', yoy: 999 });
 
-                          const defaultText = `${currentMonth}월 전체 평균 YOY ${avgYoy}%로, 목표 달성 매장(100% 이상) ${above100}개, 개선 필요 매장(90% 미만) ${below90}개입니다. 최고 성과 매장은 ${highestStore.store} (${highestStore.yoy}%), 개선이 시급한 매장은 ${lowestStore.store} (${lowestStore.yoy}%)입니다. ${avgYoy >= 100 ? '전반적으로 양호한 실적을 보이고 있습니다.' : '평균 YOY가 100% 미만으로, 전반적인 매출 개선 전략이 필요합니다.'}`;
+                          // 매장 리뉴얼/오픈 정보
+                          const storeEvents: Record<string, string> = {
+                            'HK-MONGKOK': '04-Jan-28: 신발 주력 Liner 문파 유치를 위해 신발 VMD 변경 (Liner 추력)',
+                            'HK-TIMESQUARE': '30-Nov-28: 과장 직원 교육을 위해 operation 매니저 매장 출근 및 CRM 지속 교육',
+                            'HK-HARBOUR CITY': '31-Aug-27: Renewal 완료 11월 6일',
+                            'HK-V CITY': '',
+                            'HK-I Square': '21-Aug-28: 드래픽 증가 추이-> 재고 유지 목표',
+                            'HK-APM': '26-Mar-27: VMD 변경이후 지속 매출 증가 추이',
+                            'HK-New Town Plaza': '30-Mar-26: SIC 해고 -> 신규 인원으로 변경 (Sheung Shui 매니저로 변경)',
+                            'HK-HYSAN PLACE': '14-Dec-28: 신규 주력 제품인 Meow 출시 이후 지속적인 Traffic 증가추세',
+                            'Tuen Mun Town Plaza': '28-Feb-26: V-city 폐점이후 지속적인 방사이익, 우수 직원 2인 수상',
+                            'HK-Langham Place': '28-Feb-29: 드래픽 증가 추이-> 재고 유지 목표',
+                            'HK-Harbour city kids': '',
+                            'HK-New Town Plaza Kids': '30-Jul-26: 할인 제품 포함 판매 전환 -> 매출 증가 추이',
+                            'HK-YOHO MALL': '08-Oct-26: 직원 전원 변경 이후 매출 추이 증가계',
+                            'MO-VENETIAN(2436)': '31-Aug-28: 추력 상품인 DJ 증가 및 부족 재고 24FW로 매출 하락 방어',
+                            'MO-COTAI(2239)': '30-Jun-27: 추력 상품인 DJ 증가 및 부족 재고 24FW로 매출 하락 방어',
+                            'MO-SENADO SQUARE': '20-Nov-26: 추력 상품인 DJ 증가 및 부족 재고 24FW로 매출 하락 방어',
+                            'HK-Sheung Shui': '27-Jun-26',
+                            'HK-MEGA MALL': '10-Apr-26: 할인 매너 업데이트 (작동 할인 중, 추 경상제품 흩 구성)',
+                            'HK-CITYGATE OUTLET': '26-Apr-27: 할인 매너 업데이트',
+                            'HK-YUEN LONG PLAZA': '26-Sep-27: 기조추 재구성 및 VMD 전체 변경 / 할인 매너 업데이트',
+                            'HK-MOKO': '30-Jun-26: 할인 매너 업데이트',
+                            'HK-Senado Outlet': '31-Jul-26: 할인 매너 업데이트'
+                          };
+
+                          const defaultText = `${currentMonth}월 전체 평균 YOY ${avgYoy}%로, 목표 달성 매장(100% 이상) ${above100}개, 개선 필요 매장(90% 미만) ${below90}개입니다. 최고 성과 매장은 ${highestStore.store} (${highestStore.yoy}%), 개선이 시급한 매장은 ${lowestStore.store} (${lowestStore.yoy}%)입니다. ${avgYoy >= 100 ? '전반적으로 양호한 실적을 보이고 있습니다.' : '평균 YOY가 100% 미만으로, 전반적인 매출 개선 전략이 필요합니다.'}\n\n주요 매장 활동:\n• HARBOUR CITY: Renewal 완료 (8월)\n• TIMESQUARE: Operation 매니저 교육 진행 중\n• HYSAN PLACE: 신규 제품 Meow 출시로 Traffic 증가\n• YOHO MALL: 직원 전원 교체 후 매출 증가세\n• 마카오 매장들: DJ 상품 집중 및 24FW 재고로 매출 방어 중\n• Outlet 매장들: 할인 매너 업데이트 완료`;
                           setYoyTrendSummary(defaultText);
                         }
                       }

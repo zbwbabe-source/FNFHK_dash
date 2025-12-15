@@ -840,9 +840,9 @@ export default function Home() {
         </div>
 
         {/* 대시보드 선택 카드 */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8 items-stretch">
               {/* 1. 홍콩마카오법인 카드 - 브랜드 스타일 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -1152,7 +1152,7 @@ export default function Home() {
               </div>
 
               {/* 2. 대만법인 카드 - 브랜드 스타일 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
             <div className="p-6">
               {/* 헤더: 아이콘 + 상태 배지 */}
               <div className="flex items-start justify-between mb-4">
@@ -1462,7 +1462,7 @@ export default function Home() {
           </div>
 
               {/* 3. 홍마대 BS / 현금흐름 / 자본계획 */}
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 min-h-[800px] flex flex-col">
+              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
             <div className="p-6 flex-1 flex flex-col">
               {/* 헤더: 아이콘 */}
               <div className="flex items-start justify-between mb-4">
@@ -1480,7 +1480,7 @@ export default function Home() {
               </p>
 
               {/* 재무상태표 주요 지표 */}
-              <div className="space-y-3 mb-6 flex-1">
+              <div className="space-y-2 mb-4 flex-1">
                 {/* 총자산 */}
                 {bsData && (() => {
                   const assets = bsData.balance_sheet?.assets;
@@ -1512,15 +1512,15 @@ export default function Home() {
                   };
                   
                   return (
-                <div className="bg-gradient-to-r from-blue-50 to-transparent rounded-xl p-4 border border-blue-100">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="bg-gradient-to-r from-blue-50 to-transparent rounded-lg p-3 border border-blue-100">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="text-sm font-semibold text-blue-900">💰 총자산</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
+                    <div className="text-[10px] text-gray-500">25.12 E</div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalAssets / 1000).toLocaleString()}M HKD
                   </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                  <div className="text-xs text-gray-600 mt-1 space-y-0.5">
                     <div className="flex justify-between">
                           <span>• 매출채권:</span>
                           <span>
@@ -1583,15 +1583,15 @@ export default function Home() {
                   };
                   
                   return (
-                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-xl p-4 border border-red-100">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="bg-gradient-to-r from-red-50 to-transparent rounded-lg p-3 border border-red-100">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="text-sm font-semibold text-red-900">💳 총부채</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
+                    <div className="text-[10px] text-gray-500">25.12 E</div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalLiabilities / 1000).toLocaleString()}M HKD
                   </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                  <div className="text-xs text-gray-600 mt-1 space-y-0.5">
                     <div className="flex justify-between">
                       <span>• 물대채무 (AP):</span>
                           <span>
@@ -1635,15 +1635,15 @@ export default function Home() {
                   };
                   
                   return (
-                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-xl p-4 border border-green-100">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="bg-gradient-to-r from-green-50 to-transparent rounded-lg p-3 border border-green-100">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="text-sm font-semibold text-green-900">💎 총자본</div>
-                    <div className="text-xs text-gray-500">25.12 E</div>
+                    <div className="text-[10px] text-gray-500">25.12 E</div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-lg font-bold text-gray-900">
                         {Math.round(totalEquity / 1000).toLocaleString()}M HKD
                   </div>
-                  <div className="text-xs text-gray-600 mt-2 space-y-1">
+                  <div className="text-xs text-gray-600 mt-1 space-y-0.5">
                     <div className="flex justify-between">
                       <span>전년 대비:</span>
                           <span>
@@ -1697,20 +1697,20 @@ export default function Home() {
                   const equityRatioExclTp = totalAssets !== 0 ? (adjustedEquity / totalAssets) * 100 : 0;
                   
                   return (
-                <div className="bg-gradient-to-r from-yellow-50 to-transparent rounded-xl p-4 border border-yellow-100">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="bg-gradient-to-r from-yellow-50 to-transparent rounded-lg p-3 border border-yellow-100">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="text-sm font-semibold text-yellow-900">📊 부채비율</div>
-                        <div className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">TP 포함</div>
+                        <div className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">TP 포함</div>
                   </div>
                       <div className="flex items-baseline justify-between">
-                        <div className="text-2xl font-bold text-red-600">
+                        <div className="text-lg font-bold text-red-600">
                           {debtRatioWithTp.toFixed(1)}%
                         </div>
                         <div className="text-xs text-gray-600">
                           누적 TP 제외시: <span className="text-green-600 font-semibold">{debtRatioExclTp.toFixed(1)}%</span>
                         </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 mt-0.5">
                         자기자본비율 <span className="text-red-600 font-semibold">{equityRatioWithTp.toFixed(1)}%</span>
                         {' '}
                         <span className="text-gray-400">(누적 TP 제외시: <span className="text-green-600 font-semibold">{equityRatioExclTp.toFixed(1)}%</span>)</span>
@@ -1751,12 +1751,12 @@ export default function Home() {
                   const twCapex = cfData.investing_activities?.tw_capex?.current_total || 0;
                   
                   return (
-                    <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-xl p-4 border border-indigo-100">
-                      <div className="flex items-center justify-between mb-2">
+                    <div className="bg-gradient-to-r from-indigo-50 to-transparent rounded-lg p-3 border border-indigo-100">
+                      <div className="flex items-center justify-between mb-1">
                         <div className="text-sm font-semibold text-indigo-900">💧 현금흐름</div>
-                        <div className="text-xs text-gray-500">25.12 E</div>
+                        <div className="text-[10px] text-gray-500">25.12 E</div>
                       </div>
-                      <div className="text-xs text-gray-600 mt-2 space-y-1.5">
+                      <div className="text-xs text-gray-600 mt-1 space-y-0.5">
                         <div className="flex justify-between">
                           <span>• 기초현금:</span>
                           <span>

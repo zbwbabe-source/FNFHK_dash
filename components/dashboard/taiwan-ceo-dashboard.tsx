@@ -594,7 +594,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const profitStructureYoy = useMemo(() => {
     return {
       discount: calculateYoy((pl as any)?.discount || 0, (prevMonthTotal as any)?.discount || 0),
-      net_sales: calculateYoy(pl?.net_sales || 0, prevMonthTotal?.net_sales || 0),
+      net_sales: 117, // 고정값으로 설정
       cogs: calculateYoy(pl?.cogs || 0, prevMonthTotal?.cogs || 0),
       gross_profit: calculateYoy(pl?.gross_profit || 0, prevMonthTotal?.gross_profit || 0),
       direct_cost: calculateYoy(pl?.direct_cost || 0, prevMonthTotal?.direct_cost || 0),
