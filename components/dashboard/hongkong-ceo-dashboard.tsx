@@ -1391,12 +1391,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               )}
             </div>
 
-            {/* 주요 리스크 - Risk Assessment */}
+            {/* 주요 리스크 */}
             <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border-l-4 border-orange-600">
               <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
                 <div className="flex items-center">
                   <span className="text-xl mr-2">⚠️</span>
-                  Risk Assessment
+                  주요 리스크
                 </div>
                 <button
                   onClick={() => {
@@ -1410,7 +1410,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   className="text-xs px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
                   title="전체 편집"
                 >
-                  {editingCard === 'risk-full' ? '취소' : '✏️ 편집'}
+                  {editingCard === 'risk-full' ? '취소' : '전체 편집'}
                 </button>
               </h4>
               {editingCard === 'risk-full' ? (
@@ -1426,69 +1426,57 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
                 </div>
               ) : (
-                <div className="space-y-4 text-sm text-gray-700">
+                <div className="space-y-2 text-sm text-gray-700">
                   {ceoInsights['risk-full'] ? (
                     <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-orange-200">
                       {ceoInsights['risk-full']}
                     </div>
                   ) : generateExecutiveSummary ? (
                     <>
-                      {/* 핵심 메시지 */}
-                      <div className={`rounded-lg p-3 border shadow-sm ${
-                        generateExecutiveSummary.risk.risks.some(r => r.severity === 'high')
-                          ? 'bg-red-50 border-red-200'
-                          : 'bg-white border-orange-200'
-                      }`}>
-                        <div className="flex items-start gap-2">
-                          <span className="text-lg">
-                            {generateExecutiveSummary.risk.risks.some(r => r.severity === 'high') ? '🚨' : '⚡'}
-                          </span>
-                          <div className="font-bold text-gray-900 text-base leading-snug">
-                            {generateExecutiveSummary.risk.keyMessage}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 리스크 목록 */}
-                      <div className="space-y-2">
-                        {generateExecutiveSummary.risk.risks.length > 0 ? (
-                          generateExecutiveSummary.risk.risks.map((risk, idx) => (
-                            <div 
-                              key={idx} 
-                              className={`rounded-lg p-3 border ${
-                                risk.severity === 'high' 
-                                  ? 'bg-red-50 border-red-300' 
-                                  : risk.severity === 'medium'
-                                  ? 'bg-orange-50 border-orange-200'
-                                  : 'bg-yellow-50 border-yellow-200'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                                  risk.severity === 'high' 
-                                    ? 'bg-red-500 text-white' 
-                                    : risk.severity === 'medium'
-                                    ? 'bg-orange-400 text-white'
-                                    : 'bg-yellow-400 text-gray-800'
-                                }`}>
-                                  {risk.severity === 'high' ? 'HIGH' : risk.severity === 'medium' ? 'MED' : 'LOW'}
-                                </span>
-                                <span className="font-bold text-gray-900">{risk.title}</span>
-                              </div>
-                              <div className="text-xs text-gray-600 mb-2 pl-1">
-                                <span className="font-medium">영향:</span> {risk.impact}
-                              </div>
-                              <div className="text-xs bg-white rounded p-2 border border-gray-200">
-                                <span className="font-medium text-orange-700">→ 대응:</span> {risk.action}
+                      {generateExecutiveSummary.risk.risks.length > 0 ? (
+                        generateExecutiveSummary.risk.risks.map((risk, idx) => {
+                          const itemId = `risk-${idx}`;
+                          return editingItemId === itemId ? (
+                            <div key={idx} className="flex items-start">
+                              <span className="text-orange-600 font-bold mr-2">•</span>
+                              <div className="flex-1">
+                                <textarea
+                                  value={ceoInsights[itemId] || `${risk.title}: ${risk.impact} → 대응: ${risk.action}`}
+                                  onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
+                                  onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || '')}
+                                  className="w-full h-24 p-2 border border-orange-300 rounded text-sm"
+                                  autoFocus
+                                />
                               </div>
                             </div>
-                          ))
-                        ) : (
-                          <div className="bg-green-50 rounded-lg p-3 border border-green-200 text-center">
-                            <span className="text-green-700 font-medium">✓ 주요 리스크 지표 모두 안정권</span>
+                          ) : (
+                            <div 
+                              key={idx}
+                              className="flex items-start cursor-pointer hover:bg-orange-50 p-2 rounded transition-colors"
+                              onClick={() => setEditingItemId(itemId)}
+                            >
+                              <span className="text-orange-600 font-bold mr-2">•</span>
+                              <div className="flex-1 leading-relaxed whitespace-pre-wrap">
+                                {ceoInsights[itemId] || (
+                                  <>
+                                    <span className={`font-semibold ${risk.severity === 'high' ? 'text-red-700' : 'text-orange-700'}`}>
+                                      {risk.title}:
+                                    </span>{' '}
+                                    {risk.impact} → <span className="text-orange-600 font-medium">대응:</span> {risk.action}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="flex items-start p-2">
+                          <span className="text-green-600 font-bold mr-2">✓</span>
+                          <div className="flex-1 leading-relaxed">
+                            <span className="font-semibold text-green-700">주요 리스크 지표 안정권:</span> 현재 긴급 대응이 필요한 리스크 없음, 현 운영 기조 유지
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
@@ -1497,12 +1485,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               )}
             </div>
 
-            {/* CEO 전략 방향 - Strategic Roadmap */}
+            {/* CEO 전략 방향 */}
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border-l-4 border-purple-600">
               <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
                 <div className="flex items-center">
                   <span className="text-xl mr-2">🎯</span>
-                  Strategic Roadmap
+                  CEO 전략 방향
                 </div>
                 <button
                   onClick={() => {
@@ -1516,7 +1504,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   className="text-xs px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
                   title="전체 편집"
                 >
-                  {editingCard === 'strategy-full' ? '취소' : '✏️ 편집'}
+                  {editingCard === 'strategy-full' ? '취소' : '전체 편집'}
                 </button>
               </h4>
               {editingCard === 'strategy-full' ? (
@@ -1532,75 +1520,117 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
                 </div>
               ) : (
-                <div className="space-y-4 text-sm text-gray-700">
+                <div className="space-y-2 text-sm text-gray-700">
                   {ceoInsights['strategy-full'] ? (
                     <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-purple-200">
                       {ceoInsights['strategy-full']}
                     </div>
                   ) : generateExecutiveSummary ? (
                     <>
-                      {/* 핵심 방향 */}
-                      <div className="bg-white rounded-lg p-3 border border-purple-200 shadow-sm">
-                        <div className="flex items-start gap-2">
-                          <span className="text-lg">🧭</span>
-                          <div>
-                            <div className="font-bold text-gray-900 text-base leading-snug">
-                              {generateExecutiveSummary.strategy.keyMessage}
+                      {/* 즉시 실행 (이번 달) */}
+                      {generateExecutiveSummary.strategy.strategies.immediate.map((item, idx) => {
+                        const itemId = `strategy-immediate-${idx}`;
+                        return editingItemId === itemId ? (
+                          <div key={idx} className="flex items-start">
+                            <span className="text-purple-600 font-bold mr-2">1.</span>
+                            <div className="flex-1">
+                              <textarea
+                                value={ceoInsights[itemId] || `즉시 실행: ${item}`}
+                                onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
+                                onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || '')}
+                                className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
+                                autoFocus
+                              />
                             </div>
                           </div>
-                        </div>
-                      </div>
-
-                      {/* 시간축별 전략 */}
-                      <div className="space-y-2">
-                        {/* 즉시 실행 */}
-                        <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">NOW</span>
-                            <span className="font-bold text-gray-900 text-sm">즉시 실행 (이번 달)</span>
+                        ) : (
+                          <div 
+                            key={idx}
+                            className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
+                            onClick={() => setEditingItemId(itemId)}
+                          >
+                            <span className="text-purple-600 font-bold mr-2">{idx + 1}.</span>
+                            <div className="flex-1 leading-relaxed whitespace-pre-wrap">
+                              {ceoInsights[itemId] || (
+                                <>
+                                  <span className="font-semibold text-red-700">즉시 실행:</span> {item}
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <ul className="space-y-1">
-                            {generateExecutiveSummary.strategy.strategies.immediate.map((item, idx) => (
-                              <li key={idx} className="text-xs text-gray-700 flex items-start gap-1">
-                                <span className="text-red-500 mt-0.5">▸</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        );
+                      })}
 
-                        {/* 단기 */}
-                        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-orange-400 text-white text-xs px-2 py-0.5 rounded-full font-bold">Q1</span>
-                            <span className="font-bold text-gray-900 text-sm">단기 과제 (분기)</span>
+                      {/* 단기 과제 (분기) */}
+                      {generateExecutiveSummary.strategy.strategies.shortTerm.map((item, idx) => {
+                        const itemId = `strategy-short-${idx}`;
+                        const displayIdx = generateExecutiveSummary.strategy.strategies.immediate.length + idx + 1;
+                        return editingItemId === itemId ? (
+                          <div key={idx} className="flex items-start">
+                            <span className="text-purple-600 font-bold mr-2">{displayIdx}.</span>
+                            <div className="flex-1">
+                              <textarea
+                                value={ceoInsights[itemId] || `단기 과제: ${item}`}
+                                onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
+                                onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || '')}
+                                className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
+                                autoFocus
+                              />
+                            </div>
                           </div>
-                          <ul className="space-y-1">
-                            {generateExecutiveSummary.strategy.strategies.shortTerm.map((item, idx) => (
-                              <li key={idx} className="text-xs text-gray-700 flex items-start gap-1">
-                                <span className="text-orange-500 mt-0.5">▸</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        ) : (
+                          <div 
+                            key={idx}
+                            className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
+                            onClick={() => setEditingItemId(itemId)}
+                          >
+                            <span className="text-purple-600 font-bold mr-2">{displayIdx}.</span>
+                            <div className="flex-1 leading-relaxed whitespace-pre-wrap">
+                              {ceoInsights[itemId] || (
+                                <>
+                                  <span className="font-semibold text-orange-700">단기 과제:</span> {item}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
 
-                        {/* 중기 */}
-                        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">H1</span>
-                            <span className="font-bold text-gray-900 text-sm">중기 방향 (반기)</span>
+                      {/* 중기 방향 (반기) */}
+                      {generateExecutiveSummary.strategy.strategies.midTerm.map((item, idx) => {
+                        const itemId = `strategy-mid-${idx}`;
+                        const displayIdx = generateExecutiveSummary.strategy.strategies.immediate.length + 
+                                          generateExecutiveSummary.strategy.strategies.shortTerm.length + idx + 1;
+                        return editingItemId === itemId ? (
+                          <div key={idx} className="flex items-start">
+                            <span className="text-purple-600 font-bold mr-2">{displayIdx}.</span>
+                            <div className="flex-1">
+                              <textarea
+                                value={ceoInsights[itemId] || `중기 방향: ${item}`}
+                                onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
+                                onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || '')}
+                                className="w-full h-20 p-2 border border-purple-300 rounded text-sm"
+                                autoFocus
+                              />
+                            </div>
                           </div>
-                          <ul className="space-y-1">
-                            {generateExecutiveSummary.strategy.strategies.midTerm.map((item, idx) => (
-                              <li key={idx} className="text-xs text-gray-700 flex items-start gap-1">
-                                <span className="text-blue-500 mt-0.5">▸</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
+                        ) : (
+                          <div 
+                            key={idx}
+                            className="flex items-start cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
+                            onClick={() => setEditingItemId(itemId)}
+                          >
+                            <span className="text-purple-600 font-bold mr-2">{displayIdx}.</span>
+                            <div className="flex-1 leading-relaxed whitespace-pre-wrap">
+                              {ceoInsights[itemId] || (
+                                <>
+                                  <span className="font-semibold text-blue-700">중기 방향:</span> {item}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </>
                   ) : (
                     <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
