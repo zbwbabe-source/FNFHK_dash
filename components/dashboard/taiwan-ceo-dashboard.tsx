@@ -81,11 +81,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
     } else {
       // 기본 텍스트 설정
       const defaultInsights = {
-        'executive-summary-text': `• 전체 매출: 17,683K, YOY 117%, 전년비 +2,615K
-• 평당매출: 653 HKD/평/1일, YOY 129%
+        'executive-summary-text': `• 매출개선: 17,683K, YOY 117%
+• 매장효율성 개선: 평당매출 653 HKD/평/1일, YOY 129%
 • 25F 판매율: 32.2%, 전년비 +2.0%p
 • 온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
-• 총재고: 180,260K, YOY 93%`,
+• 총재고 감소: 180,260K, YOY 93%`,
         'risk-text': `• Discovery 당월 영업손실 -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
 • 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요`,
         'strategy-text': `• 성장 모멘텀 유지: 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
@@ -787,11 +787,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       setEditingCard('executive-summary');
                       if (!ceoInsights['executive-summary-text']) {
                         // 기본 텍스트 설정
-                        const defaultText = `• 전체 매출: 17,683K, YOY 117%, 전년비 +2,615K
-• 평당매출: 653 HKD/평/1일, YOY 129%
+                        const defaultText = `• 매출개선: 17,683K, YOY 117%
+• 매장효율성 개선: 평당매출 653 HKD/평/1일, YOY 129%
 • 25F 판매율: 32.2%, 전년비 +2.0%p
 • 온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
-• 총재고: 180,260K, YOY 93%`;
+• 총재고 감소: 180,260K, YOY 93%`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -840,12 +840,167 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 {(() => {
                   const insights = [];
                   
+                  // 1. 매출개선
+                  const itemId1 = 'tw-key-performance-1';
+                  const defaultText1 = `매출개선: 17,683K, YOY 117%`;
+                  insights.push(
+                    editingItemId === itemId1 ? (
+                      <div key="sales" className="flex items-start">
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <div className="flex-1">
+                          <textarea
+                            value={ceoInsights[itemId1] || defaultText1}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId1]: e.target.value })}
+                            onBlur={() => saveInsightItem(itemId1, ceoInsights[itemId1] || defaultText1)}
+                            className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        key="sales" 
+                        className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
+                        onClick={() => setEditingItemId(itemId1)}
+                      >
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <span className="whitespace-pre-wrap">{ceoInsights[itemId1] || defaultText1}</span>
+                      </div>
+                    )
+                  );
+
+                  // 2. 매장효율성 개선
+                  const itemId2 = 'tw-key-performance-2';
+                  const defaultText2 = `매장효율성 개선: 평당매출 653 HKD/평/1일, YOY 129%`;
+                  insights.push(
+                    editingItemId === itemId2 ? (
+                      <div key="efficiency" className="flex items-start">
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <div className="flex-1">
+                          <textarea
+                            value={ceoInsights[itemId2] || defaultText2}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId2]: e.target.value })}
+                            onBlur={() => saveInsightItem(itemId2, ceoInsights[itemId2] || defaultText2)}
+                            className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        key="efficiency" 
+                        className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
+                        onClick={() => setEditingItemId(itemId2)}
+                      >
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <span className="whitespace-pre-wrap">{ceoInsights[itemId2] || defaultText2}</span>
+                      </div>
+                    )
+                  );
+
+                  // 3. 25F 판매율
+                  const itemId3 = 'tw-key-performance-3';
+                  const defaultText3 = `25F 판매율: 32.2%, 전년비 +2.0%p`;
+                  insights.push(
+                    editingItemId === itemId3 ? (
+                      <div key="sales_rate" className="flex items-start">
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <div className="flex-1">
+                          <textarea
+                            value={ceoInsights[itemId3] || defaultText3}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId3]: e.target.value })}
+                            onBlur={() => saveInsightItem(itemId3, ceoInsights[itemId3] || defaultText3)}
+                            className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        key="sales_rate" 
+                        className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
+                        onClick={() => setEditingItemId(itemId3)}
+                      >
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <span className="whitespace-pre-wrap">{ceoInsights[itemId3] || defaultText3}</span>
+                      </div>
+                    )
+                  );
+
+                  // 4. 온라인
+                  const itemId4 = 'tw-key-performance-4';
+                  const defaultText4 = `온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K`;
+                  insights.push(
+                    editingItemId === itemId4 ? (
+                      <div key="online" className="flex items-start">
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <div className="flex-1">
+                          <textarea
+                            value={ceoInsights[itemId4] || defaultText4}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId4]: e.target.value })}
+                            onBlur={() => saveInsightItem(itemId4, ceoInsights[itemId4] || defaultText4)}
+                            className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        key="online" 
+                        className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
+                        onClick={() => setEditingItemId(itemId4)}
+                      >
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <span className="whitespace-pre-wrap">{ceoInsights[itemId4] || defaultText4}</span>
+                      </div>
+                    )
+                  );
+
+                  // 5. 총재고 감소
+                  const itemId5 = 'tw-key-performance-5';
+                  const defaultText5 = `총재고 감소: 180,260K, YOY 93%`;
+                  insights.push(
+                    editingItemId === itemId5 ? (
+                      <div key="inventory" className="flex items-start">
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <div className="flex-1">
+                          <textarea
+                            value={ceoInsights[itemId5] || defaultText5}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId5]: e.target.value })}
+                            onBlur={() => saveInsightItem(itemId5, ceoInsights[itemId5] || defaultText5)}
+                            className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        key="inventory" 
+                        className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
+                        onClick={() => setEditingItemId(itemId5)}
+                      >
+                        <span className="text-green-600 font-bold mr-2">✓</span>
+                        <span className="whitespace-pre-wrap">{ceoInsights[itemId5] || defaultText5}</span>
+                      </div>
+                    )
+                  );
+                  
+                  // 기존 로직 제거, 위의 5개 항목으로 대체
+                  /*
                   // 1. 전체 매출 성장
                   if (salesSummary?.total_yoy && salesSummary.total_yoy >= 100) {
                     const itemId = 'tw-key-performance-1';
                     const defaultText = `전체 매출: ${formatNumber(salesSummary?.total_net_sales || 0)}K, YOY ${formatPercent(salesSummary?.total_yoy)}%, 전년비 +${formatNumber(salesSummary?.total_change || 0)}K`;
                     insights.push(
-                      editingItemId === itemId ? (
+                      */
+                  
+                  return insights.length > 0 ? insights : [
+                    <div key="no_insights" className="text-gray-500 text-xs">주요 성과 데이터 없음</div>
+                  ];
+                  
+                  /*
+                  // OLD CODE REMOVED
+                  editingItemId === itemId ? (
                         <div key="total_sales" className="flex items-start">
                           <span className="text-green-600 font-bold mr-2">✓</span>
                           <div className="flex-1">
@@ -957,140 +1112,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       )
                     );
                   }
-                  
-                  // 4. 온라인 성장
-                  const onlineYoy = twOnline?.yoy || 0;
-                  const onlineSales = (twOnline?.current?.net_sales || 0) / 1000;
-                  // 온라인 매출을 1K 단위로 변환 후 전체 매출(이미 1K 단위)로 나눔
-                  const onlineShare = (onlineSales / (salesSummary?.total_net_sales || 1)) * 100;
-                  const onlineDirectProfit = plData?.channel_direct_profit?.tw_online?.direct_profit || 0;
-                  const onlineDirectProfitYoy = plData?.channel_direct_profit?.tw_online?.yoy || 0;
-                  if (onlineYoy >= 100) {
-                    const itemId = 'tw-key-performance-4';
-                    const defaultText = `온라인: ${formatNumber(onlineSales)}K (YOY ${formatPercent(onlineYoy)}%, 비중 ${formatPercent(onlineShare, 1)}%), 직접이익 ${formatNumber(onlineDirectProfit)}K`;
-                    insights.push(
-                      editingItemId === itemId ? (
-                        <div key="online_growth" className="flex items-start">
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights[itemId] || defaultText}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
-                              onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || defaultText)}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div 
-                          key="online_growth" 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId(itemId)}
-                        >
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          {ceoInsights[itemId] ? (
-                            <span className="whitespace-pre-wrap">{ceoInsights[itemId]}</span>
-                          ) : (
-                            <span>
-                              <span className="font-semibold">온라인:</span> {formatNumber(onlineSales)}K 
-                              (YOY <span className="bg-blue-100 px-1.5 py-0.5 rounded font-bold">{formatPercent(onlineYoy)}%</span>, 
-                              비중 {formatPercent(onlineShare, 1)}%), 
-                              직접이익 {formatNumber(onlineDirectProfit)}K
-                            </span>
-                          )}
-                        </div>
-                      )
-                    );
-                  }
-                  
-                  // 5. 재고 안정화
-                  const inventoryYoy = ((endingInventory?.total?.current || 0) / (endingInventory?.total?.previous || 1)) * 100;
-                  if (inventoryYoy <= 110) {
-                    const itemId = 'tw-key-performance-5';
-                    const defaultText = `총재고: ${formatNumber(endingInventory?.total?.current)}K, YOY ${formatPercent(inventoryYoy)}% (전년 ${formatNumber(endingInventory?.total?.previous)}K)`;
-                    insights.push(
-                      editingItemId === itemId ? (
-                        <div key="inventory" className="flex items-start">
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights[itemId] || defaultText}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
-                              onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || defaultText)}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div 
-                          key="inventory" 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId(itemId)}
-                        >
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          {ceoInsights[itemId] ? (
-                            <span className="whitespace-pre-wrap">{ceoInsights[itemId]}</span>
-                          ) : (
-                            <span>
-                              <span className="font-semibold">총재고:</span> {formatNumber(endingInventory?.total?.current)}K, 
-                              YOY <span className="bg-green-100 px-1.5 py-0.5 rounded font-bold">{formatPercent(inventoryYoy)}%</span> 
-                              (전년 {formatNumber(endingInventory?.total?.previous)}K)
-                            </span>
-                          )}
-                        </div>
-                      )
-                    );
-                  }
-                  
-                  // 6. 직접이익률 개선
-                  const directProfitRate = (pl as any)?.direct_profit_rate || 0;
-                  // 전년 직접이익률 계산 (direct_profit_rate가 없으면 직접 계산)
-                  const prevMonthTotal = plData?.prev_month?.total || {};
-                  const prevDirectProfitRate = (prevMonthTotal as any)?.direct_profit_rate || 
-                    (prevMonthTotal.net_sales > 0 ? ((prevMonthTotal.direct_profit || 0) / prevMonthTotal.net_sales) * 100 : 0);
-                  if (directProfitRate > prevDirectProfitRate) {
-                    const itemId = 'tw-key-performance-6';
-                    const defaultText = `직접이익률: ${formatPercent(directProfitRate, 1)}%, 전년비 +${formatPercent(directProfitRate - prevDirectProfitRate, 1)}%p`;
-                    insights.push(
-                      editingItemId === itemId ? (
-                        <div key="direct_profit" className="flex items-start">
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          <div className="flex-1">
-                            <textarea
-                              value={ceoInsights[itemId] || defaultText}
-                              onChange={(e) => setCeoInsights({ ...ceoInsights, [itemId]: e.target.value })}
-                              onBlur={() => saveInsightItem(itemId, ceoInsights[itemId] || defaultText)}
-                              className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div 
-                          key="direct_profit" 
-                          className="flex items-start cursor-pointer hover:bg-blue-50 p-2 rounded transition-colors"
-                          onClick={() => setEditingItemId(itemId)}
-                        >
-                          <span className="text-green-600 font-bold mr-2">✓</span>
-                          {ceoInsights[itemId] ? (
-                            <span className="whitespace-pre-wrap">{ceoInsights[itemId]}</span>
-                          ) : (
-                            <span>
-                              <span className="font-semibold">직접이익률:</span> 
-                              <span className="bg-blue-100 px-1.5 py-0.5 rounded font-bold">{formatPercent(directProfitRate, 1)}%</span>, 
-                              전년비 <span className="text-green-700 font-bold">+{formatPercent(directProfitRate - prevDirectProfitRate, 1)}%p</span>
-                            </span>
-                          )}
-                        </div>
-                      )
-                    );
-                  }
-                  
-                  return insights.length > 0 ? insights : [
-                    <div key="no_insights" className="text-gray-500 text-xs">주요 성과 데이터 없음</div>
-                  ];
+                  */
                 })()}
               </div>
               )}
@@ -8429,22 +8451,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">지급수수료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
+                            <span className="text-gray-700">지급수수료 증가 +68K (YOY 316%)</span>
                           </div>
                           <div className="flex items-start">
                             <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
+                            <span className="text-gray-700">증가 +68K 내역: 재고폐기비용(25년 1년분) 54K, Cegid 수수료 21K</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">전체 영업비 대비: {formatPercent(currentOpexRatio)}% (전년 대비 {opexRatioChange >= 0 ? '+' : ''}{formatPercent(opexRatioChange)}%p)</span>
-                          </div>
-                          {Math.abs(changeRate) > 50 && (
-                            <div className="flex items-start">
-                              <span className="text-orange-600 mr-1">•</span>
-                              <span className="text-gray-700">지급수수료가 전년 대비 {Math.abs(changeRate) > 100 ? '크게' : '상당히'} {change >= 0 ? '증가' : '감소'}하여 주의 필요</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
@@ -8771,5 +8783,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 };
 
 export default TaiwanCEODashboard;
+
 
 

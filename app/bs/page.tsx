@@ -34,6 +34,7 @@ interface WCData {
   profit_creation: {
     total: WCItem;
     retained_earnings: WCItem;
+    accounts_payable_tp: WCItem;
   };
   other_wc_items: {
     total: WCItem;
@@ -41,7 +42,6 @@ interface WCData {
     accrued: WCItem;
     fixed_assets: WCItem;
     net_other: WCItem;
-    accounts_payable_tp: WCItem;
     other?: WCItem;
   };
   lease_related: {
@@ -527,15 +527,7 @@ export default function BSPage() {
                       bgColor="bg-yellow-50"
                       expanded={expandedSections.has('wc-main')}
                       onClick={() => toggleSection('wc-main')}
-                      note={<>
-                        {noteItem('AR', bsData.balance_sheet.working_capital.receivables.accounts_receivable.year_end - bsData.balance_sheet.working_capital.receivables.accounts_receivable.prev_year)}
-                        {', '}
-                        {noteItem('재고', bsData.balance_sheet.working_capital.receivables.inventory.year_end - bsData.balance_sheet.working_capital.receivables.inventory.prev_year)}
-                        {', '}
-                        {noteItem('선급금', bsData.balance_sheet.working_capital.other_wc_items.prepaid.year_end - bsData.balance_sheet.working_capital.other_wc_items.prepaid.prev_year)}
-                        {', '}
-                        {noteItem('AP', bsData.balance_sheet.working_capital.payables.accounts_payable.year_end - bsData.balance_sheet.working_capital.payables.accounts_payable.prev_year)}
-                      </>}
+                      note="AR +13m, 재고 △25m, 선급금 △0m, AP +1m"
                     />
 
                     {expandedSections.has('wc-main') && (
@@ -546,10 +538,11 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.receivables.accounts_receivable} 
                           isPositive={true}
                           noteKey="receivables_accounts_receivable"
-                          noteValue={notes['receivables_accounts_receivable']}
+                          noteValue={notes['receivables_accounts_receivable'] || '대만 백화점채권(d+45일 결제)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'receivables_accounts_receivable'}
                           onNoteEdit={setEditingNote}
+                          highlight={true}
                         />
                         
                         {/* 재고자산 */}
@@ -558,10 +551,11 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.receivables.inventory} 
                           isPositive={true}
                           noteKey="receivables_inventory"
-                          noteValue={notes['receivables_inventory']}
+                          noteValue={notes['receivables_inventory'] || '26년말 재고자산 120m Target(재고일수 320일 → 240일) → 현금창출 50m (40m은 매입채무 상환, 10m 리뉴얼 투자)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'receivables_inventory'}
                           onNoteEdit={setEditingNote}
+                          highlight={true}
                         />
                         
                         {/* 매입채무 */}
@@ -570,10 +564,11 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.payables.accounts_payable} 
                           isPositive={false}
                           noteKey="payables_accounts_payable"
-                          noteValue={notes['payables_accounts_payable']}
+                          noteValue={notes['payables_accounts_payable'] || '26년말 매입채무 90m Target(25년말 대비 40m 감소)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'payables_accounts_payable'}
                           onNoteEdit={setEditingNote}
+                          highlight={true}
                         />
                       </>
                     )}
@@ -595,10 +590,11 @@ export default function BSPage() {
                         item={bsData.balance_sheet.working_capital.payables.cash} 
                         isPositive={true}
                         noteKey="payables_cash"
-                        noteValue={notes['payables_cash']}
+                        noteValue={notes['payables_cash'] || '현금 및 현금성자산'}
                         onNoteChange={saveNote}
                         isEditingNote={editingNote === 'payables_cash'}
                         onNoteEdit={setEditingNote}
+                        highlight={true}
                       />
                     )}
 
@@ -613,9 +609,16 @@ export default function BSPage() {
                       isPositive={false}
                       note={(() => {
                         const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
-                        const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
-                        const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
-                        return `이익잉여금 △${yoyInMillions}m (이익잉여금 증가, 대변계정)`;
+                        const tpPayable = bsData.balance_sheet.working_capital.profit_creation.accounts_payable_tp;
+                        const reYoy = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
+                        const tpYoy = calculateYoYAmount(tpPayable.year_end, tpPayable.prev_year);
+                        return (
+                          <>
+                            {noteItem('이익잉여금', reYoy)}
+                            {', '}
+                            {noteItem('매입채무(TP)', tpYoy)}
+                          </>
+                        );
                       })()}
                     />
                     {expandedSections.has('wc-profit') && (() => {
@@ -624,16 +627,29 @@ export default function BSPage() {
                       const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
                       const defaultNote = `이익잉여금 △${yoyInMillions}m (이익잉여금 증가, 대변계정)`;
                       return (
-                        <WCRow 
-                          label="  이익잉여금" 
-                          item={retainedEarnings} 
-                          isPositive={false}
-                          noteKey="profit_creation_retained_earnings"
-                          noteValue={notes['profit_creation_retained_earnings'] || defaultNote}
-                          onNoteChange={saveNote}
-                          isEditingNote={editingNote === 'profit_creation_retained_earnings'}
-                          onNoteEdit={setEditingNote}
-                        />
+                        <>
+                          <WCRow 
+                            label="  이익잉여금" 
+                            item={retainedEarnings} 
+                            isPositive={false}
+                            noteKey="profit_creation_retained_earnings"
+                            noteValue={notes['profit_creation_retained_earnings'] || defaultNote}
+                            onNoteChange={saveNote}
+                            isEditingNote={editingNote === 'profit_creation_retained_earnings'}
+                            onNoteEdit={setEditingNote}
+                          />
+                          <WCRow 
+                            label="  매입채무(TP)" 
+                            item={bsData.balance_sheet.working_capital.profit_creation.accounts_payable_tp} 
+                            isPositive={false}
+                            noteKey="profit_creation_accounts_payable_tp"
+                            noteValue={notes['profit_creation_accounts_payable_tp'] || '본사 선수금 (무이자, Transfer Price)'}
+                            onNoteChange={saveNote}
+                            isEditingNote={editingNote === 'profit_creation_accounts_payable_tp'}
+                            onNoteEdit={setEditingNote}
+                            highlight={true}
+                          />
+                        </>
                       );
                     })()}
 
@@ -653,8 +669,6 @@ export default function BSPage() {
                         {noteItem('보증금', bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.year_end - bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.prev_year)}
                         {', '}
                         {noteItem('미수금', bsData.balance_sheet.working_capital.other_wc_items.net_other.year_end - bsData.balance_sheet.working_capital.other_wc_items.net_other.prev_year)}
-                        {', '}
-                        {noteItem('매입채무(TP)', bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp.year_end - bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp.prev_year)}
                       </>}
                     />
                     {expandedSections.has('wc-other') && (
@@ -664,7 +678,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.other_wc_items.prepaid} 
                           isPositive={true}
                           noteKey="other_wc_items_prepaid"
-                          noteValue={notes['other_wc_items_prepaid']}
+                          noteValue={notes['other_wc_items_prepaid'] || '선급임차료, 선급보험료 등'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'other_wc_items_prepaid'}
                           onNoteEdit={setEditingNote}
@@ -674,7 +688,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.other_wc_items.accrued} 
                           isPositive={false}
                           noteKey="other_wc_items_accrued"
-                          noteValue={notes['other_wc_items_accrued']}
+                          noteValue={notes['other_wc_items_accrued'] || '미지급급여, 미지급임차료 등'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'other_wc_items_accrued'}
                           onNoteEdit={setEditingNote}
@@ -684,7 +698,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets} 
                           isPositive={true}
                           noteKey="other_wc_items_fixed_assets"
-                          noteValue={notes['other_wc_items_fixed_assets']}
+                          noteValue={notes['other_wc_items_fixed_assets'] || '유형자산, 임대보증금'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'other_wc_items_fixed_assets'}
                           onNoteEdit={setEditingNote}
@@ -694,19 +708,9 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.other_wc_items.net_other}
                           isPositive={true}
                           noteKey="other_wc_items_net_other"
-                          noteValue={notes['other_wc_items_net_other']}
+                          noteValue={notes['other_wc_items_net_other'] || '기타 미수금 및 미지급금'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'other_wc_items_net_other'}
-                          onNoteEdit={setEditingNote}
-                        />
-                        <WCRow 
-                          label="  매입채무(TP)" 
-                          item={bsData.balance_sheet.working_capital.other_wc_items.accounts_payable_tp} 
-                          isPositive={false}
-                          noteKey="other_wc_items_accounts_payable_tp"
-                          noteValue={notes['other_wc_items_accounts_payable_tp']}
-                          onNoteChange={saveNote}
-                          isEditingNote={editingNote === 'other_wc_items_accounts_payable_tp'}
                           onNoteEdit={setEditingNote}
                         />
                         {bsData.balance_sheet.working_capital.other_wc_items.other && (
@@ -745,7 +749,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.lease_related.right_of_use} 
                           isPositive={true}
                           noteKey="lease_related_right_of_use"
-                          noteValue={notes['lease_related_right_of_use']}
+                          noteValue={notes['lease_related_right_of_use'] || '매장 임차권 (IFRS16)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'lease_related_right_of_use'}
                           onNoteEdit={setEditingNote}
@@ -755,7 +759,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.lease_related.lease_liabilities} 
                           isPositive={false}
                           noteKey="lease_related_lease_liabilities"
-                          noteValue={notes['lease_related_lease_liabilities']}
+                          noteValue={notes['lease_related_lease_liabilities'] || '임차료 미래지급의무 (IFRS16)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'lease_related_lease_liabilities'}
                           onNoteEdit={setEditingNote}
@@ -918,7 +922,8 @@ function WCRow({
   noteValue,
   onNoteChange,
   isEditingNote,
-  onNoteEdit
+  onNoteEdit,
+  highlight = false
 }: {
   label: string;
   item: WCItem;
@@ -934,6 +939,7 @@ function WCRow({
   onNoteChange?: (key: string, value: string) => void;
   isEditingNote?: boolean;
   onNoteEdit?: (key: string | null) => void;
+  highlight?: boolean;
 }) {
   const formatNumber = (value: number, isPositive?: boolean, isYoy?: boolean): string => {
     // 연간비교(yoy)는 실제 증감량을 표시하므로 isPositive 무시
@@ -966,7 +972,7 @@ function WCRow({
     return value >= 0 ? 'text-green-600' : 'text-red-600';
   };
 
-  const rowClass = `hover:bg-gray-100 ${bgColor} ${onClick ? 'cursor-pointer' : ''}`;
+  const rowClass = `hover:bg-gray-100 ${bgColor} ${onClick ? 'cursor-pointer' : ''} ${highlight ? 'border-l-4 border-l-yellow-400' : ''}`;
   const fontClass = isSection || isSubSection ? 'font-bold' : '';
   
   // 연간비교 = 25년 기말 - 24년 기말 (직접 계산)

@@ -259,9 +259,9 @@
       },
       "profit_creation": {
         "total": {
-          "prev_year": -4536.0,
-          "current_month": 9825.0,
-          "year_end": -11453.0,
+          "prev_year": -119115.0,
+          "current_month": -104754.0,
+          "year_end": -111955.0,
           "yoy_krw": 0
         },
         "retained_earnings": {
@@ -269,13 +269,19 @@
           "current_month": 9825.0,
           "year_end": -11453.0,
           "yoy_krw": 0
+        },
+        "accounts_payable_tp": {
+          "prev_year": -114579.0,
+          "current_month": -114579.0,
+          "year_end": -100502.0,
+          "yoy_krw": 0
         }
       },
       "other_wc_items": {
         "total": {
-          "prev_year": -101233.0,
-          "current_month": -90940.0,
-          "year_end": -76987.0,
+          "prev_year": 13346.0,
+          "current_month": 23639.0,
+          "year_end": 23515.0,
           "yoy_krw": 0
         },
         "prepaid": {
@@ -306,12 +312,6 @@
           "prev_year": -15121.0,
           "current_month": -15402.0,
           "year_end": -15402.0,
-          "yoy_krw": 0
-        },
-        "accounts_payable_tp": {
-          "prev_year": -114579.0,
-          "current_month": -114579.0,
-          "year_end": -100502.0,
           "yoy_krw": 0
         },
         "other": {
