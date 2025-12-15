@@ -1201,7 +1201,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         const defaultText = `• 11월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
 • 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
 • 평당매출/1일 증가: ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%), 홍콩 오프라인 매장 효율성 개선
-• 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승), 매출총이익률 ${formatPercent(pl?.gross_profit_rate || 0, 1)}% 유지`;
+• 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -1273,7 +1273,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">할인율 관리</span>: {formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승), 매출총이익률 {formatPercent(pl?.gross_profit_rate || 0, 1)}% 유지
+                          <span className="font-semibold">할인율 관리</span>: {formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)
                         </div>
                       </div>
 
@@ -1299,9 +1299,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• 과시즌 재고 급증: ${formatNumber(pastSeasonFW?.total?.current)}K (전년 ${formatNumber(pastSeasonFW?.total?.previous)}K, YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
-• 누적 영업손실 지속: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
-• Discovery 영업손실 지속: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
+                        const defaultText = `• 과시즌 재고: ${formatNumber(pastSeasonFW?.total?.current)}K (전년YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%)
+• 누적 영업손실 지속: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
+• Discovery 영업손실: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1352,21 +1352,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">과시즌 재고 급증</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년 {formatNumber(pastSeasonFW?.total?.previous)}K, YOY {formatPercent(pastSeasonFW?.total?.yoy)}%), 현금흐름 압박 및 진부화 손실 우려
+                          <span className="font-semibold">과시즌 재고</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년YOY {formatPercent(pastSeasonFW?.total?.yoy)}%)
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">누적 영업손실 지속</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%), 연간 흑자 전환 위해 비용 효율화 긴급
+                          <span className="font-semibold">누적 영업손실 지속</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">Discovery 영업손실 지속</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
+                          <span className="font-semibold">Discovery 영업손실</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
                         </div>
                       </div>
                     </>
@@ -1389,10 +1389,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        const defaultText = `• 재고 정상화: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
-• 수익성 개선: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
-• 성장 모멘텀 유지: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
-• 채널 효율화: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행`;
+                        const defaultText = `• 재고 정상화: 26년1월 매출YOY 113%, 재고일수 425일→320일
+• 성장 모멘텀 유지: 당월 흑자 전환 기조 지속
+• 채널 효율화: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
@@ -1443,28 +1442,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">재고 정상화</span>: 과시즌 재고 즉시 판촉 강화, 당시즌 재고 20% 감축 목표, 불용재고 처분 계획 수립
+                          <span className="font-semibold">재고 정상화</span>: 26년1월 매출YOY 113%, 재고일수 425일→320일
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">수익성 개선</span>: 누적 적자 해소를 위한 비용 효율화, 손익분기 분석, 고정비 구조조정 검토
+                          <span className="font-semibold">성장 모멘텀 유지</span>: 당월 흑자 전환 기조 지속
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">성장 모멘텀 유지</span>: 당월 흑자 전환 기조 지속, 매출 성장 레버리지 활용, 마진 관리 집중
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">채널 효율화</span>: 매장별 손익분석 기반 효율화, 채널 포트폴리오 최적화, 비효율 매장 개선 작업 병행
+                          <span className="font-semibold">채널 효율화</span>: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)
                         </div>
                       </div>
                     </>
