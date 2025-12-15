@@ -3452,7 +3452,15 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
 
           {/* 상세 테이블 */}
           <div className="overflow-x-auto">
-            <table className="min-w-full text-xs border-collapse">
+            <style>{`
+              .hk-pl-summary-table tbody tr td:nth-child(8),
+              .hk-pl-summary-table tbody tr td:nth-child(15),
+              .hk-pl-summary-table thead tr th:nth-child(8),
+              .hk-pl-summary-table thead tr th:nth-child(15) {
+                background-color: #f3f4f6 !important;
+              }
+            `}</style>
+            <table className="min-w-full text-xs border-collapse hk-pl-summary-table">
               <thead>
                 <tr className="bg-gray-100 border-b-2 border-gray-300">
                   <th rowSpan={2} className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
