@@ -42,6 +42,7 @@ interface WCData {
     fixed_assets: WCItem;
     net_other: WCItem;
     accounts_payable_tp: WCItem;
+    other?: WCItem;
   };
   lease_related: {
     total: WCItem;
@@ -610,20 +611,31 @@ export default function BSPage() {
                       expanded={expandedSections.has('wc-profit')}
                       onClick={() => toggleSection('wc-profit')}
                       isPositive={false}
-                      note={noteItem('이익잉여금', bsData.balance_sheet.working_capital.profit_creation.retained_earnings.year_end - bsData.balance_sheet.working_capital.profit_creation.retained_earnings.prev_year)}
+                      note={(() => {
+                        const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
+                        const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
+                        const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
+                        return `이익잉여금 △${yoyInMillions}m (이익잉여금 증가, 대변계정)`;
+                      })()}
                     />
-                    {expandedSections.has('wc-profit') && (
-                      <WCRow 
-                        label="  이익잉여금" 
-                        item={bsData.balance_sheet.working_capital.profit_creation.retained_earnings} 
-                        isPositive={false}
-                        noteKey="profit_creation_retained_earnings"
-                        noteValue={notes['profit_creation_retained_earnings']}
-                        onNoteChange={saveNote}
-                        isEditingNote={editingNote === 'profit_creation_retained_earnings'}
-                        onNoteEdit={setEditingNote}
-                      />
-                    )}
+                    {expandedSections.has('wc-profit') && (() => {
+                      const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
+                      const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
+                      const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
+                      const defaultNote = `이익잉여금 △${yoyInMillions}m (이익잉여금 증가, 대변계정)`;
+                      return (
+                        <WCRow 
+                          label="  이익잉여금" 
+                          item={retainedEarnings} 
+                          isPositive={false}
+                          noteKey="profit_creation_retained_earnings"
+                          noteValue={notes['profit_creation_retained_earnings'] || defaultNote}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'profit_creation_retained_earnings'}
+                          onNoteEdit={setEditingNote}
+                        />
+                      );
+                    })()}
 
                     {/* 기타 운전자본 */}
                     <WCRow
@@ -697,6 +709,18 @@ export default function BSPage() {
                           isEditingNote={editingNote === 'other_wc_items_accounts_payable_tp'}
                           onNoteEdit={setEditingNote}
                         />
+                        {bsData.balance_sheet.working_capital.other_wc_items.other && (
+                          <WCRow 
+                            label="  기타" 
+                            item={bsData.balance_sheet.working_capital.other_wc_items.other} 
+                            isPositive={undefined}
+                            noteKey="other_wc_items_other"
+                            noteValue={notes['other_wc_items_other']}
+                            onNoteChange={saveNote}
+                            isEditingNote={editingNote === 'other_wc_items_other'}
+                            onNoteEdit={setEditingNote}
+                          />
+                        )}
                       </>
                     )}
 
@@ -744,11 +768,24 @@ export default function BSPage() {
                       <td className="px-4 py-3 border border-gray-300 font-bold text-green-800">
                         합계 (Balance Check)
                       </td>
-                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
-                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
-                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
-                      <td className="px-4 py-3 border border-gray-300 text-center font-bold text-green-800">0</td>
-                      <td className="px-4 py-3 border border-gray-300 text-center text-green-600 text-xl">✓ 균형</td>
+                      <td className={`px-4 py-3 border border-gray-300 text-center font-bold ${Math.abs(bsData.balance_sheet.working_capital.balance_check.prev_year) <= 1 ? 'text-green-800' : 'text-red-600'}`}>
+                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.prev_year) <= 1 ? '0' : (bsData.balance_sheet.working_capital.balance_check.prev_year >= 0 ? '+' : '△') + formatNumber(Math.abs(bsData.balance_sheet.working_capital.balance_check.prev_year))}
+                      </td>
+                      <td className={`px-4 py-3 border border-gray-300 text-center font-bold ${Math.abs(bsData.balance_sheet.working_capital.balance_check.current_month) <= 1 ? 'text-green-800' : 'text-red-600'}`}>
+                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.current_month) <= 1 ? '0' : (bsData.balance_sheet.working_capital.balance_check.current_month >= 0 ? '+' : '△') + formatNumber(Math.abs(bsData.balance_sheet.working_capital.balance_check.current_month))}
+                      </td>
+                      <td className={`px-4 py-3 border border-gray-300 text-center font-bold ${Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? 'text-green-800' : 'text-red-600'}`}>
+                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? '0' : (bsData.balance_sheet.working_capital.balance_check.year_end >= 0 ? '+' : '△') + formatNumber(Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end))}
+                      </td>
+                      <td className={`px-4 py-3 border border-gray-300 text-center font-bold ${Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end - bsData.balance_sheet.working_capital.balance_check.prev_year) <= 1 ? 'text-green-800' : 'text-red-600'}`}>
+                        {(() => {
+                          const yoy = bsData.balance_sheet.working_capital.balance_check.year_end - bsData.balance_sheet.working_capital.balance_check.prev_year;
+                          return Math.abs(yoy) <= 1 ? '0' : (yoy >= 0 ? '+' : '△') + formatNumber(Math.abs(yoy));
+                        })()}
+                      </td>
+                      <td className={`px-4 py-3 border border-gray-300 text-center font-bold text-xl ${Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? 'text-green-600' : 'text-red-600'}`}>
+                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? '✓ 균형' : '✗ 불균형'}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -898,7 +935,12 @@ function WCRow({
   isEditingNote?: boolean;
   onNoteEdit?: (key: string | null) => void;
 }) {
-  const formatNumber = (value: number, isPositive?: boolean): string => {
+  const formatNumber = (value: number, isPositive?: boolean, isYoy?: boolean): string => {
+    // 연간비교(yoy)는 실제 증감량을 표시하므로 isPositive 무시
+    if (isYoy) {
+      const sign = value >= 0 ? '+' : '△';
+      return `${sign}${Math.abs(value).toLocaleString()}`;
+    }
     // isPositive가 지정되면 항목 성격에 따라 고정 기호 사용
     // 자산 항목(isPositive=true): 항상 + 표시
     // 부채/자본 항목(isPositive=false): 항상 △ 표시
@@ -946,7 +988,7 @@ function WCRow({
         {formatNumber(item.year_end, isPositive)}
       </td>
       <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass} ${getColorClass(calculatedYoy, isPositive)}`}>
-        {formatNumber(calculatedYoy, isPositive)}
+        {formatNumber(calculatedYoy, undefined, true)}
       </td>
       <td className="px-4 py-3 border border-gray-300 text-left text-xs text-gray-700" style={{ minWidth: '250px' }}>
         {noteKey && onNoteChange ? (
