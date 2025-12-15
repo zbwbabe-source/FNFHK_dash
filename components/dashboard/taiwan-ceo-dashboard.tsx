@@ -8144,7 +8144,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const current = (expenseDetail as any).salary || 0;
                     const prev = (expenseDetailPrev as any).salary || 0;
                     const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    const changeRate = prev !== 0 ? (current / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
                     const prevSales = prevMonthData?.net_sales || 0;
                     const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
@@ -8211,7 +8211,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const current = (expenseDetail as any).salary || 0;
                     const prev = (expenseDetailPrev as any).salary || 0;
                     const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    const changeRate = prev !== 0 ? (current / prev) * 100 : 0;
                     const currentSales = cumulativeData?.net_sales || 0;
                     const prevSales = prevCumulativeData?.net_sales || 0;
                     const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
@@ -8286,7 +8286,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const current = (expenseDetail as any).marketing || 0;
                     const prev = (expenseDetailPrev as any).marketing || 0;
                     const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    const changeRate = prev !== 0 ? (current / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
                     const prevSales = prevMonthData?.net_sales || 0;
                     const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
@@ -8353,7 +8353,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const current = (expenseDetail as any).marketing || 0;
                     const prev = (expenseDetailPrev as any).marketing || 0;
                     const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    const changeRate = prev !== 0 ? (current / prev) * 100 : 0;
                     const currentSales = cumulativeData?.net_sales || 0;
                     const prevSales = prevCumulativeData?.net_sales || 0;
                     const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
