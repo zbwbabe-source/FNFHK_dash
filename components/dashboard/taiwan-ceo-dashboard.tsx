@@ -3519,7 +3519,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.tag_sales || 0)}%</td>
                 </tr>
                 {/* 실판 */}
-                <tr className="border-b border-gray-200">
+                <tr className="border-b border-gray-200 bg-gray-100">
                   <td className="p-2 font-semibold border-r border-gray-300">실판</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.current_month?.offline?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.current_month?.online?.net_sales || 0)}</td>
@@ -3789,7 +3789,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.direct_cost || 0)}%</td>
                 </tr>
                 {/* 직접이익 */}
-                <tr className="border-b border-gray-200">
+                <tr className="border-b border-gray-200 bg-gray-100">
                   <td className="p-2 font-semibold border-r border-gray-300">직접이익</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.current_month?.offline?.direct_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.current_month?.online?.direct_profit || 0)}</td>
@@ -3951,7 +3951,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}%</td>
                 </tr>
                 {/* 영업이익 */}
-                <tr className="border-b border-gray-200">
+                <tr className="border-b border-gray-200 bg-gray-100">
                   <td className="p-2 font-semibold border-r border-gray-300">영업이익</td>
                   <td className={`p-2 text-right border-r border-gray-300 ${(plData?.current_month?.offline?.operating_profit || 0) < 0 ? 'text-red-600' : ''}`}>
                     {(plData?.current_month?.offline?.operating_profit || 0) < 0 ? '(' : ''}{formatNumber(Math.abs(plData?.current_month?.offline?.operating_profit || 0))}{(plData?.current_month?.offline?.operating_profit || 0) < 0 ? ')' : ''}
