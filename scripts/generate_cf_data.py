@@ -55,6 +55,33 @@ def parse_cash_flow_excel(excel_path, period):
     xl_file = pd.ExcelFile(excel_path)
     print(f"시트 목록: {xl_file.sheet_names}\n")
     
+    # CF SUMMARY 시트 우선 확인
+    cf_summary_sheet = None
+    for sheet in xl_file.sheet_names:
+        if 'CF SUMMARY' in sheet.upper() or 'CF_SUMMARY' in sheet.upper():
+            cf_summary_sheet = sheet
+            break
+    
+    if cf_summary_sheet:
+        print(f"✅ CF SUMMARY 시트 발견: {cf_summary_sheet}")
+        print("CF SUMMARY 시트에서 데이터를 읽습니다...\n")
+        
+        # CF SUMMARY 시트 읽기
+        df_summary = pd.read_excel(excel_path, sheet_name=cf_summary_sheet, header=None)
+        print(f"CF SUMMARY 시트 크기: {df_summary.shape[0]}행 x {df_summary.shape[1]}열\n")
+        
+        # 전체 내용 출력 (디버깅)
+        print("=== CF SUMMARY 시트 내용 ===")
+        for idx in range(min(50, len(df_summary))):
+            row = df_summary.iloc[idx]
+            row_str = ' | '.join([str(x) if pd.notna(x) else '' for x in row[:10]])
+            if row_str.strip():
+                print(f"Row {idx}: {row_str}")
+        print("=" * 80)
+        
+        # TODO: CF SUMMARY 시트 파싱 로직 추가
+        # 사용자가 제공한 CF SUMMARY 시트 구조에 맞게 파싱
+    
     # 시트 이름 찾기 (period 기반)
     hk_sheet_name = None
     tw_sheet_name = None

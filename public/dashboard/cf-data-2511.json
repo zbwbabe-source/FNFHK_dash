@@ -3,19 +3,20 @@
   "summary": {
     "beginning_cash": {
       "prev_year": 28195,
-      "current": 32082
+      "current": 32082,
+      "current_12": 22382
     },
     "operating_cash_flow": {
-      "prev_year": 20549,
-      "current_1_11": 11099,
-      "current_12": 7446,
-      "current_total": 18545
+      "prev_year": 11485,
+      "current_1_11": 15721,
+      "current_12": 2758,
+      "current_total": 18480
     },
     "investing_cash_flow": {
       "prev_year": -7598,
-      "current_1_11": -24607,
-      "current_12": -1943,
-      "current_total": -26550
+      "current_1_11": -25421,
+      "current_12": 0,
+      "current_total": -25421
     },
     "financing_cash_flow": {
       "prev_year": 0,
@@ -23,57 +24,93 @@
       "current_12": 0,
       "current_total": 0
     },
+    "net_cash_flow": {
+      "prev_year": 3887,
+      "current_1_11": -9700,
+      "current_12": 2758,
+      "current_total": -6941
+    },
     "ending_cash": {
       "prev_year": 32082,
-      "current_1_11": 25394,
+      "current_1_11": 22382,
       "current_12": 25141,
       "current_total": 25141
     }
   },
   "operating_activities": {
-    "sales_collection": {
-      "prev_year": 408206,
-      "current_1_11": 327093,
-      "current_12": 82634,
-      "current_total": 409727
+    "sales_hk": {
+      "prev_year": 287908,
+      "current_1_11": 225679,
+      "current_12": 35540,
+      "current_total": 261220
     },
-    "goods_and_duties": {
+    "sales_tw": {
+      "prev_year": 119897,
+      "current_1_11": 115207,
+      "current_12": 14142,
+      "current_total": 129349
+    },
+    "sales_total": {
+      "prev_year": 407805,
+      "current_1_11": 340887,
+      "current_12": 49682,
+      "current_total": 390569
+    },
+    "goods_and_duties_hk": {
+      "prev_year": -123178,
+      "current_1_11": -77242,
+      "current_12": -20367,
+      "current_total": -97609
+    },
+    "goods_and_duties_tw": {
+      "prev_year": -83430,
+      "current_1_11": -74638,
+      "current_12": -6857,
+      "current_total": -81495
+    },
+    "goods_and_duties_total": {
       "prev_year": -206609,
-      "current_1_11": -154695,
-      "current_12": -43229,
-      "current_total": -197924
+      "current_1_11": -151880,
+      "current_12": -27224,
+      "current_total": -179104
     },
-    "operating_expenses": {
+    "operating_expenses_hk": {
+      "prev_year": -153891,
+      "current_1_11": -137195,
+      "current_12": -13482,
+      "current_total": -150677
+    },
+    "operating_expenses_tw": {
+      "prev_year": -35820,
+      "current_1_11": -36090,
+      "current_12": -6218,
+      "current_total": -42308
+    },
+    "operating_expenses_total": {
       "prev_year": -189711,
-      "current_1_11": -174012,
-      "current_12": -38892,
-      "current_total": -212904
-    },
-    "other_income": {
-      "prev_year": 0,
-      "current_1_11": 0,
-      "current_12": 0,
-      "current_total": 0
-    },
-    "corporate_tax": {
-      "prev_year": 0,
-      "current_1_11": -1272,
-      "current_12": 0,
-      "current_total": -1272
+      "current_1_11": -173285,
+      "current_12": -19700,
+      "current_total": -192985
     }
   },
   "investing_activities": {
     "hk_capex": {
-      "prev_year": -7598,
-      "current_1_11": -18453,
-      "current_12": -1943,
-      "current_total": -20396
+      "prev_year": -6524,
+      "current_1_11": -18273,
+      "current_12": 0,
+      "current_total": -18273
     },
     "tw_capex": {
-      "prev_year": 0,
-      "current_1_11": -6154,
+      "prev_year": -1075,
+      "current_1_11": -7148,
       "current_12": 0,
-      "current_total": -6154
+      "current_total": -7148
+    },
+    "total_capex": {
+      "prev_year": -7598,
+      "current_1_11": -25421,
+      "current_12": 0,
+      "current_total": -25421
     }
   },
   "financing_activities": {
@@ -86,16 +123,16 @@
   },
   "ending_cash_detail": {
     "hk_ending_cash": {
-      "prev_year": 25418,
-      "current_1_11": 21314,
-      "current_12": 20079,
-      "current_total": 20079
+      "prev_year": 0,
+      "current_1_11": 0,
+      "current_12": 0,
+      "current_total": 0
     },
     "tw_ending_cash": {
-      "prev_year": 7728,
-      "current_1_11": 5144,
-      "current_12": 5062,
-      "current_total": 5062
+      "prev_year": 0,
+      "current_1_11": 0,
+      "current_12": 0,
+      "current_total": 0
     }
   }
 }
