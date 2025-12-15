@@ -3447,10 +3447,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <th rowSpan={2} className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">당월</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-orange-50">당월 전년비</th>
-                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-purple-50">YOY</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-gray-200">YOY</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-cyan-50">누적</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-amber-50">누적 전년비</th>
-                  <th rowSpan={2} className="text-center p-2 font-semibold bg-indigo-50">누적 YOY</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold bg-gray-200">누적 YOY</th>
                 </tr>
                 <tr className="bg-gray-50 border-b border-gray-300">
                   <th className="p-1 text-center border-r border-gray-300 bg-green-50">오프라인</th>
@@ -3494,7 +3494,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.tag_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.tag_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.tag_sales || 0)}</td>
@@ -3516,7 +3516,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.tag_sales || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.tag_sales || 0)}%</td>
                 </tr>
                 {/* 실판 */}
                 <tr className="border-b border-gray-200 bg-gray-100">
@@ -3544,7 +3544,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.net_sales || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.net_sales || 0)}</td>
@@ -3566,7 +3566,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.net_sales || 0)}%</td>
                 </tr>
                 {/* 할인율 */}
                 <tr className="border-b border-gray-200">
@@ -3652,7 +3652,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.gross_profit || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(plYoy?.gross_profit || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.gross_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.gross_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.gross_profit || 0)}</td>
@@ -3676,7 +3676,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.gross_profit || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.gross_profit || 0)}%</td>
                 </tr>
                 {/* 매출총이익률 */}
                 <tr className="border-b border-gray-200">
@@ -3762,7 +3762,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.direct_cost || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(plYoy?.direct_cost || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.direct_cost || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.direct_cost || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_cost || 0)}</td>
@@ -3786,7 +3786,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.direct_cost || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.direct_cost || 0)}%</td>
                 </tr>
                 {/* 직접이익 */}
                 <tr className="border-b border-gray-200 bg-gray-100">
@@ -3814,7 +3814,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.direct_profit || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(plYoy?.direct_profit || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.direct_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.direct_profit || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.direct_profit || 0)}</td>
@@ -3838,7 +3838,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.direct_profit || 0)}%</td>
                 </tr>
                 {/* 직접이익율 */}
                 <tr className="border-b border-gray-200">
@@ -3924,7 +3924,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right border-r border-gray-300">{formatPercent(plYoy?.sg_a || 0)}%</td>
+                  <td className="p-2 text-right border-r border-gray-300 bg-gray-100">{formatPercent(plYoy?.sg_a || 0)}%</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.offline?.sg_a || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300">{formatNumber(plData?.cumulative?.online?.sg_a || 0)}</td>
                   <td className="p-2 text-right border-r border-gray-300 font-semibold">{formatNumber(plData?.cumulative?.total?.sg_a || 0)}</td>
@@ -3948,7 +3948,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className="p-2 text-right">{formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}%</td>
+                  <td className="p-2 text-right bg-gray-100">{formatPercent(plData?.cumulative?.yoy?.sg_a || 0)}%</td>
                 </tr>
                 {/* 영업이익 */}
                 <tr className="border-b border-gray-200 bg-gray-100">
@@ -3982,7 +3982,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className={`p-2 text-right border-r border-gray-300 ${(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                  <td className={`p-2 text-right border-r border-gray-300 bg-gray-100 ${(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                     {formatPercent(plYoy?.operating_profit || 0)}%
                   </td>
                   <td className={`p-2 text-right border-r border-gray-300 ${(plData?.cumulative?.offline?.operating_profit || 0) < 0 ? 'text-red-600' : ''}`}>
@@ -4014,7 +4014,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return <span className={`font-bold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>{change >= 0 ? '+' : ''}{formatNumber(change)}</span>;
                     })()}
                   </td>
-                  <td className={`p-2 text-right ${(plData?.cumulative?.yoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                  <td className={`p-2 text-right bg-gray-100 ${(plData?.cumulative?.yoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                     {formatPercent(plData?.cumulative?.yoy?.operating_profit || 0)}%
                   </td>
                 </tr>
