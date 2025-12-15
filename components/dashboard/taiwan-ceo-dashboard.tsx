@@ -15,8 +15,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const [plData, setPlData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // CEO 인사이트 편집 상태 - 각 항목별로 관리
+  // CEO 인사이트 편집 상태
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingCard, setEditingCard] = useState<string | null>(null);
   const [ceoInsights, setCeoInsights] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -86,6 +87,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
     setCeoInsights(updated);
     localStorage.setItem(`taiwan-ceo-insights-${period}`, JSON.stringify(updated));
     setEditingItemId(null);
+  };
+
+  const saveCardFull = (cardId: string, content: string) => {
+    const updated = { ...ceoInsights, [cardId]: content };
+    setCeoInsights(updated);
+    localStorage.setItem(`taiwan-ceo-insights-${period}`, JSON.stringify(updated));
   };
 
   // Period 표시를 위한 포맷팅
@@ -752,10 +759,74 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="grid grid-cols-3 gap-4">
             {/* 핵심 성과 */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border-l-4 border-blue-600">
-              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center">
-                <span className="text-xl mr-2">💡</span>
-                핵심 성과
+              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
+                <div className="flex items-center">
+                  <span className="text-xl mr-2">💡</span>
+                  핵심 성과
+                </div>
+                <button
+                  onClick={() => {
+                    if (editingCard === 'executive-summary') {
+                      setEditingCard(null);
+                    } else {
+                      setEditingCard('executive-summary');
+                      if (!ceoInsights['executive-summary-text']) {
+                        // 현재 표시되는 내용을 기본값으로 수집
+                        const items = [];
+                        const salesSummary = dashboardData?.sales_summary || {};
+                        if (salesSummary?.total_yoy && salesSummary.total_yoy >= 100) {
+                          items.push(`• 전체 매출: ${formatNumber(salesSummary?.total_net_sales || 0)}K (YOY ${formatPercent(salesSummary?.total_yoy)}%), 전년 동월 대비 +${formatNumber(salesSummary?.total_change || 0)}K`);
+                        }
+                        if (twDailySalesPerPyeong > 0) {
+                          items.push(`• 평당매출/1일: ${formatNumber(Math.round(twDailySalesPerPyeong))} HKD (YOY ${formatPercent(twSalesPerPyeongYoy)}%)`);
+                        }
+                        if (pl?.operating_profit && pl.operating_profit > 0) {
+                          items.push(`• 당월 영업이익: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)`);
+                        }
+                        setCeoInsights({ ...ceoInsights, 'executive-summary-text': items.join('\n') });
+                      }
+                    }
+                  }}
+                  className="text-xs px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  {editingCard === 'executive-summary' ? '취소' : '편집'}
+                </button>
               </h4>
+              {editingCard === 'executive-summary' ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={ceoInsights['executive-summary-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'executive-summary-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-blue-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('executive-summary-text', ceoInsights['executive-summary-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : ceoInsights['executive-summary-text'] ? (
+                <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+                  {ceoInsights['executive-summary-text']}
+                </div>
+              ) : (
               <div className="space-y-2 text-sm text-gray-700">
                 {(() => {
                   const insights = [];
@@ -1013,14 +1084,67 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   ];
                 })()}
               </div>
+              )}
             </div>
 
             {/* 주요 리스크 */}
             <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border-l-4 border-orange-600">
-              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center">
-                <span className="text-xl mr-2">⚠️</span>
-                주요 리스크
+              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
+                <div className="flex items-center">
+                  <span className="text-xl mr-2">⚠️</span>
+                  주요 리스크
+                </div>
+                <button
+                  onClick={() => {
+                    if (editingCard === 'risk') {
+                      setEditingCard(null);
+                    } else {
+                      setEditingCard('risk');
+                      if (!ceoInsights['risk-text']) {
+                        setCeoInsights({ ...ceoInsights, 'risk-text': '• 주요 리스크 내용을 입력하세요' });
+                      }
+                    }
+                  }}
+                  className="text-xs px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+                >
+                  {editingCard === 'risk' ? '취소' : '편집'}
+                </button>
               </h4>
+              {editingCard === 'risk' ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={ceoInsights['risk-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'risk-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-orange-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('risk-text', ceoInsights['risk-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : ceoInsights['risk-text'] ? (
+                <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+                  {ceoInsights['risk-text']}
+                </div>
+              ) : (
               <div className="space-y-2 text-sm text-gray-700">
                 {(() => {
                   const risks = [];
@@ -1278,14 +1402,67 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   ];
                 })()}
               </div>
+              )}
             </div>
 
             {/* CEO 전략 방향 */}
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border-l-4 border-purple-600">
-              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center">
-                <span className="text-xl mr-2">🎯</span>
-                CEO 전략 방향
+              <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
+                <div className="flex items-center">
+                  <span className="text-xl mr-2">🎯</span>
+                  CEO 전략 방향
+                </div>
+                <button
+                  onClick={() => {
+                    if (editingCard === 'strategy') {
+                      setEditingCard(null);
+                    } else {
+                      setEditingCard('strategy');
+                      if (!ceoInsights['strategy-text']) {
+                        setCeoInsights({ ...ceoInsights, 'strategy-text': '• CEO 전략 방향 내용을 입력하세요' });
+                      }
+                    }
+                  }}
+                  className="text-xs px-3 py-1.5 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                >
+                  {editingCard === 'strategy' ? '취소' : '편집'}
+                </button>
               </h4>
+              {editingCard === 'strategy' ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={ceoInsights['strategy-text'] || ''}
+                    onChange={(e) => setCeoInsights({ ...ceoInsights, 'strategy-text': e.target.value })}
+                    className="w-full h-64 p-3 border-2 border-purple-300 rounded text-sm"
+                    placeholder="내용을 입력하세요..."
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        saveCardFull('strategy-text', ceoInsights['strategy-text'] || '');
+                        setEditingCard(null);
+                        alert('저장되었습니다.');
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCard(null);
+                      }}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : ceoInsights['strategy-text'] ? (
+                <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+                  {ceoInsights['strategy-text']}
+                </div>
+              ) : (
               <div className="space-y-2 text-sm text-gray-700">
                 {(() => {
                   const strategies = [];
@@ -1436,6 +1613,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   ];
                 })()}
               </div>
+              )}
             </div>
           </div>
         </div>
