@@ -1095,9 +1095,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• 과시즌 재고: 110,456K (전년YOY 137%)
-• 누적 영업손실 지속: -9,040K (영업이익률 -4.0%)
-• Discovery 영업손실: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
+                        const defaultText = `• Discovery 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개 매장 운영 중, 당분간 확장 없이 효율성 개선에 집중
+• 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요
+• 영업비 증가: 당월 SG&A 1,090K, 전년비 +281K 증가`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1416,9 +1416,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 425일→320일
-• 성장 모멘텀 유지: 당월 흑자 전환, 기조 지속
-• 채널 효율화: 지속적 직지 비용을 매장 집입 의사결정 필요(Yoho, NPT3, 세나도광장)`;
+                        const defaultText = `• 성장 모멘텀 유지: 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
+• 온라인 채널 강화: 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
+• 수익성 개선: 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
