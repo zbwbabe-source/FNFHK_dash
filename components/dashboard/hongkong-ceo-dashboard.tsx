@@ -1231,7 +1231,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="text-gray-600 mr-2">•</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['perf-profit'] || `영업이익 ${formatPercent(plYoy?.operating_profit || 0)}% 달성: ${formatNumber(pl?.operating_profit)}백만원, 영업이익률 ${formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%`}
+                              value={ceoInsights['perf-profit'] || `영업이익 흑자전환: ${formatNumber(pl?.operating_profit)}백만원, 영업이익률 ${formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%`}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-profit': e.target.value })}
                               onBlur={() => saveInsightItem('perf-profit', ceoInsights['perf-profit'] || '')}
                               className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
@@ -1248,7 +1248,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <div className="flex-1 leading-relaxed whitespace-pre-wrap">
                             {ceoInsights['perf-profit'] || (
                               <>
-                                영업이익 <span className="font-semibold">{formatPercent(plYoy?.operating_profit || 0)}%</span> 달성: {formatNumber(pl?.operating_profit)}백만원, 영업이익률 {formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%
+                                영업이익 <span className="font-semibold">흑자전환</span>: {formatNumber(pl?.operating_profit)}백만원, 영업이익률 {formatPercent((pl?.operating_profit || 0) / (pl?.net_sales || 1) * 100, 2)}%
                               </>
                             )}
                           </div>
