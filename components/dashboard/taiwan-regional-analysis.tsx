@@ -554,7 +554,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-6 shadow-lg">
           <h1 className="text-3xl font-bold mb-2">대만법인 지역별 분석 (전년 대비)</h1>
-          <p className="text-blue-100">2510 vs 2410 (누적 기준, 단위: 1K HKD)</p>
+          <p className="text-blue-100">2511 vs 2411 (누적 기준, 단위: 1K HKD)</p>
         </div>
 
         {/* 매장 포트폴리오 변화 분석 */}
