@@ -2424,6 +2424,42 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                               }
                               const colorClass = yoy >= 100 ? 'text-red-600' : 'text-green-600';
                               
+                              // 지급수수료 항목인 경우 상세 내역 표시
+                              if (item.key === 'fee') {
+                                const feeChange = current - previous;
+                                
+                                return (
+                                  <div key={item.key}>
+                                    <div className="flex justify-between text-xs">
+                                      <span className="text-gray-600">{item.label}</span>
+                                      <span className="font-semibold">
+                                        {formatNumber(current)} 
+                                        {showYoy && (
+                                          <span className={`ml-1 ${colorClass}`}>
+                                            ({yoy === Infinity ? '신규' : formatPercent(yoy)}%)
+                                          </span>
+                                        )}
+                                      </span>
+                                    </div>
+                                    {feeChange > 0 && (
+                                      <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-orange-200 pl-2 bg-orange-50 rounded p-1">
+                                        <div className="text-[10px] text-orange-700 font-semibold">
+                                          증가 +{formatNumber(feeChange)}K 내역:
+                                        </div>
+                                        <div className="flex justify-between text-[10px]">
+                                          <span className="text-gray-600">재고폐기비용(25년 1년분)</span>
+                                          <span className="font-semibold text-gray-700">54K</span>
+                                        </div>
+                                        <div className="flex justify-between text-[10px]">
+                                          <span className="text-gray-600">Cegid 수수료</span>
+                                          <span className="font-semibold text-gray-700">21K</span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+                              
                               // 기타 항목인 경우 토글 기능 추가
                               if (item.key === 'other') {
                                 const otherDetail = expenseDetail.other_detail || {};
