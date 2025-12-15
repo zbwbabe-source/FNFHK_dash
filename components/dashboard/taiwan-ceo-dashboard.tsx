@@ -101,7 +101,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   // ============================================================
   const [showSalesDetail, setShowSalesDetail] = useState(true);
   const [showProfitDetail, setShowProfitDetail] = useState(true);
-  const [showItemProfitDetail, setShowItemProfitDetail] = useState(true);
+  const [showItemProfitDetail, setShowItemProfitDetail] = useState(false);
   const [showExpenseDetail, setShowExpenseDetail] = useState(true);
   const [showOtherDetail, setShowOtherDetail] = useState(false);  // 당월 기타 상세
   const [showOtherDetailCumulative, setShowOtherDetailCumulative] = useState(false);  // 누적 기타 상세
