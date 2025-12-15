@@ -3443,9 +3443,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="overflow-x-auto">
             <style>{`
               .pl-summary-table tbody tr td:nth-child(8),
-              .pl-summary-table tbody tr td:nth-child(14),
+              .pl-summary-table tbody tr td:nth-child(15),
               .pl-summary-table thead tr th:nth-child(8),
-              .pl-summary-table thead tr th:nth-child(14) {
+              .pl-summary-table thead tr th:nth-child(15) {
                 background-color: #f3f4f6 !important;
               }
             `}</style>
