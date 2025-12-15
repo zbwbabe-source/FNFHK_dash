@@ -1295,7 +1295,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="text-green-600 font-bold mr-2">✓</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['perf-sales-rate'] || `당시즌 판매율 상승: ${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}% (전년 대비 +${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p), 상품 기획력 강화 및 시즌 초반 판촉 전략 주효`}
+                              value={ceoInsights['perf-sales-rate'] || `당시즌 판매율 상승: ${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}% (전년 대비 +${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p), 재고부족 리스크 26SS 조기운영으로 대응예정`}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-sales-rate': e.target.value })}
                               onBlur={() => saveInsightItem('perf-sales-rate', ceoInsights['perf-sales-rate'] || '')}
                               className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
@@ -1313,7 +1313,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             {ceoInsights['perf-sales-rate'] || (
                               <>
                                 <span className="font-semibold text-purple-700">당시즌 판매율 상승:</span>{' '}
-                                <span className="font-bold text-purple-600">{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}%</span> (전년 대비 <span className="font-semibold text-green-600">+{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p</span>), 상품 기획력 강화 및 시즌 초반 판촉 전략 주효
+                                <span className="font-bold text-purple-600">{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}%</span> (전년 대비 <span className="font-semibold text-green-600">+{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p</span>), 재고부족 리스크 26SS 조기운영으로 대응예정
                               </>
                             )}
                           </div>
