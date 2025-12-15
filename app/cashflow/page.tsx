@@ -17,10 +17,12 @@ interface CFData {
     beginning_cash: {
       prev_year: number;
       current: number;
+      current_12?: number;  // 2025년 12월 기초현금
     };
     operating_cash_flow: CFItem;
     investing_cash_flow: CFItem;
     financing_cash_flow: CFItem;
+    net_cash_flow: CFItem;
     ending_cash: {
       prev_year: number;
       current_1_11: number;  // 2025년 1~11월 (실적)
@@ -29,15 +31,20 @@ interface CFData {
     };
   };
   operating_activities: {
-    sales_collection: CFItem;
-    goods_and_duties: CFItem;
-    operating_expenses: CFItem;
-    other_income: CFItem;
-    corporate_tax: CFItem;
+    sales_hk: CFItem;
+    sales_tw: CFItem;
+    sales_total: CFItem;
+    goods_and_duties_hk: CFItem;
+    goods_and_duties_tw: CFItem;
+    goods_and_duties_total: CFItem;
+    operating_expenses_hk: CFItem;
+    operating_expenses_tw: CFItem;
+    operating_expenses_total: CFItem;
   };
   investing_activities: {
     hk_capex: CFItem;
     tw_capex: CFItem;
+    total_capex: CFItem;
   };
   financing_activities: {
     total: CFItem;
