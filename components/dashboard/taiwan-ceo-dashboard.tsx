@@ -86,8 +86,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 • 25F 판매율: 32.2%, 전년비 +2.0%p
 • 온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
 • 총재고: 180,260K, YOY 93%`,
-        'risk-text': `• Discovery 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개 매장 운영 중, 당분간 확장 없이 효율성 개선에 집중
-• 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요
+        'risk-text': `• Discovery 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
+• 할인율 상승: 25.8% (전년비 +0.3%p)
 • 영업비 증가: 당월 SG&A 1,090K, 전년비 +281K 증가`,
         'strategy-text': `• 성장 모멘텀 유지: 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
 • 온라인 채널 강화: 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
@@ -1111,8 +1111,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• Discovery 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개 매장 운영 중, 당분간 확장 없이 효율성 개선에 집중
-• 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요
+                        const defaultText = `• Discovery 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
+• 할인율 상승: 25.8% (전년비 +0.3%p)
 • 영업비 증가: 당월 SG&A 1,090K, 전년비 +281K 증가`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
