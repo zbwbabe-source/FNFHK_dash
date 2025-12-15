@@ -149,6 +149,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     setEditingCard(null);
   };
 
+  // 숫자 포맷팅 헬퍼 함수들 (컴포넌트 전체에서 사용)
+  const formatNumber = (num: number | undefined | null, decimals: number = 0) => {
+    if (num === undefined || num === null || isNaN(num)) return '0';
+    return num.toLocaleString('ko-KR', { maximumFractionDigits: decimals });
+  };
+
+  const formatPercent = (num: number | undefined | null, decimals: number = 0) => {
+    if (num === undefined || num === null || isNaN(num)) return '0';
+    return Number(num).toFixed(decimals);
+  };
+
   // ============================================================
   // CEO 인사이트 자동 생성 함수 - Executive Summary 스타일
   // ============================================================
@@ -1098,17 +1109,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const mcRetail = countryChannel?.MO_Retail || {};
   const mcOutlet = countryChannel?.MO_Outlet || {};
 
-  // 숫자 포맷팅 헬퍼
-  const formatNumber = (num: number | undefined | null, decimals: number = 0) => {
-    if (num === undefined || num === null || isNaN(num)) return '0';
-    return num.toLocaleString('ko-KR', { maximumFractionDigits: decimals });
-  };
-
-  const formatPercent = (num: number | undefined | null, decimals: number = 0) => {
-    if (num === undefined || num === null || isNaN(num)) return '0';
-    return Number(num).toFixed(decimals);
-  };
-
   // 재고주수 포맷팅 (소수점 첫째자리까지)
   const formatStockWeeks = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(num)) return '0.0';
@@ -1218,94 +1218,161 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <div className="text-xs text-gray-500 mt-1">전체 내용을 입력하고 포커스를 벗어나면 자동 저장됩니다.</div>
                 </div>
               ) : (
-                <div className="space-y-4 text-sm text-gray-700">
+                <div className="space-y-3 text-sm text-gray-700">
                   {ceoInsights['key-performance-full'] ? (
                     <div className="whitespace-pre-wrap text-gray-700 p-3 bg-white rounded border border-blue-200">
                       {ceoInsights['key-performance-full']}
                     </div>
                   ) : generateExecutiveSummary ? (
                     <>
-                      {/* 핵심 메시지 */}
-                      <div className="bg-white rounded-lg p-3 border border-blue-200 shadow-sm">
-                        <div className="flex items-start gap-2">
-                          <span className="text-lg">💡</span>
-                          <div>
-                            <div className="font-bold text-gray-900 text-base leading-snug">
-                              {generateExecutiveSummary.performance.keyMessage}
-                            </div>
-                            <div className="flex gap-2 mt-2">
-                              {generateExecutiveSummary.performance.keyDrivers.map((driver, idx) => (
-                                <span 
-                                  key={idx} 
-                                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                    driver.includes('흑자') || driver.includes('증가') || driver.includes('개선') 
-                                      ? 'bg-green-100 text-green-700' 
-                                      : driver.includes('적자') || driver.includes('감소') || driver.includes('긴급')
-                                      ? 'bg-red-100 text-red-700'
-                                      : 'bg-blue-100 text-blue-700'
-                                  }`}
-                                >
-                                  {driver}
+                      {/* 영업이익 */}
+                      {editingItemId === 'perf-profit' ? (
+                        <div className="bg-white rounded-lg p-3 border border-blue-200">
+                          <textarea
+                            value={ceoInsights['perf-profit'] || `당월 영업이익 ${formatNumber(pl?.operating_profit)}K를 기록하며 ${(pl?.operating_profit || 0) >= 0 ? '흑자를 달성' : '적자를 기록'}했습니다. 전년 동기 대비 ${formatPercent(plYoy?.operating_profit)}%로 ${Math.abs(plYoy?.operating_profit || 0) >= 100 ? '개선' : '감소'} 추세입니다.`}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-profit': e.target.value })}
+                            onBlur={() => saveInsightItem('perf-profit', ceoInsights['perf-profit'] || '')}
+                            className="w-full h-24 p-2 border border-blue-300 rounded text-sm resize-none"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-400 cursor-pointer transition-all"
+                          onClick={() => setEditingItemId('perf-profit')}
+                        >
+                          <div className="leading-relaxed">
+                            {ceoInsights['perf-profit'] || (
+                              <>
+                                당월 <span className={`font-bold text-lg ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>영업이익 {formatNumber(pl?.operating_profit)}K</span>를 기록하며{' '}
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${(pl?.operating_profit || 0) >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                  {(pl?.operating_profit || 0) >= 0 ? '흑자 달성' : '적자 기록'}
                                 </span>
-                              ))}
-                            </div>
+                                했습니다. 전년 동기 대비{' '}
+                                <span className={`font-bold ${(plYoy?.operating_profit || 0) >= 100 ? 'text-blue-600' : 'text-orange-600'}`}>
+                                  YOY {formatPercent(plYoy?.operating_profit)}%
+                                </span>
+                                로 {Math.abs(plYoy?.operating_profit || 0) >= 100 ? '개선' : '감소'} 추세입니다.
+                              </>
+                            )}
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* 근거 데이터 */}
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Key Metrics</div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white rounded p-2 border">
-                            <div className="text-xs text-gray-500">영업이익</div>
-                            <div className={`font-bold ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatNumber(pl?.operating_profit)}K
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              YOY {formatPercent(plYoy?.operating_profit)}%
-                            </div>
-                          </div>
-                          <div className="bg-white rounded p-2 border">
-                            <div className="text-xs text-gray-500">평당매출/일</div>
-                            <div className="font-bold text-blue-600">{formatNumber(dailySalesPerPyeong)} HKD</div>
-                            <div className="text-xs text-gray-500">
-                              YOY {formatPercent(dailySalesPerPyeongYoy)}%
-                            </div>
-                          </div>
-                          <div className="bg-white rounded p-2 border">
-                            <div className="text-xs text-gray-500">당시즌 판매율</div>
-                            <div className="font-bold text-blue-600">
-                              {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}%
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              전년비 +{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p
-                            </div>
-                          </div>
-                          <div className="bg-white rounded p-2 border">
-                            <div className="text-xs text-gray-500">온라인 매출</div>
-                            <div className="font-bold text-blue-600">
-                              {formatNumber((hkOnline?.current?.net_sales || 0) / 1000)}K
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              YOY {formatPercent(hkOnline?.yoy)}%
-                            </div>
+                      {/* 매장 효율성 */}
+                      {editingItemId === 'perf-efficiency' ? (
+                        <div className="bg-white rounded-lg p-3 border border-blue-200">
+                          <textarea
+                            value={ceoInsights['perf-efficiency'] || `매장 효율성은 평당매출/1일 ${formatNumber(dailySalesPerPyeong)} HKD로 전년 대비 ${formatPercent(dailySalesPerPyeongYoy)}% 성장하며 운영 효율이 크게 개선되었습니다.`}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-efficiency': e.target.value })}
+                            onBlur={() => saveInsightItem('perf-efficiency', ceoInsights['perf-efficiency'] || '')}
+                            className="w-full h-24 p-2 border border-blue-300 rounded text-sm resize-none"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-400 cursor-pointer transition-all"
+                          onClick={() => setEditingItemId('perf-efficiency')}
+                        >
+                          <div className="leading-relaxed">
+                            {ceoInsights['perf-efficiency'] || (
+                              <>
+                                매장 효율성은{' '}
+                                <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">평당매출/1일</span>{' '}
+                                <span className="font-bold text-lg text-blue-600">{formatNumber(dailySalesPerPyeong)} HKD</span>로{' '}
+                                전년 대비 <span className="font-bold text-green-600">YOY {formatPercent(dailySalesPerPyeongYoy)}%</span> 성장하며{' '}
+                                운영 효율이 크게 개선되었습니다.
+                              </>
+                            )}
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* 시사점 */}
-                      <div className="bg-blue-50 rounded-lg p-3 border-l-2 border-blue-400">
-                        <div className="flex items-start gap-2">
-                          <span className="text-sm">📌</span>
-                          <div>
-                            <div className="text-xs font-semibold text-blue-700 mb-1">경영 시사점</div>
-                            <div className="text-gray-700 leading-relaxed">
-                              {generateExecutiveSummary.performance.implication}
+                      {/* 판매율 */}
+                      {editingItemId === 'perf-sales-rate' ? (
+                        <div className="bg-white rounded-lg p-3 border border-blue-200">
+                          <textarea
+                            value={ceoInsights['perf-sales-rate'] || `당시즌(25FW) 판매율은 ${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}%로 전년 동기 대비 +${formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p 상승했습니다.`}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-sales-rate': e.target.value })}
+                            onBlur={() => saveInsightItem('perf-sales-rate', ceoInsights['perf-sales-rate'] || '')}
+                            className="w-full h-24 p-2 border border-blue-300 rounded text-sm resize-none"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-400 cursor-pointer transition-all"
+                          onClick={() => setEditingItemId('perf-sales-rate')}
+                        >
+                          <div className="leading-relaxed">
+                            {ceoInsights['perf-sales-rate'] || (
+                              <>
+                                <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold">당시즌(25FW) 판매율</span>은{' '}
+                                <span className="font-bold text-lg text-purple-600">{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate, 1)}%</span>로{' '}
+                                전년 동기 대비 <span className="font-bold text-green-600">+{formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate_change, 1)}%p</span> 상승했습니다.
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 온라인 성장 */}
+                      {editingItemId === 'perf-online' ? (
+                        <div className="bg-white rounded-lg p-3 border border-blue-200">
+                          <textarea
+                            value={ceoInsights['perf-online'] || `홍콩 온라인 채널은 매출 ${formatNumber((hkOnline?.current?.net_sales || 0) / 1000)}K로 전년 대비 ${formatPercent(hkOnline?.yoy)}% 성장하며 지속적인 확대 추세를 보이고 있습니다.`}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-online': e.target.value })}
+                            onBlur={() => saveInsightItem('perf-online', ceoInsights['perf-online'] || '')}
+                            className="w-full h-24 p-2 border border-blue-300 rounded text-sm resize-none"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-400 cursor-pointer transition-all"
+                          onClick={() => setEditingItemId('perf-online')}
+                        >
+                          <div className="leading-relaxed">
+                            {ceoInsights['perf-online'] || (
+                              <>
+                                <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold">홍콩 온라인 채널</span>은{' '}
+                                매출 <span className="font-bold text-lg text-indigo-600">{formatNumber((hkOnline?.current?.net_sales || 0) / 1000)}K</span>로{' '}
+                                전년 대비 <span className="font-bold text-green-600">YOY {formatPercent(hkOnline?.yoy)}%</span> 성장하며{' '}
+                                지속적인 확대 추세를 보이고 있습니다.
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 경영 시사점 */}
+                      {editingItemId === 'perf-insight' ? (
+                        <div className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-400">
+                          <textarea
+                            value={ceoInsights['perf-insight'] || generateExecutiveSummary.performance.implication}
+                            onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-insight': e.target.value })}
+                            onBlur={() => saveInsightItem('perf-insight', ceoInsights['perf-insight'] || '')}
+                            className="w-full h-32 p-2 border border-blue-300 rounded text-sm resize-none bg-white"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-400 hover:bg-blue-100 cursor-pointer transition-all"
+                          onClick={() => setEditingItemId('perf-insight')}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="text-sm">📌</span>
+                            <div>
+                              <div className="text-xs font-bold text-blue-700 mb-1 uppercase">CEO Insight</div>
+                              <div className="text-gray-700 leading-relaxed">
+                                {ceoInsights['perf-insight'] || generateExecutiveSummary.performance.implication}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </>
                   ) : (
                     <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
