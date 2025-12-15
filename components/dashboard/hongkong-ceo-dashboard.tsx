@@ -2343,7 +2343,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   onClick={() => setShowStoreDetail(!showStoreDetail)}
                   className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                 >
-                  <span>채널별 효율성</span>
+                  <span>채널별 평당매출</span>
                   {showStoreDetail ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
@@ -2394,9 +2394,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <div>• <span className="font-semibold">매출:</span> {formatNumber(hkOfflineSales)} K HKD (PL 데이터)</div>
                         <div>• <span className="font-semibold">면적:</span> {formatNumber(totalArea)}평 (M10A는 M10 포함, 폐점+저매출 제외)</div>
                         <div>• <span className="font-semibold">일수:</span> {currentMonth}월 {currentMonthDays}일</div>
-                        <div className="pt-1 mt-1 border-t border-amber-200">
-                          <span className="font-semibold">※ 참고:</span> 평당매출이 1 K HKD/평 미만인 폐점 매장은 제외됩니다.
-                        </div>
                       </div>
                       )}
                     </div>
