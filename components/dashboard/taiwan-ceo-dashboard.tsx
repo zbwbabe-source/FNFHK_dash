@@ -6747,7 +6747,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
         
         // 전체 매출 대비 온라인 비중 계산
         const totalCurrent = (dashboardData?.sales_summary?.total_net_sales || 0) * 1000; // 1K 단위이므로 1000 곱함
-        const totalPrevious = totalCurrent / (1 + (dashboardData?.sales_summary?.total_yoy || 0) / 100);
+        // 전년 총매출 = 전년 리테일 + 전년 온라인 + 전년 아울렛
+        const retailPrevious = countryChannel?.TW_Retail?.previous?.net_sales || 0;
+        const outletPrevious = countryChannel?.TW_Outlet?.previous?.net_sales || 0;
+        const totalPrevious = retailPrevious + onlinePrevious + outletPrevious;
         const onlineRatioCurrent = totalCurrent > 0 ? (onlineCurrent / totalCurrent) * 100 : 0;
         const onlineRatioPrevious = totalPrevious > 0 ? (onlinePrevious / totalPrevious) * 100 : 0;
         const onlineRatioChange = onlineRatioCurrent - onlineRatioPrevious;
