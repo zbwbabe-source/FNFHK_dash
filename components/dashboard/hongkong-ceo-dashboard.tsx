@@ -1231,7 +1231,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className={`font-bold mr-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>✓</span>
                           <div className="flex-1">
                             <textarea
-                              value={ceoInsights['perf-profit'] || `영업이익 ${(pl?.operating_profit || 0) >= 0 ? '흑자 달성' : '적자'}: ${formatNumber(pl?.operating_profit)}K (전년비 ${formatPercent(Math.abs(plChange?.operating_profit || 0))}K, YOY ${formatPercent(plYoy?.operating_profit)}%), ${(pl?.operating_profit || 0) >= 0 ? '매출 증가와 비용 효율화로 수익성 개선' : '비용 구조 개선 시급'}`}
+                              value={ceoInsights['perf-profit'] || `영업이익 ${(pl?.operating_profit || 0) >= 0 ? '흑자 전환 달성' : '적자'}: ${formatNumber(pl?.operating_profit)}K (전년비 ${(plChange?.operating_profit || 0) >= 0 ? '+' : ''}${formatNumber(plChange?.operating_profit || 0)}K, YOY ${formatPercent(plYoy?.operating_profit)}%), ${(pl?.operating_profit || 0) >= 0 ? '매출 증가와 비용 효율화로 수익성 개선' : '비용 구조 개선 시급'}`}
                               onChange={(e) => setCeoInsights({ ...ceoInsights, 'perf-profit': e.target.value })}
                               onBlur={() => saveInsightItem('perf-profit', ceoInsights['perf-profit'] || '')}
                               className="w-full h-20 p-2 border border-blue-300 rounded text-sm"
@@ -1249,9 +1249,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             {ceoInsights['perf-profit'] || (
                               <>
                                 <span className={`font-semibold ${(pl?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                                  영업이익 {(pl?.operating_profit || 0) >= 0 ? '흑자 달성' : '적자'}:
+                                  영업이익 {(pl?.operating_profit || 0) >= 0 ? '흑자 전환 달성' : '적자'}:
                                 </span>{' '}
-                                <span className="font-bold text-blue-600">{formatNumber(pl?.operating_profit)}K</span> (전년비 {formatNumber(Math.abs(plChange?.operating_profit || 0))}K, YOY <span className={`font-semibold ${(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>{formatPercent(plYoy?.operating_profit)}%</span>), {(pl?.operating_profit || 0) >= 0 ? '매출 증가와 비용 효율화로 수익성 개선' : '비용 구조 개선 시급'}
+                                <span className="font-bold text-blue-600">{formatNumber(pl?.operating_profit)}K</span> (전년비 <span className={`font-semibold ${(plChange?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>{(plChange?.operating_profit || 0) >= 0 ? '+' : ''}{formatNumber(plChange?.operating_profit || 0)}K</span>, YOY <span className={`font-semibold ${(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>{formatPercent(plYoy?.operating_profit)}%</span>), {(pl?.operating_profit || 0) >= 0 ? '매출 증가와 비용 효율화로 수익성 개선' : '비용 구조 개선 시급'}
                               </>
                             )}
                           </div>
