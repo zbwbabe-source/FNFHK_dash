@@ -771,19 +771,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('executive-summary');
                       if (!ceoInsights['executive-summary-text']) {
-                        // 현재 표시되는 내용을 기본값으로 수집
-                        const items = [];
-                        const salesSummary = dashboardData?.sales_summary || {};
-                        if (salesSummary?.total_yoy && salesSummary.total_yoy >= 100) {
-                          items.push(`• 전체 매출: ${formatNumber(salesSummary?.total_net_sales || 0)}K (YOY ${formatPercent(salesSummary?.total_yoy)}%), 전년 동월 대비 +${formatNumber(salesSummary?.total_change || 0)}K`);
-                        }
-                        if (twDailySalesPerPyeong > 0) {
-                          items.push(`• 평당매출/1일: ${formatNumber(Math.round(twDailySalesPerPyeong))} HKD (YOY ${formatPercent(twSalesPerPyeongYoy)}%)`);
-                        }
-                        if (pl?.operating_profit && pl.operating_profit > 0) {
-                          items.push(`• 당월 영업이익: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)`);
-                        }
-                        setCeoInsights({ ...ceoInsights, 'executive-summary-text': items.join('\n') });
+                        // 기본 텍스트 설정
+                        const defaultText = `• 전체 매출: 17,683K, YOY 117%, 전년비 +2,615K
+• 평당매출: 653 HKD/평/1일, YOY 129%
+• 25F 판매율: 32.2%, 전년비 +2.0%p
+• 온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
+• 총재고: 180,260K, YOY 93%`;
+                        setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
                   }}
@@ -1101,7 +1095,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        setCeoInsights({ ...ceoInsights, 'risk-text': '• 주요 리스크 내용을 입력하세요' });
+                        const defaultText = `• 과시즌 재고: 110,456K (전년YOY 137%)
+• 누적 영업손실 지속: -9,040K (영업이익률 -4.0%)
+• Discovery 영업손실: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
+                        setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
                   }}
@@ -1419,7 +1416,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        setCeoInsights({ ...ceoInsights, 'strategy-text': '• CEO 전략 방향 내용을 입력하세요' });
+                        const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 425일→320일
+• 성장 모멘텀 유지: 당월 흑자 전환, 기조 지속
+• 채널 효율화: 지속적 직지 비용을 매장 집입 의사결정 필요(Yoho, NPT3, 세나도광장)`;
+                        setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
                   }}
