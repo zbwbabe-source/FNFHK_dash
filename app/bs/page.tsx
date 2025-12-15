@@ -585,13 +585,14 @@ export default function BSPage() {
                       bgColor="bg-blue-50"
                       expanded={expandedSections.has('wc-cash')}
                       onClick={() => toggleSection('wc-cash')}
+                      isPositive={true}
                       note={noteItem('현금', bsData.balance_sheet.working_capital.payables.cash.year_end - bsData.balance_sheet.working_capital.payables.cash.prev_year)}
                     />
                     {expandedSections.has('wc-cash') && (
                       <WCRow 
                         label="  현금" 
                         item={bsData.balance_sheet.working_capital.payables.cash} 
-                        isPositive={false}
+                        isPositive={true}
                         noteKey="payables_cash"
                         noteValue={notes['payables_cash']}
                         onNoteChange={saveNote}
@@ -608,6 +609,7 @@ export default function BSPage() {
                       bgColor="bg-purple-50"
                       expanded={expandedSections.has('wc-profit')}
                       onClick={() => toggleSection('wc-profit')}
+                      isPositive={false}
                       note={noteItem('이익잉여금', bsData.balance_sheet.working_capital.profit_creation.retained_earnings.year_end - bsData.balance_sheet.working_capital.profit_creation.retained_earnings.prev_year)}
                     />
                     {expandedSections.has('wc-profit') && (
@@ -678,6 +680,7 @@ export default function BSPage() {
                         <WCRow 
                           label="  미수금/미지급금" 
                           item={bsData.balance_sheet.working_capital.other_wc_items.net_other}
+                          isPositive={true}
                           noteKey="other_wc_items_net_other"
                           noteValue={notes['other_wc_items_net_other']}
                           onNoteChange={saveNote}
@@ -895,7 +898,15 @@ function WCRow({
   isEditingNote?: boolean;
   onNoteEdit?: (key: string | null) => void;
 }) {
-  const formatNumber = (value: number): string => {
+  const formatNumber = (value: number, isPositive?: boolean): string => {
+    // isPositive가 지정되면 항목 성격에 따라 고정 기호 사용
+    // 자산 항목(isPositive=true): 항상 + 표시
+    // 부채/자본 항목(isPositive=false): 항상 △ 표시
+    if (isPositive !== undefined) {
+      const sign = isPositive ? '+' : '△';
+      return `${sign}${Math.abs(value).toLocaleString()}`;
+    }
+    // isPositive가 없으면 기존 로직 (값의 부호에 따라)
     const sign = value >= 0 ? '+' : '△';
     return `${sign}${Math.abs(value).toLocaleString()}`;
   };
@@ -926,16 +937,16 @@ function WCRow({
         {label}
       </td>
       <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
-        {formatNumber(item.prev_year)}
+        {formatNumber(item.prev_year, isPositive)}
       </td>
       <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
-        {formatNumber(item.current_month)}
+        {formatNumber(item.current_month, isPositive)}
       </td>
       <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass}`}>
-        {formatNumber(item.year_end)}
+        {formatNumber(item.year_end, isPositive)}
       </td>
       <td className={`px-4 py-3 border border-gray-300 text-right ${fontClass} ${getColorClass(calculatedYoy, isPositive)}`}>
-        {formatNumber(calculatedYoy)}
+        {formatNumber(calculatedYoy, isPositive)}
       </td>
       <td className="px-4 py-3 border border-gray-300 text-left text-xs text-gray-700" style={{ minWidth: '250px' }}>
         {noteKey && onNoteChange ? (

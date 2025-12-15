@@ -368,10 +368,10 @@ def parse_working_capital(df, bs_start_idx):
     
     wc_data['payables'] = {
         'total': {
-            'prev_year': -(cash['prev_year'] + borrowings['prev_year'] + accounts_payable['prev_year']),
-            'current_month': -(cash['current_month'] + borrowings['current_month'] + accounts_payable['current_month']),
-            'year_end': -(cash['year_end'] + borrowings['year_end'] + accounts_payable['year_end']),
-            'yoy_krw': -(cash['yoy_krw'] + borrowings['yoy_krw'] + accounts_payable['yoy_krw'])
+            'prev_year': cash['prev_year'] + borrowings['prev_year'] + accounts_payable['prev_year'],
+            'current_month': cash['current_month'] + borrowings['current_month'] + accounts_payable['current_month'],
+            'year_end': cash['year_end'] + borrowings['year_end'] + accounts_payable['year_end'],
+            'yoy_krw': cash['yoy_krw'] + borrowings['yoy_krw'] + accounts_payable['yoy_krw']
         },
         'cash': cash,
         'borrowings': borrowings,
@@ -389,10 +389,10 @@ def parse_working_capital(df, bs_start_idx):
     
     wc_data['profit_creation'] = {
         'total': {
-            'prev_year': -retained_earnings['prev_year'],
-            'current_month': -retained_earnings['current_month'],
-            'year_end': -retained_earnings['year_end'],
-            'yoy_krw': -retained_earnings['yoy_krw']
+            'prev_year': retained_earnings['prev_year'],
+            'current_month': retained_earnings['current_month'],
+            'year_end': retained_earnings['year_end'],
+            'yoy_krw': retained_earnings['yoy_krw']
         },
         'retained_earnings': retained_earnings
     }
@@ -452,14 +452,13 @@ def parse_working_capital(df, bs_start_idx):
         'yoy_krw': prepaid['yoy_krw'] - (payables_other['yoy_krw'] + accrued['yoy_krw'])
     }
     
-    # 기타운전자본 합계
-    # 선급비용(자산 +) + 미지급비용(부채 -) + 고정자산/보증금(자산 +) + 미수금/미지급금순액 + 매입채무(TP)(부채 -)
+    # 기타운전자본 합계 - 각 항목들의 단순 합계
     wc_data['other_wc_items'] = {
         'total': {
-            'prev_year': prepaid['prev_year'] - accrued['prev_year'] + fixed_assets['prev_year'] + net_other['prev_year'] - accounts_payable_tp['prev_year'],
-            'current_month': prepaid['current_month'] - accrued['current_month'] + fixed_assets['current_month'] + net_other['current_month'] - accounts_payable_tp['current_month'],
-            'year_end': prepaid['year_end'] - accrued['year_end'] + fixed_assets['year_end'] + net_other['year_end'] - accounts_payable_tp['year_end'],
-            'yoy_krw': prepaid['yoy_krw'] - accrued['yoy_krw'] + fixed_assets['yoy_krw'] + net_other['yoy_krw'] - accounts_payable_tp['yoy_krw']
+            'prev_year': prepaid['prev_year'] + accrued['prev_year'] + fixed_assets['prev_year'] + net_other['prev_year'] + accounts_payable_tp['prev_year'],
+            'current_month': prepaid['current_month'] + accrued['current_month'] + fixed_assets['current_month'] + net_other['current_month'] + accounts_payable_tp['current_month'],
+            'year_end': prepaid['year_end'] + accrued['year_end'] + fixed_assets['year_end'] + net_other['year_end'] + accounts_payable_tp['year_end'],
+            'yoy_krw': prepaid['yoy_krw'] + accrued['yoy_krw'] + fixed_assets['yoy_krw'] + net_other['yoy_krw'] + accounts_payable_tp['yoy_krw']
         },
         'prepaid': prepaid,
         'accrued': accrued,
@@ -499,37 +498,29 @@ def parse_working_capital(df, bs_start_idx):
     
     wc_data['lease_related'] = {
         'total': {
-            'prev_year': right_of_use['prev_year'] - lease_total['prev_year'],
-            'current_month': right_of_use['current_month'] - lease_total['current_month'],
-            'year_end': right_of_use['year_end'] - lease_total['year_end'],
-            'yoy_krw': right_of_use['yoy_krw'] - lease_total['yoy_krw']
+            'prev_year': right_of_use['prev_year'] + lease_total['prev_year'],
+            'current_month': right_of_use['current_month'] + lease_total['current_month'],
+            'year_end': right_of_use['year_end'] + lease_total['year_end'],
+            'yoy_krw': right_of_use['yoy_krw'] + lease_total['yoy_krw']
         },
         'right_of_use': right_of_use,
         'lease_liabilities': lease_total
     }
     
-    # 운전자본 합계
+    # 운전자본 합계 = 매출채권 + 재고자산 - 매입채무 (매입채무는 부채이므로 빼야 함)
     wc_data['summary'] = {
-        'prev_year': (wc_data['receivables']['total']['prev_year'] + 
-                     wc_data['payables']['total']['prev_year'] +
-                     wc_data['profit_creation']['total']['prev_year'] +
-                     wc_data['other_wc_items']['total']['prev_year'] +
-                     wc_data['lease_related']['total']['prev_year']),
-        'current_month': (wc_data['receivables']['total']['current_month'] + 
-                         wc_data['payables']['total']['current_month'] +
-                         wc_data['profit_creation']['total']['current_month'] +
-                         wc_data['other_wc_items']['total']['current_month'] +
-                         wc_data['lease_related']['total']['current_month']),
-        'year_end': (wc_data['receivables']['total']['year_end'] + 
-                    wc_data['payables']['total']['year_end'] +
-                    wc_data['profit_creation']['total']['year_end'] +
-                    wc_data['other_wc_items']['total']['year_end'] +
-                    wc_data['lease_related']['total']['year_end']),
-        'yoy_krw': (wc_data['receivables']['total']['yoy_krw'] + 
-                   wc_data['payables']['total']['yoy_krw'] +
-                   wc_data['profit_creation']['total']['yoy_krw'] +
-                   wc_data['other_wc_items']['total']['yoy_krw'] +
-                   wc_data['lease_related']['total']['yoy_krw'])
+        'prev_year': (receivables_ar['prev_year'] + 
+                     inventory['prev_year'] - 
+                     accounts_payable['prev_year']),
+        'current_month': (receivables_ar['current_month'] + 
+                         inventory['current_month'] - 
+                         accounts_payable['current_month']),
+        'year_end': (receivables_ar['year_end'] + 
+                    inventory['year_end'] - 
+                    accounts_payable['year_end']),
+        'yoy_krw': (receivables_ar['yoy_krw'] + 
+                   inventory['yoy_krw'] - 
+                   accounts_payable['yoy_krw'])
     }
     
     # Balance Check (모두 0이어야 함)
