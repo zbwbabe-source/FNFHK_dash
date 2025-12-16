@@ -1393,7 +1393,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       if (!ceoInsights['strategy-text']) {
                         const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
 • 성장 모멘텀 유지: 당월 흑자 전환 기조 지속
-• 채널 효율화: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)`;
+• 채널 효율화: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 아울렛)`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
@@ -1452,7 +1452,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">채널 효율화</span>: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)
+                          <span className="font-semibold">채널 효율화</span>: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 아울렛)
                         </div>
                       </div>
                 </div>
@@ -3460,12 +3460,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <th rowSpan={2} className="text-left p-2 font-semibold border-r border-gray-300">항목</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-green-50">당월</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-orange-50">당월 전년비</th>
-                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-purple-50">YOY</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 bg-gray-100">YOY</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-cyan-50">누적</th>
                   <th colSpan={3} className="text-center p-2 font-semibold border-r border-gray-300 bg-amber-50">누적 전년비</th>
-                  <th rowSpan={2} className="text-center p-2 font-semibold bg-indigo-50">누적 YOY</th>
+                  <th rowSpan={2} className="text-center p-2 font-semibold bg-gray-100">누적 YOY</th>
                 </tr>
-                <tr className="bg-gray-50 border-b border-gray-300">
+                <tr className="border-b border-gray-300">
                   <th className="p-1 text-center border-r border-gray-300 bg-green-50">홍콩</th>
                   <th className="p-1 text-center border-r border-gray-300 bg-green-50">마카오</th>
                   <th className="p-1 text-center border-r border-gray-300 bg-green-50">합계</th>

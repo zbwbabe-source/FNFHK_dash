@@ -911,7 +911,7 @@ export default function Home() {
                       }`}>
                         YOY {formatPercent(hkmcTotalYoy)}%
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(hkDailySalesPerPyeongCurrent)} HKD
                         {hkDailySalesPerPyeongYoy > 0 && (
                           <span className={`ml-2 font-semibold ${hkDailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -928,7 +928,7 @@ export default function Home() {
                       <div className="text-xs font-semibold text-green-600">
                         YOY {formatPercent(hkCumulativeYoy)}%
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
                         {hkSalesPerPyeongCumulativeYoy > 0 && (
                           <span className={`ml-2 font-semibold ${hkSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -939,7 +939,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-blue-100">
-                    *평당매출: 온라인 제외
+                    *평당매출: 홍콩 마카오 오프라인 매장 기준, 온라인 제외
                   </div>
                 </div>
 
@@ -1221,7 +1221,7 @@ export default function Home() {
                       }`}>
                         YOY {formatPercent(twTotalYoy)}%
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
                         {twDailySalesPerPyeongYoy > 0 && (
                           <span className={`ml-2 font-semibold ${twDailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1238,7 +1238,7 @@ export default function Home() {
                       <div className="text-xs font-semibold text-green-600">
                         YOY {formatPercent(twCumulativeYoy)}%
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500 mt-1">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
                         {twSalesPerPyeongCumulativeYoy > 0 && (
                           <span className={`ml-2 font-semibold ${twSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1249,7 +1249,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-purple-100">
-                    *평당매출: 온라인 제외
+                    *평당매출: 대만 오프라인 매장 기준, 온라인 제외
                   </div>
                 </div>
 
