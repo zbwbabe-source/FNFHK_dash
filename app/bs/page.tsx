@@ -22,14 +22,15 @@ interface WCData {
   summary: WCItem;
   receivables: {
     total: WCItem;
-    inventory: WCItem;
     accounts_receivable: WCItem;
+    inventory: WCItem;
   };
   payables: {
     total: WCItem;
+  };
+  cash: {
+    total: WCItem;
     cash: WCItem;
-    borrowings: WCItem;
-    accounts_payable: WCItem;
   };
   profit_creation: {
     total: WCItem;
@@ -38,10 +39,9 @@ interface WCData {
   };
   other_wc_items: {
     total: WCItem;
+    fixed_assets: WCItem;
     prepaid: WCItem;
     accrued: WCItem;
-    fixed_assets: WCItem;
-    net_other: WCItem;
     other?: WCItem;
   };
   lease_related: {
@@ -565,7 +565,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.payables.total}
                           isPositive={false}
                           noteKey="payables_accounts_payable"
-                          noteValue={notes['payables_accounts_payable'] || '26년말 매입채무 40m 감소 Target'}
+                          noteValue={notes['payables_accounts_payable'] || '일반 매입채무 (TP 제외)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'payables_accounts_payable'}
                           onNoteEdit={setEditingNote}
