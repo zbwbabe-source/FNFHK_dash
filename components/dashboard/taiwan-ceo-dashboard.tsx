@@ -833,7 +833,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 </div>
               ) : ceoInsights['executive-summary-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                  {ceoInsights['executive-summary-text']}
+                  {ceoInsights['executive-summary-text'].split('\n').map((line: string, idx: number) => (
+                    <div key={idx}>
+                      {line.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i}>{part.slice(2, -2)}</strong>;
+                        }
+                        return <span key={i}>{part}</span>;
+                      })}
+                    </div>
+                  ))}
                 </div>
               ) : (
               <div className="space-y-2 text-sm text-gray-700">
@@ -1175,7 +1184,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 </div>
               ) : ceoInsights['risk-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                  {ceoInsights['risk-text']}
+                  {ceoInsights['risk-text'].split('\n').map((line: string, idx: number) => (
+                    <div key={idx}>
+                      {line.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i}>{part.slice(2, -2)}</strong>;
+                        }
+                        return <span key={i}>{part}</span>;
+                      })}
+                    </div>
+                  ))}
                 </div>
               ) : (
               <div className="space-y-2 text-sm text-gray-700">
@@ -1496,7 +1514,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 </div>
               ) : ceoInsights['strategy-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                  {ceoInsights['strategy-text']}
+                  {ceoInsights['strategy-text'].split('\n').map((line: string, idx: number) => (
+                    <div key={idx}>
+                      {line.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i}>{part.slice(2, -2)}</strong>;
+                        }
+                        return <span key={i}>{part}</span>;
+                      })}
+                    </div>
+                  ))}
                 </div>
               ) : (
               <div className="space-y-2 text-sm text-gray-700">
