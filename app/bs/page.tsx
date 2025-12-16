@@ -527,7 +527,7 @@ export default function BSPage() {
                       bgColor="bg-yellow-50"
                       expanded={expandedSections.has('wc-main')}
                       onClick={() => toggleSection('wc-main')}
-                      note="AR +13m, 재고 △25m, 선급금 △0m, AP +1m"
+                      note="AR +13m, 재고 △25m, AP +1m"
                     />
 
                     {expandedSections.has('wc-main') && (
@@ -564,7 +564,7 @@ export default function BSPage() {
                           item={bsData.balance_sheet.working_capital.payables.accounts_payable} 
                           isPositive={false}
                           noteKey="payables_accounts_payable"
-                          noteValue={notes['payables_accounts_payable'] || '26년말 매입채무 90m Target(25년말 대비 40m 감소)'}
+                          noteValue={notes['payables_accounts_payable'] || '26년말 매입채무 40m 감소 Target'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'payables_accounts_payable'}
                           onNoteEdit={setEditingNote}
@@ -662,15 +662,7 @@ export default function BSPage() {
                       bgColor="bg-green-50"
                       expanded={expandedSections.has('wc-other')}
                       onClick={() => toggleSection('wc-other')}
-                      note={<>
-                        {noteItem('선급', bsData.balance_sheet.working_capital.other_wc_items.prepaid.year_end - bsData.balance_sheet.working_capital.other_wc_items.prepaid.prev_year)}
-                        {', '}
-                        {noteItem('미지급', bsData.balance_sheet.working_capital.other_wc_items.accrued.year_end - bsData.balance_sheet.working_capital.other_wc_items.accrued.prev_year)}
-                        {', '}
-                        {noteItem('보증금', bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.year_end - bsData.balance_sheet.working_capital.other_wc_items.fixed_assets.prev_year)}
-                        {', '}
-                        {noteItem('미수금', bsData.balance_sheet.working_capital.other_wc_items.net_other.year_end - bsData.balance_sheet.working_capital.other_wc_items.net_other.prev_year)}
-                      </>}
+                      note="고정자산/보증금 증가 +8m, 미지급비용 감소 +5m, 기타 +2m"
                     />
                     {expandedSections.has('wc-other') && (
                       <>
@@ -1021,7 +1013,29 @@ function WCRow({
                 onNoteEdit?.(noteKey);
               }}
             >
-              {noteValue || note || null}
+              {(() => {
+                const text = noteValue || note;
+                if (!text || typeof text !== 'string') return text;
+                
+                // 숫자+m 패턴을 찾아서 하이라이트
+                const parts = text.split(/(\d+m)/g);
+                return parts.map((part, index) => {
+                  if (/^\d+m$/.test(part)) {
+                    return <span key={index} className="font-bold text-blue-600 bg-blue-50 px-1 rounded">{part}</span>;
+                  }
+                  // 재고일수나 일수 관련 숫자 하이라이트
+                  if (part.includes('일')) {
+                    const subParts = part.split(/(\d+일)/g);
+                    return subParts.map((subPart, subIndex) => {
+                      if (/^\d+일$/.test(subPart)) {
+                        return <span key={`${index}-${subIndex}`} className="font-semibold text-purple-600">{subPart}</span>;
+                      }
+                      return subPart;
+                    });
+                  }
+                  return part;
+                });
+              })()}
             </div>
           )
         ) : (

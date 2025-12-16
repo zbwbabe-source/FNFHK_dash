@@ -925,7 +925,7 @@ export default function Home() {
                       <div className="text-xl font-bold text-gray-900">
                         {formatPlNumber(hkPlCumulative?.net_sales || 0)}
                       </div>
-                      <div className="text-xs font-semibold text-green-600">
+                      <div className={`text-xs font-semibold ${hkCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                         YOY {formatPercent(hkCumulativeYoy)}%
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
@@ -1235,7 +1235,7 @@ export default function Home() {
                       <div className="text-xl font-bold text-gray-900">
                         {formatPlNumber(twPlCumulative?.net_sales || 0)}
                       </div>
-                      <div className="text-xs font-semibold text-green-600">
+                      <div className={`text-xs font-semibold ${twCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                         YOY {formatPercent(twCumulativeYoy)}%
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
@@ -1478,9 +1478,39 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900 mb-1">
                 홍마대 BS / 현금흐름
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 mb-3">
                 Balance Sheet / Cash Flow / Capital Plan
               </p>
+
+              {/* 총자산/부채/자본 뱃지 */}
+              {bsData && (() => {
+                const totalAssets = bsData.balance_sheet?.assets?.total?.year_end || 0;
+                const totalLiabilities = bsData.balance_sheet?.liabilities?.total?.year_end || 0;
+                const totalEquity = bsData.balance_sheet?.equity?.total?.year_end || 0;
+                
+                return (
+                  <div className="flex gap-2 mb-3">
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg px-3 py-2">
+                      <span className="text-xs text-gray-600">총자산 </span>
+                      <span className="text-lg font-bold text-blue-600">
+                        {Math.round(totalAssets / 1000).toLocaleString()}M
+                      </span>
+                    </div>
+                    <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg px-3 py-2">
+                      <span className="text-xs text-gray-600">총부채 </span>
+                      <span className="text-lg font-bold text-red-600">
+                        {Math.round(totalLiabilities / 1000).toLocaleString()}M
+                      </span>
+                    </div>
+                    <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg px-3 py-2">
+                      <span className="text-xs text-gray-600">총자본 </span>
+                      <span className="text-lg font-bold text-green-600">
+                        {Math.round(totalEquity / 1000).toLocaleString()}M
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* 재무상태표 주요 지표 */}
               <div className="space-y-2 mb-4 flex-1">
