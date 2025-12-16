@@ -625,7 +625,8 @@ export default function BSPage() {
                       const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
                       const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
                       const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
-                      const defaultNote = `이익잉여금 △${yoyInMillions}m (이익잉여금 증가, 대변계정)`;
+                      const sign = yoyAmount >= 0 ? '+' : '△';
+                      const defaultNote = `이익잉여금 ${sign}${yoyInMillions}m`;
                       return (
                         <>
                           <WCRow 
@@ -643,7 +644,7 @@ export default function BSPage() {
                             item={bsData.balance_sheet.working_capital.profit_creation.accounts_payable_tp} 
                             isPositive={false}
                             noteKey="profit_creation_accounts_payable_tp"
-                            noteValue={notes['profit_creation_accounts_payable_tp'] || '본사 선수금 (무이자, Transfer Price)'}
+                            noteValue={notes['profit_creation_accounts_payable_tp'] || 'Transfer Price'}
                             onNoteChange={saveNote}
                             isEditingNote={editingNote === 'profit_creation_accounts_payable_tp'}
                             onNoteEdit={setEditingNote}
@@ -704,11 +705,11 @@ export default function BSPage() {
                           onNoteEdit={setEditingNote}
                         />
                         <WCRow 
-                          label="  미수금/미지급금" 
+                          label="  미수금 - 미지급금 (순액)" 
                           item={bsData.balance_sheet.working_capital.other_wc_items.net_other}
-                          isPositive={true}
+                          isPositive={undefined}
                           noteKey="other_wc_items_net_other"
-                          noteValue={notes['other_wc_items_net_other'] || '기타 미수금 및 미지급금'}
+                          noteValue={notes['other_wc_items_net_other'] || '미수금에서 미지급금을 뺀 순액 (기타유동부채 포함)'}
                           onNoteChange={saveNote}
                           isEditingNote={editingNote === 'other_wc_items_net_other'}
                           onNoteEdit={setEditingNote}
@@ -719,7 +720,7 @@ export default function BSPage() {
                             item={bsData.balance_sheet.working_capital.other_wc_items.other} 
                             isPositive={undefined}
                             noteKey="other_wc_items_other"
-                            noteValue={notes['other_wc_items_other']}
+                            noteValue={notes['other_wc_items_other'] || '기타유동부채, 기타비유동자산, 복구충당부채 등'}
                             onNoteChange={saveNote}
                             isEditingNote={editingNote === 'other_wc_items_other'}
                             onNoteEdit={setEditingNote}

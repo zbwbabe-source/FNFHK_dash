@@ -244,7 +244,7 @@ export default function Home() {
     return storeCode.startsWith('M') && !storeCode.startsWith('MC');
   };
 
-  // 홍콩 오프라인 매장 총 면적 계산 (평당매출 계산용, 마카오 제외)
+  // 홍콩+마카오 오프라인 매장 총 면적 계산 (평당매출 계산용, 온라인만 제외)
   const hkOfflineTotalArea = useMemo(() => {
     if (!hkData?.store_summary) return 0;
     const storeAreas = hkStoreAreas?.store_areas || {};
@@ -260,8 +260,8 @@ export default function Home() {
         return;
       }
       
-      // 홍콩만, MLB 브랜드만, 온라인 제외, 오프라인만 (Retail, Outlet)
-      if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.current?.net_sales > 0) {
+      // 홍콩+마카오, MLB 브랜드만, 온라인 제외, 오프라인만 (Retail, Outlet)
+      if (store.brand === 'MLB' && isHongKongOrMacauStore(storeCode) && store.channel !== 'Online' && store.current?.net_sales > 0) {
         const area = (storeAreas as Record<string, number>)[storeCode] || 0;
         
         // 폐점이면서 매출이 매우 적은 매장 제외 (정리 매출만 있는 경우)
@@ -292,17 +292,17 @@ export default function Home() {
     // 디버깅: 샘플 매장 데이터 확인
     const sampleStores = allStores.slice(0, 10).map(code => {
       const store = hkData.store_summary[code];
-      const isHKOnly = isHongKongOnlyStore(code);
-      const matches = store.brand === 'MLB' && isHKOnly && store.channel !== 'Online' && store.current?.net_sales > 0;
+      const isHKMC = isHongKongOrMacauStore(code);
+      const matches = store.brand === 'MLB' && isHKMC && store.channel !== 'Online' && store.current?.net_sales > 0;
       return {
         code,
-        isHKOnly: isHKOnly,
+        isHKMC: isHKMC,
         brand: store.brand,
         channel: store.channel,
         netSales: store.current?.net_sales || 0,
         matches: matches,
         reason: !store.brand || store.brand !== 'MLB' ? 'brand' : 
-                !isHKOnly ? 'macau_or_online' : 
+                !isHKMC ? 'not_hkmc' : 
                 store.channel === 'Online' ? 'online' : 
                 !store.current?.net_sales ? 'no_sales' : 'ok'
       };
@@ -313,14 +313,14 @@ export default function Home() {
       const area = (storeAreas as Record<string, number>)[code] || 0;
       return {
         code,
-        isHKOnly: isHongKongOnlyStore(code),
+        isHKMC: isHongKongOrMacauStore(code),
         channel: store.channel,
         netSales: store.current?.net_sales,
         area
       };
     });
     
-    console.log('=== 홍콩 오프라인 면적 계산 (평당매출용, 마카오 제외) ===');
+    console.log('=== 홍콩+마카오 오프라인 면적 계산 (평당매출용, 온라인만 제외) ===');
     console.log('전체 매장 수:', allStores.length, '개');
     console.log('샘플 매장 데이터 (처음 10개):', JSON.stringify(sampleStores, null, 2));
     console.log('총 면적:', totalArea, '평');
@@ -341,7 +341,7 @@ export default function Home() {
     return totalArea;
   }, [hkData]);
 
-  // 전년도 홍콩 오프라인 매장 총 면적 계산 (평당매출 계산용, 마카오 제외)
+  // 전년도 홍콩+마카오 오프라인 매장 총 면적 계산 (평당매출 계산용, 온라인만 제외)
   const hkOfflineTotalAreaPrevious = useMemo(() => {
     if (!hkData?.store_summary) return 0;
     const storeAreas = hkStoreAreas?.store_areas || {};
@@ -349,7 +349,7 @@ export default function Home() {
     Object.keys(hkData.store_summary).forEach(storeCode => {
       const store = hkData.store_summary[storeCode];
       if (storeCode === 'M10A') return;
-      if (store.brand === 'MLB' && isHongKongOnlyStore(storeCode) && store.channel !== 'Online' && store.previous?.net_sales > 0) {
+      if (store.brand === 'MLB' && isHongKongOrMacauStore(storeCode) && store.channel !== 'Online' && store.previous?.net_sales > 0) {
         const area = (storeAreas as Record<string, number>)[storeCode] || 0;
         if (store.closed === true && area > 0) {
           const salesPerPyeong = (store.previous.net_sales / 1000) / area;
@@ -512,11 +512,14 @@ export default function Home() {
   const hkmcTotalYoy = hkmcTotalPrevious > 0 ? (hkmcTotalCurrent / hkmcTotalPrevious) * 100 : 0;
   
 
-  // 홍콩만 누적 오프라인 매출 계산 (마카오 제외)
-  // PL 데이터의 cumulative.offline.net_sales 직접 사용 (이미 오프라인만 집계됨, 홍콩만)
-  const hkOfflineCumulative = useMemo(() => {
-    return hkPlData?.cumulative?.offline?.net_sales || 0;
+  // 홍콩+마카오 누적 오프라인 매출 계산 (온라인만 제외)
+  // PL 데이터에서 홍콩+마카오 오프라인 누적 매출 사용
+  const hkMcOfflineCumulative = useMemo(() => {
+    const hkCumulative = hkPlData?.cumulative?.hk?.net_sales || 0;
+    const mcCumulative = hkPlData?.cumulative?.mc?.net_sales || 0;
+    return hkCumulative + mcCumulative;
   }, [hkPlData]);
+  const hkOfflineCumulative = hkMcOfflineCumulative; // 기존 변수명 호환
 
   // 홍콩 PL 데이터
   const hkPlCurrent = hkPlData?.current_month?.total;
@@ -702,47 +705,47 @@ export default function Home() {
   // 전체 YOY는 Dashboard 데이터의 sales_summary.total_yoy 사용 (전년 동월 기준)
   const twTotalYoy = twData?.sales_summary?.total_yoy ?? (twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0);
 
-  // 평당매출 계산 (면적: 홍콩만, 매출: 홍콩만 오프라인)
+  // 평당매출 계산 (면적: 홍콩+마카오, 매출: 홍콩+마카오 오프라인)
   // PL 데이터 사용 (이미 K HKD 단위)
-  const hkOnlyOfflineCurrentKHKD = hkPlData?.current_month?.hk?.net_sales || 0; // K HKD 단위
-  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? hkOnlyOfflineCurrentKHKD / hkOfflineTotalArea : 0; // K HKD/평 단위
+  const hkMcOfflineCurrentKHKD = (hkPlData?.current_month?.hk?.net_sales || 0) + (hkPlData?.current_month?.mc?.net_sales || 0); // K HKD 단위
+  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? hkMcOfflineCurrentKHKD / hkOfflineTotalArea : 0; // K HKD/평 단위
   // hkOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
-  // 누적 평균 면적 (PL 데이터에서 월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩만)
-  const hkCumulativeAvgArea = hkPlData?.cumulative?.offline?.average_area || hkOfflineTotalArea; // 누적 평균 면적, 없으면 당월 면적 사용
+  // 누적 평균 면적 (홍콩+마카오, 당월 면적 사용 - PL 데이터의 average_area는 홍콩만일 수 있음)
+  const hkCumulativeAvgArea = hkOfflineTotalArea; // 홍콩+마카오 당월 면적 사용
   // 누적 평당매출 계산: 누적 매출을 누적 평균 면적로 나눔
   const hkSalesPerPyeongCumulative = hkCumulativeAvgArea > 0 ? hkOfflineCumulative / hkCumulativeAvgArea : 0; // 누적 평당매출 (K HKD/평 단위)
   // 평당매출/1일 계산: 평당매출(K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
   const hkDailySalesPerPyeongCurrent = currentMonthDays > 0 && hkSalesPerPyeongCurrent > 0 ? (hkSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
   const hkDailySalesPerPyeongCumulative = cumulativeDays > 0 && hkSalesPerPyeongCumulative > 0 ? (hkSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 누적 일수로 나누기
   
-  // 전년도 평당매출/1일 계산 (홍콩)
-  const hkOnlyOfflinePreviousKHKD = hkPlData?.prev_month?.hk?.net_sales || 0; // K HKD 단위
-  const hkSalesPerPyeongPrevious = hkOfflineTotalAreaPrevious > 0 ? hkOnlyOfflinePreviousKHKD / hkOfflineTotalAreaPrevious : 0; // K HKD/평 단위
+  // 전년도 평당매출/1일 계산 (홍콩+마카오)
+  const hkMcOfflinePreviousKHKD = (hkPlData?.prev_month?.hk?.net_sales || 0) + (hkPlData?.prev_month?.mc?.net_sales || 0); // K HKD 단위
+  const hkSalesPerPyeongPrevious = hkOfflineTotalAreaPrevious > 0 ? hkMcOfflinePreviousKHKD / hkOfflineTotalAreaPrevious : 0; // K HKD/평 단위
   const hkDailySalesPerPyeongPrevious = currentMonthDays > 0 && hkSalesPerPyeongPrevious > 0 ? (hkSalesPerPyeongPrevious * 1000) / currentMonthDays : 0;
   const hkDailySalesPerPyeongYoy = hkDailySalesPerPyeongPrevious > 0 ? (hkDailySalesPerPyeongCurrent / hkDailySalesPerPyeongPrevious) * 100 : 0;
   
-  // 전년도 누적 평당매출/1일 계산 (홍콩)
-  const hkOfflineCumulativePrevious = hkPlData?.cumulative?.prev_cumulative?.hk?.net_sales || 0; // K HKD 단위
+  // 전년도 누적 평당매출/1일 계산 (홍콩+마카오)
+  const hkMcOfflineCumulativePrevious = (hkPlData?.cumulative?.prev_cumulative?.hk?.net_sales || 0) + (hkPlData?.cumulative?.prev_cumulative?.mc?.net_sales || 0); // K HKD 단위
   const hkCumulativeAvgAreaPrevious = hkPlData?.cumulative?.prev_cumulative?.offline?.average_area || hkOfflineTotalAreaPrevious;
-  const hkSalesPerPyeongCumulativePrevious = hkCumulativeAvgAreaPrevious > 0 ? hkOfflineCumulativePrevious / hkCumulativeAvgAreaPrevious : 0;
+  const hkSalesPerPyeongCumulativePrevious = hkCumulativeAvgAreaPrevious > 0 ? hkMcOfflineCumulativePrevious / hkCumulativeAvgAreaPrevious : 0;
   const hkDailySalesPerPyeongCumulativePrevious = cumulativeDays > 0 && hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulativePrevious * 1000) / cumulativeDays : 0;
   // 평당매출 YOY 계산 (평당매출/1일이 아닌 평당매출 자체의 YOY)
   const hkSalesPerPyeongCumulativeYoy = hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulative / hkSalesPerPyeongCumulativePrevious) * 100 : 0;
   
-  // 디버깅: 평당매출 계산 확인 (면적: 홍콩만, 매출: 홍콩만 오프라인)
-  console.log('=== 홍콩 평당매출 계산 (면적: 홍콩만, 매출: PL 데이터, M10A는 M10에 포함) ===');
+  // 디버깅: 평당매출 계산 확인 (면적: 홍콩+마카오, 매출: 홍콩+마카오 오프라인)
+  console.log('=== 홍콩+마카오 평당매출 계산 (면적: 홍콩+마카오, 매출: PL 데이터, M10A는 M10에 포함) ===');
   console.log('[당월]');
-  console.log('홍콩 오프라인 매출 (PL 데이터):', hkOnlyOfflineCurrentKHKD.toFixed(2), 'K HKD');
-  console.log('홍콩 오프라인 면적:', hkOfflineTotalArea, '평 (M10A는 M10에 포함, 면적 0인 매장 제외)');
+  console.log('홍콩+마카오 오프라인 매출 (PL 데이터):', hkMcOfflineCurrentKHKD.toFixed(2), 'K HKD');
+  console.log('홍콩+마카오 오프라인 면적:', hkOfflineTotalArea, '평 (M10A는 M10에 포함, 면적 0인 매장 제외)');
   console.log('평당매출:', hkSalesPerPyeongCurrent.toFixed(2), 'K HKD/평');
   console.log('당월 일수:', currentMonthDays, '일');
   console.log('1일 평당매출:', hkDailySalesPerPyeongCurrent.toFixed(1), 'HKD/평/일');
-  console.log('계산식: ' + hkOnlyOfflineCurrentKHKD.toFixed(2) + ' / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
+  console.log('계산식: ' + hkMcOfflineCurrentKHKD.toFixed(2) + ' / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
   console.log('일평균 계산식: (' + hkSalesPerPyeongCurrent.toFixed(2) + ' * 1000) / ' + currentMonthDays + ' = ' + hkDailySalesPerPyeongCurrent.toFixed(1) + ' HKD/평/일');
     console.log('[누적]');
-    console.log('누적 오프라인 매출:', hkOfflineCumulative.toFixed(2), 'K HKD (PL 데이터, 이미 K HKD 단위)');
+    console.log('누적 오프라인 매출 (홍콩+마카오):', hkMcOfflineCumulative.toFixed(2), 'K HKD (PL 데이터, 이미 K HKD 단위)');
     console.log('당월 오프라인 면적:', hkOfflineTotalArea, '평');
-    console.log('누적 평균 면적:', hkCumulativeAvgArea.toFixed(2), '평 (월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩만)');
+    console.log('누적 평균 면적:', hkCumulativeAvgArea.toFixed(2), '평 (월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩+마카오)');
     console.log('평당매출:', hkSalesPerPyeongCumulative.toFixed(2), 'K HKD/평');
     console.log('누적 일수:', cumulativeDays, '일');
     console.log('1일 평당매출:', hkDailySalesPerPyeongCumulative.toFixed(1), 'HKD/평/일');
@@ -936,7 +939,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-blue-100">
-                    *평당매출: 마카오 및 온라인 제외
+                    *평당매출: 온라인 제외
                   </div>
                 </div>
 
@@ -1650,10 +1653,6 @@ export default function Home() {
                             <span className={equityChange >= 0 ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
                               {formatM(equityChange)}
                             </span>
-                            {' '}
-                            <span className={equityChangePercent >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-                              ({Math.abs(equityChangePercent).toFixed(0)}% {equityChangePercent >= 0 ? '↑' : '↓'})
-                            </span>
                           </span>
                     </div>
                     <div className="flex justify-between">
@@ -1662,12 +1661,6 @@ export default function Home() {
                             <strong className={retainedEarningsChange >= 0 ? 'text-green-600' : 'text-red-600'}>
                               {retainedEarningsChange >= 0 ? '+' : '△'}{Math.abs(Math.round(retainedEarningsChange / 1000)).toLocaleString()}M
                             </strong>
-                            {' '}
-                            {retainedEarningsChange !== 0 && (
-                              <span className={retainedEarningsChange >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-                                ({retainedEarningsChange >= 0 ? '적자 감소' : '적자 증가'} {formatM(Math.abs(retainedEarningsChange))})
-                              </span>
-                            )}
                           </span>
                     </div>
                   </div>

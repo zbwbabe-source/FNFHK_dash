@@ -95,7 +95,7 @@
       "total": {
         "prev_year": 342903.0,
         "current_month": 382194.0,
-        "year_end": 359791.0,
+        "year_end": 373868.0,
         "yoy_krw": 0,
         "note": ""
       },
@@ -103,7 +103,7 @@
         "total": {
           "prev_year": 313828.0,
           "current_month": 330414.0,
-          "year_end": 308011.0,
+          "year_end": 322088.0,
           "yoy_krw": 0,
           "note": ""
         },
@@ -117,7 +117,7 @@
         "accounts_payable_tp": {
           "prev_year": 114579.0,
           "current_month": 114579.0,
-          "year_end": 100502.0,
+          "year_end": 114579.0,
           "yoy_krw": 0,
           "note": ""
         },
@@ -178,7 +178,7 @@
       "total": {
         "prev_year": 12322.0,
         "current_month": 8791.0,
-        "year_end": 30070.0,
+        "year_end": 15993.0,
         "yoy_krw": 0,
         "note": ""
       },
@@ -199,7 +199,7 @@
       "retained_earnings": {
         "prev_year": -4536.0,
         "current_month": -9825.0,
-        "year_end": 11453.0,
+        "year_end": -2624.0,
         "yoy_krw": 0,
         "note": ""
       }
@@ -233,9 +233,9 @@
       },
       "payables": {
         "total": {
-          "prev_year": -102093.0,
-          "current_month": -119725.0,
-          "year_end": -108128.0,
+          "prev_year": -216672.0,
+          "current_month": -234304.0,
+          "year_end": -222707.0,
           "yoy_krw": 0
         },
         "cash": {
@@ -255,33 +255,39 @@
           "current_month": -141595.0,
           "year_end": -133269.0,
           "yoy_krw": 0
+        },
+        "accounts_payable_tp": {
+          "prev_year": -114579.0,
+          "current_month": -114579.0,
+          "year_end": -114579.0,
+          "yoy_krw": 0
         }
       },
       "profit_creation": {
         "total": {
           "prev_year": -119115.0,
-          "current_month": -104754.0,
-          "year_end": -111955.0,
+          "current_month": -124404.0,
+          "year_end": -117203.0,
           "yoy_krw": 0
         },
         "retained_earnings": {
           "prev_year": -4536.0,
-          "current_month": 9825.0,
-          "year_end": -11453.0,
+          "current_month": -9825.0,
+          "year_end": -2624.0,
           "yoy_krw": 0
         },
         "accounts_payable_tp": {
           "prev_year": -114579.0,
           "current_month": -114579.0,
-          "year_end": -100502.0,
+          "year_end": -114579.0,
           "yoy_krw": 0
         }
       },
       "other_wc_items": {
         "total": {
           "prev_year": 13346.0,
-          "current_month": 23639.0,
-          "year_end": 23515.0,
+          "current_month": 43288.0,
+          "year_end": 28763.0,
           "yoy_krw": 0
         },
         "prepaid": {
@@ -303,21 +309,21 @@
           "yoy_krw": 0
         },
         "net_other": {
-          "prev_year": -26054.0,
-          "current_month": -21725.0,
-          "year_end": -21725.0,
+          "prev_year": -4188.0,
+          "current_month": -9079.0,
+          "year_end": -9079.0,
           "yoy_krw": 0
         },
         "payables_other": {
-          "prev_year": -15121.0,
-          "current_month": -15402.0,
-          "year_end": -15402.0,
+          "prev_year": 0.0,
+          "current_month": 0.0,
+          "year_end": 0.0,
           "yoy_krw": 0
         },
         "other": {
-          "prev_year": -6832.0,
-          "current_month": -8668.0,
-          "year_end": -8497.0,
+          "prev_year": -17765.0,
+          "current_month": 4658.0,
+          "year_end": -9572.0,
           "yoy_krw": 0
         }
       },

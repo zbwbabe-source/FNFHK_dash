@@ -127,10 +127,10 @@ def parse_bs_csv_simple(csv_path):
                 'yoy_krw': 0,
                 'note': ''
             },
-            'cash': {  # 현금 (부채이므로 -)
-                'prev_year': -clean_number(df.iloc[start+2, COL_PREV]),
-                'current_month': -clean_number(df.iloc[start+2, COL_CURRENT]),
-                'year_end': -clean_number(df.iloc[start+2, COL_YEAR_END]),
+            'cash': {  # 현금 (자산이므로 +)
+                'prev_year': clean_number(df.iloc[start+2, COL_PREV]),
+                'current_month': clean_number(df.iloc[start+2, COL_CURRENT]),
+                'year_end': clean_number(df.iloc[start+2, COL_YEAR_END]),
                 'yoy_krw': 0,
                 'note': ''
             },
@@ -138,10 +138,17 @@ def parse_bs_csv_simple(csv_path):
         },
         'profit_creation': {
             'total': {},  # 나중에 계산
-            'retained_earnings': {  # 이익잉여금 (부채이므로 -)
-                'prev_year': -clean_number(df.iloc[start+26, COL_PREV]),
-                'current_month': -clean_number(df.iloc[start+26, COL_CURRENT]),
-                'year_end': -clean_number(df.iloc[start+26, COL_YEAR_END]),
+            'retained_earnings': {  # 이익잉여금 (CSV 값이 이미 음수)
+                'prev_year': clean_number(df.iloc[start+26, COL_PREV]),
+                'current_month': clean_number(df.iloc[start+26, COL_CURRENT]),
+                'year_end': clean_number(df.iloc[start+26, COL_YEAR_END]),
+                'yoy_krw': 0,
+                'note': ''
+            },
+            'accounts_payable_tp': {  # 매입채무(TP) (부채이므로 -)
+                'prev_year': -clean_number(df.iloc[start+15, COL_PREV]),
+                'current_month': -clean_number(df.iloc[start+15, COL_CURRENT]),
+                'year_end': -clean_number(df.iloc[start+15, COL_YEAR_END]),
                 'yoy_krw': 0,
                 'note': ''
             }
@@ -198,16 +205,18 @@ def parse_bs_csv_simple(csv_path):
         'note': ''
     }
     
-    # profit_creation total = retained_earnings (이미 음수 처리됨)
+    # profit_creation total = retained_earnings + accounts_payable_tp
     wc_data['profit_creation']['total'] = {
-        'prev_year': wc_data['profit_creation']['retained_earnings']['prev_year'],
-        'current_month': wc_data['profit_creation']['retained_earnings']['current_month'],
-        'year_end': wc_data['profit_creation']['retained_earnings']['year_end'],
+        'prev_year': wc_data['profit_creation']['retained_earnings']['prev_year'] + wc_data['profit_creation']['accounts_payable_tp']['prev_year'],
+        'current_month': wc_data['profit_creation']['retained_earnings']['current_month'] + wc_data['profit_creation']['accounts_payable_tp']['current_month'],
+        'year_end': wc_data['profit_creation']['retained_earnings']['year_end'] + wc_data['profit_creation']['accounts_payable_tp']['year_end'],
         'yoy_krw': 0,
         'note': ''
     }
     
-    # other_wc_items total = prepaid + accrued + fixed_assets + net_other (이미 음수 처리됨)
+    # other_wc_items total = prepaid + accrued + fixed_assets + net_other + payables_other + other (부호 그대로 합계)
+    # payables_other와 other는 JSON에만 있고 스크립트에는 없으므로, JSON에서 직접 계산 필요
+    # 일단 스크립트에서는 기본 4개 항목만 계산 (JSON에서 수동으로 payables_other와 other 추가 필요)
     wc_data['other_wc_items']['total'] = {
         'prev_year': wc_data['other_wc_items']['prepaid']['prev_year'] + wc_data['other_wc_items']['accrued']['prev_year'] + wc_data['other_wc_items']['fixed_assets']['prev_year'] + wc_data['other_wc_items']['net_other']['prev_year'],
         'current_month': wc_data['other_wc_items']['prepaid']['current_month'] + wc_data['other_wc_items']['accrued']['current_month'] + wc_data['other_wc_items']['fixed_assets']['current_month'] + wc_data['other_wc_items']['net_other']['current_month'],
@@ -225,23 +234,18 @@ def parse_bs_csv_simple(csv_path):
         'note': ''
     }
     
-    # summary = receivables + payables + profit_creation + other_wc_items + lease_related
+    # summary = 매출채권 + 재고 - 매입채무 (단순 운전자본 계산)
+    # accounts_receivable + inventory + accounts_payable (payables는 이미 음수로 저장됨)
     wc_data['summary'] = {
-        'prev_year': (wc_data['receivables']['total']['prev_year'] + 
-                     wc_data['payables']['total']['prev_year'] + 
-                     wc_data['profit_creation']['total']['prev_year'] + 
-                     wc_data['other_wc_items']['total']['prev_year'] + 
-                     wc_data['lease_related']['total']['prev_year']),
-        'current_month': (wc_data['receivables']['total']['current_month'] + 
-                         wc_data['payables']['total']['current_month'] + 
-                         wc_data['profit_creation']['total']['current_month'] + 
-                         wc_data['other_wc_items']['total']['current_month'] + 
-                         wc_data['lease_related']['total']['current_month']),
-        'year_end': (wc_data['receivables']['total']['year_end'] + 
-                    wc_data['payables']['total']['year_end'] + 
-                    wc_data['profit_creation']['total']['year_end'] + 
-                    wc_data['other_wc_items']['total']['year_end'] + 
-                    wc_data['lease_related']['total']['year_end']),
+        'prev_year': (wc_data['receivables']['accounts_receivable']['prev_year'] + 
+                     wc_data['receivables']['inventory']['prev_year'] + 
+                     wc_data['payables']['accounts_payable']['prev_year']),
+        'current_month': (wc_data['receivables']['accounts_receivable']['current_month'] + 
+                         wc_data['receivables']['inventory']['current_month'] + 
+                         wc_data['payables']['accounts_payable']['current_month']),
+        'year_end': (wc_data['receivables']['accounts_receivable']['year_end'] + 
+                    wc_data['receivables']['inventory']['year_end'] + 
+                    wc_data['payables']['accounts_payable']['year_end']),
         'yoy_krw': 0,
         'note': ''
     }
