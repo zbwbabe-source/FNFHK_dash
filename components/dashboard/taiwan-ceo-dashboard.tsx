@@ -86,11 +86,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 • **25F 판매율:** 32.2%, 전년비 +2.0%p
 • **온라인:** 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
 • **총재고 감소:** 180,260K, YOY 93%`,
-        'risk-text': `• Discovery 당월 영업손실 -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
-• 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요`,
-        'strategy-text': `• 성장 모멘텀 유지: 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
-• 온라인 채널 강화: 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
-• 수익성 개선: 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`
+        'risk-text': `• **Discovery 당월 영업손실:** -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
+• **할인율 상승:** 25.8% (전월 23.7%), 수익성 관리 필요`,
+        'strategy-text': `• **성장 모멘텀 유지:** 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
+• **온라인 채널 강화:** 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
+• **수익성 개선:** 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`
       };
       setCeoInsights(defaultInsights);
     }
@@ -1141,8 +1141,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• Discovery 당월 영업손실 -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
-• 할인율 상승: 25.8% (전월 23.7%), 수익성 관리 필요`;
+                        const defaultText = `• **Discovery 당월 영업손실:** -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
+• **할인율 상승:** 25.8% (전월 23.7%), 수익성 관리 필요`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1470,9 +1470,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        const defaultText = `• 성장 모멘텀 유지: 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
-• 온라인 채널 강화: 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
-• 수익성 개선: 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`;
+                        const defaultText = `• **성장 모멘텀 유지:** 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
+• **온라인 채널 강화:** 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
+• **수익성 개선:** 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
