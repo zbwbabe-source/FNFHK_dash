@@ -625,8 +625,11 @@ export default function BSPage() {
                       const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
                       const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
                       const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
-                      const sign = yoyAmount >= 0 ? '+' : '△';
+                      const sign = '+'; // 이익잉여금은 항상 + 표시 (운전자본 관점에서 증가)
                       const defaultNote = `이익잉여금 ${sign}${yoyInMillions}m`;
+                      // 이전 형식의 노트가 저장되어 있으면 무시하고 defaultNote 사용
+                      const savedNote = notes['profit_creation_retained_earnings'];
+                      const shouldUseDefault = !savedNote || savedNote.includes('△') || savedNote.includes('대변계정');
                       return (
                         <>
                           <WCRow 
@@ -634,7 +637,7 @@ export default function BSPage() {
                             item={retainedEarnings} 
                             isPositive={false}
                             noteKey="profit_creation_retained_earnings"
-                            noteValue={notes['profit_creation_retained_earnings'] || defaultNote}
+                            noteValue={shouldUseDefault ? defaultNote : savedNote}
                             onNoteChange={saveNote}
                             isEditingNote={editingNote === 'profit_creation_retained_earnings'}
                             onNoteEdit={setEditingNote}
@@ -781,7 +784,7 @@ export default function BSPage() {
                         })()}
                       </td>
                       <td className={`px-4 py-3 border border-gray-300 text-center font-bold text-xl ${Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? 'text-green-600' : 'text-red-600'}`}>
-                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? '✓ 균형' : '✗ 불균형'}
+                        {Math.abs(bsData.balance_sheet.working_capital.balance_check.year_end) <= 1 ? '' : '✗ 불균형'}
                       </td>
                     </tr>
                   </tbody>
