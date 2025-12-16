@@ -2817,14 +2817,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               {/* 시각적 표현 개선 */}
               <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3 mb-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-700">입고</span>
+                  <span className="text-xs font-semibold text-gray-700">누적입고</span>
                   <span className="text-sm font-bold text-red-600">
                     {formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.net_acp_p || 0))}K 
                     ({formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%) 🔽
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-700">판매금액</span>
+                  <span className="text-xs font-semibold text-gray-700">누적판매</span>
                   <span className="text-sm font-bold text-green-600">
                     {formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0))}K 
                     ({formatPercent((seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0) < 100 ? (seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0) + 100 : (seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0))}%) ✓
