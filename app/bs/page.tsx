@@ -513,7 +513,7 @@ export default function BSPage() {
                       <th className="px-4 py-3 border border-gray-300 text-left font-semibold">계정과목</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">24년기말</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">2025-11</th>
-                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">2025-12</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">25년 기말(E)</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">연간비교</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">비고</th>
                     </tr>
@@ -527,7 +527,8 @@ export default function BSPage() {
                       bgColor="bg-yellow-50"
                       expanded={expandedSections.has('wc-main')}
                       onClick={() => toggleSection('wc-main')}
-                      note="AR +13m, 재고 △25m, AP +1m"
+                      isPositive={undefined}
+                      note="AR 13m 증가, 재고 25m 감소, AP 1m 감소"
                     />
 
                     {expandedSections.has('wc-main') && (
@@ -559,9 +560,9 @@ export default function BSPage() {
                         />
                         
                         {/* 매입채무 */}
-                        <WCRow 
-                          label="  매입채무" 
-                          item={bsData.balance_sheet.working_capital.payables.accounts_payable} 
+                        <WCRow
+                          label="  매입채무"
+                          item={bsData.balance_sheet.working_capital.payables.total}
                           isPositive={false}
                           noteKey="payables_accounts_payable"
                           noteValue={notes['payables_accounts_payable'] || '26년말 매입채무 40m 감소 Target'}
@@ -576,23 +577,23 @@ export default function BSPage() {
                     {/* 현금 */}
                     <WCRow
                       label="▼ 현금"
-                      item={bsData.balance_sheet.working_capital.payables.cash}
+                      item={bsData.balance_sheet.working_capital.cash.cash}
                       isSection={true}
                       bgColor="bg-blue-50"
                       expanded={expandedSections.has('wc-cash')}
                       onClick={() => toggleSection('wc-cash')}
                       isPositive={true}
-                      note={noteItem('현금', bsData.balance_sheet.working_capital.payables.cash.year_end - bsData.balance_sheet.working_capital.payables.cash.prev_year)}
+                      note={noteItem('현금', bsData.balance_sheet.working_capital.cash.cash.year_end - bsData.balance_sheet.working_capital.cash.cash.prev_year)}
                     />
                     {expandedSections.has('wc-cash') && (
-                      <WCRow 
-                        label="  현금" 
-                        item={bsData.balance_sheet.working_capital.payables.cash} 
+                      <WCRow
+                        label="  현금"
+                        item={bsData.balance_sheet.working_capital.cash.cash}
                         isPositive={true}
-                        noteKey="payables_cash"
-                        noteValue={notes['payables_cash'] || '현금 및 현금성자산'}
+                        noteKey="cash_cash"
+                        noteValue={notes['cash_cash'] || '현금 및 현금성자산'}
                         onNoteChange={saveNote}
-                        isEditingNote={editingNote === 'payables_cash'}
+                        isEditingNote={editingNote === 'cash_cash'}
                         onNoteEdit={setEditingNote}
                         highlight={true}
                       />
@@ -607,35 +608,23 @@ export default function BSPage() {
                       expanded={expandedSections.has('wc-profit')}
                       onClick={() => toggleSection('wc-profit')}
                       isPositive={false}
-                      note={(() => {
-                        const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
-                        const tpPayable = bsData.balance_sheet.working_capital.profit_creation.accounts_payable_tp;
-                        const reYoy = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
-                        const tpYoy = calculateYoYAmount(tpPayable.year_end, tpPayable.prev_year);
-                        return (
-                          <>
-                            {noteItem('이익잉여금', reYoy)}
-                            {', '}
-                            {noteItem('매입채무(TP)', tpYoy)}
-                          </>
-                        );
-                      })()}
+                      note="25년 당기순이익 +2m, 매입채무(TP) 변동없음"
                     />
                     {expandedSections.has('wc-profit') && (() => {
                       const retainedEarnings = bsData.balance_sheet.working_capital.profit_creation.retained_earnings;
                       const yoyAmount = calculateYoYAmount(retainedEarnings.year_end, retainedEarnings.prev_year);
                       const yoyInMillions = Math.round(Math.abs(yoyAmount) / 1000);
                       const sign = '+'; // 이익잉여금은 항상 + 표시 (운전자본 관점에서 증가)
-                      const defaultNote = `이익잉여금 ${sign}${yoyInMillions}m`;
+                      const defaultNote = `25년 당기순이익 ${sign}${yoyInMillions}m`;
                       // 이전 형식의 노트가 저장되어 있으면 무시하고 defaultNote 사용
                       const savedNote = notes['profit_creation_retained_earnings'];
-                      const shouldUseDefault = !savedNote || savedNote.includes('△') || savedNote.includes('대변계정');
+                      const shouldUseDefault = !savedNote || savedNote.includes('△') || savedNote.includes('대변계정') || savedNote.includes('이익잉여금');
                       return (
                         <>
                           <WCRow 
                             label="  이익잉여금" 
                             item={retainedEarnings} 
-                            isPositive={false}
+                            isPositive={true}
                             noteKey="profit_creation_retained_earnings"
                             noteValue={shouldUseDefault ? defaultNote : savedNote}
                             onNoteChange={saveNote}
@@ -665,33 +654,13 @@ export default function BSPage() {
                       bgColor="bg-green-50"
                       expanded={expandedSections.has('wc-other')}
                       onClick={() => toggleSection('wc-other')}
-                      note="고정자산/보증금 증가 +8m, 미지급비용 감소 +5m, 기타 +2m"
+                      note="고정자산/보증금 증가 +8m, 미지급금 감소 +5m, 기타 +2m"
                     />
                     {expandedSections.has('wc-other') && (
                       <>
-                        <WCRow 
-                          label="  선급비용" 
-                          item={bsData.balance_sheet.working_capital.other_wc_items.prepaid} 
-                          isPositive={true}
-                          noteKey="other_wc_items_prepaid"
-                          noteValue={notes['other_wc_items_prepaid'] || '선급임차료, 선급보험료 등'}
-                          onNoteChange={saveNote}
-                          isEditingNote={editingNote === 'other_wc_items_prepaid'}
-                          onNoteEdit={setEditingNote}
-                        />
-                        <WCRow 
-                          label="  미지급비용" 
-                          item={bsData.balance_sheet.working_capital.other_wc_items.accrued} 
-                          isPositive={false}
-                          noteKey="other_wc_items_accrued"
-                          noteValue={notes['other_wc_items_accrued'] || '미지급급여, 미지급임차료 등'}
-                          onNoteChange={saveNote}
-                          isEditingNote={editingNote === 'other_wc_items_accrued'}
-                          onNoteEdit={setEditingNote}
-                        />
-                        <WCRow 
-                          label="  고정자산/보증금" 
-                          item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets} 
+                        <WCRow
+                          label="  고정자산/보증금"
+                          item={bsData.balance_sheet.working_capital.other_wc_items.fixed_assets}
                           isPositive={true}
                           noteKey="other_wc_items_fixed_assets"
                           noteValue={notes['other_wc_items_fixed_assets'] || '유형자산, 임대보증금'}
@@ -699,14 +668,24 @@ export default function BSPage() {
                           isEditingNote={editingNote === 'other_wc_items_fixed_assets'}
                           onNoteEdit={setEditingNote}
                         />
-                        <WCRow 
-                          label="  미수금 - 미지급금 (순액)" 
-                          item={bsData.balance_sheet.working_capital.other_wc_items.net_other}
-                          isPositive={undefined}
-                          noteKey="other_wc_items_net_other"
-                          noteValue={notes['other_wc_items_net_other'] || '미수금에서 미지급금을 뺀 순액 (기타유동부채 포함)'}
+                        <WCRow
+                          label="  미수금"
+                          item={bsData.balance_sheet.working_capital.other_wc_items.prepaid}
+                          isPositive={true}
+                          noteKey="other_wc_items_prepaid"
+                          noteValue={notes['other_wc_items_prepaid'] || '미수금'}
                           onNoteChange={saveNote}
-                          isEditingNote={editingNote === 'other_wc_items_net_other'}
+                          isEditingNote={editingNote === 'other_wc_items_prepaid'}
+                          onNoteEdit={setEditingNote}
+                        />
+                        <WCRow
+                          label="  미지급금"
+                          item={bsData.balance_sheet.working_capital.other_wc_items.accrued}
+                          isPositive={false}
+                          noteKey="other_wc_items_accrued"
+                          noteValue={notes['other_wc_items_accrued'] || '미지급금'}
+                          onNoteChange={saveNote}
+                          isEditingNote={editingNote === 'other_wc_items_accrued'}
                           onNoteEdit={setEditingNote}
                         />
                         {bsData.balance_sheet.working_capital.other_wc_items.other && (

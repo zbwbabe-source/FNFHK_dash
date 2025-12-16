@@ -913,7 +913,7 @@ export default function Home() {
                       </div>
                       <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
                         <span className="text-sm font-medium text-blue-700">
-                          평당매출/1일: {formatHKD(hkDailySalesPerPyeongCurrent)} HKD
+                        평당매출/1일: {formatHKD(hkDailySalesPerPyeongCurrent)} HKD
                         </span>
                         {hkDailySalesPerPyeongYoy > 0 && (
                           <span className={`ml-2 font-semibold ${hkDailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -932,7 +932,7 @@ export default function Home() {
                       </div>
                       <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
                         <span className="text-sm font-medium text-blue-700">
-                          평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
+                        평당매출/1일: {formatHKD(hkDailySalesPerPyeongCumulative)} HKD
                         </span>
                         {hkSalesPerPyeongCumulativeYoy > 0 && (
                           <span className={`ml-2 font-semibold ${hkSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1227,7 +1227,7 @@ export default function Home() {
                       </div>
                       <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
                         <span className="text-sm font-medium text-blue-700">
-                          평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
+                        평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
                         </span>
                         {twDailySalesPerPyeongYoy > 0 && (
                           <span className={`ml-2 font-semibold ${twDailySalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1246,7 +1246,7 @@ export default function Home() {
                       </div>
                       <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
                         <span className="text-sm font-medium text-blue-700">
-                          평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
+                        평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
                         </span>
                         {twSalesPerPyeongCumulativeYoy > 0 && (
                           <span className={`ml-2 font-semibold ${twSalesPerPyeongCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
