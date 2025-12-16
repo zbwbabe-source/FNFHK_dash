@@ -1202,7 +1202,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center justify-between">
                 <div className="flex items-center">
                   <span className="text-xl mr-2">📊</span>
-                  Executive Summary
+                  핵심성과
                 </div>
                 <button
                   onClick={() => {
@@ -1516,12 +1516,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <div className="mt-3 pt-3 border-t space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
                     <span>HK (홍콩)</span>
-                    <span className="text-red-600">
+                    <span>
                       {(() => {
                         const hkCurrentTotal = ((hkRetail?.current?.net_sales || 0) + (hkOutlet?.current?.net_sales || 0) + (hkOnline?.current?.net_sales || 0)) / 1000;
                         const hkPrevTotal = ((hkRetail?.previous?.net_sales || 0) + (hkOutlet?.previous?.net_sales || 0) + (hkOnline?.previous?.net_sales || 0)) / 1000;
                         const hkYoy = hkPrevTotal > 0 ? (hkCurrentTotal / hkPrevTotal) * 100 : 0;
-                        return `${formatNumber(hkCurrentTotal)} (${formatPercent(hkYoy)}%)`;
+                        const colorClass = hkYoy >= 100 ? 'text-green-600' : 'text-red-600';
+                        return (
+                          <>
+                            {formatNumber(hkCurrentTotal)} <span className={colorClass}>({formatPercent(hkYoy)}%)</span>
+                          </>
+                        );
                       })()}
                     </span>
                   </div>
@@ -1529,47 +1534,52 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatNumber((hkRetail?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(hkRetail?.yoy || 0)}%)</span>
+                      <span className={(hkRetail?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(hkRetail?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatNumber((hkOutlet?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(hkOutlet?.yoy || 0)}%)</span>
+                      <span className={(hkOutlet?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(hkOutlet?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 온라인</span>
                     <span className="font-semibold">
                       {formatNumber((hkOnline?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-green-600"> ({formatPercent(hkOnline?.yoy || 0)}%)</span>
+                      <span className={(hkOnline?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(hkOnline?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   
                   <div className="flex justify-between text-xs font-semibold text-gray-700 mt-3 pt-2 border-t">
                     <span>MC (마카오)</span>
-                    <span className="text-red-600">
-                      {formatNumber(((mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0)) / 1000)} 
-                      ({formatPercent((() => {
+                    <span>
+                      {(() => {
                         const mcCurrentTotal = (mcRetail?.current?.net_sales || 0) + (mcOutlet?.current?.net_sales || 0);
                         const mcPreviousTotal = (mcRetail?.previous?.net_sales || 0) + (mcOutlet?.previous?.net_sales || 0);
-                        return mcPreviousTotal > 0 ? (mcCurrentTotal / mcPreviousTotal) * 100 : 0;
-                      })())}%)
+                        const mcYoy = mcPreviousTotal > 0 ? (mcCurrentTotal / mcPreviousTotal) * 100 : 0;
+                        const colorClass = mcYoy >= 100 ? 'text-green-600' : 'text-red-600';
+                        return (
+                          <>
+                            {formatNumber(mcCurrentTotal / 1000)} <span className={colorClass}>({formatPercent(mcYoy)}%)</span>
+                          </>
+                        );
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatNumber((mcRetail?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(mcRetail?.yoy || 0)}%)</span>
+                      <span className={(mcRetail?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(mcRetail?.yoy || 0)}%)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatNumber((mcOutlet?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(mcOutlet?.yoy || 0)}%)</span>
+                      <span className={(mcOutlet?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(mcOutlet?.yoy || 0)}%)</span>
                     </span>
                   </div>
                 </div>
@@ -3449,9 +3459,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             <style>{`
               .hk-pl-summary-table tbody tr td:nth-child(8),
               .hk-pl-summary-table tbody tr td:nth-child(15),
-              .hk-pl-summary-table thead tr th:nth-child(8),
-              .hk-pl-summary-table thead tr th:nth-child(15) {
+              .hk-pl-summary-table thead tr:first-child th:nth-child(8),
+              .hk-pl-summary-table thead tr:first-child th:nth-child(15) {
                 background-color: #f3f4f6 !important;
+              }
+              .hk-pl-summary-table thead tr:nth-child(2) th {
+                background-color: inherit !important;
               }
             `}</style>
             <table className="min-w-full text-xs border-collapse hk-pl-summary-table">
@@ -3466,18 +3479,18 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <th rowSpan={2} className="text-center p-2 font-semibold bg-gray-100">누적 YOY</th>
                 </tr>
                 <tr className="border-b border-gray-300">
-                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-green-50">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-orange-50">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-cyan-50">합계</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">홍콩</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">마카오</th>
-                  <th className="p-1 text-center border-r border-gray-300 bg-amber-50">합계</th>
+                  <th className="bg-green-50 p-1 text-center border-r border-gray-300">홍콩</th>
+                  <th className="bg-green-50 p-1 text-center border-r border-gray-300">마카오</th>
+                  <th className="bg-green-50 p-1 text-center border-r border-gray-300">합계</th>
+                  <th className="bg-orange-50 p-1 text-center border-r border-gray-300">홍콩</th>
+                  <th className="bg-orange-50 p-1 text-center border-r border-gray-300">마카오</th>
+                  <th className="bg-orange-50 p-1 text-center border-r border-gray-300">합계</th>
+                  <th className="bg-cyan-50 p-1 text-center border-r border-gray-300">홍콩</th>
+                  <th className="bg-cyan-50 p-1 text-center border-r border-gray-300">마카오</th>
+                  <th className="bg-cyan-50 p-1 text-center border-r border-gray-300">합계</th>
+                  <th className="bg-amber-50 p-1 text-center border-r border-gray-300">홍콩</th>
+                  <th className="bg-amber-50 p-1 text-center border-r border-gray-300">마카오</th>
+                  <th className="bg-amber-50 p-1 text-center border-r border-gray-300">합계</th>
                 </tr>
               </thead>
               <tbody>
