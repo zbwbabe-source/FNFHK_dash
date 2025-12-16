@@ -545,20 +545,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const prevSalesPerStore = storeEfficiencySummary?.previous?.sales_per_store ?? offlineEfficiency?.total?.previous?.sales_per_store ?? storeStatusData?.summary?.sales_per_store ?? 0;
   const totalSalesPerStoreYoy = offlineEfficiency?.total?.yoy ?? (prevSalesPerStore ? (totalSalesPerStore / prevSalesPerStore) * 100 : 0);
 
-  // 평당매출 계산 (당월)
+  // 평당매출 계산 (당월) - 홍콩+마카오, 온라인 제외
   const storeAreas = (storeAreasData as any)?.store_areas || {};
   const currentMonthDays = new Date(currentYear, currentMonth, 0).getDate(); // 해당 월의 일수
   
-  // 홍콩 오프라인 매출 및 면적 (PL 데이터 사용)
-  const hkOfflineSales = plData?.current_month?.hk?.net_sales || 0; // K HKD
-  const hkOfflineSalesPrev = plData?.prev_month?.hk?.net_sales || 0; // K HKD (전년)
+  // 홍콩+마카오 오프라인 매출 (PL 데이터 사용)
+  const hkMcOfflineSales = (plData?.current_month?.hk?.net_sales || 0) + (plData?.current_month?.mc?.net_sales || 0); // K HKD
+  const hkMcOfflineSalesPrev = (plData?.prev_month?.hk?.net_sales || 0) + (plData?.prev_month?.mc?.net_sales || 0); // K HKD (전년)
   
-  // 면적 계산: M10A 제외, 폐점+저매출 매장 제외
+  // 면적 계산: 홍콩+마카오, MLB 브랜드만, M10A 제외, 온라인 제외, 폐점+저매출 매장 제외 - 요약 페이지와 동일
   let totalArea = 0;
   if (dashboardData?.store_summary) {
     Object.entries(dashboardData.store_summary).forEach(([code, store]: [string, any]) => {
       if (code === 'M10A') return; // M10A는 M10에 포함
-      if (code.startsWith('M') && !code.startsWith('MC') && !code.startsWith('ME')) {
+      // 홍콩+마카오: M으로 시작, MLB 브랜드, 온라인 제외
+      if (code.startsWith('M') && store?.brand === 'MLB' && store?.channel !== 'Online') {
         const netSales = store?.current?.net_sales || 0;
         if (netSales > 0) {
           const area = storeAreas[code] || 0;
@@ -573,19 +574,32 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     });
   }
   
-  // 전년 면적 계산 (전년 매장 수 기준으로 추정, 또는 동일 면적 가정)
-  // 전년 매장이 현재보다 적으면 전년 면적도 비례적으로 작을 것으로 가정
-  const prevStoreCount = offlineEfficiency?.total?.previous?.store_count || 0;
-  const currentStoreCount = offlineEfficiency?.total?.current?.store_count || 0;
-  const prevTotalArea = currentStoreCount > 0 && prevStoreCount > 0 ? (totalArea * prevStoreCount / currentStoreCount) : totalArea;
+  // 전년 면적 계산 (전년 매출이 있는 매장의 실제 면적 합계) - 요약 페이지와 동일
+  let prevTotalArea = 0;
+  if (dashboardData?.store_summary) {
+    Object.entries(dashboardData.store_summary).forEach(([code, store]: [string, any]) => {
+      if (code === 'M10A') return;
+      // 홍콩+마카오: M으로 시작, MLB 브랜드, 온라인 제외
+      if (code.startsWith('M') && store?.brand === 'MLB' && store?.channel !== 'Online') {
+        const prevNetSales = store?.previous?.net_sales || 0;
+        if (prevNetSales > 0) {
+          const area = storeAreas[code] || 0;
+          if (store?.closed === true && area > 0) {
+            const salesPerPyeong = (prevNetSales / 1000) / area;
+            if (salesPerPyeong < 1) return;
+          }
+          if (area > 0) prevTotalArea += area;
+        }
+      }
+    });
+  }
   
-  const salesPerPyeong = totalArea > 0 ? hkOfflineSales / totalArea : 0; // K HKD/평
+  const salesPerPyeong = totalArea > 0 ? hkMcOfflineSales / totalArea : 0; // K HKD/평
   const dailySalesPerPyeong = salesPerPyeong > 0 ? (salesPerPyeong * 1000) / currentMonthDays : 0; // HKD/평/일
   
-  // 전년 평당매출 계산
-  const prevSalesPerPyeong = prevTotalArea > 0 ? hkOfflineSalesPrev / prevTotalArea : 0; // K HKD/평
-  const prevMonthDays = new Date(currentYear - 1, currentMonth, 0).getDate(); // 전년 동월 일수
-  const prevDailySalesPerPyeong = prevSalesPerPyeong > 0 ? (prevSalesPerPyeong * 1000) / prevMonthDays : 0; // HKD/평/일
+  // 전년 평당매출 계산 (홍콩+마카오) - 요약 페이지와 동일하게 당월 일수 사용
+  const prevSalesPerPyeong = prevTotalArea > 0 ? hkMcOfflineSalesPrev / prevTotalArea : 0; // K HKD/평
+  const prevDailySalesPerPyeong = prevSalesPerPyeong > 0 ? (prevSalesPerPyeong * 1000) / currentMonthDays : 0; // HKD/평/일 (당월 일수 사용)
   const dailySalesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
 
   const allHKStores = useMemo(() => {
@@ -1200,7 +1214,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       if (!ceoInsights['executive-summary-text']) {
                         const defaultText = `• 11월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
 • 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
-• 평당매출/1일 증가: ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%), 홍콩 오프라인 매장 효율성 개선
+• 매장효율성 개선: 평당매출 ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%)
 • 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
@@ -1243,11 +1257,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['executive-summary-text'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                      {ceoInsights['executive-summary-text']}
-                    </div>
-                  ) : generateExecutiveSummary ? (
+                  {generateExecutiveSummary ? (
                     <>
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
@@ -1266,7 +1276,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">평당매출/1일 증가</span>: {Math.round(dailySalesPerPyeong)} HKD (YOY {formatPercent(dailySalesPerPyeongYoy)}%), 홍콩 오프라인 매장 효율성 개선
+                          <span className="font-semibold">매장효율성 개선</span>: 평당매출 {Math.round(dailySalesPerPyeong)} HKD (YOY {formatPercent(dailySalesPerPyeongYoy)}%)
                         </div>
                       </div>
 
@@ -1343,12 +1353,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['risk-text'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                      {ceoInsights['risk-text']}
-                    </div>
-                  ) : (
-                    <>
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
@@ -1369,8 +1373,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="font-semibold">Discovery 영업손실</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
                         </div>
                       </div>
-                    </>
-                  )}
                 </div>
               )}
             </div>
@@ -1389,7 +1391,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        const defaultText = `• 재고 정상화: 26년1월 매출YOY 113%, 재고일수 425일→320일
+                        const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
 • 성장 모멘텀 유지: 당월 흑자 전환 기조 지속
 • 채널 효율화: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
@@ -1433,16 +1435,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsights['strategy-text'] ? (
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                      {ceoInsights['strategy-text']}
-                    </div>
-                  ) : (
-                    <>
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">재고 정상화</span>: 26년1월 매출YOY 113%, 재고일수 425일→320일
+                          <span className="font-semibold">재고 정상화</span>: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
                         </div>
                       </div>
 
@@ -1459,8 +1455,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="font-semibold">채널 효율화</span>: 지속적 직자 비효율 매장 정리 의사결정 필요(Yoho, NPT3, 세나도 등)
                         </div>
                       </div>
-                    </>
-                  )}
                 </div>
               )}
             </div>
@@ -2571,7 +2565,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 {formatNumber(dailySalesPerPyeong)} HKD
               </div>
               <div className="text-sm text-green-600 font-semibold mb-1">
-                평당매출/1일 ({formatNumber(salesPerPyeong)} K HKD/평)
+                평당매출/1일
               </div>
               <div className="text-xs text-gray-600 mb-3">
                 전년 {formatNumber(prevDailySalesPerPyeong)} HKD 
@@ -2634,8 +2628,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       {showStoreCalcDetail && (
                         <div className="px-2 pb-2 text-xs text-amber-700 space-y-1">
                         <div>• <span className="font-semibold">계산식:</span> (PL 매출 ÷ 총 면적 × 1000) ÷ 일수</div>
-                        <div>• <span className="font-semibold">매출:</span> {formatNumber(hkOfflineSales)} K HKD (PL 데이터)</div>
-                        <div>• <span className="font-semibold">면적:</span> {formatNumber(totalArea)}평 (M10A는 M10 포함, 폐점+저매출 제외)</div>
+                        <div>• <span className="font-semibold">매출:</span> {formatNumber(hkMcOfflineSales)} K HKD (홍콩+마카오, PL 데이터)</div>
+                        <div>• <span className="font-semibold">면적:</span> {formatNumber(totalArea)}평 (홍콩+마카오)</div>
                         <div>• <span className="font-semibold">일수:</span> {currentMonth}월 {currentMonthDays}일</div>
                       </div>
                       )}
