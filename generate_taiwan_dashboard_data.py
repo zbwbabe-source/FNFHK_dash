@@ -19,12 +19,41 @@ import re
 # 2511 기준: 4.03
 # 2510 기준: 3.95701015338086
 # 2509 기준: 3.92
-TWD_TO_HKD_RATE = 4.03  # 2511 환율
+TWD_TO_HKD_RATE = 4.03  # 기본값 (동적으로 변경됨)
 
 # V- (부가세 제외) 적용 비율
 # 대만재고수불.csv의 실판매출은 V-로 표현해야 하므로 1.05로 나눔
 # hmd_pl_database (1).csv는 이미 V-로 되어있음
 VAT_EXCLUSION_RATE = 1.05
+
+def read_exchange_rate(csv_dir, period):
+    """
+    환율 파일에서 해당 period의 환율 읽기
+    
+    Args:
+        csv_dir: Dashboard_Raw_Data 디렉토리 경로
+        period: 기간 (예: '2510')
+    
+    Returns:
+        float: 환율 (TWD to HKD)
+    """
+    rate_file = os.path.join(csv_dir, 'TW', period, f'TW Exchange Rate {period}.csv')
+    
+    if os.path.exists(rate_file):
+        try:
+            with open(rate_file, 'r', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get('period') == period:
+                        rate = float(row.get('rate', 4.03))
+                        print(f"환율 파일에서 로드: {period} = {rate}")
+                        return rate
+        except Exception as e:
+            print(f"환율 파일 읽기 오류: {e}")
+    
+    # 기본값 반환
+    print(f"환율 파일 없음 또는 매칭 실패, 기본값 사용: 4.03")
+    return 4.03
 
 # Store Code 분류 (대만)
 def is_mlb_retail(store_code):
@@ -152,6 +181,18 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         output_file_path: 출력 JSON 파일 경로
         target_period: 처리할 Period (예: '2410'). None이면 마지막 Period 사용
     """
+    global TWD_TO_HKD_RATE
+    
+    # 환율 동적 로드
+    if target_period:
+        # csv_file_path: ../Dashboard_Raw_Data/TW/2510/TW Inventory_2510.csv
+        # -> csv_dir: ../Dashboard_Raw_Data
+        csv_dir = os.path.dirname(os.path.dirname(os.path.dirname(csv_file_path)))
+        TWD_TO_HKD_RATE = read_exchange_rate(csv_dir, target_period)
+        print(f"=" * 80)
+        print(f"환율 설정: 1 TWD = {TWD_TO_HKD_RATE} HKD (period: {target_period})")
+        print(f"=" * 80)
+    
     print("CSV 파일 읽는 중...")
     data, periods = read_csv_data(csv_file_path)
     

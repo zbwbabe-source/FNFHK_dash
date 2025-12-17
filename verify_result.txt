@@ -1,0 +1,52 @@
+﻿================================================================================
+2510 매장별 현황 데이터 검증
+================================================================================
+
+=== 요약 정보 ===
+총 매장 수: 19
+HK 매장: 15
+MC 매장: 4
+총 직접이익: 623.51K
+매장당 매출: 983.85K
+전체 YOY: 94.10%
+
+=== 카테고리별 매장 수 ===
+흑자 & 성장: 4개
+  - 직접이익 합계: 777.89K
+  - 평균 YOY: 114.79%
+  - 평균 임차료/인건비율: 31.71%
+흑자 & 악화: 2개
+  - 직접이익 합계: 113.80K
+  - 평균 YOY: 89.26%
+  - 평균 임차료/인건비율: 38.31%
+적자 & 성장: 5개
+  - 직접이익 합계: -505.23K
+  - 평균 YOY: 131.42%
+  - 평균 임차료/인건비율: 69.18%
+적자 & 악화: 4개
+  - 직접이익 합계: -315.85K
+  - 평균 YOY: 89.71%
+  - 평균 임차료/인건비율: 54.45%
+
+=== 샘플 매장 (M09) 상세 ===
+매장: M09 Shangshui
+카테고리: loss_improving
+실매출: 509.66K
+직접이익: -3.04K
+임차료: 150.20K
+인건비: 85.94K
+임차료/인건비율: 46.33%
+YOY: 112.69%
+
+=== 검증 결과 ===
+python : Traceback (most recent call last):
+위치 C:\Users\AD0814\AppData\Local\Temp\ps-script-50f18bd1-84f6-48ce-88ca-631c7a2f2423.ps1:82 문자:1
++ python verify_2510_data.py 2>&1 | Out-File -Encoding UTF8 verify_resu ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "D:\Cursor_work_space\HKMCTW_Dashboard\Dashboard\verify_2510_data.py", line 86, in <module>
+    print(f"{symbol} {msg}", flush=True)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2713' in position 0: illegal multibyte sequence

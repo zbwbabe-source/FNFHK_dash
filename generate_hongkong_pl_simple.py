@@ -159,10 +159,24 @@ def read_opex_data(csv_file, period):
     return opex
 
 if __name__ == '__main__':
-    period = '202511'
-    prev_period = '202411'
+    import sys
     
-    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_PL_2511.csv'
+    # 명령줄 인자로 period 받기
+    if len(sys.argv) > 1:
+        period_short = sys.argv[1]  # 예: 2510
+    else:
+        period_short = '2511'  # 기본값
+    
+    # Period 형식 변환
+    year = 2000 + int(period_short[:2])
+    month = int(period_short[2:4])
+    period = f"{year}{month:02d}"
+    
+    # 전년 동월
+    prev_year = year - 1
+    prev_period = f"{prev_year}{month:02d}"
+    
+    csv_file = f'../Dashboard_Raw_Data/HKMC/{period_short}/HKMC_PL_{period_short}.csv'
     
     print("홍콩/마카오 매장별 직접비 데이터 읽는 중...")
     stores = read_store_data(csv_file, period, prev_period)
@@ -195,8 +209,9 @@ if __name__ == '__main__':
         'opex': opex
     }
     
-    with open('public/dashboard/hongkong-pl-stores-2511.json', 'w', encoding='utf-8') as f:
+    output_file = f'public/dashboard/hongkong-pl-stores-{period_short}.json'
+    with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
     
-    print("\n데이터가 public/dashboard/hongkong-pl-stores-2511.json에 저장되었습니다.")
+    print(f"\n데이터가 {output_file}에 저장되었습니다.")
 

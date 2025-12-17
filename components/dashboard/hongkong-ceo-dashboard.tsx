@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ComposedChart, Legend, LabelList, ReferenceLine, Cell, Layer } from 'recharts';
 import { TrendingDown, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
-import storeStatusData from './hongkong-store-status.json';
 import storeAreasData from './hongkong-store-areas.json';
 
 interface HongKongCEODashboardProps {
@@ -15,6 +14,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [plData, setPlData] = useState<any>(null);
   const [plStoreData, setPlStoreData] = useState<any>(null);
+  const [storeStatusData, setStoreStatusData] = useState<any>(null);
+  const [ceoInsightsData, setCeoInsightsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // CEO 인사이트 편집 상태 - 각 항목별로 관리
@@ -96,6 +97,26 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
           } else {
             setPlStoreData(plStoreDataResult);
           }
+        }
+        
+        // 매장 상태 데이터 로드
+        let storeStatusResponse = await fetch(`/dashboard/hongkong-store-status-${period}.json`);
+        
+        // period별 파일이 없으면 기본 파일 사용
+        if (!storeStatusResponse.ok) {
+          storeStatusResponse = await fetch('/dashboard/hongkong-store-status.json');
+        }
+        
+        if (storeStatusResponse.ok) {
+          const storeStatusDataResult = await storeStatusResponse.json();
+          setStoreStatusData(storeStatusDataResult);
+        }
+        
+        // CEO 인사이트 데이터 로드 (period별)
+        const ceoInsightsResponse = await fetch(`/dashboard/hongkong-ceo-insights-${period}.json`);
+        if (ceoInsightsResponse.ok) {
+          const ceoInsightsResult = await ceoInsightsResponse.json();
+          setCeoInsightsData(ceoInsightsResult);
         }
         
       } catch (error) {
@@ -1212,7 +1233,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       setEditingCard('executive-summary');
                       // 현재 표시된 텍스트를 편집용으로 준비
                       if (!ceoInsights['executive-summary-text']) {
-                        const defaultText = `• 11월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
+                        const defaultText = ceoInsightsData 
+                          ? ceoInsightsData.executive_summary.items.join('\n')
+                          : `• ${currentMonth}월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
 • 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
 • 매장효율성 개선: 평당매출 ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%)
 • 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)`;
@@ -1257,12 +1280,23 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {generateExecutiveSummary ? (
+                  {ceoInsightsData ? (
+                    // period별 CEO 인사이트 데이터 사용 (2510 전용)
+                    <>
+                      {ceoInsightsData.executive_summary.items.map((item: string, index: number) => (
+                        <div key={index} className="flex items-start">
+                          <div className="flex-1 leading-relaxed whitespace-pre-line">
+                            {item}
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : generateExecutiveSummary ? (
                     <>
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">11월 매출 성장</span>: 실판매출 {formatNumber(pl?.net_sales)}K (YOY {formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +{formatNumber(plChange?.net_sales)}K
+                          <span className="font-semibold">{currentMonth}월 매출 성장</span>: 실판매출 {formatNumber(pl?.net_sales)}K (YOY {formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +{formatNumber(plChange?.net_sales)}K
                         </div>
                       </div>
 

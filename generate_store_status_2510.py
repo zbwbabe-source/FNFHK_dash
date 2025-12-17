@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-오프라인 매장별 현황 데이터 생성
+오프라인 매장별 현황 데이터 생성 - 2510용
 """
 import csv
 import json
@@ -103,43 +103,19 @@ def categorize_store(direct_profit, yoy):
             return 'loss_deteriorating'  # 적자 & 매출악화
 
 def main():
-    import sys
-    import os
+    # 2510 기간 설정
+    last_period_short = '2510'
     
-    # 명령줄 인자로 period 받기
-    if len(sys.argv) > 1:
-        last_period_short = sys.argv[1]
-    else:
-        # 최신 기간 확인 (hongkong-dashboard-data.json에서)
-        try:
-            with open('components/dashboard/hongkong-dashboard-data.json', 'r', encoding='utf-8') as f:
-                dashboard_data = json.load(f)
-                last_period_short = dashboard_data.get('metadata', {}).get('last_period', '2510')
-        except:
-            last_period_short = '2510'
-    
-    # 기간 파싱 (4자리 -> 6자리 변환)
+    # 기간 파싱
     year, month = parse_period(last_period_short)
     if year is None:
         print(f"Invalid period: {last_period_short}")
         return
     
-    # Period별 CSV 파일 경로 생성 (HKMC 폴더 구조 지원)
-    hkmc_csv = f'../Dashboard_Raw_Data/HKMC/{last_period_short}/HKMC_PL_{last_period_short}.csv'
-    legacy_csv = f'../Dashboard_Raw_Data/hmd_pl_database_{last_period_short}.csv'
+    # 2511 CSV 파일 사용 (2510 데이터 포함)
+    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_PL_2511.csv'
     
-    # HKMC 폴더 구조를 우선 사용
-    if os.path.exists(hkmc_csv):
-        csv_file = hkmc_csv
-    elif os.path.exists(legacy_csv):
-        csv_file = legacy_csv
-    else:
-        print(f"CSV 파일을 찾을 수 없습니다:")
-        print(f"  - {hkmc_csv}")
-        print(f"  - {legacy_csv}")
-        return
-    
-    # CSV 형식으로 변환 (202510)
+    # Period 형식으로 변환 (202510)
     last_period = f"{year}{month:02d}"
     
     # 전년 동월 계산
@@ -150,8 +126,22 @@ def main():
     prev_prev_year = prev_year - 1
     prev_prev_period = f"{prev_prev_year}{month:02d}"
     
+    print("=" * 80)
+    print("홍콩/마카오 2510 매장별 현황 데이터 생성")
+    print("=" * 80)
+    print(f"\nCSV 파일: {csv_file}")
+    print(f"Period: {last_period}")
+    print(f"Previous Period: {prev_period}")
+    
     # 데이터 읽기
-    pl_data = read_pl_database(csv_file)
+    try:
+        pl_data = read_pl_database(csv_file)
+    except FileNotFoundError:
+        print(f"\n오류: CSV 파일을 찾을 수 없습니다: {csv_file}")
+        print("2511 CSV 파일에서 2510 데이터를 추출합니다.")
+        return
+    
+    print(f"\n총 {len(pl_data)}개 PL 레코드 읽음")
     
     # 모든 오프라인 매장 목록 수집
     stores = set()
@@ -159,7 +149,9 @@ def main():
         if row['PERIOD'] == last_period:
             stores.add((row['SHOP_CD'], row['SHOP_NM'], row['CNTRY_CD']))
     
-    # 제외 매장 정의 (분석에서 제외하되 별도 표시)
+    print(f"2510 기간 매장 수: {len(stores)}")
+    
+    # 제외 매장 정의 (2510 기준)
     EXCLUDED_STORES = {
         'M12': {'name': 'WTC', 'reason': '10/11 종료'},
         'M05': {'name': 'LCX', 'reason': '10/13-11/7 리뉴얼중'}
@@ -174,6 +166,7 @@ def main():
 
         # 폐점 매장(최근 실매출 0) 제외
         if current_data['net_sales'] == 0:
+            print(f"  제외: {shop_cd} (매출 0)")
             continue
 
         previous_data = get_store_data(pl_data, prev_period, shop_cd)
@@ -218,6 +211,9 @@ def main():
             # 카테고리 분류 (제외 매장이 아닌 경우만)
             store_info['category'] = categorize_store(current_data['direct_profit'], yoy)
             store_list.append(store_info)
+    
+    print(f"\n분석 대상 매장: {len(store_list)}개")
+    print(f"제외 매장: {len(excluded_store_list)}개")
     
     # 카테고리별로 그룹화 (홍콩 오프라인 매장만)
     categorized = {
@@ -319,17 +315,22 @@ def main():
             'stores': []
         }
     
-    # JSON 저장 (period별 파일명)
-    output_file = f'public/dashboard/hongkong-store-status-{last_period_short}.json'
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # JSON 저장
+    output_file = 'public/dashboard/hongkong-store-status-2510.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
-    print(f"매장별 현황 데이터 생성 완료: {output_file}")
-    print(f"총 매장 수: {result['summary']['total_stores']}")
+    print("\n" + "=" * 80)
+    print(f"[OK] 2510 매장별 현황 데이터 생성 완료: {output_file}")
+    print("=" * 80)
+    print(f"\n총 매장 수: {result['summary']['total_stores']}")
     print(f"HK 매장: {result['summary']['hk_stores']}개")
     print(f"MC 매장: {result['summary']['mc_stores']}개")
+    print(f"총 직접이익: {result['summary']['total_direct_profit']:.2f}K")
+    
+    print("\n카테고리별 매장 수:")
+    for cat_key, cat_data in result['categories'].items():
+        print(f"  {cat_data['name']}: {cat_data['count']}개")
 
 if __name__ == '__main__':
     main()
-

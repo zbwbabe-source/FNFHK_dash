@@ -13,6 +13,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   // 동적 데이터 로드
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [plData, setPlData] = useState<any>(null);
+  const [ceoInsightsData, setCeoInsightsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // CEO 인사이트 편집 상태
@@ -44,6 +45,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
         if (plResponse.ok) {
           const plDataResult = await plResponse.json();
           setPlData(plDataResult);
+        }
+        
+        // CEO 인사이트 데이터 로드 (period별)
+        const ceoInsightsResponse = await fetch(`/dashboard/taiwan-ceo-insights-${period}.json`);
+        if (ceoInsightsResponse.ok) {
+          const ceoInsightsResult = await ceoInsightsResponse.json();
+          setCeoInsightsData(ceoInsightsResult);
         }
         
       } catch (error) {
@@ -114,6 +122,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const periodYear = period.substring(0, 2);
   const periodMonth = period.substring(2, 4);
   const periodLabel = `${periodYear}년 ${periodMonth}월`;
+  
+  // 월 키 매핑 (season_sales에서 사용)
+  const monthKeyMap: Record<string, string> = {
+    '01': 'january', '02': 'february', '03': 'march', '04': 'april',
+    '05': 'may', '06': 'june', '07': 'july', '08': 'august',
+    '09': 'september', '10': 'october', '11': 'november', '12': 'december'
+  };
+  const currentMonthKey = monthKeyMap[periodMonth] || 'october';
 
   // 보고일자 관리 (localStorage에서 읽기)
   const [reportDate, setReportDate] = useState('2024-11-17');
@@ -841,6 +857,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         }
                         return <span key={i}>{part}</span>;
                       })}
+                    </div>
+                  ))}
+                </div>
+              ) : ceoInsightsData ? (
+                // period별 CEO 인사이트 데이터 사용
+                <div className="space-y-2 text-sm text-gray-700">
+                  {ceoInsightsData.executive_summary.items.map((item: string, index: number) => (
+                    <div key={index} className="flex items-start">
+                      <span className="text-green-600 font-bold mr-2">•</span>
+                      <span className="whitespace-pre-wrap">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -2703,13 +2729,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div>
                   <div className="text-xs text-gray-500 mb-1">25F</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatNumber(Math.round(seasonSales?.current_season_f?.november?.total_net_sales || 0))}
+                    {formatNumber(Math.round((seasonSales?.current_season_f as any)?.[currentMonthKey]?.total_net_sales || 0))}
               </div>
                   <div className="text-xs font-semibold">
-                    <span className="text-gray-600">전년 {formatNumber(Math.round(seasonSales?.previous_season_f?.november?.total_net_sales || 0))}</span>
+                    <span className="text-gray-600">전년 {formatNumber(Math.round((seasonSales?.previous_season_f as any)?.[currentMonthKey]?.total_net_sales || 0))}</span>
                   </div>
                   <div className="text-xs font-semibold">
-                    <span className="text-green-600">YOY {formatPercent(((seasonSales?.current_season_f?.november?.total_net_sales || 0) / (seasonSales?.previous_season_f?.november?.total_net_sales || 1)) * 100)}%</span>
+                    <span className="text-green-600">YOY {formatPercent((((seasonSales?.current_season_f as any)?.[currentMonthKey]?.total_net_sales || 0) / ((seasonSales?.previous_season_f as any)?.[currentMonthKey]?.total_net_sales || 1)) * 100)}%</span>
                   </div>
                 </div>
                 
@@ -2748,10 +2774,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-xs font-semibold text-gray-700 mb-2">25F 카테고리별 판매금액 TOP 5</div>
                     <div className="space-y-1">
-                      {(seasonSales?.current_season_f?.november?.subcategory_top5 || []).map((item: any, idx: number) => {
+                      {((seasonSales?.current_season_f as any)?.[currentMonthKey]?.subcategory_top5 || []).map((item: any, idx: number) => {
                       // 전년 데이터는 subcategory_top5 또는 subcategory_detail에서 찾기
-                        const prevItemTop5 = seasonSales?.previous_season_f?.november?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
-                        const prevItemDetail = seasonSales?.previous_season_f?.november?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevItemTop5 = (seasonSales?.previous_season_f as any)?.[currentMonthKey]?.subcategory_top5?.find((p: any) => p.subcategory_code === item.subcategory_code);
+                        const prevItemDetail = (seasonSales?.previous_season_f as any)?.[currentMonthKey]?.subcategory_detail?.find((p: any) => p.subcategory_code === item.subcategory_code);
                       const prevItem = prevItemTop5 || prevItemDetail;
                       const yoy = prevItem && prevItem.net_sales > 0 ? ((item.net_sales / prevItem.net_sales) * 100) : 0;
                       return (
