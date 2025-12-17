@@ -1048,31 +1048,35 @@ export default function Home() {
                     
                     {/* 접혀있을 때 미리보기 */}
                     {!showHkmcDiscovery && (
-                      <div className="flex items-baseline gap-2 flex-wrap">
-                        <div className="text-xs text-gray-600">실판매출:</div>
-                        <div className="text-base font-bold text-gray-900">
-                          {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
+                      <div className="space-y-1.5">
+                        <div className="flex items-baseline gap-2">
+                          <div className="text-sm text-gray-600">실판매출:</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {formatPlNumber(hkPlData?.discovery?.net_sales || 0)}
+                          </div>
                         </div>
-                        {hkPlData?.discovery?.prev_net_sales !== undefined && hkPlData.discovery.prev_net_sales > 0 && (
-                          <div className={`text-xs font-semibold ${
-                            hkPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            전월비 {formatPercent(hkPlData.discovery.net_sales_mom)}%
-                          </div>
-                        )}
-                        {hkPlData?.discovery?.discount_rate !== undefined && (
-                          <div className="text-xs font-semibold text-amber-700">
-                            할인율 {hkPlData.discovery.discount_rate.toFixed(1)}%
-                            {hkPlData?.discovery?.prev_discount_rate !== undefined && (
-                              <span className={`ml-1 ${
-                                (hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
-                              }`}>
-                                ({(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
-                                {(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate).toFixed(1)}%p)
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex items-baseline gap-3 flex-wrap">
+                          {hkPlData?.discovery?.prev_net_sales !== undefined && hkPlData.discovery.prev_net_sales > 0 && (
+                            <div className={`text-sm font-semibold ${
+                              hkPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              전월비 {formatPercent(hkPlData.discovery.net_sales_mom)}%
+                            </div>
+                          )}
+                          {hkPlData?.discovery?.discount_rate !== undefined && (
+                            <div className="text-sm font-semibold text-amber-700">
+                              할인율 {hkPlData.discovery.discount_rate.toFixed(1)}%
+                              {hkPlData?.discovery?.prev_discount_rate !== undefined && (
+                                <span className={`ml-1 ${
+                                  (hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  ({(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
+                                  {(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate).toFixed(1)}%p)
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                     
@@ -1414,31 +1418,35 @@ export default function Home() {
                     
                     {/* 접혀있을 때 미리보기 */}
                     {!showTwDiscovery && (
-                      <div className="flex items-baseline gap-2 flex-wrap">
-                        <div className="text-xs text-gray-600">실판매출:</div>
-                        <div className="text-base font-bold text-gray-900">
-                          {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
+                      <div className="space-y-1.5">
+                        <div className="flex items-baseline gap-2">
+                          <div className="text-sm text-gray-600">실판매출:</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {formatPlNumber(twPlData?.discovery?.net_sales || 0)}
+                          </div>
                         </div>
-                        {twPlData?.discovery?.prev_net_sales !== undefined && twPlData.discovery.prev_net_sales > 0 && (
-                          <div className={`text-xs font-semibold ${
-                            twPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            전월비 {formatPercent(twPlData.discovery.net_sales_mom)}%
-                          </div>
-                        )}
-                        {twPlData?.discovery?.discount_rate !== undefined && (
-                          <div className="text-xs font-semibold text-amber-700">
-                            할인율 {twPlData.discovery.discount_rate.toFixed(1)}%
-                            {twPlData?.discovery?.prev_discount_rate !== undefined && (
-                              <span className={`ml-1 ${
-                                (twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
-                              }`}>
-                                ({(twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
-                                {(twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate).toFixed(1)}%p)
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex items-baseline gap-3 flex-wrap">
+                          {twPlData?.discovery?.prev_net_sales !== undefined && twPlData.discovery.prev_net_sales > 0 && (
+                            <div className={`text-sm font-semibold ${
+                              twPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              전월비 {formatPercent(twPlData.discovery.net_sales_mom)}%
+                            </div>
+                          )}
+                          {twPlData?.discovery?.discount_rate !== undefined && (
+                            <div className="text-sm font-semibold text-amber-700">
+                              할인율 {twPlData.discovery.discount_rate.toFixed(1)}%
+                              {twPlData?.discovery?.prev_discount_rate !== undefined && (
+                                <span className={`ml-1 ${
+                                  (twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  ({(twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
+                                  {(twPlData.discovery.discount_rate - twPlData.discovery.prev_discount_rate).toFixed(1)}%p)
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                     
