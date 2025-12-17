@@ -1089,6 +1089,10 @@ def main(target_period_short=None):
         discovery_prev_net = discovery_prev_month.get('실판', 0)
         discovery_net_mom = (discovery_net / discovery_prev_net * 100) if discovery_prev_net > 0 else 0
         
+        # 전월 할인율 계산
+        discovery_prev_tag = discovery_prev_month.get('TAG', 0)
+        discovery_prev_discount_rate = ((discovery_prev_tag - discovery_prev_net) / discovery_prev_tag * 100) if discovery_prev_tag > 0 else 0
+        
         # 판매관리비 = 직접비
         discovery_direct_cost = discovery_current.get('판매관리비', 0)
         discovery_gross_profit = discovery_current['매출총이익']
@@ -1456,6 +1460,7 @@ def main(target_period_short=None):
             'prev_net_sales': discovery_prev_net if discovery_data else 0,
             'net_sales_mom': discovery_net_mom if discovery_data else 0,
             'discount_rate': discovery_discount_rate if discovery_data else 0,
+            'prev_discount_rate': discovery_prev_discount_rate if discovery_data else 0,
             'direct_cost': discovery_direct_cost if discovery_data else 0,
             'direct_profit': discovery_direct_profit if discovery_data else 0,
             'marketing': discovery_marketing if discovery_data else 0,
