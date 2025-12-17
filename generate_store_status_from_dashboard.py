@@ -24,12 +24,77 @@ def categorize_store(direct_profit, yoy):
         else:
             return 'loss_deteriorating'  # 적자 & 악화
 
+def parse_period(period_str):
+    """Period 문자열을 파싱 (예: 202510 -> 2025, 10 또는 2510 -> 2025, 10)"""
+    if len(period_str) == 6:
+        year = int(period_str[:4])
+        month = int(period_str[4:6])
+        return year, month
+    elif len(period_str) == 4:
+        year = 2000 + int(period_str[:2])
+        month = int(period_str[2:4])
+        return year, month
+    return None, None
+
+def read_pl_csv(csv_file, period, shop_cd):
+    """CSV에서 특정 매장의 특정 기간 데이터 읽기"""
+    import csv
+    from collections import defaultdict
+    
+    store_data = defaultdict(float)
+    
+    try:
+        with open(csv_file, 'r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['PERIOD'] != period or row['SHOP_CD'] != shop_cd:
+                    continue
+                
+                account_nm = row['ACCOUNT_NM'].strip()
+                value = float(row['VALUE'] or 0)
+                
+                # 필요한 계정만 수집
+                if account_nm == '실매출액':
+                    store_data['net_sales'] += value
+                elif account_nm == '매출총이익':
+                    store_data['gross_profit'] += value
+                elif account_nm == '판매관리비':
+                    store_data['selling_expense'] += value
+        
+        # 직접이익 계산
+        store_data['direct_profit'] = store_data['gross_profit'] - store_data['selling_expense']
+        
+    except FileNotFoundError:
+        pass
+    
+    return store_data
+
 def main():
     period = '2510'
     
     print("=" * 80)
     print(f"홍콩/마카오 {period} 매장 상태 파일 생성 (대시보드 데이터 기반)")
     print("=" * 80)
+    
+    # Period 파싱
+    year, month = parse_period(period)
+    if year is None:
+        print(f"Invalid period: {period}")
+        return
+    
+    # 전년/전전년 period 계산
+    prev_year = year - 1
+    prev_prev_year = prev_year - 1
+    prev_period = f"{prev_year}{month:02d}"
+    prev_prev_period = f"{prev_prev_year}{month:02d}"
+    
+    # CSV 파일 경로 (전전년 데이터 읽기용)
+    csv_file = f'../Dashboard_Raw_Data/HKMC/{period}/HKMC_PL_{period}.csv'
+    
+    print(f"\nCSV 파일: {csv_file}")
+    print(f"Period: {year}{month:02d}")
+    print(f"Previous Period: {prev_period}")
+    print(f"Previous-Previous Period: {prev_prev_period}")
     
     # 대시보드 데이터 로드
     dashboard_file = f'public/dashboard/hongkong-dashboard-data-{period}.json'
@@ -156,6 +221,15 @@ def main():
         # YOY 계산
         yoy = calculate_yoy(net_sales, prev_net_sales)
         
+        # 전년 YOY 계산 (전년 vs 전전년) - CSV에서 읽기
+        prev_prev_data = read_pl_csv(csv_file, prev_prev_period, store_code)
+        prev_prev_net_sales = prev_prev_data.get('net_sales', 0)
+        prev_prev_direct_profit = prev_prev_data.get('direct_profit', 0)
+        prev_yoy = calculate_yoy(prev_net_sales, prev_prev_net_sales)
+        
+        # 전년 카테고리 계산
+        previous_category = categorize_store(prev_direct_profit, prev_yoy) if prev_prev_net_sales > 0 else None
+        
         # 임차료/인건비율 계산
         rent_labor_ratio = ((rent + labor_cost) / net_sales * 100) if net_sales > 0 else 0
         
@@ -176,6 +250,7 @@ def main():
             },
             'yoy': yoy,
             'category': None,
+            'previous_category': previous_category,
         }
         
         # 제외 매장인지 확인

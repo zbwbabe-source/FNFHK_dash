@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-오프라인 매장별 현황 데이터 생성 - 2510용
+오프라인 매장별 현황 데이터 생성 - 2511용
 """
 import csv
 import json
@@ -8,7 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 
 def parse_period(period_str):
-    """Period 문자열을 파싱 (예: 202510 -> 2025, 10)"""
+    """Period 문자열을 파싱 (예: 202511 -> 2025, 11)"""
     if len(period_str) == 6:
         year = int(period_str[:4])
         month = int(period_str[4:6])
@@ -103,8 +103,8 @@ def categorize_store(direct_profit, yoy):
             return 'loss_deteriorating'  # 적자 & 매출악화
 
 def main():
-    # 2510 기간 설정
-    last_period_short = '2510'
+    # 2511 기간 설정
+    last_period_short = '2511'
     
     # 기간 파싱
     year, month = parse_period(last_period_short)
@@ -112,10 +112,10 @@ def main():
         print(f"Invalid period: {last_period_short}")
         return
     
-    # 2510 CSV 파일 사용
-    csv_file = '../Dashboard_Raw_Data/HKMC/2510/HKMC_PL_2510.csv'
+    # 2511 CSV 파일 사용
+    csv_file = '../Dashboard_Raw_Data/HKMC/2511/HKMC_PL_2511.csv'
     
-    # Period 형식으로 변환 (202510)
+    # Period 형식으로 변환 (202511)
     last_period = f"{year}{month:02d}"
     
     # 전년 동월 계산
@@ -127,18 +127,18 @@ def main():
     prev_prev_period = f"{prev_prev_year}{month:02d}"
     
     print("=" * 80)
-    print("홍콩/마카오 2510 매장별 현황 데이터 생성")
+    print("홍콩/마카오 2511 매장별 현황 데이터 생성")
     print("=" * 80)
     print(f"\nCSV 파일: {csv_file}")
     print(f"Period: {last_period}")
     print(f"Previous Period: {prev_period}")
+    print(f"Previous-Previous Period: {prev_prev_period}")
     
     # 데이터 읽기
     try:
         pl_data = read_pl_database(csv_file)
     except FileNotFoundError:
         print(f"\n오류: CSV 파일을 찾을 수 없습니다: {csv_file}")
-        print("2511 CSV 파일에서 2510 데이터를 추출합니다.")
         return
     
     print(f"\n총 {len(pl_data)}개 PL 레코드 읽음")
@@ -149,12 +149,12 @@ def main():
         if row['PERIOD'] == last_period:
             stores.add((row['SHOP_CD'], row['SHOP_NM'], row['CNTRY_CD']))
     
-    print(f"2510 기간 매장 수: {len(stores)}")
+    print(f"2511 기간 매장 수: {len(stores)}")
     
-    # 제외 매장 정의 (2510 기준)
+    # 제외 매장 정의 (2511 기준)
     EXCLUDED_STORES = {
         'M12': {'name': 'WTC', 'reason': '10/11 종료'},
-        'M05': {'name': 'LCX', 'reason': '10/13-11/7 리뉴얼중'}
+        'M05': {'name': 'LCX', 'reason': '11/8 재오픈'}
     }
     
     # 매장별 데이터 수집
@@ -316,12 +316,12 @@ def main():
         }
     
     # JSON 저장
-    output_file = 'public/dashboard/hongkong-store-status-2510.json'
+    output_file = 'public/dashboard/hongkong-store-status-2511.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
     print("\n" + "=" * 80)
-    print(f"[OK] 2510 매장별 현황 데이터 생성 완료: {output_file}")
+    print(f"[OK] 2511 매장별 현황 데이터 생성 완료: {output_file}")
     print("=" * 80)
     print(f"\n총 매장 수: {result['summary']['total_stores']}")
     print(f"HK 매장: {result['summary']['hk_stores']}개")

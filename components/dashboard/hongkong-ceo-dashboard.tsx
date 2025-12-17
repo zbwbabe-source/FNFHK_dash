@@ -1496,6 +1496,95 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
         </div>
       </div>
 
+      {/* 영업이익 요약 */}
+      <div className="mb-4">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="space-y-3 mb-6">
+            {/* 당월 영업이익 */}
+            {(() => {
+              const currentOpProfit = pl?.operating_profit || 0;
+              const isCurrentProfit = currentOpProfit >= 0;
+              const currentOpRate = pl?.operating_profit_rate || 0;
+              const prevOpProfit = (plData?.prev_month?.total?.operating_profit || 0);
+              const prevOpRate = (() => {
+                const prevMonthTotal = plData?.prev_month?.total || {};
+                return (prevMonthTotal as any)?.operating_profit_rate !== undefined
+                  ? (prevMonthTotal as any).operating_profit_rate
+                  : (prevMonthTotal.net_sales > 0 ? ((prevMonthTotal.operating_profit || 0) / prevMonthTotal.net_sales) * 100 : 0);
+              })();
+              const opChange = currentOpProfit - prevOpProfit;
+              
+              return (
+                <div className={`bg-gradient-to-r rounded-xl p-3 border ${
+                  isCurrentProfit ? 'from-green-50 to-transparent border-green-100' : 'from-red-50 to-transparent border-red-100'
+                }`}>
+                  <div className="text-sm">
+                    <span className={isCurrentProfit ? 'text-green-800' : 'text-red-800'}>
+                      {isCurrentProfit ? '📈' : '📉'} <strong>영업이익 1K HKD</strong>
+                    </span>
+                    {' '}
+                    <span className="text-gray-700">
+                      <strong>당월</strong> {formatNumber(Math.abs(currentOpProfit))} {isCurrentProfit ? '흑자' : '적자'} 
+                      {' '}({formatPercent(currentOpRate, 1)}%)
+                    </span>
+                    {' '}
+                    <span className="text-gray-600">
+                      <strong>전년</strong> {formatNumber(Math.abs(prevOpProfit))} 
+                      {' '}({formatPercent(prevOpRate, 1)}%)
+                    </span>
+                    {' '}
+                    <span className={opChange >= 0 ? 'text-green-700' : 'text-red-700'}>
+                      |{opChange >= 0 ? '+' : ''}{formatNumber(opChange)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {/* 누적 영업이익 */}
+            {(() => {
+              const cumulativeOpProfit = plData?.cumulative?.total?.operating_profit || 0;
+              const isCumulativeProfit = cumulativeOpProfit >= 0;
+              const cumulativeOpRate = plData?.cumulative?.total?.operating_profit_rate || 0;
+              const prevCumulativeOpProfit = (plData?.cumulative?.prev_cumulative?.total?.operating_profit || 0);
+              const prevCumulativeOpRate = (() => {
+                const prevCumulative = plData?.cumulative?.prev_cumulative?.total || {};
+                return (prevCumulative as any)?.operating_profit_rate !== undefined
+                  ? (prevCumulative as any).operating_profit_rate
+                  : (prevCumulative.net_sales > 0 ? ((prevCumulative.operating_profit || 0) / prevCumulative.net_sales) * 100 : 0);
+              })();
+              const cumulativeOpChange = cumulativeOpProfit - prevCumulativeOpProfit;
+              
+              return (
+                <div className={`bg-gradient-to-r rounded-xl p-3 border ${
+                  isCumulativeProfit ? 'from-green-50 to-transparent border-green-100' : 'from-blue-50 to-transparent border-blue-100'
+                }`}>
+                  <div className="text-sm">
+                    <span className={isCumulativeProfit ? 'text-green-800' : 'text-blue-800'}>
+                      {isCumulativeProfit ? '📈' : '📊'} <strong>영업이익 1K HKD</strong>
+                    </span>
+                    {' '}
+                    <span className="text-gray-700">
+                      <strong>누적</strong> {formatNumber(Math.abs(cumulativeOpProfit))} {isCumulativeProfit ? '흑자' : '적자'} 
+                      {' '}({formatPercent(cumulativeOpRate, 1)}%)
+                    </span>
+                    {' '}
+                    <span className="text-gray-600">
+                      <strong>전년</strong> {formatNumber(Math.abs(prevCumulativeOpProfit))} 
+                      {' '}({formatPercent(prevCumulativeOpRate, 1)}%)
+                    </span>
+                    {' '}
+                    <span className={cumulativeOpChange >= 0 ? 'text-green-700' : 'text-red-700'}>
+                      |{cumulativeOpChange >= 0 ? '+' : '△'}{formatNumber(Math.abs(cumulativeOpChange))}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+
       {/* 홍콩법인 경영실적 (5개 카드) */}
       <div className="mb-4">
         <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg shadow-md p-6">
