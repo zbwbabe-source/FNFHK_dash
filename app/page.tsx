@@ -1002,16 +1002,18 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(hkPlCurrent?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
-                        {' '}({(hkPlCurrent?.operating_profit_rate || 0).toFixed(1)}%)
+                        {' '}<span className={`text-base font-bold ${
+                          (hkPlCurrent?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                        }`}>({(hkPlCurrent?.operating_profit_rate || 0).toFixed(1)}%)</span>
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         전년 {formatPlNumber(hkPlPrevMonth?.operating_profit || 0)}
-                        {' '}({(() => {
+                        {' '}<span className="text-sm font-semibold text-gray-600">({(() => {
                           const prevRate = (hkPlPrevMonth as any)?.operating_profit_rate !== undefined
                             ? (hkPlPrevMonth as any).operating_profit_rate
                             : (hkPlPrevMonth?.net_sales > 0 ? ((hkPlPrevMonth?.operating_profit || 0) / hkPlPrevMonth.net_sales) * 100 : 0);
                           return prevRate.toFixed(1);
-                        })()}%) |
+                        })()}%)</span> |
                         <span className={`ml-1 font-semibold ${
                           ((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
@@ -1029,16 +1031,18 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(hkPlCumulative?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
-                        {' '}({(hkPlCumulative?.operating_profit_rate || 0).toFixed(1)}%)
+                        {' '}<span className={`text-base font-bold ${
+                          (hkPlCumulative?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                        }`}>({(hkPlCumulative?.operating_profit_rate || 0).toFixed(1)}%)</span>
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         전년 {formatPlNumber(hkPlPrevCumulative?.operating_profit || 0)}
-                        {' '}({(() => {
+                        {' '}<span className="text-sm font-semibold text-gray-600">({(() => {
                           const prevRate = (hkPlPrevCumulative as any)?.operating_profit_rate !== undefined
                             ? (hkPlPrevCumulative as any).operating_profit_rate
                             : (hkPlPrevCumulative?.net_sales > 0 ? ((hkPlPrevCumulative?.operating_profit || 0) / hkPlPrevCumulative.net_sales) * 100 : 0);
                           return prevRate.toFixed(1);
-                        })()}%) |
+                        })()}%)</span> |
                         <span className={`ml-1 font-semibold ${
                           ((hkPlCumulative?.operating_profit || 0) - (hkPlPrevCumulative?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
@@ -1330,16 +1334,18 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(twPlCurrent?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
-                        {' '}({(twPlCurrent?.operating_profit_rate || 0).toFixed(1)}%)
+                        {' '}<span className={`text-base font-bold ${
+                          (twPlCurrent?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                        }`}>({(twPlCurrent?.operating_profit_rate || 0).toFixed(1)}%)</span>
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         전년 {formatPlNumber(twPlPrevMonth?.operating_profit || 0)}
-                        {' '}({(() => {
+                        {' '}<span className="text-sm font-semibold text-gray-600">({(() => {
                           const prevRate = (twPlPrevMonth as any)?.operating_profit_rate !== undefined
                             ? (twPlPrevMonth as any).operating_profit_rate
                             : (twPlPrevMonth?.net_sales > 0 ? ((twPlPrevMonth?.operating_profit || 0) / twPlPrevMonth.net_sales) * 100 : 0);
                           return prevRate.toFixed(1);
-                        })()}%) |
+                        })()}%)</span> |
                         <span className={`ml-1 font-semibold ${
                           ((twPlCurrent?.operating_profit || 0) - (twPlPrevMonth?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
@@ -1357,16 +1363,18 @@ export default function Home() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {(twPlCumulative?.operating_profit || 0) >= 0 ? '흑자' : '적자'}
-                        {' '}({(twPlCumulative?.operating_profit_rate || 0).toFixed(1)}%)
+                        {' '}<span className={`text-base font-bold ${
+                          (twPlCumulative?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                        }`}>({(twPlCumulative?.operating_profit_rate || 0).toFixed(1)}%)</span>
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         전년 {formatPlNumber(twPlPrevCumulative?.operating_profit || 0)}
-                        {' '}({(() => {
+                        {' '}<span className="text-sm font-semibold text-gray-600">({(() => {
                           const prevRate = (twPlPrevCumulative as any)?.operating_profit_rate !== undefined
                             ? (twPlPrevCumulative as any).operating_profit_rate
                             : (twPlPrevCumulative?.net_sales > 0 ? ((twPlPrevCumulative?.operating_profit || 0) / twPlPrevCumulative.net_sales) * 100 : 0);
                           return prevRate.toFixed(1);
-                        })()}%) |
+                        })()}%)</span> |
                         <span className={`ml-1 font-semibold ${
                           ((twPlCumulative?.operating_profit || 0) - (twPlPrevCumulative?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
