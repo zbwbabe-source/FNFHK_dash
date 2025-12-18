@@ -776,9 +776,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
       <div className="bg-gradient-to-r from-slate-800 to-slate-600 text-white rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">대만법인 {periodLabel} 경영실적</h1>
-            <p className="text-slate-200">(보고일 : {formatReportDateWithYear(reportDate)})</p>
+            <h1 className="text-2xl font-bold">대만법인 {periodLabel} 경영실적</h1>
           </div>
+          <a 
+            href="/"
+            className="bg-white text-slate-800 hover:bg-slate-100 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-md hover:shadow-lg"
+          >
+            홈으로
+          </a>
         </div>
       </div>
 
