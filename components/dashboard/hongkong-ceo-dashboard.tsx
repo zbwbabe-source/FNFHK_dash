@@ -1241,9 +1241,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         const defaultText = ceoInsightsData 
                           ? ceoInsightsData.executive_summary.items.join('\n')
                           : `• ${currentMonth}월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
-• 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
-• 매장효율성 개선: 평당매출 ${Math.round(dailySalesPerPyeong)} HKD (YOY ${formatPercent(dailySalesPerPyeongYoy)}%)
-• 할인율 관리: ${formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)`;
+• 당월 영업이익: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
+• 매장효율성 증대: 평당매출 ${Math.round(dailySalesPerPyeong)} HKD/평/1일 (YOY ${formatPercent(dailySalesPerPyeongYoy)}%)
+• 재고효율화: 총재고 ${formatNumber(endingInventory?.total?.current)}K (YOY ${formatPercent(endingInventory?.total?.yoy)}%)`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -1308,21 +1308,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">당월 영업이익 흑자 전환</span>: {formatNumber(pl?.operating_profit)}K (영업이익률 {formatPercent(pl?.operating_profit_rate || 0, 1)}%)
+                          <span className="font-semibold">당월 영업이익</span>: {formatNumber(pl?.operating_profit)}K (영업이익률 {formatPercent(pl?.operating_profit_rate || 0, 1)}%)
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">매장효율성 개선</span>: 평당매출 {Math.round(dailySalesPerPyeong)} HKD (YOY {formatPercent(dailySalesPerPyeongYoy)}%)
+                          <span className="font-semibold">매장효율성 증대</span>: 평당매출 {Math.round(dailySalesPerPyeong)} HKD/평/1일 (YOY {formatPercent(dailySalesPerPyeongYoy)}%)
                         </div>
                       </div>
 
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">할인율 관리</span>: {formatPercent(pl?.discount_rate || 0, 1)}% (전년 동월 대비 +1.0%p 소폭 상승)
+                          <span className="font-semibold">재고효율화</span>: 총재고 {formatNumber(endingInventory?.total?.current)}K (YOY {formatPercent(endingInventory?.total?.yoy)}%)
                         </div>
                       </div>
 
