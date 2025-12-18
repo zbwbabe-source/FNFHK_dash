@@ -1285,18 +1285,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsightsData ? (
-                    // period별 CEO 인사이트 데이터 사용 (2510 전용)
-                    <>
-                      {ceoInsightsData.executive_summary.items.map((item: string, index: number) => (
-                        <div key={index} className="flex items-start">
-                          <div className="flex-1 leading-relaxed whitespace-pre-line">
-                            {item}
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  ) : generateExecutiveSummary ? (
+                  {generateExecutiveSummary ? (
                     <>
                       <div className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
