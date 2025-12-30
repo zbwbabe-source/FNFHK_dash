@@ -8,7 +8,7 @@ function MonthlyPageContent() {
   const searchParams = useSearchParams();
   const period = searchParams.get('period') || '2511';
 
-  return <TaiwanCEODashboard period={period} hideInsights={true} />;
+  return <TaiwanCEODashboard period={period} />;
 }
 
 export default function MonthlyPage() {
