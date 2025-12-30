@@ -1155,16 +1155,27 @@ export default function Home() {
               </div>
 
 
-              {/* 대시보드 버튼 */}
-              <Link
-                href={`/hongkong?period=${selectedPeriod}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                전체 대시보드 보기
-              </Link>
+              {/* 대시보드 버튼 - 당월/누적 분리 */}
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href={`/hongkong/monthly?period=${selectedPeriod}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  당월
+                </Link>
+                <Link
+                  href={`/hongkong/cumulative?period=${selectedPeriod}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  누적
+                </Link>
+              </div>
             </div>
               </div>
 
@@ -1525,16 +1536,27 @@ export default function Home() {
               </div>
 
 
-              {/* 대시보드 버튼 */}
-              <Link
-                href={`/taiwan?period=${selectedPeriod}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                전체 대시보드 보기
-              </Link>
+              {/* 대시보드 버튼 - 당월/누적 분리 */}
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href={`/taiwan/monthly?period=${selectedPeriod}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  당월
+                </Link>
+                <Link
+                  href={`/taiwan/cumulative?period=${selectedPeriod}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  누적
+                </Link>
+              </div>
             </div>
           </div>
 
