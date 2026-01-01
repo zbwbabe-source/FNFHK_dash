@@ -8,7 +8,7 @@
     "previous_end_period": "2411",
     "last_year": 2025,
     "last_month": 11,
-    "generated_at": "2025-12-30T16:08:46.816342"
+    "generated_at": "2026-01-01T23:52:31.760379"
   },
   "sales_summary": {
     "total_net_sales": 224737.144,
@@ -1170,9 +1170,9 @@
         "sales_qty": 105552941.0
       },
       "previous": {
-        "gross_sales": 0,
-        "net_sales": 0,
-        "sales_qty": 0
+        "gross_sales": 57331605.0,
+        "net_sales": 50752757.0,
+        "sales_qty": 133831373.0
       }
     },
     "24F_과시즌F": {
@@ -1268,9 +1268,9 @@
         "sales_qty": 18149811.0
       },
       "previous": {
-        "gross_sales": 0,
-        "net_sales": 0,
-        "sales_qty": 0
+        "gross_sales": 27673677.0,
+        "net_sales": 24250362.0,
+        "sales_qty": 17988269.0
       }
     },
     "17F_과시즌F": {
@@ -1327,6 +1327,34 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 10741489.0
+      }
+    },
+    "24S_당시즌S": {
+      "season_code": "24S",
+      "season_type": "당시즌S",
+      "current": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      },
+      "previous": {
+        "gross_sales": 57331605.0,
+        "net_sales": 50752757.0,
+        "sales_qty": 133831373.0
+      }
+    },
+    "25S_과시즌S": {
+      "season_code": "25S",
+      "season_type": "과시즌S",
+      "current": {
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0
+      },
+      "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0
       }
     }
   },
@@ -1401,11 +1429,31 @@
   "season_sales_summary": {
     "current_season_f": {
       "sales": 0,
-      "sales_qty": 0
+      "sales_qty": 0,
+      "net_acp_p": 79742450.0,
+      "ac_sales_gross": 28721963.0,
+      "sales_rate": 36.01841052036902
     },
     "current_season_s": {
       "sales": 44046495.0,
-      "sales_qty": 105552941.0
+      "sales_qty": 105552941.0,
+      "net_acp_p": 88457251.0,
+      "ac_sales_gross": 50568362.0,
+      "sales_rate": 57.16700601514284
+    },
+    "previous_season_f": {
+      "sales": 24250362.0,
+      "sales_qty": 17988269.0,
+      "net_acp_p": 130732855.0,
+      "ac_sales_gross": 27946902.0,
+      "sales_rate": 21.377106772432988
+    },
+    "previous_season_s": {
+      "sales": 50752757.0,
+      "sales_qty": 133831373.0,
+      "net_acp_p": 103416526.0,
+      "ac_sales_gross": 57875890.0,
+      "sales_rate": 55.96386983643213
     },
     "acc": {
       "sales": 0,
@@ -1414,6 +1462,130 @@
       "stock_months": 5.528050454356579
     },
     "current_season_rate": 19.59911664624518
+  },
+  "season_sales": {
+    "current_season_f": {
+      "accumulated": {
+        "subcategory_top5": [
+          {
+            "subcategory_code": "TS",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 5634.423
+          },
+          {
+            "subcategory_code": "WJ",
+            "subcategory_name": "Windbreaker",
+            "net_sales": 2584.701
+          },
+          {
+            "subcategory_code": "DJ",
+            "subcategory_name": "JUMPER",
+            "net_sales": 2405.232
+          },
+          {
+            "subcategory_code": "MT",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_sales": 2217.978
+          },
+          {
+            "subcategory_code": "TR",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 1884.45
+          }
+        ]
+      }
+    },
+    "previous_season_f": {
+      "accumulated": {
+        "subcategory_top5": [
+          {
+            "subcategory_code": "TS",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 5819.732
+          },
+          {
+            "subcategory_code": "WJ",
+            "subcategory_name": "Windbreaker",
+            "net_sales": 2690.935
+          },
+          {
+            "subcategory_code": "MT",
+            "subcategory_name": "SWEAT SHIRTS",
+            "net_sales": 2476.891
+          },
+          {
+            "subcategory_code": "DJ",
+            "subcategory_name": "JUMPER",
+            "net_sales": 1976.91
+          },
+          {
+            "subcategory_code": "TR",
+            "subcategory_name": "T/SHIRTS",
+            "net_sales": 1590.708
+          }
+        ]
+      }
+    }
+  },
+  "acc_sales_data": {
+    "current": {
+      "total": {
+        "gross_sales": 126941399.0,
+        "net_sales": 107206614.0,
+        "sales_qty": 1821730584.0
+      },
+      "categories": {
+        "신발": {
+          "gross_sales": 59946290.0,
+          "net_sales": 48317014.0,
+          "sales_qty": 782368035.0
+        },
+        "모자": {
+          "gross_sales": 46595347.0,
+          "net_sales": 42504804.0,
+          "sales_qty": 570728682.0
+        },
+        "가방": {
+          "gross_sales": 17427494.0,
+          "net_sales": 13949260.0,
+          "sales_qty": 438866309.0
+        },
+        "기타ACC": {
+          "gross_sales": 2972268.0,
+          "net_sales": 2435536.0,
+          "sales_qty": 29767558.0
+        }
+      }
+    },
+    "previous": {
+      "total": {
+        "gross_sales": 156471919.0,
+        "net_sales": 135032098.0,
+        "sales_qty": 1319582725.0
+      },
+      "categories": {
+        "신발": {
+          "gross_sales": 71940923.0,
+          "net_sales": 61042827.0,
+          "sales_qty": 540369528.0
+        },
+        "모자": {
+          "gross_sales": 49009455.0,
+          "net_sales": 44450576.0,
+          "sales_qty": 405691471.0
+        },
+        "가방": {
+          "gross_sales": 33255749.0,
+          "net_sales": 27510824.0,
+          "sales_qty": 353263801.0
+        },
+        "기타ACC": {
+          "gross_sales": 2265792.0,
+          "net_sales": 2027871.0,
+          "sales_qty": 20257925.0
+        }
+      }
+    }
   },
   "trend_data": [
     {

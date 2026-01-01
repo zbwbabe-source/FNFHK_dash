@@ -1164,7 +1164,7 @@ export default function Home() {
                   className="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  당월
+                  당월 대시보드
                 </Link>
                 <Link
                   href={`/hongkong/cumulative?period=${selectedPeriod}`}
@@ -1173,7 +1173,7 @@ export default function Home() {
                   className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  누적
+                  누적 (작업중)
                 </Link>
               </div>
             </div>
@@ -1545,7 +1545,7 @@ export default function Home() {
                   className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  당월
+                  당월 대시보드
                 </Link>
                 <Link
                   href={`/taiwan/cumulative?period=${selectedPeriod}`}
@@ -1554,7 +1554,7 @@ export default function Home() {
                   className="block bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  누적
+                  누적 (작업중)
                 </Link>
               </div>
             </div>

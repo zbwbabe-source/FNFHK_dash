@@ -339,6 +339,13 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
     
     # 전년 동기 누적 데이터 집계
     print("전년 동기 누적 데이터 집계 중...")
+    
+    # 현재 시즌 코드 (25F, 25S)
+    current_season_f_code = f"{last_year % 100}F"
+    current_season_s_code = f"{last_year % 100}S"
+    previous_season_f_code = f"{(last_year - 1) % 100}F"
+    previous_season_s_code = f"{(last_year - 1) % 100}S"
+    
     for row in prev_data:
         store_code = row['Store_Code']
         season_code = row['Season_Code']
@@ -352,12 +359,37 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
             store_summary[store_code]['previous']['net_sales'] += net_sales
             store_summary[store_code]['previous']['sales_qty'] += sales_qty
         
+        # 전년 시즌 타입 결정 (prev_year 기준)
         season_type = get_season_type(season_code, prev_year, last_month)
         season_key = f"{season_code}_{season_type}"
-        if season_key in season_summary:
-            season_summary[season_key]['previous']['gross_sales'] += gross_sales
-            season_summary[season_key]['previous']['net_sales'] += net_sales
-            season_summary[season_key]['previous']['sales_qty'] += sales_qty
+        
+        # season_summary에 없으면 생성 (전년 데이터용)
+        if season_key not in season_summary:
+            season_summary[season_key]['season_code'] = season_code
+            season_summary[season_key]['season_type'] = season_type
+        
+        season_summary[season_key]['previous']['gross_sales'] += gross_sales
+        season_summary[season_key]['previous']['net_sales'] += net_sales
+        season_summary[season_key]['previous']['sales_qty'] += sales_qty
+        
+        # 25F의 전년 동기 데이터는 24F 누적 데이터이므로 매핑
+        # 25S의 전년 동기 데이터는 24S 누적 데이터이므로 매핑
+        if season_code == previous_season_f_code:
+            # 24F 데이터를 25F_과시즌F의 previous에 추가
+            # 25F는 11월 기준으로 과시즌F로 분류됨
+            current_season_f_key = f"{current_season_f_code}_과시즌F"
+            if current_season_f_key in season_summary:
+                season_summary[current_season_f_key]['previous']['gross_sales'] += gross_sales
+                season_summary[current_season_f_key]['previous']['net_sales'] += net_sales
+                season_summary[current_season_f_key]['previous']['sales_qty'] += sales_qty
+        elif season_code == previous_season_s_code:
+            # 24S 데이터를 25S_당시즌S의 previous에 추가
+            # 25S는 11월 기준으로 당시즌S로 분류됨
+            current_season_s_key = f"{current_season_s_code}_당시즌S"
+            if current_season_s_key in season_summary:
+                season_summary[current_season_s_key]['previous']['gross_sales'] += gross_sales
+                season_summary[current_season_s_key]['previous']['net_sales'] += net_sales
+                season_summary[current_season_s_key]['previous']['sales_qty'] += sales_qty
         
         # Country & Channel별 집계 (전년)
         country = row['Country']
@@ -420,15 +452,51 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
     # 당시즌 판매 및 판매율 계산
     print("당시즌 판매 및 판매율 계산 중...")
     season_sales_summary = {
-        'current_season_f': {'sales': 0, 'sales_qty': 0},
-        'current_season_s': {'sales': 0, 'sales_qty': 0},
+        'current_season_f': {'sales': 0, 'sales_qty': 0, 'net_acp_p': 0, 'ac_sales_gross': 0},
+        'current_season_s': {'sales': 0, 'sales_qty': 0, 'net_acp_p': 0, 'ac_sales_gross': 0},
+        'previous_season_f': {'sales': 0, 'sales_qty': 0, 'net_acp_p': 0, 'ac_sales_gross': 0},
+        'previous_season_s': {'sales': 0, 'sales_qty': 0, 'net_acp_p': 0, 'ac_sales_gross': 0},
         'acc': {'sales': 0, 'sales_qty': 0, 'stock_price': 0},
     }
     
+    # 25S와 25F의 net_acp_p와 ac_sales_gross 수집 (마지막 Period 기준 누적값)
+    current_season_f_code = f"{last_year % 100}F"
+    current_season_s_code = f"{last_year % 100}S"
+    previous_season_f_code = f"{(last_year - 1) % 100}F"
+    previous_season_s_code = f"{(last_year - 1) % 100}S"
+    
+    for row in last_period_inventory:
+        season_code = row['Season_Code']
+        net_acp_p = float(row.get('Net_AcP_P', 0) or 0)
+        ac_sales_gross = float(row.get('AC_Sales_Gross', 0) or 0)
+        
+        if season_code == current_season_f_code:
+            season_sales_summary['current_season_f']['net_acp_p'] += net_acp_p
+            season_sales_summary['current_season_f']['ac_sales_gross'] += ac_sales_gross
+        elif season_code == current_season_s_code:
+            season_sales_summary['current_season_s']['net_acp_p'] += net_acp_p
+            season_sales_summary['current_season_s']['ac_sales_gross'] += ac_sales_gross
+    
+    # 전년 마지막 Period 기준 전년 시즌 입고액 및 판매액 수집
+    for row in prev_last_inventory:
+        season_code = row['Season_Code']
+        net_acp_p = float(row.get('Net_AcP_P', 0) or 0)
+        ac_sales_gross = float(row.get('AC_Sales_Gross', 0) or 0)
+        
+        if season_code == previous_season_f_code:
+            season_sales_summary['previous_season_f']['net_acp_p'] += net_acp_p
+            season_sales_summary['previous_season_f']['ac_sales_gross'] += ac_sales_gross
+        elif season_code == previous_season_s_code:
+            season_sales_summary['previous_season_s']['net_acp_p'] += net_acp_p
+            season_sales_summary['previous_season_s']['ac_sales_gross'] += ac_sales_gross
+    
     for season_key, season_data in season_summary.items():
         season_type = season_data['season_type']
+        season_code = season_data['season_code']
         current_sales = season_data['current']['net_sales']
         current_qty = season_data['current']['sales_qty']
+        previous_sales = season_data['previous']['net_sales']
+        previous_qty = season_data['previous']['sales_qty']
         
         if season_type == '당시즌F':
             season_sales_summary['current_season_f']['sales'] += current_sales
@@ -436,6 +504,14 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
         elif season_type == '당시즌S':
             season_sales_summary['current_season_s']['sales'] += current_sales
             season_sales_summary['current_season_s']['sales_qty'] += current_qty
+        
+        # 전년 시즌 판매 데이터 수집 (24F, 24S)
+        if season_code == previous_season_f_code:
+            season_sales_summary['previous_season_f']['sales'] += previous_sales
+            season_sales_summary['previous_season_f']['sales_qty'] += previous_qty
+        elif season_code == previous_season_s_code:
+            season_sales_summary['previous_season_s']['sales'] += previous_sales
+            season_sales_summary['previous_season_s']['sales_qty'] += previous_qty
     
     # ACC 재고 (N시즌)
     for category, cat_data in category_summary.items():
@@ -451,7 +527,45 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
     
     season_sales_summary['acc']['stock_months'] = acc_stock_months
     
-    # 당시즌 판매율 계산 (매출 대비)
+    # 당시즌 판매율 계산 (입고 대비 판매율)
+    # 25F 판매율
+    if season_sales_summary['current_season_f']['net_acp_p'] > 0:
+        season_sales_summary['current_season_f']['sales_rate'] = (
+            season_sales_summary['current_season_f']['ac_sales_gross'] / 
+            season_sales_summary['current_season_f']['net_acp_p'] * 100
+        )
+    else:
+        season_sales_summary['current_season_f']['sales_rate'] = 0
+    
+    # 25S 판매율
+    if season_sales_summary['current_season_s']['net_acp_p'] > 0:
+        season_sales_summary['current_season_s']['sales_rate'] = (
+            season_sales_summary['current_season_s']['ac_sales_gross'] / 
+            season_sales_summary['current_season_s']['net_acp_p'] * 100
+        )
+    else:
+        season_sales_summary['current_season_s']['sales_rate'] = 0
+    
+    # 전년 판매율 계산 (24F, 24S)
+    # 24F 판매율
+    if season_sales_summary['previous_season_f']['net_acp_p'] > 0:
+        season_sales_summary['previous_season_f']['sales_rate'] = (
+            season_sales_summary['previous_season_f']['ac_sales_gross'] / 
+            season_sales_summary['previous_season_f']['net_acp_p'] * 100
+        )
+    else:
+        season_sales_summary['previous_season_f']['sales_rate'] = 0
+    
+    # 24S 판매율
+    if season_sales_summary['previous_season_s']['net_acp_p'] > 0:
+        season_sales_summary['previous_season_s']['sales_rate'] = (
+            season_sales_summary['previous_season_s']['ac_sales_gross'] / 
+            season_sales_summary['previous_season_s']['net_acp_p'] * 100
+        )
+    else:
+        season_sales_summary['previous_season_s']['sales_rate'] = 0
+    
+    # 당시즌 판매율 계산 (매출 대비 - 기존 로직 유지)
     current_season_total_sales = (season_sales_summary['current_season_f']['sales'] + 
                                    season_sales_summary['current_season_s']['sales'])
     
@@ -459,6 +573,143 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
         season_sales_summary['current_season_rate'] = (current_season_total_sales / total_net_sales_current) * 100
     else:
         season_sales_summary['current_season_rate'] = 0
+    
+    # ============================================================
+    # 누적 아이템별 데이터 생성 (25F 카테고리별 TOP 5, ACC 카테고리별)
+    # ============================================================
+    print("누적 아이템별 데이터 생성 중...")
+    
+    # 25F 카테고리별 누적 판매 (1월~target_period 누적)
+    season_f_subcat_cumulative = defaultdict(lambda: {
+        'subcategory_code': '',
+        'subcategory_name': '',
+        'net_sales': 0,
+    })
+    season_f_subcat_prev_cumulative = defaultdict(lambda: {
+        'subcategory_code': '',
+        'subcategory_name': '',
+        'net_sales': 0,
+    })
+    
+    # 현재 누적 데이터 (1월~target_period)
+    for row in current_data:
+        if row['Season_Code'] == current_season_f_code:
+            subcat_code = row.get('Subcategory_Code', '').strip()
+            subcat_name = row.get('Subcategory', '').strip()
+            if subcat_code:
+                season_f_subcat_cumulative[subcat_code]['subcategory_code'] = subcat_code
+                season_f_subcat_cumulative[subcat_code]['subcategory_name'] = subcat_name
+                season_f_subcat_cumulative[subcat_code]['net_sales'] += float(row.get('Net_Sales', 0) or 0)
+    
+    # 전년 동기 누적 데이터
+    for row in prev_data:
+        if row['Season_Code'] == previous_season_f_code:
+            subcat_code = row.get('Subcategory_Code', '').strip()
+            subcat_name = row.get('Subcategory', '').strip()
+            if subcat_code:
+                season_f_subcat_prev_cumulative[subcat_code]['subcategory_code'] = subcat_code
+                season_f_subcat_prev_cumulative[subcat_code]['subcategory_name'] = subcat_name
+                season_f_subcat_prev_cumulative[subcat_code]['net_sales'] += float(row.get('Net_Sales', 0) or 0)
+    
+    # TOP 5 정렬
+    season_f_top5 = sorted(season_f_subcat_cumulative.items(), key=lambda x: x[1]['net_sales'], reverse=True)[:5]
+    
+    # ACC 카테고리별 누적 판매 (1월~target_period 누적)
+    acc_sales_data = {
+        'current': {
+            'total': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+            'categories': {
+                '신발': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '모자': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '가방': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '기타ACC': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+            }
+        },
+        'previous': {
+            'total': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+            'categories': {
+                '신발': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '모자': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '가방': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+                '기타ACC': {'gross_sales': 0, 'net_sales': 0, 'sales_qty': 0},
+            }
+        }
+    }
+    
+    # ACC 카테고리 매핑
+    def get_acc_category(category):
+        if category == 'HEA':
+            return '모자'
+        elif category == 'SHO':
+            return '신발'
+        elif category == 'BAG':
+            return '가방'
+        else:
+            return '기타ACC'
+    
+    # 현재 누적 ACC 데이터
+    for row in current_data:
+        season_code = row['Season_Code']
+        if season_code.endswith('N'):  # N시즌만
+            category = row.get('Category', '')
+            acc_category = get_acc_category(category)
+            gross_sales = float(row.get('Gross_Sales', 0) or 0)
+            net_sales = float(row.get('Net_Sales', 0) or 0)
+            sales_qty = float(row.get('Sales_Qty', 0) or 0)
+            
+            acc_sales_data['current']['total']['gross_sales'] += gross_sales
+            acc_sales_data['current']['total']['net_sales'] += net_sales
+            acc_sales_data['current']['total']['sales_qty'] += sales_qty
+            
+            acc_sales_data['current']['categories'][acc_category]['gross_sales'] += gross_sales
+            acc_sales_data['current']['categories'][acc_category]['net_sales'] += net_sales
+            acc_sales_data['current']['categories'][acc_category]['sales_qty'] += sales_qty
+    
+    # 전년 동기 누적 ACC 데이터
+    for row in prev_data:
+        season_code = row['Season_Code']
+        if season_code.endswith('N'):  # N시즌만
+            category = row.get('Category', '')
+            acc_category = get_acc_category(category)
+            gross_sales = float(row.get('Gross_Sales', 0) or 0)
+            net_sales = float(row.get('Net_Sales', 0) or 0)
+            sales_qty = float(row.get('Sales_Qty', 0) or 0)
+            
+            acc_sales_data['previous']['total']['gross_sales'] += gross_sales
+            acc_sales_data['previous']['total']['net_sales'] += net_sales
+            acc_sales_data['previous']['total']['sales_qty'] += sales_qty
+            
+            acc_sales_data['previous']['categories'][acc_category]['gross_sales'] += gross_sales
+            acc_sales_data['previous']['categories'][acc_category]['net_sales'] += net_sales
+            acc_sales_data['previous']['categories'][acc_category]['sales_qty'] += sales_qty
+    
+    # season_sales 구조 생성 (accumulated 섹션 포함)
+    season_sales = {
+        'current_season_f': {
+            'accumulated': {
+                'subcategory_top5': [
+                    {
+                        'subcategory_code': subcat_code,
+                        'subcategory_name': data['subcategory_name'],
+                        'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                    }
+                    for subcat_code, data in season_f_top5
+                ],
+            }
+        },
+        'previous_season_f': {
+            'accumulated': {
+                'subcategory_top5': [
+                    {
+                        'subcategory_code': subcat_code,
+                        'subcategory_name': data['subcategory_name'],
+                        'net_sales': data['net_sales'] / 1000,  # 1K HKD
+                    }
+                    for subcat_code, data in sorted(season_f_subcat_prev_cumulative.items(), key=lambda x: x[1]['net_sales'], reverse=True)[:5]
+                ],
+            }
+        }
+    }
     
     # 전년 동일매장 기준 계산
     print("전년 동일매장 기준 계산 중...")
@@ -640,6 +891,8 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
         'season_summary': dict(season_summary),
         'category_summary': dict(category_summary),
         'season_sales_summary': season_sales_summary,  # 당시즌 판매 및 판매율
+        'season_sales': season_sales,  # 누적 아이템별 데이터 (25F 카테고리별 TOP 5)
+        'acc_sales_data': acc_sales_data,  # ACC 카테고리별 누적 판매
         'trend_data': trend_data,
     }
     
