@@ -1504,7 +1504,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   };
 
   // 그래프용 데이터 생성 (당월 대시보드 데이터 사용)
-  const months = useMemo(() => {
+  const months: string[] = useMemo(() => {
     // monthly_item_data가 있으면 그것을 사용, 없으면 monthly_channel_data 사용
     const sourceData = monthlyDashboardData?.monthly_item_data || monthlyDashboardData?.monthly_channel_data;
     if (!sourceData) {
@@ -4210,7 +4210,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             <>
             {(() => {
               // Y축 최대값 계산
-              const maxDataValue = Math.max(...monthly_channel_sales.map(m => m.total));
+              const maxDataValue = Math.max(...monthly_channel_sales.map((m: any) => m.total));
               const yMax = 50000; // 50K HKD
               const yStep = yMax / 3;
               
@@ -4236,7 +4236,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 
                 {/* 막대 차트 */}
                 <div className="relative h-64 flex items-end justify-between gap-0.5 z-10">
-                  {monthly_channel_sales.map((m, idx) => {
+                  {monthly_channel_sales.map((m: any, idx: number) => {
                     // 픽셀 단위로 계산 (h-64 = 256px)
                     const CHART_HEIGHT = 256;
                     const totalHeightPx = Math.max((m.total / yMax) * CHART_HEIGHT, 8);
@@ -4297,7 +4297,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             {/* X축 라벨 (월) */}
             <div className="flex gap-2 mt-2 ml-12">
               <div className="flex-1 flex justify-between text-[10px] text-gray-600 font-medium">
-                {monthly_channel_sales.map((m, idx) => (
+                {monthly_channel_sales.map((m: any, idx: number) => (
                   <div key={idx} className="flex-1 text-center">{m.month}</div>
                 ))}
               </div>
@@ -4388,7 +4388,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {/* YOY 차트 */}
                 {selectedChannelTrend === '전체' ? (
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
                       hkRetail: channelYOY['HK Retail'][idx],
                       hkOutlet: channelYOY['HK Outlet'][idx],
@@ -4414,9 +4414,9 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                   </ResponsiveContainer>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
-                      yoy: channelYOY[selectedChannelTrend]?.[idx]
+                      yoy: (channelYOY as any)[selectedChannelTrend]?.[idx]
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
@@ -4439,7 +4439,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         <th className="border border-gray-300 px-2 py-1 text-left font-semibold">
                           {selectedChannelTrend === '전체' ? '채널' : selectedChannelTrend}
                         </th>
-                        {months.map(month => (
+                        {months.map((month: string) => (
                           <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
                         ))}
                       </tr>
@@ -4447,10 +4447,10 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <tbody>
                       {selectedChannelTrend === '전체' ? (
                         <>
-                          {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map(channel => (
+                          {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map((channel: string) => (
                             <tr key={channel}>
                               <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {channelYOY[channel].map((yoy: number, idx: number) => (
+                              {((channelYOY as any)[channel] || []).map((yoy: number, idx: number) => (
                                 <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                                   {yoy}%
                                 </td>
@@ -4461,7 +4461,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                       ) : (
                         <tr>
                           <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {channelYOY[selectedChannelTrend].map((yoy: number, idx: number) => (
+                          {((channelYOY as any)[selectedChannelTrend] || []).map((yoy: number, idx: number) => (
                             <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                               {yoy}%
                             </td>
@@ -5402,7 +5402,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               <div className="mt-4">
                 {selectedSalesItem === '전체' ? (
                 <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
                       currSeasonF: idx < 6 ? (salesItemYOY as any)['당시즌S'][idx] : (salesItemYOY as any)['당시즌F'][idx], // 1~6월은 당시즌S YOY(24F)를 당시즌F로 표시
                       currSeasonS: (salesItemYOY as any)['당시즌S'][idx],
@@ -5429,7 +5429,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                   </ResponsiveContainer>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
                       yoy: selectedSalesItem === '당시즌F' && idx < 6
                         ? ((salesItemYOY as any)['당시즌S']?.[idx] ?? null) // 1~6월 당시즌F는 당시즌S YOY 표시
@@ -5453,7 +5453,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="border border-gray-300 px-2 py-1 text-left font-semibold">{selectedSalesItem === '전체' ? '아이템' : selectedSalesItem}</th>
-                        {months.map(month => (
+                        {months.map((month: string) => (
                           <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
                         ))}
                       </tr>
@@ -5639,7 +5639,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {selectedInventoryItem === '전체' ? (
                   
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
                       fSeason: idx < 6 ? inventoryItemYOY['S당시즌'][idx] : inventoryItemYOY['F당시즌'][idx], // 1~6월은 S당시즌 YOY(24F)를 F당시즌으로 표시
                       sSeason: inventoryItemYOY['S당시즌'][idx],
@@ -5668,7 +5668,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                   </ResponsiveContainer>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month, idx) => ({
+                    <LineChart data={months.map((month: string, idx: number) => ({
                       month,
                       yoy: (inventoryItemYOY as any)[selectedInventoryItem]?.[idx]
                     }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
@@ -5690,7 +5690,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="border border-gray-300 px-2 py-1 text-left font-semibold">{selectedInventoryItem === '전체' ? '아이템' : selectedInventoryItem}</th>
-                        {months.map(month => (
+                        {months.map((month: string) => (
                           <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
                         ))}
                       </tr>
