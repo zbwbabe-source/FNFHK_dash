@@ -758,13 +758,15 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   };
   
   // 디버깅: offline_store_efficiency 데이터 소스 확인
+  const byChannelValues = offlineEfficiency?.by_channel ? Object.values(offlineEfficiency.by_channel) : [];
+  const sampleChannel = byChannelValues.length > 0 ? (byChannelValues[0] as any) : null;
+  const sampleChannelYoy = sampleChannel?.yoy !== undefined ? sampleChannel.yoy.toFixed(2) + '%' : 'N/A';
   console.log('🔍 offline_store_efficiency 데이터 소스:', {
     has_monthly_offline_efficiency: !!monthlyOfflineEfficiency,
     has_cumulative_offline_efficiency: !!cumulativeOfflineEfficiency,
     by_channel_keys: Object.keys(offlineEfficiency?.by_channel || {}),
     total_yoy: totalYoy.toFixed(2) + '%',
-    sample_channel_yoy: offlineEfficiency?.by_channel ? 
-      Object.values(offlineEfficiency.by_channel)[0]?.yoy?.toFixed(2) + '%' : 'N/A'
+    sample_channel_yoy: sampleChannelYoy
   });
   
   const storeEfficiencySummary = offlineEfficiency?.total;
