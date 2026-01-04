@@ -55,26 +55,26 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
         
         // Dashboard 데이터 로드 (누적)
         try {
-          const dashboardResponse = await fetch(`/dashboard/hongkong-dashboard-cumulative-${period}.json${cacheBuster}`, {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-              'Expires': '0'
-            }
-          });
-          if (!dashboardResponse.ok) {
+        const dashboardResponse = await fetch(`/dashboard/hongkong-dashboard-cumulative-${period}.json${cacheBuster}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        if (!dashboardResponse.ok) {
             console.error(`❌ 누적 대시보드 파일 로드 실패: ${dashboardResponse.status} ${dashboardResponse.statusText}`);
             console.error(`파일 경로: /dashboard/hongkong-dashboard-cumulative-${period}.json`);
             throw new Error(`Failed to load cumulative dashboard data for period ${period}: ${dashboardResponse.status} ${dashboardResponse.statusText}`);
-          }
-          const dashData = await dashboardResponse.json();
+        }
+        const dashData = await dashboardResponse.json();
           console.log('✅ 누적 대시보드 데이터 로드 성공:', {
             period,
             has_sales_summary: !!dashData?.sales_summary,
             has_season_summary: !!dashData?.season_summary
           });
-          setDashboardData(dashData);
+        setDashboardData(dashData);
         } catch (fetchError: any) {
           console.error('❌ 누적 대시보드 데이터 fetch 실패:', fetchError);
           console.error('파일 경로: /dashboard/hongkong-dashboard-cumulative-${period}.json');
@@ -247,10 +247,10 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   const generateExecutiveSummary = useMemo(() => {
     if (!plData || !dashboardData) return null;
 
-    const pl = plData?.current_month?.total || {};
-    const plYoy = plData?.current_month?.yoy || {};
-    const plChange = plData?.current_month?.change || {};
-    const plPrev = plData?.prev_month?.total || {};
+    const pl = plData?.cumulative?.total || {};
+    const plYoy = plData?.cumulative?.yoy || {};
+    const plChange = plData?.cumulative?.change || {};
+    const plPrev = plData?.cumulative?.prev_cumulative?.total || {};
     const salesSummary = dashboardData?.sales_summary || {};
     const seasonSales = dashboardData?.season_sales || {};
     const endingInventory = dashboardData?.ending_inventory || {};
@@ -811,12 +811,12 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
         
         // 폐점이면서 매출이 매우 적은 매장 제외 (정리 매출만 있는 경우)
         // 평당매출이 1 K HKD/평 미만이면 제외
-        if (store?.closed === true && area > 0) {
+          if (store?.closed === true && area > 0) {
           const salesPerPyeong = ((store.current.net_sales || 0) / 1000) / area;
           if (salesPerPyeong < 1) {
             return; // 폐점 + 저매출 매장 제외
           }
-        }
+          }
         
         if (area > 0) {
           totalArea += area;
@@ -852,7 +852,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
       // 홍콩+마카오, MLB 브랜드만, 온라인 제외
       if (store?.brand === 'MLB' && isHongKongOrMacauStore(storeCode) && store?.channel !== 'Online' && (store?.previous?.net_sales || 0) > 0) {
         const area = storeAreas[storeCode] || 0;
-        if (store?.closed === true && area > 0) {
+          if (store?.closed === true && area > 0) {
           const salesPerPyeong = ((store.previous.net_sales || 0) / 1000) / area;
           if (salesPerPyeong < 1) {
             return;
@@ -893,20 +893,229 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   const prevDailySalesPerPyeong = prevSalesPerPyeong > 0 ? (prevSalesPerPyeong * 1000) / cumulativeDays : 0; // HKD/평/일 (누적 일수 사용)
   const dailySalesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
 
+  // 누적 대시보드용: storeStatusData의 매장별 직접이익을 누적 데이터로 변환
   const allHKStores = useMemo(() => {
     if (!storeStatusData?.categories) return [];
-    return [
+    
+    // 모든 매장 수집
+    const allStores = [
       ...(storeStatusData?.categories?.profit_improving?.stores || []),
       ...(storeStatusData?.categories?.profit_deteriorating?.stores || []),
       ...(storeStatusData?.categories?.loss_improving?.stores || []),
       ...(storeStatusData?.categories?.loss_deteriorating?.stores || [])
     ];
-  }, [storeStatusData]);
+    
+    // 누적 데이터로 변환: 누적 직접이익 계산
+    // 직접이익 = 매출총이익 - 직접비
+    // 매출총이익 = 매출 - 원가
+    const cumulativeStores = plStoreData?.cumulative_stores || {};
+    const storeSummary = dashboardData?.store_summary || {};
+    
+    return allStores.map((store: any) => {
+      const storeCode = store.shop_cd || store.shop_code;
+      const cumulativeStoreCosts = cumulativeStores[storeCode];
+      const cumulativeStoreSales = storeSummary[storeCode];
+      
+      if (cumulativeStoreCosts && cumulativeStoreSales) {
+        // 누적 직접비 계산 (plStoreData.cumulative_stores에서)
+        const cumulativeDirectCost = (
+          (cumulativeStoreCosts.labor_cost || 0) +
+          (cumulativeStoreCosts.rent || 0) +
+          (cumulativeStoreCosts.logistics || 0) +
+          (cumulativeStoreCosts.other_fee || 0) +
+          (cumulativeStoreCosts.marketing || 0) +
+          (cumulativeStoreCosts.fee || 0) +
+          (cumulativeStoreCosts.maintenance || 0) +
+          (cumulativeStoreCosts.insurance || 0) +
+          (cumulativeStoreCosts.utilities || 0) +
+          (cumulativeStoreCosts.supplies || 0) +
+          (cumulativeStoreCosts.travel || 0) +
+          (cumulativeStoreCosts.communication || 0) +
+          (cumulativeStoreCosts.uniform || 0) +
+          (cumulativeStoreCosts.depreciation || 0)
+        ) / 1000; // K HKD
+        
+        // 전년 누적 직접비 계산
+        const prevCumulativeDirectCost = (
+          (cumulativeStoreCosts.labor_cost_prev || 0) +
+          (cumulativeStoreCosts.rent_prev || 0) +
+          (cumulativeStoreCosts.logistics_prev || 0) +
+          (cumulativeStoreCosts.other_fee_prev || 0) +
+          (cumulativeStoreCosts.marketing_prev || 0) +
+          (cumulativeStoreCosts.fee_prev || 0) +
+          (cumulativeStoreCosts.maintenance_prev || 0) +
+          (cumulativeStoreCosts.insurance_prev || 0) +
+          (cumulativeStoreCosts.utilities_prev || 0) +
+          (cumulativeStoreCosts.supplies_prev || 0) +
+          (cumulativeStoreCosts.travel_prev || 0) +
+          (cumulativeStoreCosts.communication_prev || 0) +
+          (cumulativeStoreCosts.uniform_prev || 0) +
+          (cumulativeStoreCosts.depreciation_prev || 0)
+        ) / 1000; // K HKD
+        
+        // 누적 매출 (dashboardData?.store_summary에서 - 이미 누적 데이터)
+        const cumulativeNetSales = (cumulativeStoreSales.current?.net_sales || 0) / 1000; // K HKD
+        const prevCumulativeNetSales = (cumulativeStoreSales.previous?.net_sales || 0) / 1000; // K HKD
+        
+        // 누적 매출총이익 계산: 원가율을 사용하여 추정
+        // 전체 PL 데이터의 누적 원가율 사용
+        const totalCogsRate = plData?.cumulative?.total?.cogs_rate || 0;
+        const prevTotalCogsRate = plData?.cumulative?.prev_cumulative?.total?.cogs_rate || 0;
+        
+        // 누적 매출총이익 = 누적 매출 * (1 - 원가율)
+        const cumulativeGrossProfit = cumulativeNetSales * (1 - totalCogsRate / 100);
+        const prevCumulativeGrossProfit = prevCumulativeNetSales * (1 - prevTotalCogsRate / 100);
+        
+        // 누적 직접이익 = 누적 매출총이익 - 누적 직접비
+        const cumulativeDirectProfit = cumulativeGrossProfit - cumulativeDirectCost;
+        const prevCumulativeDirectProfit = prevCumulativeGrossProfit - prevCumulativeDirectCost;
+        
+        // 누적 YOY 계산
+        let cumulativeYoy = 0;
+        if (prevCumulativeDirectProfit > 0) {
+          cumulativeYoy = (cumulativeDirectProfit / prevCumulativeDirectProfit * 100);
+        } else if (prevCumulativeDirectProfit < 0 && cumulativeDirectProfit >= 0) {
+          // 적자에서 흑자로 전환: 원본 YOY 사용
+          cumulativeYoy = store.yoy || 0;
+        } else if (prevCumulativeDirectProfit < 0 && cumulativeDirectProfit < 0) {
+          // 적자에서 적자: 손실이 개선되면 YOY > 100, 악화되면 YOY < 100
+          cumulativeYoy = prevCumulativeDirectProfit !== 0 
+            ? (cumulativeDirectProfit / prevCumulativeDirectProfit * 100)
+            : 0;
+        } else {
+          // 기타 경우: 원본 YOY 사용
+          cumulativeYoy = store.yoy || 0;
+        }
+        
+        return {
+          ...store,
+          current: {
+            ...store.current,
+            direct_profit: cumulativeDirectProfit,
+            net_sales: cumulativeNetSales,
+            rent: (cumulativeStoreCosts.rent || 0) / 1000,
+            labor_cost: (cumulativeStoreCosts.labor_cost || 0) / 1000
+          },
+          previous: {
+            ...store.previous,
+            direct_profit: prevCumulativeDirectProfit,
+            net_sales: prevCumulativeNetSales,
+            rent: (cumulativeStoreCosts.rent_prev || 0) / 1000,
+            labor_cost: (cumulativeStoreCosts.labor_cost_prev || 0) / 1000
+          },
+          yoy: cumulativeYoy
+        };
+      }
+      
+      // 누적 데이터가 없으면 원본 유지
+      return store;
+    });
+  }, [storeStatusData, dashboardData, plData, plStoreData]);
 
   const activeHKStores = useMemo(
     () => allHKStores.filter((store: any) => (store?.current?.net_sales || 0) > 0),
     [allHKStores]
   );
+  
+  // 누적 대시보드용: storeStatusData의 summary와 categories를 누적 데이터로 재계산
+  const cumulativeStoreStatusData = useMemo(() => {
+    if (!storeStatusData || !allHKStores.length) return storeStatusData;
+    
+    // 누적 직접이익 합계 계산
+    const totalDirectProfit = allHKStores.reduce((sum: number, store: any) => sum + (store?.current?.direct_profit || 0), 0);
+    
+    // 카테고리별 재분류 (누적 직접이익 기준)
+    const profitImproving: any[] = [];
+    const profitDeteriorating: any[] = [];
+    const lossImproving: any[] = [];
+    const lossDeteriorating: any[] = [];
+    
+    allHKStores.forEach((store: any) => {
+      const directProfit = store?.current?.direct_profit || 0;
+      const yoy = store?.yoy || 0;
+      
+      if (directProfit >= 0) {
+        // 흑자
+        if (yoy >= 100) {
+          profitImproving.push(store);
+        } else {
+          profitDeteriorating.push(store);
+        }
+      } else {
+        // 적자
+        if (yoy >= 100) {
+          lossImproving.push(store);
+        } else {
+          lossDeteriorating.push(store);
+        }
+      }
+    });
+    
+    // 카테고리별 평균 YOY 및 임차료/인건비율 계산 (누적 데이터 기준)
+    const calculateCategoryStats = (stores: any[]) => {
+      if (stores.length === 0) return { avg_yoy: 0, avg_rent_labor_ratio: 0 };
+      
+      const validYoyStores = stores.filter((s: any) => s.yoy !== null && s.yoy !== undefined);
+      const avgYoy = validYoyStores.length > 0 
+        ? validYoyStores.reduce((sum: number, s: any) => sum + (s.yoy || 0), 0) / validYoyStores.length
+        : 0;
+      
+      // 누적 임차료/인건비율 계산
+      const totalRent = stores.reduce((sum: number, s: any) => sum + (s.current?.rent || 0), 0);
+      const totalLabor = stores.reduce((sum: number, s: any) => sum + (s.current?.labor_cost || 0), 0);
+      const totalSales = stores.reduce((sum: number, s: any) => sum + (s.current?.net_sales || 0), 0);
+      const avgRentLaborRatio = totalSales > 0 ? ((totalRent + totalLabor) / totalSales * 100) : 0;
+      
+      return { avg_yoy: avgYoy, avg_rent_labor_ratio: avgRentLaborRatio };
+    };
+    
+    const profitImprovingStats = calculateCategoryStats(profitImproving);
+    const profitDeterioratingStats = calculateCategoryStats(profitDeteriorating);
+    const lossImprovingStats = calculateCategoryStats(lossImproving);
+    const lossDeterioratingStats = calculateCategoryStats(lossDeteriorating);
+    
+    return {
+      ...storeStatusData,
+      summary: {
+        ...storeStatusData.summary,
+        total_direct_profit: totalDirectProfit
+      },
+      categories: {
+        profit_improving: {
+          ...storeStatusData.categories?.profit_improving,
+          stores: profitImproving,
+          count: profitImproving.length,
+          total_direct_profit: profitImproving.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
+          avg_yoy: profitImprovingStats.avg_yoy,
+          avg_rent_labor_ratio: profitImprovingStats.avg_rent_labor_ratio
+        },
+        profit_deteriorating: {
+          ...storeStatusData.categories?.profit_deteriorating,
+          stores: profitDeteriorating,
+          count: profitDeteriorating.length,
+          total_direct_profit: profitDeteriorating.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
+          avg_yoy: profitDeterioratingStats.avg_yoy,
+          avg_rent_labor_ratio: profitDeterioratingStats.avg_rent_labor_ratio
+        },
+        loss_improving: {
+          ...storeStatusData.categories?.loss_improving,
+          stores: lossImproving,
+          count: lossImproving.length,
+          total_direct_profit: lossImproving.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
+          avg_yoy: lossImprovingStats.avg_yoy,
+          avg_rent_labor_ratio: lossImprovingStats.avg_rent_labor_ratio
+        },
+        loss_deteriorating: {
+          ...storeStatusData.categories?.loss_deteriorating,
+          stores: lossDeteriorating,
+          count: lossDeteriorating.length,
+          total_direct_profit: lossDeteriorating.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
+          avg_yoy: lossDeterioratingStats.avg_yoy,
+          avg_rent_labor_ratio: lossDeterioratingStats.avg_rent_labor_ratio
+        }
+      }
+    };
+  }, [storeStatusData, allHKStores]);
   const seasonSales = dashboardData?.season_sales || {};
   const seasonSalesSummary = dashboardData?.season_sales_summary || {};  // 누적 대시보드용
   const seasonSummary = dashboardData?.season_summary || {};  // 11월 누적 데이터용
@@ -935,31 +1144,31 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
     }
   }, [dashboardData, seasonSalesSummary, season25FSalesRate, season25SSalesRate]);
   
-  // 누적 대시보드용: dashboardData에서 직접 매출 데이터 사용 (salesSummary는 위에서 이미 선언됨)
+  // 누적 대시보드용: 누적 데이터 사용
   const pl = {
     net_sales: salesSummary.total_net_sales || 0,
-    tag_sales: plData?.current_month?.total?.tag_sales || 0,
-    gross_sales: plData?.current_month?.total?.gross_sales || 0,
-    gross_profit: plData?.current_month?.total?.gross_profit || 0,
-    discount: plData?.current_month?.total?.discount || 0,
-    discount_rate: plData?.current_month?.total?.discount_rate || 0,
-    cogs: plData?.current_month?.total?.cogs || 0,
-    direct_cost: plData?.current_month?.total?.direct_cost || 0,
-    direct_profit: plData?.current_month?.total?.direct_profit || 0,
-    direct_profit_rate: plData?.current_month?.total?.direct_profit_rate || 0,
-    operating_profit: plData?.current_month?.total?.operating_profit || 0,
-    operating_profit_rate: plData?.current_month?.total?.operating_profit_rate || 0,
-    sg_a: plData?.current_month?.total?.sg_a || 0,
+    tag_sales: plData?.cumulative?.total?.tag_sales || 0,
+    gross_sales: plData?.cumulative?.total?.tag_sales || 0, // 누적에서는 tag_sales와 동일
+    gross_profit: plData?.cumulative?.total?.gross_profit || 0,
+    discount: (plData?.cumulative?.total?.tag_sales || 0) - (plData?.cumulative?.total?.net_sales || 0),
+    discount_rate: plData?.cumulative?.total?.discount_rate || 0,
+    cogs: (plData?.cumulative?.total?.tag_sales || 0) - (plData?.cumulative?.total?.gross_profit || 0) - ((plData?.cumulative?.total?.tag_sales || 0) - (plData?.cumulative?.total?.net_sales || 0)),
+    direct_cost: plData?.cumulative?.total?.direct_cost || 0,
+    direct_profit: plData?.cumulative?.total?.direct_profit || 0,
+    direct_profit_rate: plData?.cumulative?.total?.direct_profit_rate || 0,
+    operating_profit: plData?.cumulative?.total?.operating_profit || 0,
+    operating_profit_rate: plData?.cumulative?.total?.operating_profit_rate || 0,
+    sg_a: plData?.cumulative?.total?.sg_a || 0,
   };
-  const plYoy = plData?.current_month?.yoy || {};
+  const plYoy = plData?.cumulative?.yoy || {};
   const plChange = {
     net_sales: salesSummary.total_change || 0,
-    tag_sales: (plData?.current_month?.total?.tag_sales || 0) - (plData?.prev_month?.total?.tag_sales || 0),
-    gross_profit: (plData?.current_month?.total?.gross_profit || 0) - (plData?.prev_month?.total?.gross_profit || 0),
-    direct_cost: (plData?.current_month?.total?.direct_cost || 0) - (plData?.prev_month?.total?.direct_cost || 0),
-    direct_profit: (plData?.current_month?.total?.direct_profit || 0) - (plData?.prev_month?.total?.direct_profit || 0),
-    operating_profit: (plData?.current_month?.total?.operating_profit || 0) - (plData?.prev_month?.total?.operating_profit || 0),
-    sg_a: (plData?.current_month?.total?.sg_a || 0) - (plData?.prev_month?.total?.sg_a || 0),
+    tag_sales: (plData?.cumulative?.total?.tag_sales || 0) - (plData?.cumulative?.prev_cumulative?.total?.tag_sales || 0),
+    gross_profit: (plData?.cumulative?.total?.gross_profit || 0) - (plData?.cumulative?.prev_cumulative?.total?.gross_profit || 0),
+    direct_cost: (plData?.cumulative?.total?.direct_cost || 0) - (plData?.cumulative?.prev_cumulative?.total?.direct_cost || 0),
+    direct_profit: (plData?.cumulative?.total?.direct_profit || 0) - (plData?.cumulative?.prev_cumulative?.total?.direct_profit || 0),
+    operating_profit: (plData?.cumulative?.total?.operating_profit || 0) - (plData?.cumulative?.prev_cumulative?.total?.operating_profit || 0),
+    sg_a: (plData?.cumulative?.total?.sg_a || 0) - (plData?.cumulative?.prev_cumulative?.total?.sg_a || 0),
   };
 
   // 전년 할인율 계산 (prev_month에 discount_rate가 없는 경우)
@@ -1956,10 +2165,13 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     const cumPrevHK = plData?.cumulative?.prev_cumulative?.hk || {};
                     const cumPrevMC = plData?.cumulative?.prev_cumulative?.mc || {};
                     
-                    // HK 오프라인: HK 전체에서 온라인 제외 (당월 데이터로 온라인 비율 추정)
-                    const hkOnlineCurrent = plData?.current_month?.hk?.net_sales || 0;
+                    // HK 오프라인: HK 전체에서 온라인 제외 (누적 데이터로 온라인 비율 계산)
+                    // 누적 채널별 매출 데이터 사용
+                    const monthlyChannelData = monthlyDashboardData?.monthly_channel_data || [];
+                    const hkOnlineCumulative = monthlyChannelData.reduce((sum: number, item: any) => sum + (item.HK_Online || 0), 0);
+                    const hkTotalCumulative = monthlyChannelData.reduce((sum: number, item: any) => sum + (item.HK_Retail || 0) + (item.HK_Outlet || 0) + (item.HK_Online || 0), 0);
+                    const hkOnlineRate = hkTotalCumulative > 0 ? (hkOnlineCumulative / hkTotalCumulative) : 0;
                     const hkTotalCurrent = cumHK.net_sales || 0;
-                    const hkOnlineRate = hkTotalCurrent > 0 ? (hkOnlineCurrent / hkTotalCurrent) : 0;
                     const hkOfflineDirectProfit = (cumHK.direct_profit || 0) * (1 - hkOnlineRate);
                     const hkOfflineNetSales = hkTotalCurrent * (1 - hkOnlineRate);
                     const hkOfflinePrevDirectProfit = (cumPrevHK.direct_profit || 0) * (1 - hkOnlineRate);
@@ -1992,42 +2204,42 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     
                     return (
                       <>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">HK 오프라인</span>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">HK 오프라인</span>
                           <span className={`font-semibold ${hkOfflineDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {formatNumber(hkOfflineDirectProfit)} 
                             <span className={hkOfflineYoy === null || hkOfflineYoy === undefined ? 'text-green-600' : ((hkOfflineYoy || 0) >= 100 ? 'text-green-600' : 'text-red-600')}> ({hkOfflineYoy === null || hkOfflineYoy === undefined ? '흑자전환' : `${formatPercent(hkOfflineYoy)}%`})</span> 
                             <span className="text-blue-600"> [{formatPercent(hkOfflineRate, 1)}%]</span>
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">MC 오프라인</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">MC 오프라인</span>
                           <span className={`font-semibold ${mcOfflineDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {formatNumber(mcOfflineDirectProfit)} 
                             <span className={mcOfflineYoy === null || mcOfflineYoy === undefined ? 'text-green-600' : ((mcOfflineYoy || 0) >= 100 ? 'text-green-600' : 'text-red-600')}> ({mcOfflineYoy === null || mcOfflineYoy === undefined ? '흑자전환' : `${formatPercent(mcOfflineYoy)}%`})</span> 
                             <span className="text-blue-600"> [{formatPercent(mcOfflineRate, 1)}%]</span>
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600">HK 온라인</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">HK 온라인</span>
                           <span className={`font-semibold ${hkOnlineDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {formatNumber(hkOnlineDirectProfit)} 
                             <span className={hkOnlineYoy === null || hkOnlineYoy === undefined ? 'text-green-600' : ((hkOnlineYoy || 0) >= 100 ? 'text-green-600' : 'text-red-600')}> ({hkOnlineYoy === null || hkOnlineYoy === undefined ? '흑자전환' : `${formatPercent(hkOnlineYoy)}%`})</span> 
                             <span className="text-blue-600"> [{formatPercent(hkOnlineRateValue, 1)}%]</span>
-                          </span>
-                        </div>
-                        
-                        <div className="flex justify-between text-xs font-semibold mt-2 pt-2 border-t">
-                          <span className="text-gray-700">전체 직접이익</span>
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between text-xs font-semibold mt-2 pt-2 border-t">
+                    <span className="text-gray-700">전체 직접이익</span>
                           <span className={totalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
                             {formatNumber(totalDirectProfit)} 
                             <span className={(totalYoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(totalYoy)}%)</span>
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-xs font-semibold">
-                          <span className="text-gray-700">직접이익률</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-gray-700">직접이익률</span>
                           <span className={totalDirectProfit >= 0 ? 'text-green-600' : 'text-red-600'}>{formatPercent(totalRate, 1)}%</span>
-                        </div>
+                  </div>
                       </>
                     );
                   })()}
@@ -3006,11 +3218,11 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                                     {formatNumber(Math.round(item.net_sales))}K  {/* 이미 1K HKD 단위 */}
                                     <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                                   </span>
-                                </div>
+                </div>
                               );
                             })}
-                          </div>
-                        </div>
+              </div>
+            </div>
                       )}
                       
                       {/* ACC 카테고리별 판매 (누적 데이터 사용) */}
@@ -3084,7 +3296,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                       <>
                         <div className="text-2xl font-bold text-indigo-600">
                           {formatPercent(rate, 1)}%
-                        </div>
+              </div>
                         <div className={`text-xs font-semibold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {change >= 0 ? '+' : ''}{formatPercent(change, 1)}%p
                         </div>
@@ -3138,7 +3350,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         <>
                           <span className={`text-sm font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             {formatNumber(Math.round(current / 1000))}K
-                          </span>
+                  </span>
                           <div className={`text-xs font-semibold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             YOY {formatPercent(yoy)}%
                           </div>
@@ -3158,7 +3370,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         <>
                           <span className={`text-sm font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             {formatNumber(Math.round(current / 1000))}K
-                          </span>
+                  </span>
                           <div className={`text-xs font-semibold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             YOY {formatPercent(yoy)}%
                           </div>
@@ -3225,15 +3437,15 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             <span className="font-semibold text-green-600">
                               {formatStockWeeks(shoes?.current?.stock_weeks || 0)}주 
                               <span className="text-gray-500"> (△{formatNumber(((shoes?.current?.stock_weeks || 0) - (shoes?.previous?.stock_weeks || 0)) * -1, 1)}주)</span>
-                            </span>
-                          </div>
+                  </span>
+                </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-gray-600">모자</span>
                             <span className="font-semibold text-green-600">
                               {formatStockWeeks(cap?.current?.stock_weeks || 0)}주 
                               <span className="text-gray-500"> (△{formatNumber(((cap?.current?.stock_weeks || 0) - (cap?.previous?.stock_weeks || 0)) * -1, 1)}주)</span>
-                            </span>
-                          </div>
+                  </span>
+                </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-gray-600">가방외</span>
                             <span className="font-semibold text-green-600">
@@ -3244,7 +3456,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         </>
                       );
                     })()}
-                  </div>
+              </div>
                   
                   {/* 누적 매출 */}
                   <div className="mt-3 pt-3 border-t">
@@ -3373,29 +3585,29 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                           <span className="font-semibold">
                             {formatNumber(currentSeasonF)} 
                             <span className={currentSeasonFYoy >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(currentSeasonFYoy)}%)</span>
-                          </span>
-                        </div>
+                  </span>
+                </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">당시즌 SS (25S)</span>
                           <span className="font-semibold">
                             {formatNumber(currentSeasonS)} 
                             <span className={currentSeasonSYoy >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(currentSeasonSYoy)}%)</span>
-                          </span>
-                        </div>
+                  </span>
+                </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">과시즌 FW</span>
                           <span className="font-semibold">
                             {formatNumber(pastSeasonFW)} 
                             <span className={pastSeasonFWYoy >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(pastSeasonFWYoy)}%)</span>
-                          </span>
-                        </div>
+                  </span>
+                </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">과시즌 SS</span>
                           <span className="font-semibold">
                             {formatNumber(pastSeasonSS)} 
                             <span className={pastSeasonSSYoy >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(pastSeasonSSYoy)}%)</span>
                           </span>
-                        </div>
+              </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-600">악세 합계</span>
                           <span className="font-semibold">
@@ -3441,11 +3653,11 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                   <>
                     <div className={`text-3xl font-bold mb-2 ${fwYoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
                       {formatNumber(Math.round(fwCurrent))}
-                    </div>
-                    <div className="text-sm font-semibold mb-3">
+              </div>
+              <div className="text-sm font-semibold mb-3">
                       <span className="text-gray-600">전년 {formatNumber(Math.round(fwPrevious))}</span> | 
                       <span className={fwYoy >= 100 ? 'text-red-600' : 'text-green-600'}> YOY {formatPercent(fwYoy)}% {fwYoy >= 100 ? '🔴' : ''}</span>
-                    </div>
+              </div>
                     
                     {/* 재고 시즌별 상세보기 */}
                     <div className="border-t pt-3">
@@ -3537,22 +3749,22 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         })()}
                       </>
                     )}
-                    
-                    {/* 구성 상세 */}
+              
+              {/* 구성 상세 */}
                     <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-3 space-y-2 mt-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-gray-700">전체 재고 대비</span>
-                        <span className="text-sm font-bold text-red-600">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-700">전체 재고 대비</span>
+                  <span className="text-sm font-bold text-red-600">
                           {formatPercent((fwCurrent / totalCurrent) * 100, 1)}%
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-gray-700">과시즌 중 FW 비중</span>
-                        <span className="text-sm font-bold text-orange-600">
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-700">과시즌 중 FW 비중</span>
+                  <span className="text-sm font-bold text-orange-600">
                           {formatPercent((fwCurrent / (pastSeasonTotal || 1)) * 100, 1)}%
-                        </span>
-                      </div>
-                    </div>
+                  </span>
+                </div>
+              </div>
                   </>
                 );
               })()}
@@ -4187,305 +4399,12 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
       {/* 월별 추세 그래프 */}
       <div className="mt-4 grid grid-cols-3 gap-4">
         {/* 월별 채널별 매출 추세 */}
-        <div className="bg-white rounded-lg shadow-md p-4 relative" id="sales-channel-chart">
-          <DataStatusBadge status="connected" label="채널별매출그래프" />
-          <div className="flex items-center justify-between mb-4" style={{ height: '40px' }}>
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              2025년 월별 채널별 매출 추세 (실판 V-, 1K HKD)
-            </h3>
-            <div style={{ width: '200px' }}></div>
-          </div>
-          {/* 전문적인 세로 막대 차트 (그림과 동일한 디자인) */}
-          <div className="relative px-4 py-2">
-            {!monthlyDashboardData ? (
-              <div className="text-center py-8 text-gray-500">당월 대시보드 데이터 로딩 중...</div>
-            ) : !monthly_channel_sales || monthly_channel_sales.length === 0 ? (
-              <div className="text-center py-8 text-red-500">
-                데이터 없음: monthly_channel_sales가 비어있습니다.
-                <br />
-                <small>monthlyDashboardData?.monthly_channel_data: {monthlyDashboardData?.monthly_channel_data ? `있음 (${monthlyDashboardData.monthly_channel_data.length}개)` : '없음'}</small>
-              </div>
-            ) : (
-            <>
-            {(() => {
-              // Y축 최대값 계산
-              const maxDataValue = Math.max(...monthly_channel_sales.map((m: any) => m.total));
-              const yMax = 50000; // 50K HKD
-              const yStep = yMax / 3;
-              
-              return (
-            <div className="flex gap-2">
-              {/* Y축 레이블과 눈금 */}
-              <div className="flex flex-col justify-between h-64 text-[10px] text-gray-500 font-medium pr-2">
-                <div className="text-right">{yMax.toLocaleString()}</div>
-                <div className="text-right">{Math.round(yStep * 2).toLocaleString()}</div>
-                <div className="text-right">{Math.round(yStep).toLocaleString()}</div>
-                <div className="text-right">0</div>
-              </div>
-              
-              {/* 차트 영역 */}
-              <div className="flex-1 relative">
-                {/* 격자선 (Horizontal Grid Lines) */}
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  <div className="border-t border-dashed border-gray-300"></div>
-                  <div className="border-t border-dashed border-gray-300"></div>
-                  <div className="border-t border-dashed border-gray-300"></div>
-                  <div className="border-t border-gray-400"></div>
-                </div>
-                
-                {/* 막대 차트 */}
-                <div className="relative h-64 flex items-end justify-between gap-0.5 z-10">
-                  {monthly_channel_sales.map((m: any, idx: number) => {
-                    // 픽셀 단위로 계산 (h-64 = 256px)
-                    const CHART_HEIGHT = 256;
-                    const totalHeightPx = Math.max((m.total / yMax) * CHART_HEIGHT, 8);
-                    
-                    const channels = [
-                      { name: 'HK Retail', value: m['HK Retail'] || 0, color: '#93C5FD' },
-                      { name: 'HK Outlet', value: m['HK Outlet'] || 0, color: '#C4B5FD' },
-                      { name: 'HK Online', value: m['HK Online'] || 0, color: '#F9A8D4' },
-                      { name: 'MO Retail', value: m['MO Retail'] || 0, color: '#86EFAC' },
-                      { name: 'MO Outlet', value: m['MO Outlet'] || 0, color: '#FDE047' }
-                    ];
-                    
-                    return (
-                      <div key={idx} className="flex-1 flex flex-col items-center">
-                        {/* 세로 막대 */}
-                        <div 
-                          className="w-full relative flex flex-col-reverse rounded-t-sm hover:opacity-90 transition-opacity cursor-pointer shadow-sm hover:shadow-lg"
-                          style={{ 
-                            height: `${totalHeightPx}px`,
-                            minHeight: '8px'
-                          }}
-                          onMouseEnter={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setHoveredBar({
-                              month: m.month,
-                              data: { ...m, channels },
-                              x: rect.left + rect.width / 2,
-                              y: rect.top
-                            });
-                          }}
-                          onMouseLeave={() => setHoveredBar(null)}
-                        >
-                          {channels.map((ch, chIdx) => {
-                            const segmentHeight = m.total > 0 ? (ch.value / m.total * 100) : 0;
-                            return segmentHeight > 0 ? (
-                              <div 
-                                key={chIdx}
-                                className="flex items-center justify-center"
-                                style={{ 
-                                  height: `${segmentHeight}%`,
-                                  backgroundColor: ch.color,
-                                  minHeight: segmentHeight > 1 ? '3px' : '0px'
-                                }}
-                                title={`${ch.name}: ${ch.value.toLocaleString()}K`}
-                              />
-                            ) : null;
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-              );
-            })()}
-            
-            {/* X축 라벨 (월) */}
-            <div className="flex gap-2 mt-2 ml-12">
-              <div className="flex-1 flex justify-between text-[10px] text-gray-600 font-medium">
-                {monthly_channel_sales.map((m: any, idx: number) => (
-                  <div key={idx} className="flex-1 text-center">{m.month}</div>
-                ))}
-              </div>
-            </div>
-            </>
-            )}
-          </div>
-          
-          {/* 툴팁 */}
-          {hoveredBar && (
-            <div
-              className="fixed z-50 pointer-events-none"
-              style={{
-                left: `${hoveredBar.x}px`,
-                top: `${hoveredBar.y - 10}px`,
-                transform: 'translate(-50%, -100%)'
-              }}
-            >
-              <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-3 min-w-[200px]">
-                <div className="font-bold text-sm text-gray-900 mb-2 pb-2 border-b border-gray-200">
-                  📅 {hoveredBar.data.month} 매출
-                </div>
-                <div className="space-y-1.5 text-xs">
-                  {hoveredBar.data.channels.map((ch: any, idx: number) => (
-                    ch.value > 0 && (
-                      <div key={idx} className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-1.5">
-                          <div 
-                            className="w-3 h-3 rounded-sm" 
-                            style={{ backgroundColor: ch.color }}
-                          ></div>
-                          <span className="text-gray-700 font-medium">{ch.name}</span>
-                        </div>
-                        <span className="font-bold text-gray-900">{ch.value.toLocaleString()}K</span>
-                      </div>
-                    )
-                  ))}
-                  <div className="pt-2 mt-2 border-t border-gray-200 flex justify-between items-center">
-                    <span className="font-bold text-gray-900">총매출</span>
-                    <span className="font-bold text-blue-600 text-sm">{hoveredBar.data.total.toLocaleString()}K</span>
-                  </div>
-                </div>
-              </div>
-              {/* 화살표 */}
-              <div 
-                className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-3 h-3 bg-white border-r border-b border-gray-200"
-              ></div>
-            </div>
-          )}
-          
-          {/* 채널 선택 버튼 */}
-          <div className="mt-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                { name: '전체', color: '#A78BFA' },
-                { name: 'HK Retail', color: '#93C5FD' },
-                { name: 'HK Outlet', color: '#C4B5FD' },
-                { name: 'HK Online', color: '#F9A8D4' },
-                { name: 'MC Retail', color: '#86EFAC' },
-                { name: 'MC Outlet', color: '#FDE047' }
-              ].map(channel => (
-                <button
-                  key={channel.name}
-                  onClick={() => setSelectedChannelTrend(selectedChannelTrend === channel.name ? null : channel.name)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
-                    selectedChannelTrend === channel.name
-                      ? 'ring-2 ring-blue-600 scale-105'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{ 
-                    backgroundColor: channel.color,
-                    color: '#1F2937'
-                  }}
-                >
-                  {channel.name}
-                </button>
-              ))}
-            </div>
-
-            {/* 선택된 채널의 상세 정보 */}
-            {selectedChannelTrend && isClient && (
-              <div className="mt-4 relative">
-                <DataStatusBadge status="connected" label="채널별YOY추세" />
-                <div className="mb-2 text-xs text-gray-600">
-                  선택된 채널: {selectedChannelTrend}
-                </div>
-                
-                {/* YOY 차트 */}
-                {selectedChannelTrend === '전체' ? (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      hkRetail: channelYOY['HK Retail'][idx],
-                      hkOutlet: channelYOY['HK Outlet'][idx],
-                      hkOnline: channelYOY['HK Online'][idx],
-                      mcRetail: channelYOY['MC Retail'][idx],
-                      mcOutlet: channelYOY['MC Outlet'][idx]
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 350]} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => value ? [`${value}%`, name] : ['N/A', name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <ReferenceLine y={100} stroke="#000000" strokeWidth={2} strokeDasharray="5 5" label={{ value: '100%', position: 'right', fill: '#000000', fontSize: 10 }} />
-                      <Line type="monotone" dataKey="hkRetail" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="HK Retail" />
-                      <Line type="monotone" dataKey="hkOutlet" stroke="#8B5CF6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="HK Outlet" />
-                      <Line type="monotone" dataKey="hkOnline" stroke="#EC4899" strokeWidth={3} dot={{ r: 4 }} connectNulls name="HK Online" />
-                      <Line type="monotone" dataKey="mcRetail" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} connectNulls name="MC Retail" />
-                      <Line type="monotone" dataKey="mcOutlet" stroke="#FBBF24" strokeWidth={3} dot={{ r: 4 }} connectNulls name="MC Outlet" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      yoy: (channelYOY as any)[selectedChannelTrend]?.[idx]
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => [`${value}%`, name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="yoy" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} name="YOY" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )}
-
-                {/* YOY 데이터 테이블 */}
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-2 py-1 text-left font-semibold">
-                          {selectedChannelTrend === '전체' ? '채널' : selectedChannelTrend}
-                        </th>
-                        {months.map((month: string) => (
-                          <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedChannelTrend === '전체' ? (
-                        <>
-                          {['HK Retail', 'HK Outlet', 'HK Online', 'MC Retail', 'MC Outlet'].map((channel: string) => (
-                            <tr key={channel}>
-                              <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">{channel}</td>
-                              {((channelYOY as any)[channel] || []).map((yoy: number, idx: number) => (
-                                <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {yoy}%
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </>
-                      ) : (
-                        <tr>
-                          <td className="border border-gray-300 px-2 py-1 font-semibold bg-blue-50">YOY</td>
-                          {((channelYOY as any)[selectedChannelTrend] || []).map((yoy: number, idx: number) => (
-                            <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                              {yoy}%
-                            </td>
-                          ))}
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* 안내 메시지 */}
-            {!selectedChannelTrend && (
-              <div className="mt-4 text-center text-xs text-gray-500 bg-gradient-to-r from-blue-50 to-purple-50 py-2 px-3 rounded border border-blue-200">
-                💡 버튼을 클릭하면 해당 채널의 YOY 추세와 상세 데이터를 확인할 수 있습니다
-              </div>
-            )}
-          </div>
-          
-          {/* 구 Recharts 차트는 숨김 */}
-          <div style={{display: 'none'}}>
-          {isClient ? (
-            <ResponsiveContainer width="100%" height={250}>
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="w-2 h-20 rounded-full mr-2"></div>
+            2025년 채널별 실판매출 추세 (1K HKD)
+          </h3>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart 
               data={(monthlyDashboardData?.monthly_channel_data || []).map((item: any) => ({
                 month: `${item.period.slice(2, 4)}월`,
@@ -4624,13 +4543,9 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          ) : null}
-          </div>
-          {/* Recharts 차트 끝 (숨김) */}
           
-          {/* 범례 클릭 가능하게 만들기 - 이미 위에 표시됨 */}
-          <div className="mt-4" style={{display: 'none'}}>
-            <div className="flex flex-wrap gap-2 justify-center">
+          {/* 채널 선택 버튼 */}
+          <div className="mt-3 flex flex-wrap gap-2 justify-center">
             {[
               { name: '전체', color: '#E5E7EB' },
               { name: 'HK 정상', color: '#93C5FD' },
@@ -4657,9 +4572,10 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {channel.name}
               </button>
             ))}
-            </div>
-            
-            {selectedChannel && (
+          </div>
+          
+          {/* YOY 꺾은선 그래프 (채널 선택 시) */}
+          {selectedChannel && (
             <div className="mt-4">
               <div className="mb-2 text-xs text-gray-600">
                 선택된 채널: {selectedChannel}
@@ -4667,7 +4583,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               {selectedChannel === '전체' ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
-                    data={(dashboardData?.monthly_channel_data || []).map((item: any, idx: number) => ({
+                    data={(monthlyDashboardData?.monthly_channel_data || []).map((item: any, idx: number) => ({
                       month: `${item.period.slice(2, 4)}월`,
                       hkRetail: monthlyDashboardData?.monthly_channel_yoy?.['HK_Retail']?.[idx] || 0,
                       hkOutlet: monthlyDashboardData?.monthly_channel_yoy?.['HK_Outlet']?.[idx] || 0,
@@ -4696,7 +4612,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               ) : (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
-                    data={(dashboardData?.monthly_channel_data || []).map((item: any, idx: number) => {
+                    data={(monthlyDashboardData?.monthly_channel_data || []).map((item: any, idx: number) => {
                       // 채널 이름을 언더스코어 형식으로 변환 (예: 'HK 정상' -> 'HK_Retail')
                       const channelKey = selectedChannel === 'HK 정상' ? 'HK_Retail' : 
                                        selectedChannel === 'HK 아울렛' ? 'HK_Outlet' :
@@ -4786,7 +4702,6 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               </div>
             </div>
           )}
-          </div>
           
           {/* 주요 인사이트 */}
           <div className="mt-3 grid grid-cols-3 gap-1">
@@ -5191,13 +5106,12 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           </div>
         </div>
         
-        {/* 월별 아이템별 매출 추세 */}
-        <div className="bg-white rounded-lg shadow-md p-4 relative" id="item-sales-chart" key={`item-chart-${period}-${salesPriceType}`}>
-          <DataStatusBadge status="connected" label="아이템별매출그래프" />
-          <div className="flex items-center justify-between mb-4" style={{ height: '40px' }}>
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
-              2025년 아이템별 추세 (1K HKD)
+        {/* 2025년 아이템별 추세 (1K HKD) - 강제 새로고침 */}
+        <div className="bg-white rounded-lg shadow-md p-4" key={`item-chart-${period}-${salesPriceType}-${Date.now()}`}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-gray-900 flex items-center whitespace-nowrap">
+              <div className="w-2 h-20 rounded-full mr-2"></div>
+              2025년 아이템별 실판매출 추세 (1K HKD)
             </h3>
             
             {/* 실판가/택가/할인율 토글 버튼 */}
@@ -5235,45 +5149,24 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             </div>
           </div>
           
-          {!monthlyDashboardData?.monthly_item_data || monthlyDashboardData.monthly_item_data.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              데이터 로딩 중... (monthlyDashboardData: {monthlyDashboardData ? '있음' : '없음'}, monthly_item_data: {monthlyDashboardData?.monthly_item_data ? `${monthlyDashboardData.monthly_item_data.length}개` : '없음'})
-              <div className="text-xs mt-2 text-gray-400">
-                파일: hongkong-dashboard-data-{period}.json
-              </div>
-            </div>
-          ) : (() => {
-            const itemData = monthlyDashboardData?.monthly_item_data || [];
-            console.log('📊 [아이템별 그래프] 렌더링 시작:', {
-              dataLength: itemData.length,
-              salesPriceType,
-              firstItem: itemData[0],
-              hasData: itemData.length > 0
-            });
-            
-            if (itemData.length === 0) {
-              return <div className="text-center py-8 text-gray-500">데이터가 없습니다.</div>;
-            }
-            
-            return (
-            <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={250}>
             {salesPriceType === '할인율' ? (
               <LineChart 
-                data={itemData.map((item: any) => {
+                data={(monthlyDashboardData?.monthly_item_data || []).map((item: any) => {
                   const calculateDiscount = (gross: number, net: number) => {
                     if (gross === 0) return 0;
                     return ((gross - net) / gross * 100);
                   };
                   return {
                     month: `${item.period.slice(2, 4)}월`,
-                    '당시즌F': calculateDiscount(item.당시즌F?.gross_sales || 0, item.당시즌F?.net_sales || 0),
-                    '당시즌S': calculateDiscount(item.당시즌S?.gross_sales || 0, item.당시즌S?.net_sales || 0),
-                    '과시즌F': calculateDiscount(item.과시즌F?.gross_sales || 0, item.과시즌F?.net_sales || 0),
-                    '과시즌S': calculateDiscount(item.과시즌S?.gross_sales || 0, item.과시즌S?.net_sales || 0),
-                    '모자': calculateDiscount(item.모자?.gross_sales || 0, item.모자?.net_sales || 0),
-                    '신발': calculateDiscount(item.신발?.gross_sales || 0, item.신발?.net_sales || 0),
-                    '가방': calculateDiscount(item.가방?.gross_sales || 0, item.가방?.net_sales || 0),
-                    '기타ACC': calculateDiscount(item.기타ACC?.gross_sales || 0, item.기타ACC?.net_sales || 0),
+                    '당시즌F': calculateDiscount(item.당시즌F.gross_sales, item.당시즌F.net_sales),
+                    '당시즌S': calculateDiscount(item.당시즌S.gross_sales, item.당시즌S.net_sales),
+                    '과시즌F': calculateDiscount(item.과시즌F.gross_sales, item.과시즌F.net_sales),
+                    '과시즌S': calculateDiscount(item.과시즌S.gross_sales, item.과시즌S.net_sales),
+                    '모자': calculateDiscount(item.모자.gross_sales, item.모자.net_sales),
+                    '신발': calculateDiscount(item.신발.gross_sales, item.신발.net_sales),
+                    '가방': calculateDiscount(item.가방.gross_sales, item.가방.net_sales),
+                    '기타ACC': calculateDiscount(item.기타ACC.gross_sales, item.기타ACC.net_sales),
                   };
                 })} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -5294,48 +5187,64 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <Line type="monotone" dataKey="가방" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} name="👜 가방" />
                 <Line type="monotone" dataKey="기타ACC" stroke="#F9A8D4" strokeWidth={3} dot={{ r: 4 }} name="✨ 기타ACC" />
               </LineChart>
-            ) : (() => {
-                const mappedData = itemData.map((item: any) => {
+            ) : (
+              <BarChart 
+                data={(() => {
+                  const mappedData = (monthlyDashboardData?.monthly_item_data || []).map((item: any) => {
+                    // [검증됨] 채널별 매출과 100% 일치하는 아이템별 데이터
+                    // 실판가: net_sales 사용 (채널별 매출과 동일)
+                    // 택가: gross_sales 사용
                     const isNetSales = salesPriceType === '실판';
                     
-                    const f25 = isNetSales ? (item.당시즌F?.net_sales || 0) : (item.당시즌F?.gross_sales || 0);
-                    const s25 = isNetSales ? (item.당시즌S?.net_sales || 0) : (item.당시즌S?.gross_sales || 0);
-                    const fPast = isNetSales ? (item.과시즌F?.net_sales || 0) : (item.과시즌F?.gross_sales || 0);
-                    const sPast = isNetSales ? (item.과시즌S?.net_sales || 0) : (item.과시즌S?.gross_sales || 0);
-                    const cap = isNetSales ? (item.모자?.net_sales || 0) : (item.모자?.gross_sales || 0);
-                    const shoes = isNetSales ? (item.신발?.net_sales || 0) : (item.신발?.gross_sales || 0);
-                    const bag = isNetSales ? (item.가방?.net_sales || 0) : (item.가방?.gross_sales || 0);
-                    const acc = isNetSales ? (item.기타ACC?.net_sales || 0) : (item.기타ACC?.gross_sales || 0);
+                    const f25 = isNetSales ? item.당시즌F.net_sales : item.당시즌F.gross_sales;
+                    const s25 = isNetSales ? item.당시즌S.net_sales : item.당시즌S.gross_sales;
+                    const fPast = isNetSales ? item.과시즌F.net_sales : item.과시즌F.gross_sales;
+                    const sPast = isNetSales ? item.과시즌S.net_sales : item.과시즌S.gross_sales;
+                    const cap = isNetSales ? item.모자.net_sales : item.모자.gross_sales;
+                    const shoes = isNetSales ? item.신발.net_sales : item.신발.gross_sales;
+                    const bag = isNetSales ? item.가방.net_sales : item.가방.gross_sales;
+                    const acc = isNetSales ? item.기타ACC.net_sales : item.기타ACC.gross_sales;
                     
-                    return {
-                      month: `${item.period.slice(2, 4)}월`,
+                    const total = Math.round(f25 + s25 + fPast + sPast + cap + shoes + bag + acc);
+                    
+                  return {
+                    month: `${item.period.slice(2, 4)}월`,
                       period: item.period,
-                      '당시즌F': Math.round(f25 / 1000),
-                      '당시즌S': Math.round(s25 / 1000),
-                      '과시즌F': Math.round(fPast / 1000),
-                      '과시즌S': Math.round(sPast / 1000),
-                      '모자': Math.round(cap / 1000),
-                      '신발': Math.round(shoes / 1000),
-                      '가방': Math.round(bag / 1000),
-                      '기타ACC': Math.round(acc / 1000),
+                      '당시즌F': Math.round(f25),
+                      '당시즌S': Math.round(s25),
+                      '과시즌F': Math.round(fPast),
+                      '과시즌S': Math.round(sPast),
+                      '모자': Math.round(cap),
+                      '신발': Math.round(shoes),
+                      '가방': Math.round(bag),
+                      '기타ACC': Math.round(acc),
+                      _total: total,
                     };
                   });
                   
-                  console.log('📊 [아이템별 그래프] BarChart 데이터:', {
-                    dataLength: mappedData.length,
-                    firstItem: mappedData[0],
-                    salesPriceType,
-                    sampleData: mappedData.slice(0, 3)
-                  });
+                  // 디버깅: 01월 데이터 출력
+                  const jan = mappedData.find((d: any) => d.period === '2501');
+                  if (jan) {
+                    console.log('🔍 [아이템별 그래프] 2501 (01월) 렌더링 데이터:');
+                    console.log('  실판가 선택?', salesPriceType === '실판');
+                    console.log('  당시즌F:', jan['당시즌F']);
+                    console.log('  당시즌S:', jan['당시즌S']);
+                    console.log('  과시즌F:', jan['과시즌F']);
+                    console.log('  과시즌S:', jan['과시즌S']);
+                    console.log('  모자:', jan['모자']);
+                    console.log('  신발:', jan['신발']);
+                    console.log('  가방:', jan['가방']);
+                    console.log('  기타ACC:', jan['기타ACC']);
+                    console.log('  → 합계:', jan._total, 'K HKD');
+                  }
                   
-                  return (
-              <BarChart 
-                data={mappedData} 
+                  return mappedData;
+                })()} 
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 onClick={(data: any) => {
                   if (data && data.activePayload && data.activePayload[0]) {
                     const itemName = data.activePayload[0].dataKey;
-                    setSelectedSalesItem(selectedSalesItem === itemName ? null : itemName);
+                    setSelectedItem(selectedItem === itemName ? null : itemName);
                   }
                 }}
               >
@@ -5362,195 +5271,323 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <Bar dataKey="가방" stackId="a" fill="#C4B5FD" name="👜 가방" />
                 <Bar dataKey="기타ACC" stackId="a" fill="#F9A8D4" name="✨ 기타ACC" />
               </BarChart>
-                  );
-                })()}
-          </ResponsiveContainer>
-            );
-          })()}
-          
-          {/* 범례 클릭 가능하게 만들기 */}
-          <div className="mt-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                { name: '전체', color: '#FB923C' },
-                { name: '당시즌F', color: '#34D399' },
-                { name: '당시즌S', color: '#60A5FA' },
-                { name: '과시즌의류', color: '#FCA5A5' },
-                { name: '모자', color: '#93C5FD' },
-                { name: '신발', color: '#FCD34D' },
-                { name: '가방외', color: '#C4B5FD' }
-              ].map(item => (
-                <button
-                  key={item.name}
-                  onClick={() => setSelectedSalesItem(selectedSalesItem === item.name ? null : item.name)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
-                    selectedSalesItem === item.name
-                      ? 'ring-2 ring-orange-600 scale-105'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{ 
-                    backgroundColor: item.color,
-                    color: '#1F2937'
-                  }}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          
-            {selectedSalesItem && (
-              <div className="mt-4">
-                {selectedSalesItem === '전체' ? (
-                <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      currSeasonF: idx < 6 ? (salesItemYOY as any)['당시즌S'][idx] : (salesItemYOY as any)['당시즌F'][idx], // 1~6월은 당시즌S YOY(24F)를 당시즌F로 표시
-                      currSeasonS: (salesItemYOY as any)['당시즌S'][idx],
-                      pastSeason: (salesItemYOY as any)['과시즌의류'][idx],
-                      cap: (salesItemYOY as any)['모자'][idx],
-                      shoes: (salesItemYOY as any)['신발'][idx],
-                      bagEtc: (salesItemYOY as any)['가방외'][idx]
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => value ? [`${value}%`, name] : ['N/A', name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="currSeasonF" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} connectNulls name="당시즌F" />
-                      <Line type="monotone" dataKey="currSeasonS" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="당시즌S" />
-                      <Line type="monotone" dataKey="pastSeason" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} connectNulls name="과시즌의류" />
-                      <Line type="monotone" dataKey="cap" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="모자" />
-                      <Line type="monotone" dataKey="shoes" stroke="#F59E0B" strokeWidth={3} dot={{ r: 4 }} connectNulls name="신발" />
-                      <Line type="monotone" dataKey="bagEtc" stroke="#8B5CF6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="가방외" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      yoy: selectedSalesItem === '당시즌F' && idx < 6
-                        ? ((salesItemYOY as any)['당시즌S']?.[idx] ?? null) // 1~6월 당시즌F는 당시즌S YOY 표시
-                        : ((salesItemYOY[selectedSalesItem as keyof typeof salesItemYOY] as any)?.[idx] ?? null)
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => value ? [`${value}%`, name] : ['N/A', name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="yoy" stroke="#EA580C" strokeWidth={3} dot={{ r: 4 }} connectNulls name="YOY" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )}
-                
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-2 py-1 text-left font-semibold">{selectedSalesItem === '전체' ? '아이템' : selectedSalesItem}</th>
-                        {months.map((month: string) => (
-                          <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedSalesItem === '전체' ? (
-                        <>
-                          {['당시즌F', '당시즌S', '과시즌의류', '모자', '신발', '가방외'].map(item => (
-                            <tr key={item}>
-                              <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">{item}</td>
-                              {(salesItemYOY as any)[item].map((yoy: number, idx: number) => {
-                                // 1~6월 당시즌F는 당시즌S YOY를 표시
-                                const displayYoy = (item === '당시즌F' && idx < 6) 
-                                  ? (salesItemYOY as any)['당시즌S'][idx] 
-                                  : yoy;
-                                return (
-                                  <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {displayYoy === null ? '-' : `${displayYoy}%`}
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          ))}
-                          <tr className="bg-blue-100 font-bold border-t-2 border-blue-300">
-                            <td className="border border-gray-300 px-2 py-1 text-blue-900">합계</td>
-                            {(salesItemYOY as any)['합계'].map((yoy: number, idx: number) => (
-                              <td key={idx} className={`border border-gray-300 px-2 py-1 text-center ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                                {yoy}%
-                              </td>
-                            ))}
-                          </tr>
-                        </>
-                      ) : (
-                        <>
-                          <tr>
-                            <td className="border border-gray-300 px-2 py-1 font-semibold bg-orange-50">YOY</td>
-                            {(salesItemYOY as any)[selectedSalesItem]?.map((yoy: number, idx: number) => {
-                              // 당시즌F 선택 시 1~6월은 당시즌S YOY 표시
-                              const displayYoy = (selectedSalesItem === '당시즌F' && idx < 6)
-                                ? (salesItemYOY as any)['당시즌S'][idx]
-                                : yoy;
-                              return (
-                                <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {displayYoy === null ? '-' : `${displayYoy}%`}
-                                </td>
-                              );
-                            }) || []}
-                          </tr>
-                        </>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             )}
+          </ResponsiveContainer>
+          
+          {/* 아이템 선택 버튼 (재고 그래프와 동일한 F/S + ACC 구성) */}
+          <div className="mt-3 flex flex-wrap gap-2 justify-center">
+            {[
+              { name: '전체', displayName: '전체', color: '#E5E7EB' },
+              { name: '당시즌F', displayName: '🍂 25F', color: '#FFD4B3' },
+              { name: '당시즌S', displayName: '☀️ 25S', color: '#B3E5FC' },
+              { name: '과시즌F', displayName: '🍂 과시즌F', color: '#FFB3C1' },
+              { name: '과시즌S', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
+              { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
+              { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
+              { name: '가방', displayName: '👜 가방', color: '#C4B5FD' },
+              { name: '기타ACC', displayName: '✨ 기타ACC', color: '#F9A8D4' },
+            ].map((item) => (
+              <button
+                key={item.name}
+                onClick={() => {
+                  setSelectedItem(selectedItem === item.name ? null : item.name);
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                  selectedItem === item.name
+                    ? 'ring-2 ring-orange-600 scale-105'
+                    : 'hover:scale-105'
+                }`}
+                style={{ 
+                  backgroundColor: item.color,
+                  color: '#000000'
+                }}
+              >
+                {item.displayName}
+              </button>
+            ))}
           </div>
           
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-2">
-              <h4 className="text-xs font-bold text-red-800 mb-1">🔥 시즌 트렌드</h4>
-              <div className="space-y-0.5 text-xs text-red-700">
-                <div>• 1~3월: 24FW 강세 (당시즌F)</div>
-                <div>• 4~6월: 25SS 전환 (당시즌S)</div>
-                <div>• 7~10월: 25FW 본격화, 10월 8,940K</div>
+          {/* YOY 꺾은선 그래프 (아이템 선택 시) */}
+          {selectedItem && (
+            <div className="mt-4">
+              <div className="mb-2 text-xs text-gray-600">
+                선택된 아이템: {selectedItem}
+              </div>
+              {selectedItem === '전체' ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart 
+                    data={(monthlyDashboardData?.monthly_item_data || []).map((item: any, idx: number, arr: any[]) => {
+                      const yoyData = (monthlyDashboardData?.monthly_item_yoy || {}) as Record<string, number[]>;
+                      const seasonSalesData = seasonSales as any;
+                      const isLast = idx === arr.length - 1;
+
+                      // 카드용 당시즌F YOY (10월 기준) - season_sales에서 직접 계산
+                      let cardSeasonFYoy: number | null = null;
+                      const currentF = seasonSalesData?.current_season_f?.october?.total_net_sales;
+                      const prevF = seasonSalesData?.previous_season_f?.october?.total_net_sales;
+                      if (typeof currentF === 'number' && typeof prevF === 'number' && prevF !== 0) {
+                        cardSeasonFYoy = Math.round((currentF / prevF) * 100);
+                      }
+
+                      const baseData: any = {
+                        month: `${item.period.slice(2, 4)}월`,
+                        당시즌F: yoyData['당시즌F']?.[idx] ?? 0,
+                        당시즌S: yoyData['당시즌S']?.[idx] ?? 0,
+                        과시즌F: yoyData['과시즌F']?.[idx] ?? 0,
+                        과시즌S: yoyData['과시즌S']?.[idx] ?? 0,
+                        모자: yoyData['모자']?.[idx] ?? 0,
+                        신발: yoyData['신발']?.[idx] ?? 0,
+                        가방: yoyData['가방']?.[idx] ?? 0,
+                        기타ACC: yoyData['기타ACC']?.[idx] ?? 0,
+                        전체합계: (overallItemYoy[idx] ?? 0),
+                      };
+
+                      // 마지막 월(10월)은 카드와 동일한 당시즌F YOY로 덮어씀
+                      if (isLast && cardSeasonFYoy !== null) {
+                        baseData['당시즌F'] = cardSeasonFYoy;
+                      }
+
+                      return baseData;
+                    })} 
+                    margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
+                    <Tooltip 
+                      formatter={(value: any, name: string) => [`${value}%`, name]}
+                      contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
+                    />
+                    <Line type="monotone" dataKey="전체합계" stroke="#111827" strokeWidth={2.5} dot={{ r: 4 }} name="전체합계" />
+                    <Line type="monotone" dataKey="당시즌F" stroke="#FFD4B3" strokeWidth={2} name="🍂 25F" />
+                    <Line type="monotone" dataKey="당시즌S" stroke="#B3E5FC" strokeWidth={2} name="☀️ 25S" />
+                    <Line type="monotone" dataKey="과시즌F" stroke="#FFB3C1" strokeWidth={2} name="🍂 과시즌F" />
+                    <Line type="monotone" dataKey="과시즌S" stroke="#B2F5EA" strokeWidth={2} name="☀️ 과시즌S" />
+                    <Line type="monotone" dataKey="모자" stroke="#93C5FD" strokeWidth={2} name="🧢 모자" />
+                    <Line type="monotone" dataKey="신발" stroke="#FCD34D" strokeWidth={2} name="👟 신발" />
+                    <Line type="monotone" dataKey="가방" stroke="#C4B5FD" strokeWidth={2} name="👜 가방" />
+                    <Line type="monotone" dataKey="기타ACC" stroke="#F9A8D4" strokeWidth={2} name="✨ 기타ACC" />
+                    <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart 
+                    data={(monthlyDashboardData?.monthly_item_data || []).map((item: any, idx: number) => ({
+                      month: `${item.period.slice(2, 4)}월`,
+                      yoy: monthlyDashboardData?.monthly_item_yoy ? ((monthlyDashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] || 0) : 0
+                    }))} 
+                    margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
+                    <Tooltip 
+                      formatter={(value: any) => [`${value}%`, 'YOY']}
+                      contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
+                    />
+                    <Line type="monotone" dataKey="yoy" stroke="#F59E0B" strokeWidth={2} name={`${selectedItem} YOY`} />
+                    <ReferenceLine y={100} stroke="#666" strokeDasharray="3 3" />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+              
+              {/* YOY 테이블 */}
+              <div className="mt-4">
+                <table className="w-full text-[10px] border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-300 px-1 py-1 text-left font-semibold">
+                        {selectedItem === '전체' ? '아이템' : selectedItem}
+                      </th>
+                      {(monthlyDashboardData?.monthly_item_data || []).map((item: any) => (
+                        <th key={item.period} className="border border-gray-300 px-1 py-1 text-center font-semibold">{`${item.period.slice(2, 4)}월`}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedItem === '전체' ? (
+                      <>
+                        {[
+                          { key: '전체합계', label: '전체합계' },
+                          { key: '당시즌F', label: '🍂 25F' },
+                          { key: '당시즌S', label: '☀️ 25S' },
+                          { key: '과시즌F', label: '🍂 과시즌F' },
+                          { key: '과시즌S', label: '☀️ 과시즌S' },
+                          { key: '모자', label: '🧢 모자' },
+                          { key: '신발', label: '👟 신발' },
+                          { key: '가방', label: '👜 가방' },
+                          { key: '기타ACC', label: '✨ 기타ACC' },
+                        ].map((row) => (
+                          <tr key={row.key}>
+                            <td className="border border-gray-300 px-1 py-1 font-semibold">
+                              {row.label}
+                            </td>
+                            {(() => {
+                              const yoyArray: number[] =
+                                row.key === '전체합계'
+                                  ? overallItemYoy
+                                  : ((monthlyDashboardData?.monthly_item_yoy
+                                      ? ((monthlyDashboardData.monthly_item_yoy as any)[row.key] as number[])
+                                      : []) || []);
+
+                              // 당시즌F 10월 값은 카드 기준 95%로 맞추기
+                              let overrideArray = yoyArray;
+                              if (row.key === '당시즌F' && yoyArray.length > 0) {
+                                const seasonSalesData = seasonSales as any;
+                                const currentF =
+                                  seasonSalesData?.current_season_f?.october?.total_net_sales;
+                                const prevF =
+                                  seasonSalesData?.previous_season_f?.october?.total_net_sales;
+                                if (typeof currentF === 'number' && typeof prevF === 'number' && prevF !== 0) {
+                                  const cardYoy = Math.round((currentF / prevF) * 100);
+                                  overrideArray = [...yoyArray];
+                                  overrideArray[overrideArray.length - 1] = cardYoy;
+                                }
+                              }
+
+                              return overrideArray.map((yoy: number, idx: number) => (
+                                <td
+                                  key={idx}
+                                  className={`border border-gray-300 px-1 py-1 text-center font-bold ${
+                                    yoy >= 100 ? 'text-green-600' : 'text-red-600'
+                                  }`}
+                                >
+                                  {yoy}%
+                                </td>
+                              ));
+                            })()}
+                          </tr>
+                        ))}
+                      </>
+                    ) : (
+                      <tr>
+                        <td className="border border-gray-300 px-1 py-1 font-semibold">YOY</td>
+                        {((monthlyDashboardData?.monthly_item_yoy ? (monthlyDashboardData.monthly_item_yoy as any)[selectedItem] : undefined) || []).map((yoy: number, idx: number) => (
+                          <td 
+                            key={idx} 
+                            className={`border border-gray-300 px-1 py-1 text-center font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}
+                          >
+                            {yoy}%
+                          </td>
+                        ))}
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
-              <h4 className="text-xs font-bold text-blue-800 mb-1">👔 카테고리 분석</h4>
-              <div className="space-y-0.5 text-xs text-blue-700">
-                <div>• 신발: 1월 최대 10,448K, 10월 3,973K</div>
-                <div>• 모자: 안정적 4,000K 수준 유지</div>
-                <div>• 가방외: 1,200~2,300K 소폭 기여</div>
-              </div>
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-2">
-              <h4 className="text-xs font-bold text-amber-800 mb-1">⚡ 핵심 액션</h4>
-              <div className="space-y-0.5 text-xs text-amber-700">
-                <div>• 과시즌의류 조기 소진 가속화</div>
-                <div>• 신발 YOY 75% 회복 전략 시급</div>
-                <div>• 25FW 판매 모멘텀 지속 강화</div>
-              </div>
-            </div>
+          )}
+          
+          {/* 주요 인사이트 */}
+          <div className="mt-3 grid grid-cols-3 gap-1">
+            {selectedItem === null || selectedItem === '전체' ? (
+              <>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-1.5">
+                  <h4 className="text-xs font-bold text-orange-800 mb-1">📈 주요 인사이트</h4>
+                  <div className="space-y-0.5 text-xs text-orange-700">
+                    {(() => {
+                      const monthlyData = (monthlyDashboardData?.monthly_item_data || []) as any[];
+                      if (monthlyData.length === 0) return <div>데이터 없음</div>;
+                      
+                      // [검증됨] 채널별 매출과 100% 일치
+                      const isNetSales = salesPriceType === '실판';
+                      const totals = monthlyData.map((item: any) => {
+                        const f25 = isNetSales ? item.당시즌F.net_sales : item.당시즌F.gross_sales;
+                        const s25 = isNetSales ? item.당시즌S.net_sales : item.당시즌S.gross_sales;
+                        const fPast = isNetSales ? item.과시즌F.net_sales : item.과시즌F.gross_sales;
+                        const sPast = isNetSales ? item.과시즌S.net_sales : item.과시즌S.gross_sales;
+                        const cap = isNetSales ? item.모자.net_sales : item.모자.gross_sales;
+                        const shoes = isNetSales ? item.신발.net_sales : item.신발.gross_sales;
+                        const bag = isNetSales ? item.가방.net_sales : item.가방.gross_sales;
+                        const acc = isNetSales ? item.기타ACC.net_sales : item.기타ACC.gross_sales;
+                        
+                        return Math.round(f25 + s25 + fPast + sPast + cap + shoes + bag + acc);
+                      });
+                      const maxTotal = Math.max(...totals);
+                      const minTotal = Math.min(...totals);
+                      const maxMonth = monthlyData[totals.indexOf(maxTotal)]?.period?.slice(2, 4) || '';
+                      const minMonth = monthlyData[totals.indexOf(minTotal)]?.period?.slice(2, 4) || '';
+                      const latestTotal = totals[totals.length - 1] || 0;
+                      const prevTotal = totals[totals.length - 2] || 0;
+                      
+                      return (
+                        <>
+                          <div>• {maxMonth}월 최대 {maxTotal.toLocaleString()}K</div>
+                          <div>• {minMonth}월 최저 {minTotal.toLocaleString()}K</div>
+                          {latestTotal > prevTotal ? (
+                            <div>• {monthlyData[monthlyData.length - 1]?.period?.slice(2, 4) || ''}월 회복세</div>
+                          ) : (
+                            <div>• {monthlyData[monthlyData.length - 1]?.period?.slice(2, 4) || ''}월 하락세</div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-1.5">
+                  <h4 className="text-xs font-bold text-purple-800 mb-1">🎯 아이템 트렌드</h4>
+                  <div className="space-y-0.5 text-xs text-purple-700">
+                    {(() => {
+                      const monthlyData = (monthlyDashboardData?.monthly_item_data || []) as any[];
+                      if (monthlyData.length === 0) return <div>데이터 없음</div>;
+                      
+                      const latest = monthlyData[monthlyData.length - 1] || {};
+                      const isNetSales = salesPriceType === '실판';
+                      
+                      const 당F = Math.round((isNetSales ? latest.당시즌F?.net_sales : latest.당시즌F?.gross_sales) || 0);
+                      const 당S = Math.round((isNetSales ? latest.당시즌S?.net_sales : latest.당시즌S?.gross_sales) || 0);
+                      const 과F = Math.round((isNetSales ? latest.과시즌F?.net_sales : latest.과시즌F?.gross_sales) || 0);
+                      const 과S = Math.round((isNetSales ? latest.과시즌S?.net_sales : latest.과시즌S?.gross_sales) || 0);
+                      const 모자 = Math.round((isNetSales ? latest.모자?.net_sales : latest.모자?.gross_sales) || 0);
+                      const 신발 = Math.round((isNetSales ? latest.신발?.net_sales : latest.신발?.gross_sales) || 0);
+                      const 가방 = Math.round((isNetSales ? latest.가방?.net_sales : latest.가방?.gross_sales) || 0);
+                      const 기타ACC = Math.round((isNetSales ? latest.기타ACC?.net_sales : latest.기타ACC?.gross_sales) || 0);
+                      const total = 당F + 당S + 과F + 과S + 모자 + 신발 + 가방 + 기타ACC;
+                      
+                      const currentSeason = 당F + 당S;
+                      const currentSeasonPct = total > 0 ? ((currentSeason / total) * 100).toFixed(1) : '0';
+                      const 모자Pct = total > 0 ? ((모자 / total) * 100).toFixed(1) : '0';
+                      const 신발Pct = total > 0 ? ((신발 / total) * 100).toFixed(1) : '0';
+                      
+                      return (
+                        <>
+                          <div>• 25F/S: 최대 비중 ({currentSeasonPct}%)</div>
+                          <div>• 모자: 안정적 기여 ({모자Pct}%)</div>
+                          <div>• 신발: 주요 아이템 ({신발Pct}%)</div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
+                  <h4 className="text-xs font-bold text-green-800 mb-1">💡 전략 포인트</h4>
+                  <div className="space-y-0.5 text-xs text-green-700">
+                    <div>• 25F/S 집중 육성</div>
+                    <div>• 액세서리(모자·신발·가방외) 라인 강화</div>
+                    <div>• 아이템별 차별화 전략</div>
+                  </div>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
         
-        {/* 월별 아이템별 재고 추세 (이동됨) */}
-        <div className="bg-white rounded-lg shadow-md p-4 relative" id="inventory-chart">
-          <DataStatusBadge status="connected" label="아이템별재고그래프" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-            2025년 월별 아이템별 재고 추세 (TAG, 1K HKD)
-          </h3>
-          {!monthlyDashboardData?.monthly_inventory_data || monthlyDashboardData.monthly_inventory_data.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              데이터 로딩 중... (monthlyDashboardData?.monthly_inventory_data: {monthlyDashboardData?.monthly_inventory_data ? `${monthlyDashboardData.monthly_inventory_data.length}개` : '없음'})
-            </div>
-          ) : (
+        {/* 월별 아이템별 재고 추세 그래프 */}
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-gray-900 flex items-center whitespace-nowrap">
+              <div className="w-2 h-20 rounded-full mr-2"></div>
+              2025년 월별 아이템별 재고 추세 (TAG, 1K HKD)
+            </h3>
+            <button
+              className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded hover:bg-indigo-700 transition-colors whitespace-nowrap"
+              onClick={() => setShowStockWeeksModal(true)}
+            >
+              재고주수 추세
+            </button>
+          </div>
+          
           <div style={{ position: 'relative' }}>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart 
@@ -5559,19 +5596,23 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 const periodMonth = parseInt(item.period.slice(2, 4));
                 const isFirstHalf = periodMonth >= 1 && periodMonth <= 6;
                 
-                const f당시즌Value = Math.round((item.F당시즌?.stock_price || 0) / 1000);
-                const 과시즌FWValue = Math.round((item.과시즌FW?.stock_price || 0) / 1000);
+                const f당시즌Value = Math.round(item.F당시즌?.stock_price || 0);
+                const 과시즌FWValue = Math.round(item.과시즌FW?.stock_price || 0);
                 
                 return {
                   month: `${item.period.slice(2, 4)}월`,
                   'F당시즌': isFirstHalf ? 0 : f당시즌Value, // 1~6월은 0 (24F는 과시즌으로 이동)
-                  'S당시즌': Math.round((item.S당시즌?.stock_price || 0) / 1000),
+                  'S당시즌': Math.round(item.S당시즌?.stock_price || 0),
                   '과시즌FW': isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue, // 1~6월은 F당시즌(24F)을 과시즌에 포함
-                  '과시즌SS': Math.round((item.과시즌SS?.stock_price || 0) / 1000),
-                  '모자': Math.round((item.모자?.stock_price || 0) / 1000),
-                  '신발': Math.round((item.신발?.stock_price || 0) / 1000),
-                  '가방': Math.round((item.가방?.stock_price || 0) / 1000),
-                  '기타ACC': Math.round((item.기타ACC?.stock_price || 0) / 1000),
+                  '과시즌SS': Math.round(item.과시즌SS?.stock_price || 0),
+                  '모자': Math.round(item.모자?.stock_price || 0),
+                  '신발': Math.round(item.신발?.stock_price || 0),
+                  '가방': Math.round(item.가방?.stock_price || 0),
+                  '기타ACC': Math.round(item.기타ACC?.stock_price || 0),
+                  // 재고주수는 레이블용으로만 저장
+                  '모자_weeks': item.모자?.stock_weeks || 0,
+                  '신발_weeks': item.신발?.stock_weeks || 0,
+                  '가방외_weeks': item.가방외?.stock_weeks || 0,
                 };
               })} 
               margin={{ top: 40, right: 30, left: 20, bottom: 5 }}
@@ -5586,9 +5627,13 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 width={80}
               />
               <Tooltip 
-                formatter={(value: any, name: string) => [`${Math.round(value).toLocaleString()}K HKD`, name]}
+                formatter={(value: any, name: string) => {
+                  if (name.includes('_weeks')) return null;
+                  return [`${Math.round(value).toLocaleString()} HKD`, name];
+                }}
                 contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", padding: "8px", fontSize: "11px" }}
               />
+              {/* 범례 이름을 아이템 판매 그래프와 통일: 25F/S, 과시즌F/S */}
               <Bar dataKey="F당시즌" stackId="a" fill="#FFD4B3" name="🍂 25F" />
               <Bar dataKey="S당시즌" stackId="a" fill="#B3E5FC" name="☀️ 25S" />
               <Bar dataKey="과시즌FW" stackId="a" fill="#FFB3BA" name="🍂 과시즌F" />
@@ -5597,27 +5642,205 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               <Bar dataKey="신발" stackId="a" fill="#FCD34D" name="👟 신발" />
               <Bar dataKey="가방" stackId="a" fill="#C4B5FD" name="👜 가방" />
               <Bar dataKey="기타ACC" stackId="a" fill="#F9A8D4" name="✨ 기타ACC" />
+              <Layer>
+                {(monthlyDashboardData?.monthly_inventory_data || []).map((item: any, dataIndex: number) => {
+                  // 차트 데이터 매핑 (1~6월: 24F를 과시즌FW로 이동)
+                  const chartData = (monthlyDashboardData?.monthly_inventory_data || []).map((d: any) => {
+                    const periodMonth = parseInt(d.period.slice(2, 4));
+                    const isFirstHalf = periodMonth >= 1 && periodMonth <= 6;
+                    
+                    const f당시즌Value = Math.round(d.F당시즌?.stock_price || 0);
+                    const 과시즌FWValue = Math.round(d.과시즌FW?.stock_price || 0);
+                    
+                    return {
+                      F당시즌: isFirstHalf ? 0 : f당시즌Value,
+                      S당시즌: Math.round(d.S당시즌?.stock_price || 0),
+                      과시즌FW: isFirstHalf ? (과시즌FWValue + f당시즌Value) : 과시즌FWValue,
+                      과시즌SS: Math.round(d.과시즌SS?.stock_price || 0),
+                      모자: Math.round(d.모자?.stock_price || 0),
+                      신발: Math.round(d.신발?.stock_price || 0),
+                      가방: Math.round(d.가방?.stock_price || 0),
+                      기타ACC: Math.round(d.기타ACC?.stock_price || 0),
+                    };
+                  });
+                  
+                  if (chartData.length === 0) return null;
+                  
+                  const maxValue = Math.max(...chartData.map((d: any) => 
+                    d.F당시즌 + d.S당시즌 + d.과시즌FW + d.과시즌SS + d.모자 + d.신발 + d.가방 + d.기타ACC
+                  ));
+                  
+                  const currentData = chartData[dataIndex];
+                  const F당시즌 = currentData.F당시즌;
+                  const S당시즌 = currentData.S당시즌;
+                  const 과시즌FW = currentData.과시즌FW;
+                  const 과시즌SS = currentData.과시즌SS;
+                  const 모자 = currentData.모자;
+                  const 신발 = currentData.신발;
+                  const 가방 = currentData.가방;
+                  const 기타ACC = currentData.기타ACC;
+                  
+                  const 누적_모자 = F당시즌 + S당시즌 + 과시즌FW + 과시즌SS + 모자;
+                  const 누적_신발 = 누적_모자 + 신발;
+                  const 누적_가방 = 누적_신발 + 가방;
+                  const 누적_기타ACC = 누적_가방 + 기타ACC;
+                  
+                  const 모자Weeks = item.모자?.stock_weeks || 0;
+                  const 신발Weeks = item.신발?.stock_weeks || 0;
+                  const 가방Weeks = item.가방?.stock_weeks || 0;
+                  const 기타ACCWeeks = item.기타ACC?.stock_weeks || 0;
+                  
+                  // 차트 설정
+                  const chartHeight = 205;
+                  const marginTop = 40;
+                  const marginLeft = 60;
+                  const yBase = marginTop + chartHeight;
+                  
+                  // 막대 너비 및 X 위치 계산 (10개 월 기준)
+                  const totalWidth = 175 - marginLeft - 30; // 전체 너비에서 여백 제외
+                  const barWidth = totalWidth / chartData.length;
+                  const barX = marginLeft + (dataIndex * barWidth) + (barWidth / 2);
+                  
+                  // Y 위치 계산
+                  const 모자Y = yBase - (누적_모자 / maxValue * chartHeight);
+                  const 신발Y = yBase - (누적_신발 / maxValue * chartHeight);
+                  const 가방Y = yBase - (누적_가방 / maxValue * chartHeight);
+                  const 기타ACCY = yBase - (누적_기타ACC / maxValue * chartHeight);
+                  
+                  return (
+                    <g key={`stock-weeks-${dataIndex}`}>
+                      {모자Weeks > 0 && (
+                        <g>
+                          <rect
+                            x={barX - 15}
+                            y={모자Y - 16}
+                            width={30}
+                            height={13}
+                            fill="white"
+                            fillOpacity={0.95}
+                            stroke="#93C5FD"
+                            strokeWidth={1}
+                            rx={2}
+                          />
+                          <text
+                            x={barX}
+                            y={모자Y - 5}
+                            textAnchor="middle"
+                            fill="#1e3a8a"
+                            fontSize="9"
+                            fontWeight="700"
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            {formatStockWeeks(모자Weeks)}주
+                          </text>
+                        </g>
+                      )}
+                      {신발Weeks > 0 && (
+                        <g>
+                          <rect
+                            x={barX - 15}
+                            y={신발Y - 16}
+                            width={30}
+                            height={13}
+                            fill="white"
+                            fillOpacity={0.95}
+                            stroke="#FCD34D"
+                            strokeWidth={1}
+                            rx={2}
+                          />
+                          <text
+                            x={barX}
+                            y={신발Y - 5}
+                            textAnchor="middle"
+                            fill="#854d0e"
+                            fontSize="9"
+                            fontWeight="700"
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            {formatStockWeeks(신발Weeks)}주
+                          </text>
+                        </g>
+                      )}
+                      {가방Weeks > 0 && (
+                        <g>
+                          <rect
+                            x={barX - 15}
+                            y={가방Y - 16}
+                            width={30}
+                            height={13}
+                            fill="white"
+                            fillOpacity={0.95}
+                            stroke="#C4B5FD"
+                            strokeWidth={1}
+                            rx={2}
+                          />
+                          <text
+                            x={barX}
+                            y={가방Y - 5}
+                            textAnchor="middle"
+                            fill="#5b21b6"
+                            fontSize="9"
+                            fontWeight="700"
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            {formatStockWeeks(가방Weeks)}주
+                          </text>
+                        </g>
+                      )}
+                      {기타ACCWeeks > 0 && (
+                        <g>
+                          <rect
+                            x={barX - 15}
+                            y={기타ACCY - 16}
+                            width={30}
+                            height={13}
+                            fill="white"
+                            fillOpacity={0.95}
+                            stroke="#F9A8D4"
+                            strokeWidth={1}
+                            rx={2}
+                          />
+                          <text
+                            x={barX}
+                            y={기타ACCY - 5}
+                            textAnchor="middle"
+                            fill="#831843"
+                            fontSize="9"
+                            fontWeight="700"
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            {formatStockWeeks(기타ACCWeeks)}주
+                          </text>
+                        </g>
+                      )}
+                    </g>
+                  );
+                })}
+              </Layer>
             </BarChart>
           </ResponsiveContainer>
+          
           </div>
-          )}
           
           {/* 범례 클릭 가능하게 만들기 */}
           <div className="mt-4">
             <div className="flex flex-wrap gap-2 justify-center">
               {[
-                { name: '전체', color: '#A855F7' },
-                { name: 'F당시즌', color: '#FCA5A5' },
-                { name: 'S당시즌', color: '#86EFAC' },
-                { name: '과시즌FW', color: '#D1D5DB' },
-                { name: '과시즌SS', color: '#E5E7EB' },
-                { name: '모자', color: '#93C5FD' },
-                { name: '신발', color: '#FCD34D' },
-                { name: '가방외', color: '#C4B5FD' }
-              ].map(item => (
+                { name: '전체', displayName: '전체', color: '#E5E7EB' },
+                { name: 'F당시즌', displayName: '🍂 25F', color: '#FFD4B3' },
+                { name: 'S당시즌', displayName: '☀️ 25S', color: '#B3E5FC' },
+                { name: '과시즌FW', displayName: '🍂 과시즌F', color: '#FFB3BA' },
+                { name: '과시즌SS', displayName: '☀️ 과시즌S', color: '#B2F5EA' },
+                { name: '모자', displayName: '🧢 모자', color: '#93C5FD' },
+                { name: '신발', displayName: '👟 신발', color: '#FCD34D' },
+                { name: '가방', displayName: '👜 가방', color: '#C4B5FD' },
+                { name: '기타ACC', displayName: '✨ 기타ACC', color: '#F9A8D4' },
+              ].map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => setSelectedInventoryItem(selectedInventoryItem === item.name ? null : item.name)}
+                  onClick={() => {
+                    setSelectedInventoryItem(selectedInventoryItem === item.name ? null : item.name);
+                  }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
                     selectedInventoryItem === item.name
                       ? 'ring-2 ring-purple-600 scale-105'
@@ -5625,112 +5848,174 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                   }`}
                   style={{ 
                     backgroundColor: item.color,
-                    color: '#1F2937'
+                    color: '#000000'
                   }}
                 >
-                  {item.name}
+                  {item.displayName}
                 </button>
               ))}
             </div>
             
             {selectedInventoryItem && (
-              <div className="mt-4 relative">
-                <DataStatusBadge status="connected" label="아이템별재고YOY" />
-                {selectedInventoryItem === '전체' ? (
+              <div className="mt-4">
+                {(() => {
+                  const months = (monthlyDashboardData?.monthly_inventory_data || []).map((item: any) => `${item.period.slice(2, 4)}월`);
+                  const inventoryYOY = monthlyDashboardData?.monthly_inventory_yoy || {};
                   
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      fSeason: idx < 6 ? inventoryItemYOY['S당시즌'][idx] : inventoryItemYOY['F당시즌'][idx], // 1~6월은 S당시즌 YOY(24F)를 F당시즌으로 표시
-                      sSeason: inventoryItemYOY['S당시즌'][idx],
-                      pastFW: inventoryItemYOY['과시즌FW'][idx],
-                      pastSS: inventoryItemYOY['과시즌SS'][idx],
-                      cap: inventoryItemYOY['모자'][idx],
-                      shoes: inventoryItemYOY['신발'][idx],
-                      bagEtc: inventoryItemYOY['가방외'][idx]
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => value ? [`${value}%`, name] : ['N/A', name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="fSeason" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} connectNulls name="F당시즌" />
-                      <Line type="monotone" dataKey="sSeason" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} connectNulls name="S당시즌" />
-                      <Line type="monotone" dataKey="pastFW" stroke="#9CA3AF" strokeWidth={3} dot={{ r: 4 }} connectNulls name="과시즌FW" />
-                      <Line type="monotone" dataKey="pastSS" stroke="#D1D5DB" strokeWidth={3} dot={{ r: 4 }} connectNulls name="과시즌SS" />
-                      <Line type="monotone" dataKey="cap" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="모자" />
-                      <Line type="monotone" dataKey="shoes" stroke="#F59E0B" strokeWidth={3} dot={{ r: 4 }} connectNulls name="신발" />
-                      <Line type="monotone" dataKey="bagEtc" stroke="#8B5CF6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="가방외" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={months.map((month: string, idx: number) => ({
-                      month,
-                      yoy: (inventoryItemYOY as any)[selectedInventoryItem]?.[idx]
-                    }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                      <Tooltip 
-                        formatter={(value, name) => value ? [`${value}%`, name] : ['N/A', name]}
-                        contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="yoy" stroke="#9333EA" strokeWidth={3} dot={{ r: 4 }} connectNulls name="YOY" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )}
-                
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
+                  if (selectedInventoryItem === '전체') {
+                    return (
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart data={months.map((month: string, idx: number) => {
+                          // 1~6월: F당시즌을 0으로, 과시즌FW는 원본 데이터 유지 (이미 프론트엔드에서 합산됨)
+                          const monthNum = idx + 1;
+                          const isFirstHalf = monthNum >= 1 && monthNum <= 6;
+                          
+                          return {
+                            month,
+                            fSeason: isFirstHalf ? 0 : (inventoryYOY['F당시즌']?.[idx] ?? null),
+                            sSeason: inventoryYOY['S당시즌']?.[idx] ?? null,
+                            pastFW: inventoryYOY['과시즌FW']?.[idx] ?? null,
+                            pastSS: inventoryYOY['과시즌SS']?.[idx] ?? null,
+                            cap: inventoryYOY['모자']?.[idx] ?? null,
+                            shoes: inventoryYOY['신발']?.[idx] ?? null,
+                            bagEtc: inventoryYOY['가방외']?.[idx] ?? null
+                          };
+                        })} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                          <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
+                          <Tooltip 
+                            formatter={(value: any, name: string) => value !== null ? [`${value}%`, name] : ['N/A', name]}
+                            contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
+                          />
+                          <ReferenceLine y={100} stroke="#000000" strokeWidth={2} strokeDasharray="5 5" label={{ value: '100%', position: 'right', fill: '#000000', fontSize: 10 }} />
+                          <Line type="monotone" dataKey="fSeason" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} connectNulls name="F당시즌" />
+                          <Line type="monotone" dataKey="sSeason" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} connectNulls name="S당시즌" />
+                          <Line type="monotone" dataKey="pastFW" stroke="#9CA3AF" strokeWidth={3} dot={{ r: 4 }} connectNulls name="과시즌FW" />
+                          <Line type="monotone" dataKey="pastSS" stroke="#D1D5DB" strokeWidth={3} dot={{ r: 4 }} connectNulls name="과시즌SS" />
+                          <Line type="monotone" dataKey="cap" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} connectNulls name="모자" />
+                          <Line type="monotone" dataKey="shoes" stroke="#FCD34D" strokeWidth={3} dot={{ r: 4 }} connectNulls name="신발" />
+                          <Line type="monotone" dataKey="bagEtc" stroke="#C4B5FD" strokeWidth={3} dot={{ r: 4 }} connectNulls name="가방외" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    );
+                  } else {
+                    const itemKey = selectedInventoryItem;
+                    const yoyData = (inventoryYOY as any)[itemKey] || [];
+                    const itemColors: { [key: string]: string } = {
+                      'F당시즌': '#EF4444',
+                      'S당시즌': '#10B981',
+                      '과시즌FW': '#9CA3AF',
+                      '과시즌SS': '#D1D5DB',
+                      '모자': '#3B82F6',
+                      '신발': '#FCD34D',
+                      '가방외': '#C4B5FD'
+                    };
+                    
+                    return (
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart data={months.map((month: string, idx: number) => ({
+                          month,
+                          value: yoyData[idx] ?? null
+                        }))} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                          <YAxis tick={{ fontSize: 11 }} domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
+                          <Tooltip 
+                            formatter={(value: any) => value !== null ? [`${value}%`, selectedInventoryItem] : ['N/A', selectedInventoryItem]}
+                            contentStyle={{ backgroundColor: "white", border: "1px solid #ccc", borderRadius: "4px", fontSize: "11px" }}
+                          />
+                          <ReferenceLine y={100} stroke="#000000" strokeWidth={2} strokeDasharray="5 5" label={{ value: '100%', position: 'right', fill: '#000000', fontSize: 10 }} />
+                          <Line 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke={itemColors[itemKey] || '#000000'} 
+                            strokeWidth={3} 
+                            dot={{ r: 4 }} 
+                            connectNulls 
+                            name={selectedInventoryItem}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    );
+                  }
+                })()}
+              </div>
+            )}
+            
+            {/* 재고 YOY 데이터 테이블 - 범례 클릭 시에만 표시 */}
+            {selectedInventoryItem && (
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold text-gray-800 mb-2">재고 YOY 데이터</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[10px] border-collapse">
                     <thead>
                       <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-2 py-1 text-left font-semibold">{selectedInventoryItem === '전체' ? '아이템' : selectedInventoryItem}</th>
-                        {months.map((month: string) => (
-                          <th key={month} className="border border-gray-300 px-2 py-1 text-center font-semibold">{month}</th>
-                        ))}
+                        <th className="border border-gray-300 px-1 py-1 text-left font-semibold">아이템</th>
+                        {(() => {
+                          const months = (monthlyDashboardData?.monthly_inventory_data || []).map((item: any) => `${item.period.slice(2, 4)}월`);
+                          return months.map((month: string) => (
+                            <th key={month} className="border border-gray-300 px-1 py-1 text-center font-semibold">{month}</th>
+                          ));
+                        })()}
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedInventoryItem === '전체' ? (
-                        <>
-                          {['F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방외'].map(item => (
-                            <tr key={item}>
-                              <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">{item}</td>
-                              {(inventoryItemYOY as any)[item].map((yoy: number, idx: number) => {
-                                // 1~6월 F당시즌은 S당시즌 YOY를 표시
-                                const displayYoy = (item === 'F당시즌' && idx < 6) 
-                                  ? (inventoryItemYOY as any)['S당시즌'][idx] 
-                                  : yoy;
-                                return (
-                                  <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
-                                    {displayYoy === null ? '-' : `${displayYoy}%`}
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          ))}
-                        </>
-                      ) : (
-                        <tr>
-                          <td className="border border-gray-300 px-2 py-1 font-semibold bg-purple-50">YOY</td>
-                          {(inventoryItemYOY as any)[selectedInventoryItem].map((yoy: number, idx: number) => {
-                            // F당시즌 선택 시 1~6월은 S당시즌 YOY 표시
-                            const displayYoy = (selectedInventoryItem === 'F당시즌' && idx < 6)
-                              ? (inventoryItemYOY as any)['S당시즌'][idx]
-                              : yoy;
-                            return (
-                              <td key={idx} className={`border border-gray-300 px-2 py-1 text-center font-bold ${displayYoy === null ? 'text-gray-400' : displayYoy >= 100 ? 'text-red-600' : 'text-green-600'}`}>
-                                {displayYoy === null ? '-' : `${displayYoy}%`}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      )}
+                      {(() => {
+                        const months = (monthlyDashboardData?.monthly_inventory_data || []).map((item: any) => `${item.period.slice(2, 4)}월`);
+                        const inventoryYOY = monthlyDashboardData?.monthly_inventory_yoy || {};
+                        const itemKeys = selectedInventoryItem === '전체' 
+                          ? ['전체합계', 'F당시즌', 'S당시즌', '과시즌FW', '과시즌SS', '모자', '신발', '가방', '기타ACC']
+                          : [selectedInventoryItem];
+                        
+                        return itemKeys.map((itemKey: string) => (
+                          <tr key={itemKey} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-1 py-1 font-semibold bg-gray-50">
+                              {itemKey === '전체합계' && '전체합계'}
+                              {itemKey === 'F당시즌' && '🍂 25F'}
+                              {itemKey === 'S당시즌' && '☀️ 25S'}
+                              {itemKey === '과시즌FW' && '🍂 과시즌F'}
+                              {itemKey === '과시즌SS' && '☀️ 과시즌S'}
+                              {itemKey === '모자' && '🧢 모자'}
+                              {itemKey === '신발' && '👟 신발'}
+                              {itemKey === '가방' && '👜 가방'}
+                              {itemKey === '기타ACC' && '✨ 기타ACC'}
+                            </td>
+                            {months.map((month: string, idx: number) => {
+                              // 1~6월: F당시즌을 0으로 표시
+                              const monthNum = idx + 1;
+                              const isFirstHalf = monthNum >= 1 && monthNum <= 6;
+                              
+                              let yoyValue =
+                                itemKey === '전체합계'
+                                  ? overallInventoryYoy[idx]
+                                  : (inventoryYOY as any)[itemKey]?.[idx];
+                              
+                              // 1~6월의 F당시즌은 0으로 표시
+                              if (itemKey === 'F당시즌' && isFirstHalf) {
+                                yoyValue = 0;
+                              }
+                              
+                              const displayValue = yoyValue !== null && yoyValue !== undefined ? `${yoyValue}%` : '-';
+                              const isPositive = yoyValue !== null && yoyValue !== undefined && yoyValue < 100;
+                              const isNegative = yoyValue !== null && yoyValue !== undefined && yoyValue > 100;
+                              
+                              return (
+                                <td 
+                                  key={month}
+                                  className={`border border-gray-300 px-1 py-1 text-center ${
+                                    isPositive ? 'text-green-600 font-semibold' : 
+                                    isNegative ? 'text-red-600 font-semibold' : 
+                                    'text-gray-700'
+                                  }`}
+                                >
+                                  {displayValue}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ));
+                      })()}
                     </tbody>
                   </table>
                 </div>
@@ -5738,29 +6023,36 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             )}
           </div>
           
-          {/* 인사이트 카드 이동 */}
+          {/* 주요 인사이트 */}
           <div className="mt-3 grid grid-cols-3 gap-1">
             <div className="bg-red-50 border border-red-200 rounded-lg p-1.5">
-              <h4 className="text-xs font-bold text-red-800 mb-1">🚨 Critical Alert</h4>
+              <h4 className="text-xs font-bold text-red-800 mb-1">▲ Critical Alert</h4>
               <div className="space-y-0.5 text-xs text-red-700">
-                <div>• 과시즌FW 재고 YOY 139% 급증</div>
-                <div>• 과시즌SS 재고 YOY 122% 증가</div>
-                <div>• 총재고 384,314K (전년비 △8.5%)</div>
+                <div>• 과시즌FW 재고 YOY {Math.round((monthlyDashboardData?.ending_inventory?.past_season_fw?.total?.yoy || 0))}% 급증</div>
+                <div>• 과시즌SS 재고 YOY {Math.round((monthlyDashboardData?.ending_inventory?.by_season?.과시즌_SS?.yoy || 0))}% 증가</div>
+                <div>• 총재고 {Math.round((monthlyDashboardData?.ending_inventory?.total?.current || 0))}K (YOY {Math.round((monthlyDashboardData?.ending_inventory?.total?.yoy || 0))}%)</div>
               </div>
             </div>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-1.5">
-              <h4 className="text-xs font-bold text-orange-800 mb-1">⚠️ Risk Monitoring</h4>
+              <h4 className="text-xs font-bold text-orange-800 mb-1">▲ Risk Monitoring</h4>
               <div className="space-y-0.5 text-xs text-orange-700">
-                <div>• 신발 재고주수 48.0주 (전년 51.7주)</div>
-                <div>• 가방외 재고주수 40.8주 (전년 35.2주)</div>
-                <div>• F당시즌 YOY 54% 정상화 중</div>
+                <div>• 신발 재고주수 {formatStockWeeks(monthlyDashboardData?.acc_stock_summary?.by_category?.SHO?.current?.stock_weeks || 0)}주 (전년 {formatStockWeeks(monthlyDashboardData?.acc_stock_summary?.by_category?.SHO?.previous?.stock_weeks || 0)}주)</div>
+                {(() => {
+                  const current = monthlyDashboardData?.acc_stock_summary?.by_category?.BAG?.current?.stock_weeks || 0;
+                  const previous = monthlyDashboardData?.acc_stock_summary?.by_category?.BAG?.previous?.stock_weeks || 0;
+                  const isIncrease = current > previous;
+                  return (
+                    <div>• 가방외 재고주수 {formatStockWeeks(current)}주 (전년 {formatStockWeeks(previous)}주) {isIncrease ? '증가' : '감소'}</div>
+                  );
+                })()}
+                <div>• F당시즌 YOY {Math.round((monthlyDashboardData?.ending_inventory?.by_season?.당시즌_의류?.yoy || 0))}% 정상화 중</div>
               </div>
             </div>
             <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
-              <h4 className="text-xs font-bold text-green-800 mb-1">✅ Positive Sign</h4>
+              <h4 className="text-xs font-bold text-green-800 mb-1">✓ Positive Sign</h4>
               <div className="space-y-0.5 text-xs text-green-700">
-                <div>• 신발 재고 YOY 86% 개선</div>
-                <div>• 가방외 재고 YOY 75% 개선</div>
+                <div>• 신발 재고 YOY {Math.round((monthlyDashboardData?.ending_inventory?.acc_by_category?.SHO?.yoy || 0))}% 개선</div>
+                <div>• 가방외 재고 YOY {Math.round((monthlyDashboardData?.ending_inventory?.acc_by_category?.BAG?.yoy || 0))}% 개선</div>
                 <div>• 9월 임시매장 운영으로 과시즌SS 대폭 소진</div>
               </div>
             </div>
@@ -5777,7 +6069,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 const p = period || '2510';
                 const year = parseInt(p.substring(0, 2)) + 2000;
                 const month = parseInt(p.substring(2, 4));
-                return `${year % 100}년 ${month}월`;
+                return `${year % 100}년 1월~${month}월 누적`;
               })()} 기준)
             </h3>
             <div className="flex items-center gap-2">
@@ -5823,14 +6115,15 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           
           {(() => {
             // 동적으로 카드 개수 계산 (전체 요약 1 + 홍콩 카드들 + 마카오 1)
+            const storeData = cumulativeStoreStatusData || storeStatusData;
             const hkCardCount = [
-              storeStatusData?.categories?.profit_improving?.count,
-              storeStatusData?.categories?.profit_deteriorating?.count,
-              storeStatusData?.categories?.loss_improving?.count,
-              storeStatusData?.categories?.loss_deteriorating?.count
+              storeData?.categories?.profit_improving?.count,
+              storeData?.categories?.profit_deteriorating?.count,
+              storeData?.categories?.loss_improving?.count,
+              storeData?.categories?.loss_deteriorating?.count
             ].filter(count => count && count > 0).length;
             
-            const mcCardCount = storeStatusData?.mc_summary?.count > 0 ? 1 : 0;
+            const mcCardCount = storeData?.mc_summary?.count > 0 ? 1 : 0;
             const totalCards = 1 + hkCardCount + mcCardCount; // 전체 요약 1 + 홍콩 + 마카오
             
             return (
@@ -5856,7 +6149,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     {formatNumber(dailySalesPerPyeong)} HKD
                   </div>
                   <div className="text-slate-300 text-[10px]">
-                    (면적: {formatNumber(totalArea)}평 | {currentMonth}월: {currentMonthDays}일)
+                    (면적: {formatNumber(totalArea)}평 | 누적: {cumulativeDays}일)
                   </div>
                   <div className="text-[9px] text-slate-400 mt-1">
                     *M10A는 M10 포함, 폐점+저매출 매장 제외
@@ -5867,8 +6160,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <div className="pt-2 border-t border-slate-600">
                   <div className="flex items-center justify-between">
                     <div className="text-slate-300 text-[10px]">전체 직접이익</div>
-                    <div className={`font-bold text-sm ${(storeStatusData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatNumber(Math.round(storeStatusData?.summary?.total_direct_profit || 0))}K HKD
+                    <div className={`font-bold text-sm ${((cumulativeStoreStatusData || storeStatusData)?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatNumber(Math.round((cumulativeStoreStatusData || storeStatusData)?.summary?.total_direct_profit || 0))}K HKD
                   </div>
                 </div>
                       </div>
@@ -5876,28 +6169,28 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {/* 홍콩 오프라인 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="text-white font-semibold text-xs mb-2">
-                    홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)
+                    홍콩 오프라인 ({((cumulativeStoreStatusData || storeStatusData)?.summary?.hk_stores || 0)}개, 리뉴얼 1개 포함)
                       </div>
                   <div className="grid grid-cols-4 gap-2">
                     <div className="bg-green-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold text-center">흑자 & 성장</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{((cumulativeStoreStatusData || storeStatusData)?.categories?.profit_improving?.count || 0)}개</span>
                       </div>
                     <div className="bg-blue-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-orange-300 text-sm">▲</span>
                       <span className="text-white text-xs font-semibold text-center">흑자 & 악화</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{((cumulativeStoreStatusData || storeStatusData)?.categories?.profit_deteriorating?.count || 0)}개</span>
                       </div>
                     <div className="bg-amber-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold text-center">적자 & 성장</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{((cumulativeStoreStatusData || storeStatusData)?.categories?.loss_improving?.count || 0)}개</span>
                     </div>
                     <div className="bg-red-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-red-200 text-sm">↓</span>
                       <span className="text-white text-xs font-semibold text-center">적자 & 악화</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{((cumulativeStoreStatusData || storeStatusData)?.categories?.loss_deteriorating?.count || 0)}개</span>
                 </div>
                   </div>
                   <div className="mt-2">
@@ -5911,14 +6204,15 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {/* 마카오 매장 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="text-white font-semibold text-xs mb-2">
-                    마카오 매장 ({storeStatusData?.summary?.mc_stores || 0}개)
+                    마카오 매장 ({((cumulativeStoreStatusData || storeStatusData)?.summary?.mc_stores || 0)}개)
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold">흑자</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          const storeData = cumulativeStoreStatusData || storeStatusData;
+                          const mcStores = storeData?.mc_summary?.stores || [];
                           return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
                         })()}개</span>
                       </div>
@@ -5926,7 +6220,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold">적자 (Senado)</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          const storeData = cumulativeStoreStatusData || storeStatusData;
+                          const mcStores = storeData?.mc_summary?.stores || [];
                           return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
                         })()}개</span>
                       </div>
@@ -5960,8 +6255,15 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <span className="text-white font-semibold text-xs">전략 인사이트</span>
                             </div>
                   <div className="text-[10px] text-slate-200 space-y-1.5">
-                    <div>적자 {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개 매장 집중 관리 필요 (HK {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개, MC {(() => {
-                      const mcStores = storeStatusData?.mc_summary?.stores || [];
+                    <div>적자 {((() => {
+                      const storeData = cumulativeStoreStatusData || storeStatusData;
+                      return ((storeData?.categories?.loss_improving?.count || 0) + (storeData?.categories?.loss_deteriorating?.count || 0));
+                    })())}개 매장 집중 관리 필요 (HK {((() => {
+                      const storeData = cumulativeStoreStatusData || storeStatusData;
+                      return ((storeData?.categories?.loss_improving?.count || 0) + (storeData?.categories?.loss_deteriorating?.count || 0));
+                    })())}개, MC {(() => {
+                      const storeData = cumulativeStoreStatusData || storeStatusData;
+                      const mcStores = storeData?.mc_summary?.stores || [];
                       return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
                     })()}개), Yoho-NTP3-Time Sq 우선 개선 대상</div>
                     <div className="flex items-start gap-1.5">
@@ -5975,7 +6277,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             
             {/* 흑자 & 성장 */}
             {(() => {
-              const cat = storeStatusData?.categories?.profit_improving;
+              const storeData = cumulativeStoreStatusData || storeStatusData;
+              const cat = storeData?.categories?.profit_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-green-50 rounded-lg p-3 border-2 border-green-400 min-w-0">
@@ -6103,7 +6406,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             
             {/* 흑자 & 매출악화 */}
             {(() => {
-              const cat = storeStatusData?.categories?.profit_deteriorating;
+              const storeData = cumulativeStoreStatusData || storeStatusData;
+              const cat = storeData?.categories?.profit_deteriorating;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-400 min-w-0">
@@ -6231,7 +6535,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             
             {/* 적자 & 성장 */}
             {(() => {
-              const cat = storeStatusData?.categories?.loss_improving;
+              const storeData = cumulativeStoreStatusData || storeStatusData;
+              const cat = storeData?.categories?.loss_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-yellow-50 rounded-lg p-3 border-2 border-yellow-400 min-w-0">
@@ -6358,7 +6663,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
             
             {/* 적자 & 매출악화 */}
             {(() => {
-              const cat = storeStatusData?.categories?.loss_deteriorating;
+              const storeData = cumulativeStoreStatusData || storeStatusData;
+              const cat = storeData?.categories?.loss_deteriorating;
               if (!cat || cat.count === 0) return null;
               // LCX 제외 (리뉴얼 중)
               const storesWithoutLCX = cat.stores.filter((s: any) => s.shop_cd !== 'M05');

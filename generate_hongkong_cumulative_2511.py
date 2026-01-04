@@ -368,9 +368,9 @@ def generate_cumulative_dashboard_data(csv_file_path, output_file_path, target_p
             season_summary[season_key]['season_code'] = season_code
             season_summary[season_key]['season_type'] = season_type
         
-        season_summary[season_key]['previous']['gross_sales'] += gross_sales
-        season_summary[season_key]['previous']['net_sales'] += net_sales
-        season_summary[season_key]['previous']['sales_qty'] += sales_qty
+            season_summary[season_key]['previous']['gross_sales'] += gross_sales
+            season_summary[season_key]['previous']['net_sales'] += net_sales
+            season_summary[season_key]['previous']['sales_qty'] += sales_qty
         
         # 25F의 전년 동기 데이터는 24F 누적 데이터이므로 매핑
         # 25S의 전년 동기 데이터는 24S 누적 데이터이므로 매핑
