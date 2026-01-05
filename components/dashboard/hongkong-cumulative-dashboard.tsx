@@ -897,13 +897,20 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   const allHKStores = useMemo(() => {
     if (!storeStatusData?.categories) return [];
     
-    // 모든 매장 수집
+    // 모든 매장 수집 (누적 대시보드에서는 LCX 포함)
     const allStores = [
       ...(storeStatusData?.categories?.profit_improving?.stores || []),
       ...(storeStatusData?.categories?.profit_deteriorating?.stores || []),
       ...(storeStatusData?.categories?.loss_improving?.stores || []),
       ...(storeStatusData?.categories?.loss_deteriorating?.stores || [])
     ];
+    
+    // 누적 대시보드에서는 LCX(M05) 포함 (excluded_stores에서 추가)
+    const excludedStores = storeStatusData?.excluded_stores?.stores || [];
+    const lcxStore = excludedStores.find((s: any) => s.shop_cd === 'M05');
+    if (lcxStore && !allStores.find((s: any) => s.shop_cd === 'M05')) {
+      allStores.push(lcxStore);
+    }
     
     // 누적 데이터로 변환: 누적 직접이익 계산
     // 직접이익 = 매출총이익 - 직접비
@@ -913,6 +920,33 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
     
     return allStores.map((store: any) => {
       const storeCode = store.shop_cd || store.shop_code;
+      
+      // JSON에 추가된 cumulative 데이터가 있으면 우선 사용 (CSV에서 계산된 정확한 값)
+      if (store.current?.cumulative?.direct_profit !== undefined) {
+        const cumulativeData = store.current.cumulative;
+        const prevCumulativeData = store.previous?.cumulative || {};
+        
+        return {
+          ...store,
+          current: {
+            ...store.current,
+            direct_profit: cumulativeData.direct_profit,
+            net_sales: cumulativeData.net_sales,
+            rent: cumulativeData.rent || store.current.rent,
+            labor_cost: cumulativeData.labor_cost || store.current.labor_cost
+          },
+          previous: {
+            ...store.previous,
+            direct_profit: prevCumulativeData.direct_profit || 0,
+            net_sales: prevCumulativeData.net_sales || 0,
+            rent: prevCumulativeData.rent || store.previous?.rent,
+            labor_cost: prevCumulativeData.labor_cost || store.previous?.labor_cost
+          },
+          yoy: store.cumulative_yoy || store.yoy || 0
+        };
+      }
+      
+      // cumulative 데이터가 없으면 기존 방식 사용 (fallback)
       const cumulativeStoreCosts = cumulativeStores[storeCode];
       const cumulativeStoreSales = storeSummary[storeCode];
       
@@ -1021,8 +1055,9 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
   const cumulativeStoreStatusData = useMemo(() => {
     if (!storeStatusData || !allHKStores.length) return storeStatusData;
     
-    // 누적 직접이익 합계 계산
-    const totalDirectProfit = allHKStores.reduce((sum: number, store: any) => sum + (store?.current?.direct_profit || 0), 0);
+    // 누적 직접이익 합계: JSON에서 가져온 cumulative_direct_profit 값 사용 (CSV에서 계산된 누적 데이터)
+    const totalDirectProfit = storeStatusData?.summary?.cumulative_direct_profit ?? 
+      allHKStores.reduce((sum: number, store: any) => sum + (store?.current?.direct_profit || 0), 0);
     
     // 카테고리별 재분류 (누적 직접이익 기준)
     const profitImproving: any[] = [];
@@ -1034,24 +1069,31 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
       const directProfit = store?.current?.direct_profit || 0;
       const yoy = store?.yoy || 0;
       
+      // 카테고리 결정 및 store 객체에 category 추가
+      let category: string;
       if (directProfit >= 0) {
         // 흑자
         if (yoy >= 100) {
-          profitImproving.push(store);
+          category = 'profit_improving';
+          profitImproving.push({ ...store, category });
         } else {
-          profitDeteriorating.push(store);
+          category = 'profit_deteriorating';
+          profitDeteriorating.push({ ...store, category });
         }
       } else {
         // 적자
         if (yoy >= 100) {
-          lossImproving.push(store);
+          category = 'loss_improving';
+          lossImproving.push({ ...store, category });
         } else {
-          lossDeteriorating.push(store);
+          category = 'loss_deteriorating';
+          lossDeteriorating.push({ ...store, category });
         }
       }
     });
     
-    // 카테고리별 평균 YOY 및 임차료/인건비율 계산 (누적 데이터 기준)
+    // 카테고리별 평균 YOY 및 임차료/인건비율 계산
+    // 임차료/인건비율은 store.current의 월별 데이터(원본 JSON 데이터)를 사용 (K HKD 단위)
     const calculateCategoryStats = (stores: any[]) => {
       if (stores.length === 0) return { avg_yoy: 0, avg_rent_labor_ratio: 0 };
       
@@ -1060,10 +1102,28 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
         ? validYoyStores.reduce((sum: number, s: any) => sum + (s.yoy || 0), 0) / validYoyStores.length
         : 0;
       
-      // 누적 임차료/인건비율 계산
-      const totalRent = stores.reduce((sum: number, s: any) => sum + (s.current?.rent || 0), 0);
-      const totalLabor = stores.reduce((sum: number, s: any) => sum + (s.current?.labor_cost || 0), 0);
-      const totalSales = stores.reduce((sum: number, s: any) => sum + (s.current?.net_sales || 0), 0);
+      // 임차료/인건비율 계산: 원본 JSON의 월별 데이터 사용 (K HKD 단위)
+      // allHKStores는 cumulative 데이터로 변환되어 net_sales가 HKD 원본 단위일 수 있으므로,
+      // 원본 JSON의 월별 데이터(storeStatusData.categories)에서 직접 가져와야 함
+      let totalRent = 0;
+      let totalLabor = 0;
+      let totalSales = 0;
+      
+      stores.forEach((s: any) => {
+        // 원본 JSON에서 해당 매장 찾기
+        const originalStore = storeStatusData?.categories?.['profit_improving']?.stores?.find((st: any) => st.shop_cd === s.shop_cd) ||
+                              storeStatusData?.categories?.['profit_deteriorating']?.stores?.find((st: any) => st.shop_cd === s.shop_cd) ||
+                              storeStatusData?.categories?.['loss_improving']?.stores?.find((st: any) => st.shop_cd === s.shop_cd) ||
+                              storeStatusData?.categories?.['loss_deteriorating']?.stores?.find((st: any) => st.shop_cd === s.shop_cd);
+        
+        if (originalStore?.current) {
+          // 원본 JSON의 월별 데이터 사용 (K HKD 단위로 통일됨)
+          totalRent += originalStore.current.rent || 0;
+          totalLabor += originalStore.current.labor_cost || 0;
+          totalSales += originalStore.current.net_sales || 0;
+        }
+      });
+      
       const avgRentLaborRatio = totalSales > 0 ? ((totalRent + totalLabor) / totalSales * 100) : 0;
       
       return { avg_yoy: avgYoy, avg_rent_labor_ratio: avgRentLaborRatio };
@@ -1087,7 +1147,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           count: profitImproving.length,
           total_direct_profit: profitImproving.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
           avg_yoy: profitImprovingStats.avg_yoy,
-          avg_rent_labor_ratio: profitImprovingStats.avg_rent_labor_ratio
+          avg_rent_labor_ratio: storeStatusData.categories?.profit_improving?.avg_rent_labor_ratio || 0  // JSON 원본 값 사용 (월별 데이터 기준)
         },
         profit_deteriorating: {
           ...storeStatusData.categories?.profit_deteriorating,
@@ -1095,7 +1155,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           count: profitDeteriorating.length,
           total_direct_profit: profitDeteriorating.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
           avg_yoy: profitDeterioratingStats.avg_yoy,
-          avg_rent_labor_ratio: profitDeterioratingStats.avg_rent_labor_ratio
+          avg_rent_labor_ratio: profitDeterioratingStats.avg_rent_labor_ratio  // 재분류된 매장 기준으로 계산
         },
         loss_improving: {
           ...storeStatusData.categories?.loss_improving,
@@ -1103,7 +1163,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           count: lossImproving.length,
           total_direct_profit: lossImproving.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
           avg_yoy: lossImprovingStats.avg_yoy,
-          avg_rent_labor_ratio: lossImprovingStats.avg_rent_labor_ratio
+          avg_rent_labor_ratio: storeStatusData.categories?.loss_improving?.avg_rent_labor_ratio || 0  // JSON 원본 값 사용
         },
         loss_deteriorating: {
           ...storeStatusData.categories?.loss_deteriorating,
@@ -1111,7 +1171,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
           count: lossDeteriorating.length,
           total_direct_profit: lossDeteriorating.reduce((sum: number, s: any) => sum + (s?.current?.direct_profit || 0), 0),
           avg_yoy: lossDeterioratingStats.avg_yoy,
-          avg_rent_labor_ratio: lossDeterioratingStats.avg_rent_labor_ratio
+          avg_rent_labor_ratio: lossDeterioratingStats.avg_rent_labor_ratio  // 재분류된 매장 기준으로 계산
         }
       }
     };
@@ -2051,8 +2111,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 {formatPercent(plData?.cumulative?.total?.discount_rate || 0, 1)}%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(prevCumulativeDiscountRate, 1)}%</span> | 
-                <span className={((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate) <= 0 ? 'text-green-600' : 'text-red-600'}> 전년비 {((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate) <= 0 ? '-' : '+'}{formatPercent(Math.abs((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate), 1)}%p</span>
+                <span className={((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate) <= 0 ? 'text-green-600' : 'text-red-600'}> {((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate) <= 0 ? '△' : '+'}{formatPercent(Math.abs((plData?.cumulative?.total?.discount_rate || 0) - prevCumulativeDiscountRate), 1)}%p</span>
               </div>
               
               {/* 할인 상세보기 */}
@@ -2075,28 +2134,49 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <span className="text-gray-600">HK (홍콩)</span>
                     <span className="font-semibold text-purple-600">
                       {formatPercent(plData?.cumulative?.hk?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.hk?.discount_rate || 0) - prevCumulativeHKDiscountRate, 1)}%p)</span>
+                      <span className={((plData?.cumulative?.hk?.discount_rate || 0) - prevCumulativeHKDiscountRate) <= 0 ? 'text-green-600' : 'text-red-600'}> ({((plData?.cumulative?.hk?.discount_rate || 0) - prevCumulativeHKDiscountRate) <= 0 ? '△' : '+'}{formatPercent(Math.abs((plData?.cumulative?.hk?.discount_rate || 0) - prevCumulativeHKDiscountRate), 1)}%p)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatPercent(hkRetail?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkRetail?.previous?.discount_rate || 0, 1)}%)</span>
+                      {(() => {
+                        const current = hkRetail?.current?.discount_rate || 0;
+                        const previous = hkRetail?.previous?.discount_rate || 0;
+                        const change = current - previous;
+                        return change !== 0 ? (
+                          <span className={change <= 0 ? 'text-green-600' : 'text-red-600'}> ({change <= 0 ? '△' : '+'}{formatPercent(Math.abs(change), 1)}%p)</span>
+                        ) : null;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatPercent(hkOutlet?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkOutlet?.previous?.discount_rate || 0, 1)}%)</span>
+                      {(() => {
+                        const current = hkOutlet?.current?.discount_rate || 0;
+                        const previous = hkOutlet?.previous?.discount_rate || 0;
+                        const change = current - previous;
+                        return change !== 0 ? (
+                          <span className={change <= 0 ? 'text-green-600' : 'text-red-600'}> ({change <= 0 ? '△' : '+'}{formatPercent(Math.abs(change), 1)}%p)</span>
+                        ) : null;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 온라인</span>
                     <span className="font-semibold">
                       {formatPercent(hkOnline?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(hkOnline?.previous?.discount_rate || 0, 1)}%)</span>
+                      {(() => {
+                        const current = hkOnline?.current?.discount_rate || 0;
+                        const previous = hkOnline?.previous?.discount_rate || 0;
+                        const change = current - previous;
+                        return change !== 0 ? (
+                          <span className={change <= 0 ? 'text-green-600' : 'text-red-600'}> ({change <= 0 ? '△' : '+'}{formatPercent(Math.abs(change), 1)}%p)</span>
+                        ) : null;
+                      })()}
                     </span>
                   </div>
                   
@@ -2104,21 +2184,35 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <span className="text-gray-700">MC (마카오)</span>
                     <span className="text-purple-600">
                       {formatPercent(plData?.cumulative?.mc?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent((plData?.cumulative?.mc?.discount_rate || 0) - prevCumulativeMCDiscountRate, 1)}%p)</span>
+                      <span className={((plData?.cumulative?.mc?.discount_rate || 0) - prevCumulativeMCDiscountRate) <= 0 ? 'text-green-600' : 'text-red-600'}> ({((plData?.cumulative?.mc?.discount_rate || 0) - prevCumulativeMCDiscountRate) <= 0 ? '△' : '+'}{formatPercent(Math.abs((plData?.cumulative?.mc?.discount_rate || 0) - prevCumulativeMCDiscountRate), 1)}%p)</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 정상</span>
                     <span className="font-semibold">
                       {formatPercent(mcRetail?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(mcRetail?.previous?.discount_rate || 0, 1)}%)</span>
+                      {(() => {
+                        const current = mcRetail?.current?.discount_rate || 0;
+                        const previous = mcRetail?.previous?.discount_rate || 0;
+                        const change = current - previous;
+                        return change !== 0 ? (
+                          <span className={change <= 0 ? 'text-green-600' : 'text-red-600'}> ({change <= 0 ? '△' : '+'}{formatPercent(Math.abs(change), 1)}%p)</span>
+                        ) : null;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pl-3">
                     <span className="text-gray-600">- 아울렛</span>
                     <span className="font-semibold">
                       {formatPercent(mcOutlet?.current?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(mcOutlet?.previous?.discount_rate || 0, 1)}%)</span>
+                      {(() => {
+                        const current = mcOutlet?.current?.discount_rate || 0;
+                        const previous = mcOutlet?.previous?.discount_rate || 0;
+                        const change = current - previous;
+                        return change !== 0 ? (
+                          <span className={change <= 0 ? 'text-green-600' : 'text-red-600'}> ({change <= 0 ? '△' : '+'}{formatPercent(Math.abs(change), 1)}%p)</span>
+                        ) : null;
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -3147,7 +3241,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <div>
                   <div className="text-xs text-gray-500 mb-1">25F (당시즌)</div>
                   <div className="text-2xl font-bold text-orange-600">
-                    {formatNumber(Math.round((season25F?.current?.net_sales || 0) / 1000))}K
+                    {formatNumber(Math.round((season25F?.current?.net_sales || 0) / 1000))}
                   </div>
                   <div className="text-xs font-semibold">
                     {(() => {
@@ -3167,7 +3261,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <div>
                   <div className="text-xs text-gray-500 mb-1">ACC</div>
                   <div className="text-2xl font-bold text-blue-600">
-                    {formatNumber(Math.round((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / 1000))}K
+                    {formatNumber(Math.round((dashboardData?.acc_sales_data?.current?.total?.net_sales || 0) / 1000))}
                   </div>
                   <div className="text-xs font-semibold">
                     {(() => {
@@ -3215,7 +3309,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                                 <div key={idx} className="flex justify-between text-xs">
                                   <span className="text-gray-600">{item.subcategory_code}</span>
                                   <span className="font-semibold">
-                                    {formatNumber(Math.round(item.net_sales))}K  {/* 이미 1K HKD 단위 */}
+                                    {formatNumber(Math.round(item.net_sales))}  {/* 이미 1K HKD 단위 */}
                                     <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                                   </span>
                 </div>
@@ -3241,7 +3335,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                                 <div key={category} className="flex justify-between text-xs">
                                   <span className="text-gray-600">{category}</span>
                                   <span className="font-semibold">
-                                    {formatNumber(Math.round((categoryData?.net_sales || 0) / 1000))}K  {/* HKD -> 1K HKD 변환 */}
+                                    {formatNumber(Math.round((categoryData?.net_sales || 0) / 1000))}  {/* HKD -> 1K HKD 변환 */}
                                     <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
                                   </span>
                                 </div>
@@ -3250,7 +3344,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             <div className="flex justify-between text-xs font-semibold border-t pt-0.5 mt-0.5">
                               <span className="text-gray-700">악세 합계</span>
                               <span className="text-indigo-600">
-                                {formatNumber(Math.round((cumulativeAccSales?.current?.total?.net_sales || 0) / 1000))}K  {/* HKD -> 1K HKD 변환 */}
+                                {formatNumber(Math.round((cumulativeAccSales?.current?.total?.net_sales || 0) / 1000))}  {/* HKD -> 1K HKD 변환 */}
                                 <span className={(() => {
                                   const currentTotal = cumulativeAccSales?.current?.total?.net_sales || 0;
                                   const previousTotal = cumulativeAccSales?.previous?.total?.net_sales || 1;
@@ -3349,7 +3443,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                       return (
                         <>
                           <span className={`text-sm font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatNumber(Math.round(current / 1000))}K
+                            {formatNumber(Math.round(current / 1000))}
                   </span>
                           <div className={`text-xs font-semibold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             YOY {formatPercent(yoy)}%
@@ -3369,7 +3463,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                       return (
                         <>
                           <span className={`text-sm font-bold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatNumber(Math.round(current / 1000))}K
+                            {formatNumber(Math.round(current / 1000))}
                   </span>
                           <div className={`text-xs font-semibold ${yoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                             YOY {formatPercent(yoy)}%
@@ -6160,8 +6254,16 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                 <div className="pt-2 border-t border-slate-600">
                   <div className="flex items-center justify-between">
                     <div className="text-slate-300 text-[10px]">전체 직접이익</div>
-                    <div className={`font-bold text-sm ${((cumulativeStoreStatusData || storeStatusData)?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatNumber(Math.round((cumulativeStoreStatusData || storeStatusData)?.summary?.total_direct_profit || 0))}K HKD
+                    {(() => {
+                      // JSON에서 가져온 누적 직접이익 값 사용 (CSV에서 계산된 값)
+                      const cumulativeDirectProfit = (cumulativeStoreStatusData || storeStatusData)?.summary?.cumulative_direct_profit ?? 
+                        (cumulativeStoreStatusData || storeStatusData)?.summary?.total_direct_profit ?? 0;
+                      return (
+                        <div className={`font-bold text-sm ${cumulativeDirectProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatNumber(Math.round(cumulativeDirectProfit))}K HKD
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
                       </div>
@@ -6273,7 +6375,6 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                         </div>
                     </div>
               </div>
-            </div>
             
             {/* 흑자 & 성장 */}
             {(() => {
@@ -6290,7 +6391,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     </div>
                     <div>
                       <div className="text-green-700">직접이익 합계</div>
-                      <div className="font-bold text-green-900">+{Math.round(cat.total_direct_profit)}K</div>
+                      <div className="font-bold text-green-900">+{formatNumber(Math.round(cat.total_direct_profit))}K</div>
                       <div className="text-green-600">| 평균 YOY: {Math.round(cat.avg_yoy)}%</div>
                     </div>
                   </div>
@@ -6334,7 +6435,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                                {store.current.direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(store.current.direct_profit))}K
                               </div>
                               <div className="text-green-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
                             </div>
@@ -6404,14 +6505,14 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               );
             })()}
             
-            {/* 흑자 & 매출악화 */}
+            {/* 흑자 & 역성장 */}
             {(() => {
               const storeData = cumulativeStoreStatusData || storeStatusData;
               const cat = storeData?.categories?.profit_deteriorating;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-400 min-w-0">
-                  <h4 className="text-sm font-bold text-blue-800 mb-2">흑자 & 매출악화</h4>
+                  <h4 className="text-sm font-bold text-blue-800 mb-2">흑자 & 역성장</h4>
                   <div className="text-xs text-blue-700 mb-1 font-semibold">▲주의</div>
                   <div className="space-y-2 text-xs mb-3">
                     <div>
@@ -6419,7 +6520,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     </div>
                     <div>
                       <div className="text-blue-700">직접이익 합계</div>
-                      <div className="font-bold text-blue-900">+{Math.round(cat.total_direct_profit)}K</div>
+                      <div className="font-bold text-blue-900">+{formatNumber(Math.round(cat.total_direct_profit))}K</div>
                       <div className="text-blue-600">| 평균 YOY: {Math.round(cat.avg_yoy)}%</div>
                     </div>
                   </div>
@@ -6463,7 +6564,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                                {store.current.direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(store.current.direct_profit))}K
                               </div>
                               <div className="text-blue-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
                             </div>
@@ -6548,7 +6649,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     </div>
                     <div>
                       <div className="text-yellow-700">직접손실 합계</div>
-                      <div className="font-bold text-red-600">{Math.round(cat.total_direct_profit)}K</div>
+                      <div className="font-bold text-red-600">{formatNumber(Math.round(cat.total_direct_profit))}K</div>
                       <div className="text-yellow-600">| 평균 YOY: {Math.round(cat.avg_yoy)}%</div>
                     </div>
                   </div>
@@ -6592,7 +6693,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                                {store.current.direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(store.current.direct_profit))}K
                               </div>
                               <div className="text-yellow-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
                             </div>
@@ -6661,19 +6762,18 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               );
             })()}
             
-            {/* 적자 & 매출악화 */}
+            {/* 적자 & 역성장 */}
             {(() => {
               const storeData = cumulativeStoreStatusData || storeStatusData;
               const cat = storeData?.categories?.loss_deteriorating;
               if (!cat || cat.count === 0) return null;
-              // LCX 제외 (리뉴얼 중)
-              const storesWithoutLCX = cat.stores.filter((s: any) => s.shop_cd !== 'M05');
-              const avgYoyWithoutLCX = storesWithoutLCX.length > 0 
-                ? storesWithoutLCX.reduce((sum: number, s: any) => sum + s.yoy, 0) / storesWithoutLCX.length 
+              // 누적 대시보드에서는 LCX 포함
+              const avgYoy = cat.stores.length > 0 
+                ? cat.stores.reduce((sum: number, s: any) => sum + (s.yoy || 0), 0) / cat.stores.length 
                 : 0;
               return (
                 <div className="bg-red-50 rounded-lg p-3 border-2 border-red-400 min-w-0">
-                  <h4 className="text-sm font-bold text-red-800 mb-2">적자 & 매출악화</h4>
+                  <h4 className="text-sm font-bold text-red-800 mb-2">적자 & 역성장</h4>
                   <div className="text-xs text-red-700 mb-1 font-semibold">긴급</div>
                   <div className="space-y-2 text-xs mb-3">
                     <div>
@@ -6681,8 +6781,8 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     </div>
                     <div>
                       <div className="text-red-700">직접손실 합계</div>
-                      <div className="font-bold text-red-600">{Math.round(cat.total_direct_profit)}K</div>
-                      <div className="text-red-600">| 평균 YOY: {Math.round(avgYoyWithoutLCX)}% (LCX 제외)</div>
+                      <div className="font-bold text-red-600">{formatNumber(Math.round(cat.total_direct_profit))}K</div>
+                      <div className="text-red-600">| 평균 YOY: {Math.round(avgYoy)}%</div>
                     </div>
                   </div>
                   <div className="border-t border-red-300 pt-2 mb-2">
@@ -6727,7 +6827,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                                {store.current.direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(store.current.direct_profit))}K
                               </div>
                               <div className="text-red-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
                             </div>
@@ -6766,7 +6866,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             임차료율: {rentRate}%, 인건비율: {laborRate}%
                         </div>
                         <div className="mt-2 space-y-0.5">
-                          {cat.stores.filter((s: any) => s.shop_cd !== 'M05').map((store: any, idx: number) => {
+                          {cat.stores.map((store: any, idx: number) => {
                             const rentRatio = store.current.net_sales > 0 ? ((store.current.rent || 0) / store.current.net_sales * 100) : 0;
                             const laborRatio = store.current.net_sales > 0 ? ((store.current.labor_cost || 0) / store.current.net_sales * 100) : 0;
                             const totalRatio = rentRatio + laborRatio;
@@ -6810,7 +6910,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                     <div>
                       <div className="text-purple-700">직접이익 합계</div>
                       <div className={`font-bold ${mc.total_direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {mc.total_direct_profit >= 0 ? '+' : ''}{Math.round(mc.total_direct_profit)}K
+                        {mc.total_direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(mc.total_direct_profit))}K
                       </div>
                       <div className="text-purple-600">| 전체 YOY: {Math.round(mc.overall_yoy)}%</div>
                     </div>
@@ -6855,7 +6955,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {store.current.direct_profit >= 0 ? '+' : ''}{Math.round(store.current.direct_profit)}K
+                                {store.current.direct_profit >= 0 ? '+' : ''}{formatNumber(Math.round(store.current.direct_profit))}K
                               </div>
                               <div className="text-purple-600 text-[10px]">YOY {Math.round(store.yoy)}%</div>
                             </div>
