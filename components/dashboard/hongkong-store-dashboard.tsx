@@ -34,12 +34,17 @@ interface StoreRecord {
     rent_labor_ratio: number;
     rent?: number;
     labor_cost?: number;
+    cumulative?: {
+      net_sales?: number;
+      direct_profit?: number;
+    };
   };
   previous?: {
     net_sales?: number;
     direct_profit?: number;
   };
   yoy: number;
+  cumulative_yoy?: number;
   category: StoreCategoryKey;
 }
 
