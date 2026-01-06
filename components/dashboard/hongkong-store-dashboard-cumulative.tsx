@@ -17,7 +17,6 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, ChevronRight, ArrowRight } from 'lucide-react';
-import storeStatusData from './hongkong-store-status.json';
 import storeAreasData from './hongkong-store-areas.json';
 import storeTurnoverTargetsData from './hongkong-store-turnover-targets.json';
 import plData from './hongkong-pl-data.json';
@@ -34,12 +33,17 @@ interface StoreRecord {
     rent_labor_ratio: number;
     rent?: number;
     labor_cost?: number;
+    cumulative?: {
+      net_sales?: number;
+      direct_profit?: number;
+    };
   };
   previous?: {
     net_sales?: number;
     direct_profit?: number;
   };
   yoy: number;
+  cumulative_yoy?: number;
   category: StoreCategoryKey;
 }
 
@@ -112,11 +116,11 @@ const getGradeStyle = (grade: string) => {
   }
 };
 
-interface HongKongStoreDashboardProps {
+interface HongKongStoreDashboardCumulativeProps {
   period?: string;
 }
 
-const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period = '2511' }) => {
+const HongKongStoreDashboardCumulative: React.FC<HongKongStoreDashboardCumulativeProps> = ({ period = '2511' }) => {
   const ALL_CATEGORY_KEYS: StoreCategoryKey[] = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'];
   const [selectedStore, setSelectedStore] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -131,6 +135,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   
   // 동적 데이터 로드
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [storeStatusData, setStoreStatusData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -143,6 +148,16 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         }
         const data = await response.json();
         setDashboardData(data);
+        
+        // Period별 storeStatusData 로드
+        let storeStatusResponse = await fetch(`/dashboard/hongkong-store-status-${period}.json`);
+        if (!storeStatusResponse.ok) {
+          storeStatusResponse = await fetch('/dashboard/hongkong-store-status.json');
+        }
+        if (storeStatusResponse.ok) {
+          const storeStatusDataResult = await storeStatusResponse.json();
+          setStoreStatusData(storeStatusDataResult);
+        }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         // 폴백: 기본 데이터 로드 시도
@@ -150,6 +165,12 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           const fallbackResponse = await fetch('/dashboard/hongkong-dashboard-data.json');
           const fallbackData = await fallbackResponse.json();
           setDashboardData(fallbackData);
+          
+          const fallbackStoreStatusResponse = await fetch('/dashboard/hongkong-store-status.json');
+          if (fallbackStoreStatusResponse.ok) {
+            const fallbackStoreStatusData = await fallbackStoreStatusResponse.json();
+            setStoreStatusData(fallbackStoreStatusData);
+          }
         } catch (fallbackError) {
           console.error('Error loading fallback data:', fallbackError);
         }
@@ -195,6 +216,8 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   const [editingText, setEditingText] = useState<string>('');
   
   const allStores: FlattenedStoreRow[] = useMemo(() => {
+    if (!storeStatusData) return [];
+    
     const result: FlattenedStoreRow[] = [];
     const storeAreas = (storeAreasData as any)?.store_areas || {};
 
@@ -226,12 +249,20 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         const netSales = s.current?.cumulative?.net_sales ?? s.current?.net_sales ?? 0;
         const salesPerPyeong = area > 0 ? netSales / area : 0; // 평당매출 (1K HKD/평) - 누적 기준
         
-        const rent = s.current?.rent ?? 0;
-        const laborCost = s.current?.labor_cost ?? 0;
-        const rentRate = netSales > 0 ? (rent / netSales) * 100 : 0;
-        const laborRate = netSales > 0 ? (laborCost / netSales) * 100 : 0;
+        // 누적 개월 수 계산 (Period에서 월 추출)
+        const periodMonth = parseInt(period.substring(2, 4));
+        const cumulativeMonths = periodMonth; // 2511이면 11개월
         
-        // 턴오버 기준 달성률 계산
+        // 누적 기준으로 임차료 및 인건비 계산
+        const monthlyRent = s.current?.rent ?? 0;
+        const monthlyLaborCost = s.current?.labor_cost ?? 0;
+        const cumulativeRent = monthlyRent * cumulativeMonths; // 누적 임차료
+        const cumulativeLaborCost = monthlyLaborCost * cumulativeMonths; // 누적 인건비
+        
+        const rentRate = netSales > 0 ? (cumulativeRent / netSales) * 100 : 0;
+        const laborRate = netSales > 0 ? (cumulativeLaborCost / netSales) * 100 : 0;
+        
+        // 턴오버 기준 달성률 계산 (누적 기준)
         const storeTurnoverTargets = (storeTurnoverTargetsData as any)?.store_turnover_targets || {};
         const turnoverTarget = storeTurnoverTargets[s.shop_cd];
         let turnoverTargetSales = 0;
@@ -246,38 +277,41 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         let turnoverAchievementDirectProfitRate = 0;
         
         if (turnoverTarget && turnoverTarget.turnover_rate > 0) {
-          // 턴오버 기준: 매출 × 턴오버 기준율 >= 고정임차료
-          // 목표 매출 = 고정임차료 / 턴오버 기준율 (턴오버 기준을 달성하기 위한 최소 매출)
-          turnoverTargetSales = turnoverTarget.fixed_rent / turnoverTarget.turnover_rate;
-          // 부족 매출 = 목표 매출 - 실제 매출 (음수면 초과)
+          // 누적 기준: 누적 매출 × 턴오버 기준율 >= 누적 고정임차료
+          // 누적 고정임차료 = 당월 고정임차료 × 누적 개월 수
+          const cumulativeFixedRent = turnoverTarget.fixed_rent * cumulativeMonths;
+          
+          // 목표 매출 = 누적 고정임차료 / 턴오버 기준율 (턴오버 기준을 달성하기 위한 최소 누적 매출)
+          turnoverTargetSales = cumulativeFixedRent / turnoverTarget.turnover_rate;
+          // 부족 매출 = 목표 매출 - 실제 누적 매출 (음수면 초과)
           turnoverShortfall = turnoverTargetSales - netSales;
-          // 달성률 = (매출 × 턴오버 기준율 / 고정임차료) × 100
-          // 100% 이상이면 턴오버 기준 달성 (매출 × 턴오버 기준율 >= 고정임차료)
+          // 달성률 = (누적 매출 × 턴오버 기준율 / 누적 고정임차료) × 100
+          // 100% 이상이면 턴오버 기준 달성 (누적 매출 × 턴오버 기준율 >= 누적 고정임차료)
           const turnoverBasedRent = netSales * turnoverTarget.turnover_rate;
-          turnoverAchievement = turnoverTarget.fixed_rent > 0 
-            ? (turnoverBasedRent / turnoverTarget.fixed_rent) * 100 
+          turnoverAchievement = cumulativeFixedRent > 0 
+            ? (turnoverBasedRent / cumulativeFixedRent) * 100 
             : 0;
           
           // 턴오버 달성시 직접이익 계산 (누적 기준)
-          // 1. 현재 매출총이익 = 누적 직접이익 + 현재 임차료 + 인건비
-          const currentGrossProfit = cumulativeDirectProfit + rent + laborCost;
-          // 2. 현재 매출원가 = 현재 매출 - 현재 매출총이익 (최소 0)
-          const currentCogs = Math.max(0, netSales - currentGrossProfit);
-          // 3. 현재 매출원가율 = 현재 매출원가 / 현재 매출 (0-1 사이로 제한)
-          const currentCogsRate = netSales > 0 ? Math.max(0, Math.min(1, currentCogs / netSales)) : 0;
+          // 1. 누적 매출총이익 = 누적 직접이익 + 누적 임차료 + 누적 인건비
+          const cumulativeGrossProfit = cumulativeDirectProfit + cumulativeRent + cumulativeLaborCost;
+          // 2. 누적 매출원가 = 누적 매출 - 누적 매출총이익 (최소 0)
+          const cumulativeCogs = Math.max(0, netSales - cumulativeGrossProfit);
+          // 3. 누적 매출원가율 = 누적 매출원가 / 누적 매출 (0-1 사이로 제한)
+          const cumulativeCogsRate = netSales > 0 ? Math.max(0, Math.min(1, cumulativeCogs / netSales)) : 0;
           
-          // 4. 턴오버 달성시 매출 = 목표 매출 (현재 매출이 목표보다 높으면 현재 매출 유지)
+          // 4. 턴오버 달성시 누적 매출 = 목표 누적 매출 (현재 누적 매출이 목표보다 높으면 현재 누적 매출 유지)
           const turnoverAchievementSales = Math.max(netSales, turnoverTargetSales);
-          // 5. 턴오버 달성시 매출원가 = 턴오버 달성시 매출 × 현재 매출원가율
-          const turnoverAchievementCogs = turnoverAchievementSales * currentCogsRate;
-          // 6. 턴오버 달성시 매출총이익 = 턴오버 달성시 매출 - 턴오버 달성시 매출원가
+          // 5. 턴오버 달성시 누적 매출원가 = 턴오버 달성시 누적 매출 × 누적 매출원가율
+          const turnoverAchievementCogs = turnoverAchievementSales * cumulativeCogsRate;
+          // 6. 턴오버 달성시 누적 매출총이익 = 턴오버 달성시 누적 매출 - 턴오버 달성시 누적 매출원가
           const turnoverAchievementGrossProfit = turnoverAchievementSales - turnoverAchievementCogs;
           
-          // 7. 턴오버 달성시 임차료 = 현재 임차료 금액 동일
-          const turnoverAchievementRent = rent;
+          // 7. 턴오버 달성시 누적 임차료 = 현재 누적 임차료 금액 동일
+          const turnoverAchievementRent = cumulativeRent;
           
-          // 8. 턴오버 달성시 인건비 = 현재 인건비 금액 동일 (고정)
-          const turnoverAchievementLaborCost = laborCost;
+          // 8. 턴오버 달성시 누적 인건비 = 현재 누적 인건비 금액 동일 (고정)
+          const turnoverAchievementLaborCost = cumulativeLaborCost;
           
           // 9. 턴오버 달성시 직접이익 = 턴오버 달성시 매출총이익 - 임차료 - 인건비
           turnoverAchievementDirectProfit = turnoverAchievementGrossProfit - turnoverAchievementRent - turnoverAchievementLaborCost;
@@ -362,8 +396,17 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
       store.efficiency_grade = getEfficiencyGrade(store.efficiency_score, allScores);
     });
 
+    // 디버깅: 카테고리별 매장 수 확인
+    const categoryCounts = {
+      profit_improving: result.filter(s => s.category === 'profit_improving').length,
+      profit_deteriorating: result.filter(s => s.category === 'profit_deteriorating').length,
+      loss_improving: result.filter(s => s.category === 'loss_improving').length,
+      loss_deteriorating: result.filter(s => s.category === 'loss_deteriorating').length,
+    };
+    console.log('누적 기준 카테고리별 매장 수:', categoryCounts);
+
     return result;
-  }, []);
+  }, [storeStatusData]);
 
   // 기본값 설정
   useEffect(() => {
@@ -404,9 +447,9 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
       <div className="max-w-7xl mx-auto mb-6">
         <div className="bg-gradient-to-r from-slate-800 to-slate-600 text-white rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">매장효율성 분석 ({periodLabel} 기준)</h1>
+            <h1 className="text-2xl font-bold mb-1">매장효율성 분석 ({periodLabel} 누적 기준)</h1>
             <p className="text-sm text-slate-200">
-              매장별 평당매출, 턴오버 달성률, 손익구조를 분석하여 효율성을 한눈에 파악하는 화면입니다.
+              매장별 평당매출, 턴오버 달성률, 손익구조를 누적 기준으로 분석하여 효율성을 한눈에 파악하는 화면입니다.
             </p>
           </div>
         </div>
@@ -569,7 +612,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                     <th className="p-2 text-left font-semibold">매장명</th>
                     <th className="p-2 text-right font-semibold">평당매출</th>
                     <th className="p-2 text-right font-semibold">매출액</th>
-                    <th className="p-2 text-right font-semibold">당월직접이익</th>
+                    <th className="p-2 text-right font-semibold">누적직접이익</th>
                     <th className="p-2 text-right font-semibold">면적(평)</th>
                     <th className="p-2 text-right font-semibold">순위</th>
                     <th className="p-2 text-left font-semibold">개선전략</th>
@@ -742,14 +785,17 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           const storesWithTurnover = allStores.filter(s => s.turnover_rate_achievement > 0);
           const belowTarget = storesWithTurnover.filter(s => s.turnover_rate_achievement < 100);
           
-          // 전체 합계 행과 동일한 계산 방식
+          // 전체 합계 행과 동일한 계산 방식 (누적 기준)
           const totalNetSales = storesWithTurnover.reduce((sum, s) => sum + s.net_sales, 0);
+          const periodMonth = parseInt(period.substring(2, 4));
+          const cumulativeMonths = periodMonth;
           const totalRent = storesWithTurnover.reduce((sum, s) => {
             const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
-            return sum + (storeRecord?.current?.rent || 0);
+            const monthlyRent = storeRecord?.current?.rent || 0;
+            return sum + (monthlyRent * cumulativeMonths); // 누적 임차료
           }, 0);
           
-          const avgCurrentRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
+          const avgCumulativeRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
           
           const totalTurnoverSales = storesWithTurnover.reduce((sum, s) => {
             return sum + (s.turnover_target_sales > 0 ? Math.max(s.net_sales, s.turnover_target_sales) : s.net_sales);
@@ -761,7 +807,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
             ? storesWithTurnover.reduce((sum, s) => sum + s.turnover_rate_achievement, 0) / storesWithTurnover.length
             : 0;
           
-          const defaultText = `턴오버 100% 달성 시 임차료율이 평균 ${formatPercent(avgTargetRentRate, 1)}로 하락합니다 (현재 ${formatPercent(avgCurrentRentRate, 1)}, ${formatPercent(avgCurrentRentRate - avgTargetRentRate, 1)}%p 개선). 현재 평균 달성률은 ${formatPercent(avgAchievement, 1)}이며, ${belowTarget.length}개 매장이 목표 미달 상태입니다.`;
+          const defaultText = `턴오버 100% 달성 시 임차료율이 평균 ${formatPercent(avgTargetRentRate, 1)}로 하락합니다 (누적 ${formatPercent(avgCumulativeRentRate, 1)}, ${formatPercent(avgCumulativeRentRate - avgTargetRentRate, 1)}%p 개선). 누적 평균 달성률은 ${formatPercent(avgAchievement, 1)}이며, ${belowTarget.length}개 매장이 목표 미달 상태입니다.`;
           const displayText = aiAnalysisTexts['section2'] || defaultText;
           
           return (
@@ -831,7 +877,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                       <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300 sticky left-0 bg-gray-100 z-10">매장명<br/>(면적, YOY)</th>
                       <th rowSpan={2} className="text-center p-2 font-semibold border-r border-gray-300">턴오버율<br/>달성률 (%)</th>
                       <th colSpan={4} className="text-center p-2 font-bold border-r-2 border-gray-400 bg-blue-50">
-                        <span>현재 지표</span>
+                        <span>누적 지표</span>
                       </th>
                       <th colSpan={1} className="text-center p-2 font-bold bg-green-50 w-24">
                         <span>턴오버 100% 달성시</span>
@@ -839,7 +885,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                     </tr>
                     {/* 컬럼 헤더 행 */}
                     <tr className="bg-gray-100 border-b-2 border-gray-300">
-                      {/* 현재 지표 그룹 */}
+                      {/* 누적 지표 그룹 */}
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">직접이익률<br/>(%)</th>
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-blue-50 w-24">임차료율<br/>(%)</th>
                       <th className="text-right p-2 font-semibold border-r border-gray-300 bg-purple-100 w-24">턴오버기준율<br/>(%)</th>
@@ -1095,7 +1141,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                       </div>
                                     </td>
                                     
-                                    {/* 현재 지표: 직접이익률, 임차료율, 인건비율 */}
+                                    {/* 누적 지표: 직접이익률, 임차료율, 인건비율 */}
                                     <td className={`p-2 text-right border-r border-gray-300 bg-white ${directProfitRate >= 0 ? 'text-green-600' : 'text-red-600'} font-semibold`}>
                                       {directProfitRate.toFixed(1)}%
                                     </td>
@@ -1152,22 +1198,26 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                     {(() => {
                       const allStoresWithTurnover = allStores.filter(s => s.turnover_rate_achievement > 0);
                       
-                      // 전체 합계 계산
+                      // 전체 합계 계산 (누적 기준)
                       const totalNetSales = allStoresWithTurnover.reduce((sum, s) => sum + s.net_sales, 0);
                       const totalDirectProfit = allStoresWithTurnover.reduce((sum, s) => sum + s.direct_profit, 0);
+                      const periodMonth = parseInt(period.substring(2, 4));
+                      const cumulativeMonths = periodMonth;
                       const totalRent = allStoresWithTurnover.reduce((sum, s) => {
                         const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
-                        return sum + (storeRecord?.current?.rent || 0);
+                        const monthlyRent = storeRecord?.current?.rent || 0;
+                        return sum + (monthlyRent * cumulativeMonths); // 누적 임차료
                       }, 0);
                       const totalLaborCost = allStoresWithTurnover.reduce((sum, s) => {
                         const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
-                        return sum + (storeRecord?.current?.labor_cost || 0);
+                        const monthlyLaborCost = storeRecord?.current?.labor_cost || 0;
+                        return sum + (monthlyLaborCost * cumulativeMonths); // 누적 인건비
                       }, 0);
                       
-                      // 현재 지표 평균
-                      const avgCurrentDirectProfitRate = totalNetSales > 0 ? (totalDirectProfit / totalNetSales) * 100 : 0;
-                      const avgCurrentRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
-                      const avgCurrentLaborRate = totalNetSales > 0 ? (totalLaborCost / totalNetSales) * 100 : 0;
+                      // 누적 지표 평균
+                      const avgCumulativeDirectProfitRate = totalNetSales > 0 ? (totalDirectProfit / totalNetSales) * 100 : 0;
+                      const avgCumulativeRentRate = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
+                      const avgCumulativeLaborRate = totalNetSales > 0 ? (totalLaborCost / totalNetSales) * 100 : 0;
                       
                       // 턴오버 달성시 합계
                       const totalTurnoverSales = allStoresWithTurnover.reduce((sum, s) => {
@@ -1214,12 +1264,12 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                             </div>
                           </td>
                           
-                          {/* 현재 지표 */}
+                          {/* 누적 지표 */}
                           <td className="p-3 text-right border-r border-gray-300 bg-blue-50">
-                            {formatPercent(avgCurrentDirectProfitRate, 1)}
+                            {formatPercent(avgCumulativeDirectProfitRate, 1)}
                           </td>
                           <td className="p-3 text-right border-r border-gray-300 bg-blue-50">
-                            {formatPercent(avgCurrentRentRate, 1)}
+                            {formatPercent(avgCumulativeRentRate, 1)}
                           </td>
                           <td className="p-3 text-right border-r border-gray-300 bg-blue-50 font-semibold text-blue-800">
                             {(() => {
@@ -1237,7 +1287,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                             })()}
                           </td>
                           <td className="p-3 text-right border-r-2 border-gray-400 bg-blue-50">
-                            {formatPercent(avgCurrentLaborRate, 1)}
+                            {formatPercent(avgCumulativeLaborRate, 1)}
                           </td>
                           
                           {/* 턴오버 달성시 지표 */}
@@ -1253,11 +1303,11 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
             </div>
           </div>
           
-        {/* 홍콩 현재 영업이익/직접이익 및 턴오버 달성시 영업이익 요약 */}
+        {/* 홍콩 누적 영업이익/직접이익 및 턴오버 달성시 영업이익 요약 */}
                 {(() => {
-          // 홍콩 전체 현재 영업이익, 직접이익
-          const hkCurrentOperatingProfit = (plData as any)?.current_month?.hk?.operating_profit || 0;
-          const hkCurrentDirectProfit = (plData as any)?.current_month?.hk?.direct_profit || 0;
+          // 홍콩 전체 누적 영업이익, 직접이익
+          const hkCumulativeOperatingProfit = (plData as any)?.cumulative?.hk?.operating_profit || 0;
+          const hkCumulativeDirectProfit = (plData as any)?.cumulative?.hk?.direct_profit || 0;
           
           // 필터링된 매장 데이터 가져오기
           let filteredStores = allStores;
@@ -1271,35 +1321,39 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
             return storeRecord?.country === 'HK';
           });
           
-          // 홍콩 전체 직접이익 및 영업이익 (pl-data 기준)
-          const hkTotalDirectProfit = (plData as any)?.current_month?.hk?.direct_profit || 0;
-          const hkTotalOperatingProfit = (plData as any)?.current_month?.hk?.operating_profit || 0;
-          const hkTotalSgA = (plData as any)?.current_month?.hk?.sg_a || 0;
-          const hkTotalSales = (plData as any)?.current_month?.hk?.net_sales || 0;
+          // 홍콩 전체 누적 직접이익 및 영업이익 (pl-data 기준)
+          const hkTotalDirectProfit = (plData as any)?.cumulative?.hk?.direct_profit || 0;
+          const hkTotalOperatingProfit = (plData as any)?.cumulative?.hk?.operating_profit || 0;
+          const hkTotalSgA = (plData as any)?.cumulative?.hk?.sg_a || 0;
+          const hkTotalSales = (plData as any)?.cumulative?.hk?.net_sales || 0;
           
-          // 직접이익률 및 영업이익률 계산
-          const hkCurrentDirectProfitRate = hkTotalSales > 0 ? (hkTotalDirectProfit / hkTotalSales) * 100 : 0;
-          const hkCurrentOperatingProfitRate = hkTotalSales > 0 ? (hkTotalOperatingProfit / hkTotalSales) * 100 : 0;
+          // 누적 직접이익률 및 영업이익률 계산
+          const hkCumulativeDirectProfitRate = hkTotalSales > 0 ? (hkTotalDirectProfit / hkTotalSales) * 100 : 0;
+          const hkCumulativeOperatingProfitRate = hkTotalSales > 0 ? (hkTotalOperatingProfit / hkTotalSales) * 100 : 0;
           
-          // 현재 홍콩 오프라인 직접이익 (pl-data 기준 사용)
-          const currentHkOfflineDirectProfit = (plData as any)?.channel_direct_profit?.hk_offline?.direct_profit || 0;
+          // 누적 홍콩 오프라인 직접이익 (pl-data 기준 사용)
+          const cumulativeHkOfflineDirectProfit = (plData as any)?.channel_direct_profit?.hk_offline?.direct_profit || 0;
           
           // 턴오버 달성시 매출 증가분 계산 (오프라인 매장들의 목표 매출 합계)
-          const currentHkOfflineSales = hkOfflineStores.reduce((sum, s) => sum + s.net_sales, 0);
+          const cumulativeHkOfflineSales = hkOfflineStores.reduce((sum, s) => sum + s.net_sales, 0);
           
-          // 홍콩 전체 임차료 및 인건비 계산 (오프라인 매장 합계)
+          // 홍콩 전체 누적 임차료 및 인건비 계산 (오프라인 매장 합계)
+          const periodMonth = parseInt(period.substring(2, 4));
+          const cumulativeMonths = periodMonth;
           const hkTotalRent = hkOfflineStores.reduce((sum, s) => {
             const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
-            return sum + (storeRecord?.current?.rent || 0);
+            const monthlyRent = storeRecord?.current?.rent || 0;
+            return sum + (monthlyRent * cumulativeMonths); // 누적 임차료
           }, 0);
           const hkTotalLaborCost = hkOfflineStores.reduce((sum, s) => {
             const storeRecord = (storeStatusData as any)?.categories?.[s.category]?.stores?.find((st: any) => st.shop_cd === s.store_code);
-            return sum + (storeRecord?.current?.labor_cost || 0);
+            const monthlyLaborCost = storeRecord?.current?.labor_cost || 0;
+            return sum + (monthlyLaborCost * cumulativeMonths); // 누적 인건비
           }, 0);
           
           // 임차료율 및 인건비율 계산 (오프라인 매출 기준)
-          const hkCurrentRentRate = currentHkOfflineSales > 0 ? (hkTotalRent / currentHkOfflineSales) * 100 : 0;
-          const hkCurrentLaborCostRate = currentHkOfflineSales > 0 ? (hkTotalLaborCost / currentHkOfflineSales) * 100 : 0;
+          const hkCumulativeRentRate = cumulativeHkOfflineSales > 0 ? (hkTotalRent / cumulativeHkOfflineSales) * 100 : 0;
+          const hkCumulativeLaborCostRate = cumulativeHkOfflineSales > 0 ? (hkTotalLaborCost / cumulativeHkOfflineSales) * 100 : 0;
           
           // 턴오버 달성시 홍콩 오프라인 직접이익 합계 (모든 매장 포함)
           const turnoverAchievementHkOfflineDirectProfit = hkOfflineStores.reduce((sum, s) => {
@@ -1307,14 +1361,14 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           }, 0);
           
           // 오프라인 직접이익 증가분
-          const offlineDirectProfitIncrease = turnoverAchievementHkOfflineDirectProfit - currentHkOfflineDirectProfit;
+          const offlineDirectProfitIncrease = turnoverAchievementHkOfflineDirectProfit - cumulativeHkOfflineDirectProfit;
           const turnoverAchievementHkOfflineSales = hkOfflineStores.reduce((sum, s) => {
             if (s.turnover_target_sales > 0) {
               return sum + Math.max(s.net_sales, s.turnover_target_sales);
             }
             return sum + s.net_sales;
           }, 0);
-          const offlineSalesIncrease = turnoverAchievementHkOfflineSales - currentHkOfflineSales;
+          const offlineSalesIncrease = turnoverAchievementHkOfflineSales - cumulativeHkOfflineSales;
           
           // 턴오버 달성시 홍콩 전체 매출 = 현재 전체 매출 + 오프라인 매출 증가분
           const turnoverAchievementHkTotalSales = hkTotalSales + offlineSalesIncrease;
@@ -1354,6 +1408,6 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   );
 };
 
-export default HongKongStoreDashboard;
+export default HongKongStoreDashboardCumulative;
 
 

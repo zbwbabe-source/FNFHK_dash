@@ -6175,7 +6175,7 @@ const HongKongCumulativeDashboard: React.FC<HongKongCumulativeDashboardProps> = 
               </button>
             <button
               className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
-              onClick={() => window.open('/hongkong/stores-dashboard', '_blank')}
+              onClick={() => window.open(`/hongkong/stores-dashboard-cumulative?period=${period}`, '_blank')}
             >
                 평당매출 상세
             </button>
