@@ -10,7 +10,12 @@
     "mc_stores": 4,
     "total_direct_profit": 1503.4937170000003,
     "sales_per_store": 1056.3050452631578,
-    "overall_yoy": 108.65990798990373
+    "overall_yoy": 108.65990798990373,
+    "cumulative_direct_profit": 4256.704561914999,
+    "cumulative_direct_profit_prev": 17962.960932299997,
+    "cumulative_direct_profit_prev_prev": 67110.986608534,
+    "cumulative_yoy": 23.697120858626544,
+    "cumulative_prev_yoy": 26.766051044786433
   },
   "categories": {
     "profit_improving": {
@@ -29,15 +34,31 @@
             "direct_profit": 287.7967007,
             "rent_labor_ratio": 27.909820676292124,
             "rent": 172.15,
-            "labor_cost": 131.77469
+            "labor_cost": 131.77469,
+            "cumulative": {
+              "net_sales": 11550.805999999999,
+              "gross_profit": 7526.6315286,
+              "selling_expense": 5151.50861,
+              "direct_profit": 2375.1229186,
+              "direct_profit_rate": 20.562399875818194
+            }
           },
           "previous": {
             "net_sales": 1015.5505,
-            "direct_profit": 175.29889360000004
+            "direct_profit": 175.29889360000004,
+            "cumulative": {
+              "net_sales": 12217.156500000001,
+              "gross_profit": 7745.2126800999995,
+              "selling_expense": 5472.65907,
+              "direct_profit": 2272.5536101,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 107.22780403337894,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 94.54578076330607,
+          "cumulative_prev_yoy": 80.97125564470437
         },
         {
           "shop_cd": "M07",
@@ -48,15 +69,31 @@
             "direct_profit": 194.64475119999997,
             "rent_labor_ratio": 25.334812654570477,
             "rent": 306.19493,
-            "labor_cost": 162.82833
+            "labor_cost": 162.82833,
+            "cumulative": {
+              "net_sales": 16725.126500000002,
+              "gross_profit": 7305.8122776,
+              "selling_expense": 6386.36523,
+              "direct_profit": 919.4470475999997,
+              "direct_profit_rate": 5.497399661521242
+            }
           },
           "previous": {
             "net_sales": 1654.8193,
-            "direct_profit": 164.91980950000004
+            "direct_profit": 164.91980950000004,
+            "cumulative": {
+              "net_sales": 21597.355299999996,
+              "gross_profit": 10382.4191829,
+              "selling_expense": 7305.655830000001,
+              "direct_profit": 3076.7633528999986,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 111.87321177605314,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 77.44062301924535,
+          "cumulative_prev_yoy": 74.02740939966392
         },
         {
           "shop_cd": "M18",
@@ -67,15 +104,31 @@
             "direct_profit": 298.5431360000001,
             "rent_labor_ratio": 32.10472854440977,
             "rent": 376.86591,
-            "labor_cost": 129.15309
+            "labor_cost": 129.15309,
+            "cumulative": {
+              "net_sales": 18016.416999999998,
+              "gross_profit": 11742.543467699998,
+              "selling_expense": 8546.894620000001,
+              "direct_profit": 3195.6488476999966,
+              "direct_profit_rate": 17.73742719043413
+            }
           },
           "previous": {
             "net_sales": 1415.4605,
-            "direct_profit": 258.71544069999993
+            "direct_profit": 258.71544069999993,
+            "cumulative": {
+              "net_sales": 17135.5275,
+              "gross_profit": 10817.915312699999,
+              "selling_expense": 7538.15865,
+              "direct_profit": 3279.7566626999987,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 111.35252449644481,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 105.14072006245503,
+          "cumulative_prev_yoy": 116.44809973438257
         },
         {
           "shop_cd": "M17",
@@ -86,15 +139,31 @@
             "direct_profit": 148.58290820000002,
             "rent_labor_ratio": 27.431143666773313,
             "rent": 129.82542,
-            "labor_cost": 80.67281
+            "labor_cost": 80.67281,
+            "cumulative": {
+              "net_sales": 6850.5475,
+              "gross_profit": 4378.9110793,
+              "selling_expense": 3788.11676,
+              "direct_profit": 590.7943193000001,
+              "direct_profit_rate": 8.624045294189992
+            }
           },
           "previous": {
             "net_sales": 588.0245,
-            "direct_profit": 43.116231700000014
+            "direct_profit": 43.116231700000014,
+            "cumulative": {
+              "net_sales": 6522.715,
+              "gross_profit": 4071.7468645,
+              "selling_expense": 3680.4334199999994,
+              "direct_profit": 391.3134445000005,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 130.49957952432254,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 105.02601294093026,
+          "cumulative_prev_yoy": 125.69366428057755
         },
         {
           "shop_cd": "M14",
@@ -105,15 +174,31 @@
             "direct_profit": 92.03322419999995,
             "rent_labor_ratio": 45.870335437060405,
             "rent": 401.57,
-            "labor_cost": 145.79108
+            "labor_cost": 145.79108,
+            "cumulative": {
+              "net_sales": 12467.4025,
+              "gross_profit": 8053.0802133,
+              "selling_expense": 7870.404619999999,
+              "direct_profit": 182.6755933000004,
+              "direct_profit_rate": 1.4652257621425184
+            }
           },
           "previous": {
             "net_sales": 1153.6255,
-            "direct_profit": 21.343307099999947
+            "direct_profit": 21.343307099999947,
+            "cumulative": {
+              "net_sales": 13793.226500000002,
+              "gross_profit": 8664.0855111,
+              "selling_expense": 8058.77104,
+              "direct_profit": 605.3144711000004,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 103.43729399185438,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 90.38786175228833,
+          "cumulative_prev_yoy": 87.09784919267373
         },
         {
           "shop_cd": "M09",
@@ -124,15 +209,31 @@
             "direct_profit": 48.807658,
             "rent_labor_ratio": 38.76790883779249,
             "rent": 150.2,
-            "labor_cost": 81.075
+            "labor_cost": 81.075,
+            "cumulative": {
+              "net_sales": 5869.5305,
+              "gross_profit": 3705.2340590999997,
+              "selling_expense": 3397.68673,
+              "direct_profit": 307.54732909999984,
+              "direct_profit_rate": 5.239726228528839
+            }
           },
           "previous": {
             "net_sales": 595.4135,
-            "direct_profit": 57.93335309999998
+            "direct_profit": 57.93335309999998,
+            "cumulative": {
+              "net_sales": 6717.743499999999,
+              "gross_profit": 4192.627291700001,
+              "selling_expense": 3784.68175,
+              "direct_profit": 407.9455417000004,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 100.19305910934166,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 87.37354291660586,
+          "cumulative_prev_yoy": 73.57474027305726
         },
         {
           "shop_cd": "M10",
@@ -143,15 +244,31 @@
             "direct_profit": 102.03671300000019,
             "rent_labor_ratio": 43.008641880443186,
             "rent": 648.501,
-            "labor_cost": 177.07031
+            "labor_cost": 177.07031,
+            "cumulative": {
+              "net_sales": 18976.801000000003,
+              "gross_profit": 12261.0738511,
+              "selling_expense": 8954.82166,
+              "direct_profit": 3306.2521911000003,
+              "direct_profit_rate": 17.42260031656547
+            }
           },
           "previous": {
             "net_sales": 1625.7615,
-            "direct_profit": 239.808405
+            "direct_profit": 239.808405,
+            "cumulative": {
+              "net_sales": 20245.060999999998,
+              "gross_profit": 12763.7202031,
+              "selling_expense": 8610.73156,
+              "direct_profit": 4152.9886430999995,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 118.07067026744082,
           "category": "profit_improving",
-          "previous_category": "profit_deteriorating"
+          "previous_category": "profit_deteriorating",
+          "cumulative_yoy": 93.73545972521399,
+          "cumulative_prev_yoy": 81.41030206167098
         },
         {
           "shop_cd": "M01",
@@ -162,15 +279,31 @@
             "direct_profit": 71.88008900000011,
             "rent_labor_ratio": 43.921814615554986,
             "rent": 529.65,
-            "labor_cost": 186.24088
+            "labor_cost": 186.24088,
+            "cumulative": {
+              "net_sales": 14774.3705,
+              "gross_profit": 9553.205184600001,
+              "selling_expense": 9650.33034,
+              "direct_profit": -97.12515539999913,
+              "direct_profit_rate": -0.6573894664412208
+            }
           },
           "previous": {
             "net_sales": 1574.162,
-            "direct_profit": -76.47677900000008
+            "direct_profit": -76.47677900000008,
+            "cumulative": {
+              "net_sales": 21165.997799999997,
+              "gross_profit": 13337.346611599998,
+              "selling_expense": 12173.683590000002,
+              "direct_profit": 1163.6630215999958,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 103.54213861089265,
           "category": "profit_improving",
-          "previous_category": "loss_deteriorating"
+          "previous_category": "loss_deteriorating",
+          "cumulative_yoy": 69.80238134580172,
+          "cumulative_prev_yoy": 80.07861476497415
         }
       ]
     },
@@ -198,15 +331,31 @@
             "direct_profit": -88.54421020000001,
             "rent_labor_ratio": 57.57254967257997,
             "rent": 207.65,
-            "labor_cost": 108.72469
+            "labor_cost": 108.72469,
+            "cumulative": {
+              "net_sales": 5193.5685,
+              "gross_profit": 3379.3389746999997,
+              "selling_expense": 4724.40215,
+              "direct_profit": -1345.0631753000002,
+              "direct_profit_rate": -25.89863164989545
+            }
           },
           "previous": {
             "net_sales": 428.322,
-            "direct_profit": -154.82515039999998
+            "direct_profit": -154.82515039999998,
+            "cumulative": {
+              "net_sales": 5623.531,
+              "gross_profit": 3569.1634192,
+              "selling_expense": 4638.98592,
+              "direct_profit": -1069.8225008,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 128.29681874851164,
           "category": "loss_improving",
-          "previous_category": "loss_deteriorating"
+          "previous_category": "loss_deteriorating",
+          "cumulative_yoy": 92.3542254857313,
+          "cumulative_prev_yoy": 80.3742586750024
         },
         {
           "shop_cd": "M22",
@@ -217,15 +366,31 @@
             "direct_profit": -212.13269690000004,
             "rent_labor_ratio": 68.5331826068697,
             "rent": 314.735,
-            "labor_cost": 86.31
+            "labor_cost": 86.31,
+            "cumulative": {
+              "net_sales": 5711.170179999999,
+              "gross_profit": 3653.6945575,
+              "selling_expense": 6269.87484,
+              "direct_profit": -2616.1802825000004,
+              "direct_profit_rate": -45.80813038388572
+            }
           },
           "previous": {
             "net_sales": 471.7765,
-            "direct_profit": -284.4394898
+            "direct_profit": -284.4394898,
+            "cumulative": {
+              "net_sales": 5558.585499999999,
+              "gross_profit": 3470.1517322,
+              "selling_expense": 6336.58946,
+              "direct_profit": -2866.4377278,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 124.03832747074091,
           "category": "loss_improving",
-          "previous_category": "loss_improving"
+          "previous_category": "loss_improving",
+          "cumulative_yoy": 102.74502712965376,
+          "cumulative_prev_yoy": 2851.5144830699537
         },
         {
           "shop_cd": "M15",
@@ -236,15 +401,31 @@
             "direct_profit": -0.022488100000003897,
             "rent_labor_ratio": 28.57047271742114,
             "rent": 77.68702,
-            "labor_cost": 82.60876
+            "labor_cost": 82.60876,
+            "cumulative": {
+              "net_sales": 5221.83,
+              "gross_profit": 2192.7074174,
+              "selling_expense": 2847.667569999999,
+              "direct_profit": -654.9601525999992,
+              "direct_profit_rate": -12.542732195418067
+            }
           },
           "previous": {
             "net_sales": 430.986,
-            "direct_profit": -76.5577576
+            "direct_profit": -76.5577576,
+            "cumulative": {
+              "net_sales": 4833.894,
+              "gross_profit": 2398.7677676000003,
+              "selling_expense": 2885.20372,
+              "direct_profit": -486.4359523999997,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 130.17917055310383,
           "category": "loss_improving",
-          "previous_category": "loss_improving"
+          "previous_category": "loss_improving",
+          "cumulative_yoy": 108.02533113055436,
+          "cumulative_prev_yoy": 75.55009851892616
         },
         {
           "shop_cd": "M21",
@@ -255,15 +436,31 @@
             "direct_profit": -19.340939900000023,
             "rent_labor_ratio": 31.392496639794583,
             "rent": 163.62165,
-            "labor_cost": 110.22844
+            "labor_cost": 110.22844,
+            "cumulative": {
+              "net_sales": 8739.683,
+              "gross_profit": 3841.476686,
+              "selling_expense": 4545.89752,
+              "direct_profit": -704.4208340000005,
+              "direct_profit_rate": -8.060027280165658
+            }
           },
           "previous": {
             "net_sales": 688.0765,
-            "direct_profit": -124.2893186
+            "direct_profit": -124.2893186,
+            "cumulative": {
+              "net_sales": 9108.771999999999,
+              "gross_profit": 4446.0225123,
+              "selling_expense": 4710.59017,
+              "direct_profit": -264.5676577000004,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 126.77987113351494,
           "category": "loss_improving",
-          "previous_category": "loss_improving"
+          "previous_category": "loss_improving",
+          "cumulative_yoy": 95.94798288946086,
+          "cumulative_prev_yoy": 348.59928200298236
         },
         {
           "shop_cd": "M19",
@@ -274,15 +471,31 @@
             "direct_profit": -122.07507270000002,
             "rent_labor_ratio": 85.33662599083159,
             "rent": 131.08,
-            "labor_cost": 51.723
+            "labor_cost": 51.723,
+            "cumulative": {
+              "net_sales": 1500.5670000000002,
+              "gross_profit": 944.18198653,
+              "selling_expense": 2533.39131,
+              "direct_profit": -1589.20932347,
+              "direct_profit_rate": -105.90725528883414
+            }
           },
           "previous": {
             "net_sales": 129.416,
-            "direct_profit": -145.42567173999998
+            "direct_profit": -145.42567173999998,
+            "cumulative": {
+              "net_sales": 1435.7714999999998,
+              "gross_profit": 900.41718986,
+              "selling_expense": 2491.64184,
+              "direct_profit": -1591.2246501399998,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 165.52358286456078,
           "category": "loss_improving",
-          "previous_category": "loss_deteriorating"
+          "previous_category": "loss_deteriorating",
+          "cumulative_yoy": 104.5129395589758,
+          "cumulative_prev_yoy": 240.4488031330307
         },
         {
           "shop_cd": "M02",
@@ -293,15 +506,31 @@
             "direct_profit": -128.08668969999997,
             "rent_labor_ratio": 71.1382406910052,
             "rent": 288.3,
-            "labor_cost": 106.365
+            "labor_cost": 106.365,
+            "cumulative": {
+              "net_sales": 5442.118,
+              "gross_profit": 3553.3302387,
+              "selling_expense": 5276.11285,
+              "direct_profit": -1722.7826113000006,
+              "direct_profit_rate": -31.65647292653339
+            }
           },
           "previous": {
             "net_sales": 503.588,
-            "direct_profit": -154.05648790000004
+            "direct_profit": -154.05648790000004,
+            "cumulative": {
+              "net_sales": 7093.1089999999995,
+              "gross_profit": 4500.6782814,
+              "selling_expense": 5440.690210000001,
+              "direct_profit": -940.0119286000008,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 110.16664416149709,
           "category": "loss_improving",
-          "previous_category": "loss_deteriorating"
+          "previous_category": "loss_deteriorating",
+          "cumulative_yoy": 76.72401481494224,
+          "cumulative_prev_yoy": 50.91757910839253
         },
         {
           "shop_cd": "M13",
@@ -312,15 +541,31 @@
             "direct_profit": -5.837253999999973,
             "rent_labor_ratio": 40.78832292061366,
             "rent": 118.45,
-            "labor_cost": 66.70125
+            "labor_cost": 66.70125,
+            "cumulative": {
+              "net_sales": 4220.255,
+              "gross_profit": 2401.6679073000005,
+              "selling_expense": 3072.4113900000007,
+              "direct_profit": -670.7434827000002,
+              "direct_profit_rate": -15.893434939357935
+            }
           },
           "previous": {
             "net_sales": 405.63,
-            "direct_profit": -69.84197410000002
+            "direct_profit": -69.84197410000002,
+            "cumulative": {
+              "net_sales": 4550.779,
+              "gross_profit": 2823.1831817,
+              "selling_expense": 3706.3830799999996,
+              "direct_profit": -883.1998982999994,
+              "direct_profit_rate": 0
+            }
           },
           "yoy": 111.90789635875058,
           "category": "loss_improving",
-          "previous_category": "loss_deteriorating"
+          "previous_category": "loss_deteriorating",
+          "cumulative_yoy": 92.73697975665264,
+          "cumulative_prev_yoy": 71.06269022119123
         }
       ]
     },
@@ -348,15 +593,31 @@
           "direct_profit": 611.72578,
           "rent_labor_ratio": 30.769127330902485,
           "rent": 702.48,
-          "labor_cost": 164.28288
+          "labor_cost": 164.28288,
+          "cumulative": {
+            "net_sales": 30254.2427,
+            "gross_profit": 19130.537855,
+            "selling_expense": 11342.935099999999,
+            "direct_profit": 7787.602755,
+            "direct_profit_rate": 25.740531112352055
+          }
         },
         "previous": {
           "net_sales": 2768.91262,
-          "direct_profit": 758.770454
+          "direct_profit": 758.770454,
+          "cumulative": {
+            "net_sales": 36281.790310000004,
+            "gross_profit": 22262.537347,
+            "selling_expense": 10676.394349999999,
+            "direct_profit": 11586.142997000003,
+            "direct_profit_rate": 0
+          }
         },
         "yoy": 101.73628483805312,
         "category": "profit_improving",
-        "previous_category": "profit_deteriorating"
+        "previous_category": "profit_deteriorating",
+        "cumulative_yoy": 83.3868517553868,
+        "cumulative_prev_yoy": 85.09804417365322
       },
       {
         "shop_cd": "MC2",
@@ -367,15 +628,31 @@
           "direct_profit": -71.16229149999998,
           "rent_labor_ratio": 51.81028224002203,
           "rent": 259.4,
-          "labor_cost": 77.95184
+          "labor_cost": 77.95184,
+          "cumulative": {
+            "net_sales": 8379.70729,
+            "gross_profit": 5280.0360323,
+            "selling_expense": 5165.31769,
+            "direct_profit": 114.71834230000059,
+            "direct_profit_rate": 1.369001784070677
+          }
         },
         "previous": {
           "net_sales": 793.41019,
-          "direct_profit": 51.6540382
+          "direct_profit": 51.6540382,
+          "cumulative": {
+            "net_sales": 11423.774739999999,
+            "gross_profit": 7016.899268300001,
+            "selling_expense": 5365.575339999999,
+            "direct_profit": 1651.3239283000012,
+            "direct_profit_rate": 0
+          }
         },
         "yoy": 82.06714990640592,
         "category": "loss_deteriorating",
-        "previous_category": "profit_deteriorating"
+        "previous_category": "profit_deteriorating",
+        "cumulative_yoy": 73.35322588827589,
+        "cumulative_prev_yoy": 71.87886767087686
       },
       {
         "shop_cd": "MC3",
@@ -386,15 +663,31 @@
           "direct_profit": 366.8164525000001,
           "rent_labor_ratio": 31.181246859993134,
           "rent": 333.33333,
-          "labor_cost": 127.87379
+          "labor_cost": 127.87379,
+          "cumulative": {
+            "net_sales": 14273.24028,
+            "gross_profit": 9158.735748900002,
+            "selling_expense": 7725.121010000001,
+            "direct_profit": 1433.6147389000016,
+            "direct_profit_rate": 10.044073460381776
+          }
         },
         "previous": {
           "net_sales": 1552.23641,
-          "direct_profit": 315.04563429999996
+          "direct_profit": 315.04563429999996,
+          "cumulative": {
+            "net_sales": 18589.583500000004,
+            "gross_profit": 11555.6849872,
+            "selling_expense": 8393.6808,
+            "direct_profit": 3162.0041872,
+            "direct_profit_rate": 0
+          }
         },
         "yoy": 95.28941470970908,
         "category": "profit_deteriorating",
-        "previous_category": "profit_deteriorating"
+        "previous_category": "profit_deteriorating",
+        "cumulative_yoy": 76.7808503079157,
+        "cumulative_prev_yoy": 79.75638887593647
       },
       {
         "shop_cd": "MC4",
@@ -405,15 +698,31 @@
           "direct_profit": -72.17205280000002,
           "rent_labor_ratio": 41.65573105375155,
           "rent": 180.0,
-          "labor_cost": 115.10679
+          "labor_cost": 115.10679,
+          "cumulative": {
+            "net_sales": 7585.159119999999,
+            "gross_profit": 3151.622224,
+            "selling_expense": 4019.22566,
+            "direct_profit": -867.6034359999999,
+            "direct_profit_rate": -11.438170541635255
+          }
         },
         "previous": {
           "net_sales": 675.11456,
-          "direct_profit": -70.35418529999998
+          "direct_profit": -70.35418529999998,
+          "cumulative": {
+            "net_sales": 7066.92767,
+            "gross_profit": 3200.3725473,
+            "selling_expense": 3881.8226799999993,
+            "direct_profit": -681.4501326999994,
+            "direct_profit_rate": 0
+          }
         },
         "yoy": 104.93659476104322,
         "category": "loss_improving",
-        "previous_category": "loss_improving"
+        "previous_category": "loss_improving",
+        "cumulative_yoy": 107.33319306775924,
+        "cumulative_prev_yoy": 572.5233185333691
       }
     ]
   },
@@ -429,16 +738,32 @@
           "direct_profit": -145.5919761,
           "rent_labor_ratio": 63.802457893509334,
           "rent": 312.35,
-          "labor_cost": 88.41844
+          "labor_cost": 88.41844,
+          "cumulative": {
+            "net_sales": 8295.2495,
+            "gross_profit": 5374.567649399999,
+            "selling_expense": 6549.12893,
+            "direct_profit": -1174.5612806000008,
+            "direct_profit_rate": -14.159444879867698
+          }
         },
         "previous": {
           "net_sales": 707.795,
-          "direct_profit": -158.81035589999993
+          "direct_profit": -158.81035589999993,
+          "cumulative": {
+            "net_sales": 10071.261,
+            "gross_profit": 6348.1297404,
+            "selling_expense": 6721.426009999999,
+            "direct_profit": -373.2962695999995,
+            "direct_profit_rate": 0
+          }
         },
         "yoy": 88.74596458013974,
         "category": null,
         "previous_category": "loss_deteriorating",
-        "exclusion_reason": "11/8 재오픈"
+        "exclusion_reason": "11/8 재오픈",
+        "cumulative_yoy": 82.36554985517702,
+        "cumulative_prev_yoy": 50.837983454686885
       }
     ]
   }
