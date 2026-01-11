@@ -11,6 +11,11 @@ import glob
 from collections import defaultdict
 from datetime import datetime
 import sys
+import io
+
+# Windows 콘솔 인코딩 문제 해결
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Store Code 분류
 OUTLET_CODES = {'M07', 'M13', 'M15', 'M21'}

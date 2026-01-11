@@ -14,6 +14,12 @@ import shutil
 from collections import defaultdict
 from datetime import datetime
 import re
+import sys
+import io
+
+# Windows 콘솔 인코딩 문제 해결
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # TWD to HKD 환산환율
 # 2511 기준: 4.03
@@ -37,23 +43,30 @@ def read_exchange_rate(csv_dir, period):
     Returns:
         float: 환율 (TWD to HKD)
     """
-    rate_file = os.path.join(csv_dir, 'TW', period, f'TW Exchange Rate {period}.csv')
+    # 다양한 파일명 형식 지원
+    possible_rate_files = [
+        os.path.join(csv_dir, 'TW', period, f'TW Exchange Rate {period}.csv'),
+        os.path.join(csv_dir, 'TW', period, f'TW_Exchange Rate {period}.csv'),
+        os.path.join(csv_dir, 'TW', period, f'TW_Exchange_Rate_{period}.csv'),
+    ]
     
-    if os.path.exists(rate_file):
-        try:
-            with open(rate_file, 'r', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    if row.get('period') == period:
-                        rate = float(row.get('rate', 4.03))
-                        print(f"환율 파일에서 로드: {period} = {rate}")
-                        return rate
-        except Exception as e:
-            print(f"환율 파일 읽기 오류: {e}")
+    for rate_file in possible_rate_files:
+        if os.path.exists(rate_file):
+            try:
+                with open(rate_file, 'r', encoding='utf-8-sig') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if row.get('period') == period or row.get('Period') == period:
+                            rate = float(row.get('rate', row.get('Rate', 4.03)))
+                            print(f"환율 파일에서 로드: {period} = {rate}")
+                            return rate
+            except Exception as e:
+                print(f"환율 파일 읽기 오류: {e}")
+                continue
     
     # 기본값 반환
-    print(f"환율 파일 없음 또는 매칭 실패, 기본값 사용: 4.03")
-    return 4.03
+    print(f"환율 파일 없음 또는 매칭 실패, 기본값 사용: {TWD_TO_HKD_RATE}")
+    return TWD_TO_HKD_RATE
 
 # Store Code 분류 (대만)
 def is_mlb_retail(store_code):
@@ -2101,16 +2114,42 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     print(f"  - 추세 데이터 포인트: {len(trend_data)}")
 
 if __name__ == '__main__':
-    # 2511 데이터 생성 (기존 2510 유지)
-    csv_file = '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
-    output_file = 'components/dashboard/taiwan-dashboard-data-2511.json'
+    import sys
+    import glob
+    
+    # 커맨드라인 인자로 period 받기 (기본값: 2512)
+    period = sys.argv[1] if len(sys.argv) > 1 else '2512'
+    
+    # CSV 파일 찾기 (다양한 파일명 형식 지원)
+    csv_dir = f'../Dashboard_Raw_Data/TW/{period}'
+    possible_csv_patterns = [
+        f'{csv_dir}/TW_Inventory_{period}.csv',
+        f'{csv_dir}/TW_Inventory_*_{period}*.csv',
+        f'{csv_dir}/*Inventory*.csv',
+    ]
+    
+    csv_file = None
+    for pattern in possible_csv_patterns:
+        matches = glob.glob(pattern)
+        if matches:
+            csv_file = matches[0]
+            break
+    
+    if not csv_file:
+        print(f"❌ CSV 파일을 찾을 수 없습니다: {csv_dir}")
+        print(f"   확인된 패턴:")
+        for pattern in possible_csv_patterns:
+            print(f"   - {pattern}")
+        sys.exit(1)
+    
+    output_file = f'components/dashboard/taiwan-dashboard-data-{period}.json'
     print("=" * 80)
-    print("대만 대시보드 2511 데이터 생성")
+    print(f"대만 대시보드 {period} 데이터 생성")
     print("=" * 80)
     print(f"CSV 파일: {csv_file}")
     print(f"출력 파일: {output_file}")
-    print(f"환율: {TWD_TO_HKD_RATE}")
+    print(f"환율: {TWD_TO_HKD_RATE} (동적 로드 예정)")
     print("=" * 80)
-    generate_dashboard_data(csv_file, output_file, target_period='2511')
-    print("\n✅ 대만 대시보드 2511 데이터 생성 완료!")
+    generate_dashboard_data(csv_file, output_file, target_period=period)
+    print(f"\n✅ 대만 대시보드 {period} 데이터 생성 완료!")
 

@@ -13,155 +13,168 @@ import io
 # Windows 인코딩 문제 해결
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-print("=" * 80)
-print("홍콩 대시보드 - 매출/재고 데이터 자동 생성")
-print("=" * 80)
-
-# ========================================
-# 설정
-# ========================================
-TARGET_PERIOD = 2510  # 2025년 10월
-PREV_PERIOD = 2410    # 2024년 10월 (전년 동월)
-
-csv_path = '../Dashboard_Raw_Data/HKMC/2511/HKMC_Inventory_2511.csv'
-
-# CSV 로드
-print(f"\nCSV 로드 중: {csv_path}")
-df = pd.read_csv(csv_path)
-print(f"총 {len(df):,}개 레코드 로드 완료")
-
-df_current = df[df['Period'] == TARGET_PERIOD]
-df_prev = df[df['Period'] == PREV_PERIOD]
-
-print(f"기준월: {TARGET_PERIOD} ({len(df_current):,}개 레코드)")
-print(f"전년월: {PREV_PERIOD} ({len(df_prev):,}개 레코드)")
-
-# ========================================
-# 1. 채널별 매출 데이터
-# ========================================
-print("\n[1/7] 채널별 매출 데이터 생성 중...")
-
-def get_channel_sales():
-    current = df_current.groupby(['Country', 'Channel']).agg({
-        'Net_Sales': 'sum',
-        'Gross_Sales': 'sum',
-        'Stock_Price': 'sum',
-        'Stock_Cost': 'sum'
-    }).round(0)
-    
-    prev = df_prev.groupby(['Country', 'Channel']).agg({
-        'Net_Sales': 'sum'
-    }).round(0)
-    
-    result = {}
-    for idx in current.index:
-        country, channel = idx
-        key = f"{country}_{channel}"
-        net_sales = current.loc[idx, 'Net_Sales']
-        gross_sales = current.loc[idx, 'Gross_Sales']
-        prev_sales = prev.loc[idx, 'Net_Sales'] if idx in prev.index else 0
+def main():
+        # 커맨드라인 인자로 period 받기 (기본값: 2512)
+        period = sys.argv[1] if len(sys.argv) > 1 else '2512'
+        period_int = int(period)
         
-        result[key] = {
-            "country": country,
-            "channel": channel,
-            "net_sales": float(net_sales),
-            "gross_sales": float(gross_sales),
-            "stock_price": float(current.loc[idx, 'Stock_Price']),
-            "stock_cost": float(current.loc[idx, 'Stock_Cost']),
-            "prev_sales": float(prev_sales),
-            "yoy": round((net_sales / prev_sales * 100) if prev_sales > 0 else 0, 1),
-            "discount_rate": round((1 - net_sales / gross_sales) * 100, 1) if gross_sales > 0 else 0
-        }
-    
-    return result
-
-channels = get_channel_sales()
-print(f"   {len(channels)}개 채널 데이터 생성 완료")
-
-# ========================================
-# 2. 월별 YOY 추세 (1-10월)
-# ========================================
-print("[2/7] 월별 YOY 추세 생성 중...")
-
-def get_monthly_yoy():
-    result = {}
-    
-    for month in range(1, 11):
-        period_25 = 2500 + month
-        period_24 = 2400 + month
+        # 전년 동월 계산
+        prev_period_int = period_int - 100
         
-        df_25 = df[df['Period'] == period_25]
-        df_24 = df[df['Period'] == period_24]
+        TARGET_PERIOD = period_int
+        PREV_PERIOD = prev_period_int
         
-        if len(df_24) == 0:
-            continue
+        # CSV 경로 (HKMC 폴더 구조 지원)
+        csv_path = f'../Dashboard_Raw_Data/HKMC/{period}/HKMC_Inventory_{period}.csv'
+        
+        print("=" * 80)
+        print(f"홍콩 대시보드 - 매출/재고 데이터 자동 생성 ({period})")
+        print("=" * 80)
+        
+        # CSV 로드
+        print(f"\nCSV 로드 중: {csv_path}")
+        df = pd.read_csv(csv_path)
+        print(f"총 {len(df):,}개 레코드 로드 완료")
+        
+        df_current = df[df['Period'] == TARGET_PERIOD]
+        df_prev = df[df['Period'] == PREV_PERIOD]
+        
+        print(f"기준월: {TARGET_PERIOD} ({len(df_current):,}개 레코드)")
+        print(f"전년월: {PREV_PERIOD} ({len(df_prev):,}개 레코드)")
+        
+        # 년도와 월 계산
+        year = 2000 + period_int // 100
+        month = period_int % 100
+        prev_year = 2000 + prev_period_int // 100
+        prev_month = prev_period_int % 100
+        
+        # ========================================
+        # 1. 채널별 매출 데이터
+        # ========================================
+        print("\n[1/7] 채널별 매출 데이터 생성 중...")
+        
+        def get_channel_sales():
+            current = df_current.groupby(['Country', 'Channel']).agg({
+            'Net_Sales': 'sum',
+            'Gross_Sales': 'sum',
+                'Stock_Price': 'sum',
+                'Stock_Cost': 'sum'
+            }).round(0)
             
-        sales_25 = df_25.groupby(['Country', 'Channel'])['Net_Sales'].sum()
-        sales_24 = df_24.groupby(['Country', 'Channel'])['Net_Sales'].sum()
-        
-        for idx in sales_25.index:
-            country, channel = idx
-            key = f"{country}_{channel}"
+            prev = df_prev.groupby(['Country', 'Channel']).agg({
+                'Net_Sales': 'sum'
+            }).round(0)
             
-            if key not in result:
-                result[key] = []
+            result = {}
+            for idx in current.index:
+                country, channel = idx
+                key = f"{country}_{channel}"
+                net_sales = current.loc[idx, 'Net_Sales']
+                gross_sales = current.loc[idx, 'Gross_Sales']
+                prev_sales = prev.loc[idx, 'Net_Sales'] if idx in prev.index else 0
+                
+                result[key] = {
+                    "country": country,
+                    "channel": channel,
+                    "net_sales": float(net_sales),
+                    "gross_sales": float(gross_sales),
+                    "stock_price": float(current.loc[idx, 'Stock_Price']),
+                    "stock_cost": float(current.loc[idx, 'Stock_Cost']),
+                    "prev_sales": float(prev_sales),
+                    "yoy": round((net_sales / prev_sales * 100) if prev_sales > 0 else 0, 1),
+                    "discount_rate": round((1 - net_sales / gross_sales) * 100, 1) if gross_sales > 0 else 0
+                }
             
-            yoy = round((sales_25[idx] / sales_24[idx] * 100) if idx in sales_24.index and sales_24[idx] > 0 else 0, 0)
-            result[key].append(int(yoy))
-    
-    return result
-
-monthly_yoy = get_monthly_yoy()
-print(f"   월별 추세 데이터 생성 완료")
-
-# ========================================
-# 2-1. 월별 채널별 실제 매출액 (차트용)
-# ========================================
-print("[2-1/7] 월별 채널별 매출액 생성 중...")
-
-def get_monthly_channel_sales():
-    """월별 채널별 실제 매출액 추출 (1월~10월)"""
-    result = []
-    
-    for month in range(1, 11):
-        period = 2500 + month
-        df_month = df[df['Period'] == period]
+            return result
         
-        if len(df_month) == 0:
-            continue
+        channels = get_channel_sales()
+        print(f"   {len(channels)}개 채널 데이터 생성 완료")
         
-        # 채널별 매출 집계
-        sales_by_channel = df_month.groupby(['Country', 'Channel'])['Net_Sales'].sum()
+        # ========================================
+        # 2. 월별 YOY 추세 (1-10월)
+        # ========================================
+        print("[2/7] 월별 YOY 추세 생성 중...")
         
-        month_data = {
-            'month': f'{month}월',
-            'month_num': month,
-            'period': period
-        }
+        def get_monthly_yoy(year, month):
+            result = {}
+            
+            # 해당 년도의 1월부터 현재 월까지
+            for m in range(1, month + 1):
+                period_current = (year % 100) * 100 + m
+                period_prev = ((year - 1) % 100) * 100 + m
+                
+                df_current_month = df[df['Period'] == period_current]
+                df_prev_month = df[df['Period'] == period_prev]
+                
+                if len(df_prev_month) == 0:
+                    continue
+                    
+                sales_current = df_current_month.groupby(['Country', 'Channel'])['Net_Sales'].sum()
+                sales_prev = df_prev_month.groupby(['Country', 'Channel'])['Net_Sales'].sum()
+                
+                for idx in sales_current.index:
+                    country, channel = idx
+                    key = f"{country}_{channel}"
+                    
+                    if key not in result:
+                        result[key] = []
+                    
+                    yoy = round((sales_current[idx] / sales_prev[idx] * 100) if idx in sales_prev.index and sales_prev[idx] > 0 else 0, 0)
+                    result[key].append(int(yoy))
+            
+            return result
         
-        # 각 채널별 매출 추가
-        for idx in sales_by_channel.index:
-            country, channel = idx
-            key = f"{country} {channel}"
-            # HKD를 1K 단위로 변환 (차트 표시용)
-            month_data[key] = round(sales_by_channel[idx] / 1000, 0)
+        monthly_yoy = get_monthly_yoy(year, month)
+        print(f"   월별 추세 데이터 생성 완료")
         
-        # 총합계
-        month_data['total'] = sum([v for k, v in month_data.items() if k not in ['month', 'month_num', 'period']])
+        # ========================================
+        # 2-1. 월별 채널별 실제 매출액 (차트용)
+        # ========================================
+        print("[2-1/7] 월별 채널별 매출액 생성 중...")
         
-        result.append(month_data)
-    
-    return result
-
-monthly_channel_sales = get_monthly_channel_sales()
-print(f"   {len(monthly_channel_sales)}개월 채널별 매출 데이터 생성 완료")
-
-# ========================================
-# 3. 카테고리별 매출
-# ========================================
-print("[3/7] 카테고리별 매출 생성 중...")
-
-def get_category_sales():
+        def get_monthly_channel_sales(year, month):
+            """월별 채널별 실제 매출액 추출 (1월~현재월)"""
+            result = []
+            
+            for m in range(1, month + 1):
+                period = (year % 100) * 100 + m
+                df_month = df[df['Period'] == period]
+                
+                if len(df_month) == 0:
+                    continue
+                
+                # 채널별 매출 집계
+                sales_by_channel = df_month.groupby(['Country', 'Channel'])['Net_Sales'].sum()
+                
+                month_data = {
+                    'month': f'{m}월',
+                    'month_num': m,
+                    'period': period
+                }
+                
+                # 각 채널별 매출 추가
+                for idx in sales_by_channel.index:
+                    country, channel = idx
+                    key = f"{country} {channel}"
+                    # HKD를 1K 단위로 변환 (차트 표시용)
+                    month_data[key] = round(sales_by_channel[idx] / 1000, 0)
+                
+                # 총합계
+                month_data['total'] = sum([v for k, v in month_data.items() if k not in ['month', 'month_num', 'period']])
+                
+                result.append(month_data)
+            
+            return result
+        
+        monthly_channel_sales = get_monthly_channel_sales(year, month)
+        print(f"   {len(monthly_channel_sales)}개월 채널별 매출 데이터 생성 완료")
+        
+        # ========================================
+        # 3. 카테고리별 매출
+        # ========================================
+        print("[3/7] 카테고리별 매출 생성 중...")
+        
+        def get_category_sales():
     category_mapping = {
         'INN': '의류', 'OUT': '의류', 'BOT': '의류', 'WTC': '의류',
         'HEA': '모자', 'SHO': '신발', 'BAG': '가방', 'ATC': '악세'
@@ -202,15 +215,15 @@ def get_category_sales():
     
     return result
 
-categories = get_category_sales()
-print(f"   {len(categories)}개 카테고리 데이터 생성 완료")
+    categories = get_category_sales()
+    print(f"   {len(categories)}개 카테고리 데이터 생성 완료")
 
 # ========================================
 # 4. 아이템별 월별 YOY
 # ========================================
-print("[4/7] 아이템별 월별 YOY 생성 중...")
+    print("[4/7] 아이템별 월별 YOY 생성 중...")
 
-def get_item_monthly_yoy():
+def get_item_monthly_yoy(year, month):
     def classify_item(row):
         category = row['Category']
         season_type = row['Season_Type']
@@ -231,41 +244,41 @@ def get_item_monthly_yoy():
     
     result = {}
     
-    for month in range(1, 11):
-        period_25 = 2500 + month
-        period_24 = 2400 + month
+    for m in range(1, month + 1):
+        period_current = (year % 100) * 100 + m
+        period_prev = ((year - 1) % 100) * 100 + m
         
-        df_25 = df[df['Period'] == period_25].copy()
-        df_24 = df[df['Period'] == period_24].copy()
+        df_current_month = df[df['Period'] == period_current].copy()
+        df_prev_month = df[df['Period'] == period_prev].copy()
         
-        if len(df_24) == 0:
+        if len(df_prev_month) == 0:
             continue
         
-        df_25['item_type'] = df_25.apply(classify_item, axis=1)
-        df_24['item_type'] = df_24.apply(classify_item, axis=1)
+        df_current_month['item_type'] = df_current_month.apply(classify_item, axis=1)
+        df_prev_month['item_type'] = df_prev_month.apply(classify_item, axis=1)
         
-        sales_25 = df_25.groupby('item_type')['Net_Sales'].sum()
-        sales_24 = df_24.groupby('item_type')['Net_Sales'].sum()
+        sales_current = df_current_month.groupby('item_type')['Net_Sales'].sum()
+        sales_prev = df_prev_month.groupby('item_type')['Net_Sales'].sum()
         
-        for item in sales_25.index:
+        for item in sales_current.index:
             if item not in result:
                 result[item] = []
             
-            yoy = round((sales_25[item] / sales_24[item] * 100) if item in sales_24.index and sales_24[item] > 0 else 0, 0)
+            yoy = round((sales_current[item] / sales_prev[item] * 100) if item in sales_prev.index and sales_prev[item] > 0 else 0, 0)
             result[item].append(int(yoy))
     
     return result
 
-item_monthly_yoy = get_item_monthly_yoy()
-print(f"   {len(item_monthly_yoy)}개 아이템 월별 추세 생성 완료")
+    item_monthly_yoy = get_item_monthly_yoy(year, month)
+    print(f"   {len(item_monthly_yoy)}개 아이템 월별 추세 생성 완료")
 
 # ========================================
 # 4-1. 아이템별 월별 실제 매출액 (차트용)
 # ========================================
-print("[4-1/7] 아이템별 월별 매출액 생성 중...")
+    print("[4-1/7] 아이템별 월별 매출액 생성 중...")
 
-def get_monthly_item_sales():
-    """월별 아이템별 실제 매출액 추출 (1월~10월)"""
+def get_monthly_item_sales(year, month):
+    """월별 아이템별 실제 매출액 추출 (1월~현재월)"""
     def classify_item(row):
         category = row['Category']
         season_type = row['Season_Type']
@@ -286,8 +299,8 @@ def get_monthly_item_sales():
     
     result = []
     
-    for month in range(1, 11):
-        period = 2500 + month
+    for m in range(1, month + 1):
+        period = (year % 100) * 100 + m
         df_month = df[df['Period'] == period].copy()
         
         if len(df_month) == 0:
@@ -297,8 +310,8 @@ def get_monthly_item_sales():
         sales_by_item = df_month.groupby('item_type')['Net_Sales'].sum()
         
         month_data = {
-            'month': f'{month}월',
-            'month_num': month,
+            'month': f'{m}월',
+            'month_num': m,
             'period': period
         }
         
@@ -313,15 +326,15 @@ def get_monthly_item_sales():
     
     return result
 
-monthly_item_sales = get_monthly_item_sales()
-print(f"   {len(monthly_item_sales)}개월 아이템별 매출 데이터 생성 완료")
+    monthly_item_sales = get_monthly_item_sales(year, month)
+    print(f"   {len(monthly_item_sales)}개월 아이템별 매출 데이터 생성 완료")
 
 # ========================================
 # 4-2. 아이템별 월별 매출 데이터 (item_sales_data.json 형식)
 # ========================================
-print("[4-2/8] 아이템별 월별 매출 데이터 (차트용) 생성 중...")
+    print("[4-2/8] 아이템별 월별 매출 데이터 (차트용) 생성 중...")
 
-def get_item_sales_data():
+def get_item_sales_data(year, month):
     """item_sales_data.json 형식으로 데이터 생성 (아이템별 월별 배열)"""
     def classify_item(row):
         category = row['Category']
@@ -359,14 +372,14 @@ def get_item_sales_data():
     yoy_data['합계'] = []
     
     # 월별 데이터 추출
-    for month in range(1, 11):
-        period_25 = 2500 + month
-        period_24 = 2400 + month
+    for m in range(1, month + 1):
+        period_current = (year % 100) * 100 + m
+        period_prev = ((year - 1) % 100) * 100 + m
         
-        df_25 = df[df['Period'] == period_25].copy()
-        df_24 = df[df['Period'] == period_24].copy()
+        df_current_month = df[df['Period'] == period_current].copy()
+        df_prev_month = df[df['Period'] == period_prev].copy()
         
-        if len(df_25) == 0:
+        if len(df_current_month) == 0:
             # 데이터가 없으면 0 또는 null 추가
             for item in item_list:
                 net_sales_data[item].append(0)
@@ -375,44 +388,44 @@ def get_item_sales_data():
             yoy_data['합계'].append(None)
             continue
         
-        df_25['item_type'] = df_25.apply(classify_item, axis=1)
+        df_current_month['item_type'] = df_current_month.apply(classify_item, axis=1)
         
-        # 25년 데이터
-        sales_25_net = df_25.groupby('item_type')['Net_Sales'].sum()
-        sales_25_gross = df_25.groupby('item_type')['Gross_Sales'].sum()
+        # 현재년 데이터
+        sales_current_net = df_current_month.groupby('item_type')['Net_Sales'].sum()
+        sales_current_gross = df_current_month.groupby('item_type')['Gross_Sales'].sum()
         
-        # 24년 데이터 (YOY 계산용)
-        if len(df_24) > 0:
-            df_24['item_type'] = df_24.apply(classify_item, axis=1)
-            sales_24_net = df_24.groupby('item_type')['Net_Sales'].sum()
+        # 전년 데이터 (YOY 계산용)
+        if len(df_prev_month) > 0:
+            df_prev_month['item_type'] = df_prev_month.apply(classify_item, axis=1)
+            sales_prev_net = df_prev_month.groupby('item_type')['Net_Sales'].sum()
         else:
-            sales_24_net = pd.Series(dtype=float)
+            sales_prev_net = pd.Series(dtype=float)
         
         # 각 아이템별로 데이터 추가 (1K 단위)
-        total_net_25 = 0
-        total_net_24 = 0
+        total_net_current = 0
+        total_net_prev = 0
         
         for item in item_list:
-            net_val = round(sales_25_net.get(item, 0) / 1000, 0) if item in sales_25_net.index else 0
-            gross_val = round(sales_25_gross.get(item, 0) / 1000, 0) if item in sales_25_gross.index else 0
+            net_val = round(sales_current_net.get(item, 0) / 1000, 0) if item in sales_current_net.index else 0
+            gross_val = round(sales_current_gross.get(item, 0) / 1000, 0) if item in sales_current_gross.index else 0
             
             net_sales_data[item].append(int(net_val))
             gross_sales_data[item].append(int(gross_val))
             
             # YOY 계산
-            net_24_val = sales_24_net.get(item, 0) if item in sales_24_net.index else 0
-            if net_24_val > 0:
-                yoy = round((sales_25_net.get(item, 0) / net_24_val * 100) if item in sales_25_net.index else 0, 0)
+            net_prev_val = sales_prev_net.get(item, 0) if item in sales_prev_net.index else 0
+            if net_prev_val > 0:
+                yoy = round((sales_current_net.get(item, 0) / net_prev_val * 100) if item in sales_current_net.index else 0, 0)
                 yoy_data[item].append(int(yoy))
             else:
                 yoy_data[item].append(None)
             
-            total_net_25 += sales_25_net.get(item, 0) if item in sales_25_net.index else 0
-            total_net_24 += net_24_val
+            total_net_current += sales_current_net.get(item, 0) if item in sales_current_net.index else 0
+            total_net_prev += net_prev_val
         
         # 합계 YOY
-        if total_net_24 > 0:
-            yoy_total = round((total_net_25 / total_net_24 * 100), 0)
+        if total_net_prev > 0:
+            yoy_total = round((total_net_current / total_net_prev * 100), 0)
             yoy_data['합계'].append(int(yoy_total))
         else:
             yoy_data['합계'].append(None)
@@ -423,13 +436,13 @@ def get_item_sales_data():
         "yoy": yoy_data
     }
 
-item_sales_data = get_item_sales_data()
-print(f"   아이템별 월별 매출 데이터 생성 완료")
+    item_sales_data = get_item_sales_data(year, month)
+    print(f"   아이템별 월별 매출 데이터 생성 완료")
 
 # ========================================
 # 5. 재고 데이터
 # ========================================
-print("[5/8] 재고 데이터 생성 중...")
+    print("[5/8] 재고 데이터 생성 중...")
 
 def get_inventory_data():
     total_stock = float(df_current['Stock_Price'].sum())
@@ -478,16 +491,16 @@ def get_inventory_data():
         "by_category": category_data
     }
 
-inventory = get_inventory_data()
-print(f"   재고 데이터 생성 완료")
+    inventory = get_inventory_data()
+    print(f"   재고 데이터 생성 완료")
 
 # ========================================
 # 5-1. 월별 아이템별 재고 데이터 (차트용)
 # ========================================
-print("[5-1/9] 월별 아이템별 재고 데이터 생성 중...")
+    print("[5-1/9] 월별 아이템별 재고 데이터 생성 중...")
 
-def get_monthly_item_inventory():
-    """월별 아이템별 재고 데이터 추출 (1월~10월)"""
+def get_monthly_item_inventory(year, month):
+    """월별 아이템별 재고 데이터 추출 (1월~현재월)"""
     def classify_inventory_item(row):
         """재고 아이템 분류 (그래프용)"""
         category = row['Category']
@@ -521,8 +534,8 @@ def get_monthly_item_inventory():
     
     result = []
     
-    for month in range(1, 11):
-        period = 2500 + month
+    for m in range(1, month + 1):
+        period = (year % 100) * 100 + m
         df_month = df[df['Period'] == period].copy()
         
         if len(df_month) == 0:
@@ -532,8 +545,8 @@ def get_monthly_item_inventory():
         inventory_by_item = df_month.groupby('inventory_item_type')['Stock_Price'].sum()
         
         month_data = {
-            'month': f'{month}월',
-            'month_num': month,
+            'month': f'{m}월',
+            'month_num': m,
             'period': period
         }
         
@@ -549,16 +562,16 @@ def get_monthly_item_inventory():
     
     return result
 
-monthly_item_inventory = get_monthly_item_inventory()
-print(f"   {len(monthly_item_inventory)}개월 아이템별 재고 데이터 생성 완료")
+    monthly_item_inventory = get_monthly_item_inventory(year, month)
+    print(f"   {len(monthly_item_inventory)}개월 아이템별 재고 데이터 생성 완료")
 
 # ========================================
 # 5-2. 월별 아이템별 재고 YOY 데이터
 # ========================================
-print("[5-2/9] 월별 아이템별 재고 YOY 데이터 생성 중...")
+    print("[5-2/9] 월별 아이템별 재고 YOY 데이터 생성 중...")
 
-def get_monthly_item_inventory_yoy():
-    """월별 아이템별 재고 YOY 데이터 추출 (1월~10월)"""
+def get_monthly_item_inventory_yoy(year, month):
+    """월별 아이템별 재고 YOY 데이터 추출 (1월~현재월)"""
     def classify_inventory_item(row):
         """재고 아이템 분류 (그래프용)"""
         category = row['Category']
@@ -597,51 +610,51 @@ def get_monthly_item_inventory_yoy():
     for item in item_keys:
         result[item] = []
     
-    for month in range(1, 11):
-        period_25 = 2500 + month
-        period_24 = 2400 + month
+    for m in range(1, month + 1):
+        period_current = (year % 100) * 100 + m
+        period_prev = ((year - 1) % 100) * 100 + m
         
-        df_25 = df[df['Period'] == period_25].copy()
-        df_24 = df[df['Period'] == period_24].copy()
+        df_current_month = df[df['Period'] == period_current].copy()
+        df_prev_month = df[df['Period'] == period_prev].copy()
         
-        if len(df_25) == 0:
+        if len(df_current_month) == 0:
             # 데이터가 없으면 null 추가
             for item in item_keys:
                 result[item].append(None)
             continue
         
-        if len(df_24) == 0:
+        if len(df_prev_month) == 0:
             # 전년도 데이터가 없으면 null 추가
             for item in item_keys:
                 result[item].append(None)
             continue
         
-        df_25['inventory_item_type'] = df_25.apply(classify_inventory_item, axis=1)
-        df_24['inventory_item_type'] = df_24.apply(classify_inventory_item, axis=1)
+        df_current_month['inventory_item_type'] = df_current_month.apply(classify_inventory_item, axis=1)
+        df_prev_month['inventory_item_type'] = df_prev_month.apply(classify_inventory_item, axis=1)
         
-        inventory_25 = df_25.groupby('inventory_item_type')['Stock_Price'].sum()
-        inventory_24 = df_24.groupby('inventory_item_type')['Stock_Price'].sum()
+        inventory_current = df_current_month.groupby('inventory_item_type')['Stock_Price'].sum()
+        inventory_prev = df_prev_month.groupby('inventory_item_type')['Stock_Price'].sum()
         
         # 각 아이템별로 YOY 계산
         for item in item_keys:
-            stock_25 = inventory_25.get(item, 0) if item in inventory_25.index else 0
-            stock_24 = inventory_24.get(item, 0) if item in inventory_24.index else 0
+            stock_current = inventory_current.get(item, 0) if item in inventory_current.index else 0
+            stock_prev = inventory_prev.get(item, 0) if item in inventory_prev.index else 0
             
-            if stock_24 > 0:
-                yoy = round((stock_25 / stock_24 * 100), 0)
+            if stock_prev > 0:
+                yoy = round((stock_current / stock_prev * 100), 0)
                 result[item].append(int(yoy))
             else:
                 result[item].append(None)
     
     return result
 
-item_monthly_inventory_yoy = get_monthly_item_inventory_yoy()
-print(f"   아이템별 재고 YOY 데이터 생성 완료")
+    item_monthly_inventory_yoy = get_monthly_item_inventory_yoy(year, month)
+    print(f"   아이템별 재고 YOY 데이터 생성 완료")
 
 # ========================================
 # 6. 매장별 데이터
 # ========================================
-print("[6/9] 매장별 데이터 생성 중...")
+    print("[6/9] 매장별 데이터 생성 중...")
 
 def get_store_data():
     stores = df_current.groupby(['Store_Code', 'Store_Name', 'Channel', 'Country']).agg({
@@ -675,24 +688,24 @@ def get_store_data():
     
     return sorted(result, key=lambda x: x['sales'], reverse=True)
 
-stores = get_store_data()
-print(f"   {len(stores)}개 매장 데이터 생성 완료")
+    stores = get_store_data()
+    print(f"   {len(stores)}개 매장 데이터 생성 완료")
 
 # ========================================
 # 7. 종합 요약
 # ========================================
-print("[7/9] 종합 데이터 생성 중...")
+    print("[7/9] 종합 데이터 생성 중...")
 
-total_sales = float(df_current['Net_Sales'].sum())
-total_sales_prev = float(df_prev['Net_Sales'].sum())
-total_gross_sales = float(df_current['Gross_Sales'].sum())
+    total_sales = float(df_current['Net_Sales'].sum())
+    total_sales_prev = float(df_prev['Net_Sales'].sum())
+    total_gross_sales = float(df_current['Gross_Sales'].sum())
 
-output_data = {
+    output_data = {
     "meta": {
         "period": TARGET_PERIOD,
-        "period_name": "2025년 10월",
+        "period_name": f"{year}년 {month}월",
         "prev_period": PREV_PERIOD,
-        "prev_period_name": "2024년 10월",
+        "prev_period_name": f"{prev_year}년 {prev_month}월",
         "generated_at": datetime.now().isoformat(),
         "csv_source": csv_path,
         "record_count": len(df_current),
@@ -719,89 +732,91 @@ output_data = {
     "item_monthly_inventory_yoy": item_monthly_inventory_yoy,  # 🆕 월별 아이템별 재고 YOY
     "inventory": inventory,
     "stores": stores
-}
+    }
 
-# JSON 저장
-output_file = 'components/dashboard/hongkong-sales-inventory.json'
-with open(output_file, 'w', encoding='utf-8') as f:
-    json.dump(output_data, f, ensure_ascii=False, indent=2)
+    # JSON 저장
+    output_file = 'components/dashboard/hongkong-sales-inventory.json'
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(output_data, f, ensure_ascii=False, indent=2)
 
-print(f"\n{output_file} 생성 완료!")
+    print(f"\n{output_file} 생성 완료!")
 
 # ========================================
 # 8. item_sales_data.json 생성
 # ========================================
-print("\n[8/8] item_sales_data.json 생성 중...")
+    print("\n[8/8] item_sales_data.json 생성 중...")
 
-item_sales_output_file = 'components/dashboard/item_sales_data.json'
-with open(item_sales_output_file, 'w', encoding='utf-8') as f:
-    json.dump(item_sales_data, f, ensure_ascii=False, indent=2)
+    item_sales_output_file = 'components/dashboard/item_sales_data.json'
+    with open(item_sales_output_file, 'w', encoding='utf-8') as f:
+        json.dump(item_sales_data, f, ensure_ascii=False, indent=2)
 
-print(f"{item_sales_output_file} 생성 완료!")
-print("=" * 80)
-print("\n생성된 데이터 요약:")
-print(f"   총매출: {total_sales:,.0f} HKD (YOY {output_data['summary']['sales_yoy']}%)")
-print(f"   총재고: {inventory['total_price']:,.0f} HKD (YOY {inventory['yoy']}%)")
-print(f"   채널수: {len(channels)}개")
-print(f"   매장수: {len(stores)}개")
-print(f"   할인율: {output_data['summary']['discount_rate']}%")
-print("\n매출/재고 데이터 생성 완료!")
-print("=" * 80)
+    print(f"{item_sales_output_file} 생성 완료!")
+    print("=" * 80)
+    print("\n생성된 데이터 요약:")
+    print(f"   총매출: {total_sales:,.0f} HKD (YOY {output_data['summary']['sales_yoy']}%)")
+    print(f"   총재고: {inventory['total_price']:,.0f} HKD (YOY {inventory['yoy']}%)")
+    print(f"   채널수: {len(channels)}개")
+    print(f"   매장수: {len(stores)}개")
+    print(f"   할인율: {output_data['summary']['discount_rate']}%")
+    print("\n매출/재고 데이터 생성 완료!")
+    print("=" * 80)
 
 # ========================================
 # TSX 파일 자동 업데이트
 # ========================================
-print("\n[추가] TSX 파일 차트 데이터 자동 업데이트 중...")
+    print("\n[추가] TSX 파일 차트 데이터 자동 업데이트 중...")
 
-tsx_file = 'components/dashboard/hongkong-report.tsx'
+    tsx_file = 'components/dashboard/hongkong-report.tsx'
 
 # 차트 데이터 코드 생성
-chart_data_lines = []
-for m in monthly_channel_sales:
-    line = f"              {{ month: '{m['month']}', 'HK Retail': {m['HK Retail']:.0f}, 'HK Outlet': {m['HK Outlet']:.0f}, 'HK Online': {m['HK Online']:.0f}, 'MC Retail': {m['MO Retail']:.0f}, 'MC Outlet': {m['MO Outlet']:.0f}, total: {m['total']:.0f} }},"
-    chart_data_lines.append(line)
+    chart_data_lines = []
+    for m in monthly_channel_sales:
+        line = f"              {{ month: '{m['month']}', 'HK Retail': {m['HK Retail']:.0f}, 'HK Outlet': {m['HK Outlet']:.0f}, 'HK Online': {m['HK Online']:.0f}, 'MC Retail': {m['MO Retail']:.0f}, 'MC Outlet': {m['MO Outlet']:.0f}, total: {m['total']:.0f} }},"
+        chart_data_lines.append(line)
 
-chart_data_code = '\n'.join(chart_data_lines)
+    chart_data_code = '\n'.join(chart_data_lines)
 
-# TSX 파일 읽기
-try:
-    with open(tsx_file, 'r', encoding='utf-8') as f:
-        tsx_content = f.read()
-    
-    # 마커 찾기
-    start_marker = '// AUTO-GENERATED-CHART-DATA-START'
-    end_marker = '// AUTO-GENERATED-CHART-DATA-END'
-    
-    if start_marker in tsx_content and end_marker in tsx_content:
-        # 마커 사이의 내용 교체
-        start_idx = tsx_content.find(start_marker)
-        end_idx = tsx_content.find(end_marker)
+    # TSX 파일 읽기
+    try:
+        with open(tsx_file, 'r', encoding='utf-8') as f:
+            tsx_content = f.read()
         
-        before = tsx_content[:start_idx + len(start_marker)]
-        after = tsx_content[end_idx:]
+        # 마커 찾기
+        start_marker = '// AUTO-GENERATED-CHART-DATA-START'
+        end_marker = '// AUTO-GENERATED-CHART-DATA-END'
         
-        new_content = f"{before}\n{chart_data_code}\n            {after}"
+        if start_marker in tsx_content and end_marker in tsx_content:
+            # 마커 사이의 내용 교체
+            start_idx = tsx_content.find(start_marker)
+            end_idx = tsx_content.find(end_marker)
+            
+            before = tsx_content[:start_idx + len(start_marker)]
+            after = tsx_content[end_idx:]
+            
+            new_content = f"{before}\n{chart_data_code}\n            {after}"
+            
+            # TSX 파일 쓰기
+            with open(tsx_file, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            
+            print(f"   ✅ {tsx_file} 차트 데이터 자동 업데이트 완료!")
+        else:
+            print(f"   ⚠️  마커를 찾을 수 없습니다. 수동으로 차트 코드를 업데이트해주세요.")
+            print(f"\n   다음 코드를 복사하여 사용하세요:")
+            print("   " + "=" * 70)
+            print(chart_data_code)
+            print("   " + "=" * 70)
         
-        # TSX 파일 쓰기
-        with open(tsx_file, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-        
-        print(f"   ✅ {tsx_file} 차트 데이터 자동 업데이트 완료!")
-    else:
-        print(f"   ⚠️  마커를 찾을 수 없습니다. 수동으로 차트 코드를 업데이트해주세요.")
-        print(f"\n   다음 코드를 복사하여 사용하세요:")
+    except Exception as e:
+        print(f"   ❌ TSX 파일 업데이트 실패: {e}")
+        print(f"\n   다음 코드를 수동으로 복사하여 사용하세요:")
         print("   " + "=" * 70)
         print(chart_data_code)
         print("   " + "=" * 70)
-        
-except Exception as e:
-    print(f"   ❌ TSX 파일 업데이트 실패: {e}")
-    print(f"\n   다음 코드를 수동으로 복사하여 사용하세요:")
-    print("   " + "=" * 70)
-    print(chart_data_code)
-    print("   " + "=" * 70)
 
-print("\n" + "=" * 80)
-print("🎉 모든 작업 완료!")
-print("=" * 80)
+    print("\n" + "=" * 80)
+    print("🎉 모든 작업 완료!")
+    print("=" * 80)
 
+if __name__ == '__main__':
+    main()

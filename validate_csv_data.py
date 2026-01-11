@@ -11,6 +11,12 @@ CSV 데이터 품질 검증 스크립트
 import pandas as pd
 import sys
 import os
+import glob
+import io
+
+# Windows 콘솔 인코딩 문제 해결
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 def validate_hongkong_csv(period):
     """홍콩 CSV 데이터 검증"""
@@ -20,6 +26,7 @@ def validate_hongkong_csv(period):
     
     # CSV 파일 찾기
     possible_paths = [
+        f'../Dashboard_Raw_Data/HKMC/{period}/HKMC_Inventory_{period}.csv',
         f'../Dashboard_Raw_Data/홍콩재고수불_{period}.csv',
         f'../Dashboard_Raw_Data/24012{period} 홍콩재고수불.csv'
     ]
@@ -126,8 +133,14 @@ def validate_taiwan_csv(period):
     
     # CSV 파일 찾기
     possible_paths = [
-        f'../Dashboard_Raw_Data/대만재고수불_{period}.csv',
-        '../Dashboard_Raw_Data/TW/2511/TW_Inventory_2511.csv'
+        f'../Dashboard_Raw_Data/TW/{period}/TW_Inventory_{period}.csv',
+        f'../Dashboard_Raw_Data/대만재고수불_{period}.csv'
+    ]
+    
+    # glob 패턴으로 파일 찾기 (다양한 파일명 형식 지원)
+    glob_patterns = [
+        f'../Dashboard_Raw_Data/TW/{period}/TW_Inventory_*.csv',
+        f'../Dashboard_Raw_Data/TW/{period}/*Inventory*.csv'
     ]
     
     csv_path = None
@@ -135,6 +148,13 @@ def validate_taiwan_csv(period):
         if os.path.exists(path):
             csv_path = path
             break
+    
+    if not csv_path:
+        for pattern in glob_patterns:
+            matches = glob.glob(pattern)
+            if matches:
+                csv_path = matches[0]
+                break
     
     if not csv_path:
         print(f"❌ CSV 파일을 찾을 수 없습니다.")
@@ -180,6 +200,8 @@ def validate_pl_database(period):
     
     # CSV 파일 찾기 (period별 파일 우선, 없으면 기본 파일)
     possible_paths = [
+        f'../Dashboard_Raw_Data/HKMC/{period}/HKMC_PL_{period}.csv',
+        f'../Dashboard_Raw_Data/HKMC/{period}/HKMC PL {period}.csv',
         f'../Dashboard_Raw_Data/hmd_pl_database_{period}.csv',
         '../Dashboard_Raw_Data/hmd_pl_database.csv'
     ]

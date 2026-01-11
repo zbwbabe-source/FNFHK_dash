@@ -76,6 +76,16 @@ def read_pl_database(csv_file, brand_filter=None, include_office=False):
             pl_data.append(row)
     return pl_data
 
+def clean_number(value):
+    """숫자 문자열에서 쉼표와 공백 제거 후 float 변환"""
+    if value is None or value == '':
+        return 0.0
+    value_str = str(value).strip().replace(',', '').replace(' ', '')
+    try:
+        return float(value_str)
+    except ValueError:
+        return 0.0
+
 def get_mlb_sg_a(pl_data, period):
     """MLB 영업비 계산 (T99 오피스의 판매관리비, BRD_CD='M'만)"""
     sg_a = 0.0
@@ -83,8 +93,8 @@ def get_mlb_sg_a(pl_data, period):
         if (row['PERIOD'] == period and 
             row['SHOP_CD'] == 'T99' and 
             row['BRD_CD'] == 'M' and  # MLB만
-            row['ACCOUNT_NM'].strip() == '판매관리비'):
-            sg_a += float(row['VALUE'] or 0)
+            row['ACCOUNT_NM'].strip() in ['판매관리비', 'Selling & Administrative Expenses']):
+            sg_a += clean_number(row['VALUE'])
     return sg_a
 
 def get_dx_sg_a(pl_data, period):
@@ -95,7 +105,7 @@ def get_dx_sg_a(pl_data, period):
             row['SHOP_CD'] == 'T99' and
             row['BRD_CD'] == 'X' and  # DX만
             row['ACCOUNT_NM'].strip() == '판매관리비'):
-            sg_a += float(row['VALUE'] or 0)
+            sg_a += clean_number(row['VALUE'])
     return sg_a
 
 def get_mlb_expense_detail(pl_data, period):
@@ -141,7 +151,7 @@ def get_mlb_expense_detail(pl_data, period):
             
             account_cd = row['ACCOUNT_CD'].strip()
             account_nm = row['ACCOUNT_NM'].strip()
-            value = float(row['VALUE'] or 0)
+            value = clean_number(row['VALUE'])
             
             # 계정 코드 또는 계정명으로 매핑
             if account_cd == '급여' or account_nm == ' - Payroll' or account_nm == '1. 급 여':
@@ -182,7 +192,7 @@ def aggregate_pl_by_period(pl_data, period, country=None, channel=None):
         
         account_nm = row['ACCOUNT_NM'].strip()
         account_cd = row['ACCOUNT_CD'].strip()
-        value = float(row['VALUE'] or 0)
+        value = clean_number(row['VALUE'])
         
         # 계정별 집계
         if account_nm == '실매출액' or account_cd == 'ACT_SALE_AMT':
@@ -265,7 +275,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
         
         account_nm = row['ACCOUNT_NM'].strip()
         account_cd = row['ACCOUNT_CD'].strip()
-        value = float(row['VALUE'] or 0)
+        value = clean_number(row['VALUE'])
         
         # 실매출액
         if account_nm == '실매출액' or account_cd == 'ACT_SALE_AMT':
@@ -312,7 +322,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
         
         account_nm = row['ACCOUNT_NM'].strip()
         account_cd = row['ACCOUNT_CD'].strip()
-        value = float(row['VALUE'] or 0)
+        value = clean_number(row['VALUE'])
         
         # 실매출액
         if account_nm == '실매출액' or account_cd == 'ACT_SALE_AMT':
@@ -357,7 +367,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
                 row['SHOP_CD'] == store_code and 
                 row['CNTRY_CD'] == 'TW' and
                 row['ACCOUNT_NM'].strip() == '영업이익'):
-                operating_profit = float(row['VALUE'] or 0)
+                operating_profit = clean_number(row['VALUE'])
                 break
         
         # 전년 동월 영업이익 찾기
@@ -367,7 +377,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
                 row['SHOP_CD'] == store_code and 
                 row['CNTRY_CD'] == 'TW' and
                 row['ACCOUNT_NM'].strip() == '영업이익'):
-                operating_profit_prev = float(row['VALUE'] or 0)
+                operating_profit_prev = clean_number(row['VALUE'])
                 break
         
         # direct_profit 필드에 영업이익 저장 (호환성을 위해 필드명은 유지)
@@ -409,7 +419,7 @@ def calculate_cumulative_store_data(pl_data, periods):
             
             account_nm = row['ACCOUNT_NM'].strip()
             account_cd = row['ACCOUNT_CD'].strip()
-            value = float(row['VALUE'] or 0)
+            value = clean_number(row['VALUE'])
             
             # 각 계정 매핑
             if account_nm == '1. 급 여':
@@ -696,14 +706,36 @@ def main(target_period_short=None):
     
     # 손익 데이터 읽기 (MLB만, 오피스 제외)
     print("\n손익 데이터 읽는 중...")
-    # Period별 파일 찾기
-    import os
     # Period별 파일 찾기 (TW 폴더 구조 지원)
-    pl_csv_path = f'../Dashboard_Raw_Data/TW/{latest_period_short}/TW_PL_{latest_period_short}.csv'
-    if not os.path.exists(pl_csv_path):
-        pl_csv_path = f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv'
-    if not os.path.exists(pl_csv_path):
-        pl_csv_path = '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    import os
+    import glob
+    possible_pl_paths = [
+        f'../Dashboard_Raw_Data/TW/{latest_period_short}/TWPL_{latest_period_short}.csv',
+        f'../Dashboard_Raw_Data/TW/{latest_period_short}/TW_PL_{latest_period_short}.csv',
+        f'../Dashboard_Raw_Data/hmd_pl_database_{latest_period_short}.csv',
+        '../Dashboard_Raw_Data/hmd_pl_database.csv'
+    ]
+    
+    pl_csv_path = None
+    for path in possible_pl_paths:
+        if os.path.exists(path):
+            pl_csv_path = path
+            break
+    
+    if not pl_csv_path:
+        # glob으로 찾기
+        glob_pattern = f'../Dashboard_Raw_Data/TW/{latest_period_short}/*PL*.csv'
+        matches = glob.glob(glob_pattern)
+        if matches:
+            pl_csv_path = matches[0]
+    
+    if not pl_csv_path:
+        print(f"❌ PL CSV 파일을 찾을 수 없습니다!")
+        print(f"   확인 경로:")
+        for path in possible_pl_paths:
+            print(f"   - {path}")
+        return
+    
     print(f"PL CSV 파일: {pl_csv_path}")
     pl_data = read_pl_database(pl_csv_path, brand_filter='M', include_office=False)
     print(f"총 {len(pl_data):,}건의 MLB 손익 데이터 읽음")
@@ -1121,7 +1153,7 @@ def main(target_period_short=None):
         for row in discovery_data:
             if (row['PERIOD'] == latest_period_full and 
                 row['ACCOUNT_NM'] == '실매출액' and
-                float(row.get('VALUE', 0) or 0) != 0 and
+                clean_number(row.get('VALUE', 0)) != 0 and
                 row['SHOP_CD'].strip() not in ['T99']):  # 오피스 제외
                 store_code = row['SHOP_CD'].strip()
                 # 매장 코드 패턴으로 채널 구분
@@ -1135,7 +1167,7 @@ def main(target_period_short=None):
         discovery_prev_stores = set()
         for row in discovery_data:
             if row.get('PERIOD') == prev_month_period and row.get('ACCOUNT_NM', '').strip() == '실매출액':
-                if float(row.get('VALUE', 0) or 0) != 0:
+                if clean_number(row.get('VALUE', 0)) != 0:
                     store_code = row['SHOP_CD'].strip()
                     channel = get_store_channel(store_code)
                     discovery_prev_stores.add((row['CNTRY_CD'], store_code, channel))
@@ -1147,7 +1179,7 @@ def main(target_period_short=None):
         # 디스커버리가 실제로 영업한 기간 확인
         discovery_periods = set()
         for row in discovery_data:
-            if row.get('ACCOUNT_NM', '').strip() == '실매출액' and float(row.get('VALUE', 0) or 0) != 0:
+            if row.get('ACCOUNT_NM', '').strip() == '실매출액' and clean_number(row.get('VALUE', 0)) != 0:
                 discovery_periods.add(row['PERIOD'])
         
         # 누적 기간과 실제 영업 기간의 교집합만 계산
