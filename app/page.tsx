@@ -13,7 +13,7 @@ export default function Home() {
   const [twPlData, setTwPlData] = useState<any>(null);
   const [bsData, setBsData] = useState<any>(null);
   const [cfData, setCfData] = useState<any>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('2511'); // 기본값: 25년 11월
+  const [selectedPeriod, setSelectedPeriod] = useState('2512'); // 기본값: 25년 12월
   const [isLoading, setIsLoading] = useState(true);
   const [showHkmcDiscovery, setShowHkmcDiscovery] = useState(false);
   const [showTwDiscovery, setShowTwDiscovery] = useState(false);
@@ -175,6 +175,7 @@ export default function Home() {
     return [
       { value: '2510', label: '25년 10월' },
       { value: '2511', label: '25년 11월' },
+      { value: '2512', label: '25년 12월' },
     ];
   }, []);
 
@@ -664,12 +665,16 @@ export default function Home() {
   // PL 데이터 우선, 없으면 Dashboard 데이터 사용
   const twOfflineCurrent = twPlData?.current_month?.offline?.net_sales ?? 
     ((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0)) / 1000; // PL: K HKD 또는 Dashboard: HKD → K HKD
-  const twOfflinePrevious = ((twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0)) / 1000; // Dashboard: HKD → K HKD
+  const twOfflinePrevious = twPlData?.prev_month?.offline?.net_sales ??
+    ((twRetail?.previous?.net_sales || 0) + (twOutlet?.previous?.net_sales || 0)) / 1000; // Dashboard: HKD → K HKD
   const twOfflineYoy = twOfflinePrevious > 0 ? (twOfflineCurrent / twOfflinePrevious) * 100 : 0;
 
   // 대만 온라인 (K HKD 단위로 변환)
-  const twOnlineCurrent = (twOnline?.current?.net_sales || 0) / 1000; // Dashboard: HKD → K HKD
-  const twOnlinePrevious = (twOnline?.previous?.net_sales || 0) / 1000; // Dashboard: HKD → K HKD
+  // PL 데이터 우선 사용
+  const twOnlineCurrent = twPlData?.current_month?.online?.net_sales ??
+    ((twOnline?.current?.net_sales || 0) / 1000); // PL: K HKD 또는 Dashboard: HKD → K HKD
+  const twOnlinePrevious = twPlData?.prev_month?.online?.net_sales ??
+    ((twOnline?.previous?.net_sales || 0) / 1000); // Dashboard: HKD → K HKD
   const twOnlineYoy = twOnlinePrevious > 0 ? (twOnlineCurrent / twOnlinePrevious) * 100 : 0;
 
   // 대만법인 합계 (모두 K HKD 단위)
@@ -1155,25 +1160,16 @@ export default function Home() {
               </div>
 
 
-              {/* 대시보드 버튼 - 당월/누적 분리 */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* 대시보드 버튼 */}
+              <div>
                 <Link
-                  href={`/hongkong/monthly?period=${selectedPeriod}`}
+                  href={`/hongkong?period=${selectedPeriod}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   당월 대시보드
-                </Link>
-                <Link
-                  href={`/hongkong/cumulative?period=${selectedPeriod}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  누적 (작업중)
                 </Link>
               </div>
             </div>
@@ -1232,7 +1228,7 @@ export default function Home() {
                 {/* 실판매출 */}
                 <div className="bg-gradient-to-r from-purple-50 to-transparent rounded-xl p-4 border border-purple-100">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-purple-900">💰 실판매출</div>
+                    <div className="text-sm font-semibold text-purple-900">💰 실판매출 (V-)</div>
                     <div className="text-xs text-gray-500">1K HKD</div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -1246,7 +1242,8 @@ export default function Home() {
                       }`}>
                         YOY {formatPercent(twTotalYoy)}%
                       </div>
-                      <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
+                      
+                      <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-2">
                         <span className="text-sm font-medium text-blue-700">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCurrent)} HKD
                         </span>
@@ -1265,7 +1262,8 @@ export default function Home() {
                       <div className={`text-xs font-semibold ${twCumulativeYoy >= 100 ? 'text-green-600' : 'text-red-600'}`}>
                         YOY {formatPercent(twCumulativeYoy)}%
                       </div>
-                      <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-1">
+                      
+                      <div className="inline-block bg-blue-50 px-2 py-1 rounded-md mt-2">
                         <span className="text-sm font-medium text-blue-700">
                         평당매출/1일: {formatHKD(twDailySalesPerPyeongCumulative)} HKD
                         </span>
@@ -1536,25 +1534,16 @@ export default function Home() {
               </div>
 
 
-              {/* 대시보드 버튼 - 당월/누적 분리 */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* 대시보드 버튼 */}
+              <div>
                 <Link
-                  href={`/taiwan/monthly?period=${selectedPeriod}`}
+                  href={`/taiwan?period=${selectedPeriod}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   당월 대시보드
-                </Link>
-                <Link
-                  href={`/taiwan/cumulative?period=${selectedPeriod}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  누적 (작업중)
                 </Link>
               </div>
             </div>

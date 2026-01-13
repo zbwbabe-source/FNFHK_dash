@@ -650,13 +650,23 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     # Category를 아이템으로 매핑
     def get_item_from_category_and_season(category, season_code, period_year, period_month):
         """Category와 Season Code를 기반으로 아이템 분류"""
-        # 모자와 신발은 Category로 판단
-        if category == 'HEA':
-            return '모자'
-        elif category == 'SHO':
-            return '신발'
         
-        # 의류는 Season Code로 판단
+        # 악세사리 판단: Season_Code가 'N'으로 끝나면 악세사리
+        is_accessory = season_code.endswith('N') if season_code else False
+        
+        if is_accessory:
+            # 악세사리인 경우 Category로 세부 분류
+            if category == 'HEA':
+                return '모자'
+            elif category == 'SHO':
+                return '신발'
+            elif category == 'BAG':
+                return '가방외'  # 기본적으로는 가방외, 별도로 '가방'에도 추가됨
+            else:
+                # ATC, BOT, WTC 등
+                return '가방외'  # 기본적으로는 가방외, 별도로 '기타ACC'에도 추가됨
+        
+        # 의류는 Season Code로 판단 (악세사리가 아닌 경우)
         if len(season_code) >= 3:
             season_year = int(season_code[:2])
             season_type = season_code[2]  # F or S
@@ -719,37 +729,42 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         for row in period_data:
             category = row.get('Category', '')
             season_code = row.get('Season_Code', '')
-            item = get_item_from_category_and_season(category, season_code, period_year, period_month)
+            
+            # 악세사리 여부 확인
+            is_accessory = season_code.endswith('N') if season_code else False
             
             # CSV는 TWD 단위이므로 HKD로 환산
             gross_sales = float(row['Gross_Sales'] or 0) / TWD_TO_HKD_RATE
             net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE  # V- 적용
             
-            # 그래프용: 가방(BAG)과 기타ACC(ATC+BOT+WTC) 분리
-            # BAG는 항상 가방으로 분리
-            # 기타ACC: 악세(N으로 끝나는 시즌) 중 모자(HEA), 신발(SHO), 가방(BAG) 제외한 나머지
-            if category == 'BAG':
-                item_sales['가방']['gross_sales'] += gross_sales
-                item_sales['가방']['net_sales'] += net_sales
-                # 가방외에도 추가 (다른 섹션 호환성)
-                item_sales[item]['gross_sales'] += gross_sales
-                item_sales[item]['net_sales'] += net_sales
-            elif category in ['ATC', 'BOT', 'WTC']:
-                # Season Code가 'N'으로 끝나면 악세 → 기타ACC
-                season_code = row.get('Season_Code', '')
-                if season_code and season_code.endswith('N'):
-                    # 악세 (N으로 끝남) → 기타ACC
+            if is_accessory:
+                # 악세사리: Season_Code가 'N'으로 끝나는 경우
+                # Category로 세부 분류
+                if category == 'HEA':
+                    # 모자
+                    item_sales['모자']['gross_sales'] += gross_sales
+                    item_sales['모자']['net_sales'] += net_sales
+                elif category == 'SHO':
+                    # 신발
+                    item_sales['신발']['gross_sales'] += gross_sales
+                    item_sales['신발']['net_sales'] += net_sales
+                elif category == 'BAG':
+                    # 가방
+                    item_sales['가방']['gross_sales'] += gross_sales
+                    item_sales['가방']['net_sales'] += net_sales
+                    # 가방외에도 추가 (다른 섹션 호환성)
+                    item_sales['가방외']['gross_sales'] += gross_sales
+                    item_sales['가방외']['net_sales'] += net_sales
+                else:
+                    # 기타ACC (ATC, BOT, WTC 등)
                     item_sales['기타ACC']['gross_sales'] += gross_sales
                     item_sales['기타ACC']['net_sales'] += net_sales
                     # 가방외에도 추가 (다른 섹션 호환성)
-                    item_sales[item]['gross_sales'] += gross_sales
-                    item_sales[item]['net_sales'] += net_sales
-                else:
-                    # Season Code가 'F'나 'S'로 끝나면 의류 → 의류로만 분류 (기타ACC 제외)
-                    item_sales[item]['gross_sales'] += gross_sales
-                    item_sales[item]['net_sales'] += net_sales
+                    item_sales['가방외']['gross_sales'] += gross_sales
+                    item_sales['가방외']['net_sales'] += net_sales
             else:
-                # BAG, ATC, BOT, WTC가 아닌 경우만 일반 로직 적용
+                # 의류: Season Code로 판단
+                item = get_item_from_category_and_season(category, season_code, period_year, period_month)
                 item_sales[item]['gross_sales'] += gross_sales
                 item_sales[item]['net_sales'] += net_sales
         
@@ -816,25 +831,27 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
             for row in prev_period_data:
                 category = row.get('Category', '')
                 season_code = row.get('Season_Code', '')
-                # YOY 계산 시 전년도 데이터는 전년도 기준으로 분류
-                item = get_item_from_category_and_season(category, season_code, prev_year, prev_month)
+                
+                # 악세사리 여부 확인
+                is_accessory = season_code.endswith('N') if season_code else False
                 net_sales = float(row['Net_Sales'] or 0) / TWD_TO_HKD_RATE / VAT_EXCLUSION_RATE
                 
-                # BAG와 기타ACC 분리 (그래프용)
-                if category == 'BAG':
-                    prev_item_sales['가방']['net_sales'] += net_sales
-                    prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
-                elif category in ['ATC', 'BOT', 'WTC']:
-                    # Season Code가 'N'으로 끝나면 악세 → 기타ACC
-                    season_code = row.get('Season_Code', '')
-                    if season_code and season_code.endswith('N'):
-                        # 악세 (N으로 끝남) → 기타ACC
-                        prev_item_sales['기타ACC']['net_sales'] += net_sales
-                        prev_item_sales[item]['net_sales'] += net_sales  # 가방외에도 추가
+                if is_accessory:
+                    # 악세사리: Season_Code가 'N'으로 끝나는 경우
+                    if category == 'HEA':
+                        prev_item_sales['모자']['net_sales'] += net_sales
+                    elif category == 'SHO':
+                        prev_item_sales['신발']['net_sales'] += net_sales
+                    elif category == 'BAG':
+                        prev_item_sales['가방']['net_sales'] += net_sales
+                        prev_item_sales['가방외']['net_sales'] += net_sales
                     else:
-                        # Season Code가 'F'나 'S'로 끝나면 의류 → 의류로만 분류 (기타ACC 제외)
-                        prev_item_sales[item]['net_sales'] += net_sales
+                        # 기타ACC
+                        prev_item_sales['기타ACC']['net_sales'] += net_sales
+                        prev_item_sales['가방외']['net_sales'] += net_sales
                 else:
+                    # 의류: Season Code로 판단
+                    item = get_item_from_category_and_season(category, season_code, prev_year, prev_month)
                     prev_item_sales[item]['net_sales'] += net_sales
             
             # YOY 계산
@@ -1415,25 +1432,49 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         }
     
     # 카테고리별 기말재고
-    for category in category_summary:
-        category_name = category_summary[category]['category_name']
+    # ACC 카테고리별 기말재고 (악세사리 N시즌만)
+    acc_category_map = {'SHO': '신발', 'HEA': '모자', 'BAG': '가방', 'ATC': '기타ACC', 'BOT': '기타ACC', 'WTC': '기타ACC'}
+    
+    for category, category_name in acc_category_map.items():
+        # 악세사리(N시즌)만 필터링
         stock_current = sum(float(row['Stock_Price'] or 0) for row in current_data 
-                           if row['Category'] == category) / TWD_TO_HKD_RATE
+                           if row['Category'] == category and row['Season_Code'].endswith('N')) / TWD_TO_HKD_RATE
         stock_previous = sum(float(row['Stock_Price'] or 0) for row in prev_data 
-                            if row['Category'] == category) / TWD_TO_HKD_RATE
+                            if row['Category'] == category and row['Season_Code'].endswith('N')) / TWD_TO_HKD_RATE
         stock_yoy = (stock_current / stock_previous * 100) if stock_previous > 0 else 0
         
-        ending_inventory['acc_by_category'][category] = {
-            'category': category,
-            'category_name': category_name,
-            'current': {
-                'stock_price': stock_current / 1000  # 1K HKD
-            },
-            'previous': {
-                'stock_price': stock_previous / 1000  # 1K HKD
-            },
-            'yoy': stock_yoy
-        }
+        # 기타ACC는 ATC, BOT, WTC 합산
+        if category_name == '기타ACC':
+            if '기타ACC' not in ending_inventory['acc_by_category']:
+                ending_inventory['acc_by_category']['기타ACC'] = {
+                    'category': '기타ACC',
+                    'category_name': '기타ACC',
+                    'current': {'stock_price': 0},
+                    'previous': {'stock_price': 0},
+                    'yoy': 0
+                }
+            ending_inventory['acc_by_category']['기타ACC']['current']['stock_price'] += stock_current / 1000
+            ending_inventory['acc_by_category']['기타ACC']['previous']['stock_price'] += stock_previous / 1000
+        else:
+            ending_inventory['acc_by_category'][category_name] = {
+                'category': category,
+                'category_name': category_name,
+                'current': {
+                    'stock_price': stock_current / 1000  # 1K HKD
+                },
+                'previous': {
+                    'stock_price': stock_previous / 1000  # 1K HKD
+                },
+                'yoy': stock_yoy
+            }
+    
+    # 기타ACC YOY 재계산
+    if '기타ACC' in ending_inventory['acc_by_category']:
+        etc_acc = ending_inventory['acc_by_category']['기타ACC']
+        if etc_acc['previous']['stock_price'] > 0:
+            etc_acc['yoy'] = (etc_acc['current']['stock_price'] / etc_acc['previous']['stock_price']) * 100
+        else:
+            etc_acc['yoy'] = 0
     
     # 과시즌 FW 재고 (년차별)
     past_season_fw_data = [row for row in current_data 
@@ -1979,8 +2020,8 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 yoy = (current_stock / prev_stock * 100) if prev_stock > 0 else 0
                 monthly_inventory_yoy[inv_key].append(round(yoy))
     
-    # ACC 판매 데이터 계산 (Season_Type = '악세')
-    print("ACC 판매 데이터 계산 중...")
+    # ACC 판매 데이터 계산 (Season_Code가 'N'으로 끝나는 것)
+    print("ACC 판매 데이터 계산 중... (Season_Code 끝자리 'N' 기준)")
     acc_sales_data = {
         'current': {
             'total': {'net_sales': 0, 'gross_sales': 0},
@@ -2007,12 +2048,15 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
         'SHO': '신발',
         'HEA': '모자',
         'BAG': '가방',
-        'ATC': '기타ACC'
+        'ATC': '기타ACC',
+        'WTC': '기타ACC',  # WTC는 기타ACC에 포함
+        'BOT': '기타ACC'   # BOT는 기타ACC에 포함
     }
     
-    # 당월 ACC 데이터
+    # 당월 ACC 데이터 (Season_Code가 'N'으로 끝나는 것)
     for row in data:
-        if row['Period'] == last_period and row.get('Season_Type') == '악세' and row.get('Brand') == 'MLB':
+        season_code = row.get('Season_Code', '')
+        if row['Period'] == last_period and season_code.endswith('N') and row.get('Brand') == 'MLB':
             net_sales = float(row['Net_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
             gross_sales = float(row['Gross_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
             
@@ -2026,9 +2070,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
                 acc_sales_data['current']['categories'][korean_cat]['net_sales'] += net_sales
                 acc_sales_data['current']['categories'][korean_cat]['gross_sales'] += gross_sales
     
-    # 전년 ACC 데이터
+    # 전년 ACC 데이터 (Season_Code가 'N'으로 끝나는 것)
     for row in data:
-        if row['Period'] == prev_period and row.get('Season_Type') == '악세' and row.get('Brand') == 'MLB':
+        season_code = row.get('Season_Code', '')
+        if row['Period'] == prev_period and season_code.endswith('N') and row.get('Brand') == 'MLB':
             net_sales = float(row['Net_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
             gross_sales = float(row['Gross_Sales'] or 0) / VAT_EXCLUSION_RATE / TWD_TO_HKD_RATE
             
@@ -2093,9 +2138,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     with open(period_output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
-    # 기본 파일명으로도 복사 (최신 Period용)
-    shutil.copy2(period_output_path, output_file_path)
-    print(f"기본 파일로도 복사: {output_file_path}")
+    # 기본 파일명으로도 복사 - 비활성화 (Period별 파일만 사용하여 이전 데이터 보호)
+    # shutil.copy2(period_output_path, output_file_path)
+    # print(f"기본 파일로도 복사: {output_file_path}")
+    print(f"Period별 파일 생성 완료: {period_output_path}")
     
     # public/dashboard 폴더에도 복사 (Next.js에서 동적 로드용)
     public_dir = 'public/dashboard'
@@ -2104,8 +2150,10 @@ def generate_dashboard_data(csv_file_path, output_file_path, target_period=None)
     public_period_file = os.path.join(public_dir, period_file)
     public_default_file = os.path.join(public_dir, os.path.basename(output_file_path))
     shutil.copy2(period_output_path, public_period_file)
-    shutil.copy2(period_output_path, public_default_file)
-    print(f"public 폴더로 복사 완료: {public_period_file}, {public_default_file}")
+    # 기본 파일 복사도 비활성화
+    # shutil.copy2(period_output_path, public_default_file)
+    print(f"public 폴더로 복사 완료: {public_period_file}")
+    print(f"기본 파일 복사 생략 (Period별 독립 데이터 유지)")
     
     print("완료!")
     print(f"  - Store 수: {len(store_summary)}")

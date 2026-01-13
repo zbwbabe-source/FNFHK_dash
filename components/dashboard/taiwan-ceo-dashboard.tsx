@@ -167,6 +167,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const [showOtherDetailCumulative, setShowOtherDetailCumulative] = useState(false);  // 누적 기타 상세
   const [showDiscountDetail, setShowDiscountDetail] = useState(true);
   const [showStoreDetail, setShowStoreDetail] = useState(false);
+  const [showStoreEfficiencyMonthlyOrYTD, setShowStoreEfficiencyMonthlyOrYTD] = useState<'monthly' | 'cumulative'>('monthly');
+  const [showOfflineStoreMonthlyOrYTD, setShowOfflineStoreMonthlyOrYTD] = useState<'monthly' | 'cumulative'>('monthly');
   const [showSeasonSalesDetail, setShowSeasonSalesDetail] = useState(true);
   const [showAccInventoryDetail, setShowAccInventoryDetail] = useState(true);
   const [showEndInventoryDetail, setShowEndInventoryDetail] = useState(true);
@@ -175,10 +177,22 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const [showPastSeasonDetail, setShowPastSeasonDetail] = useState(true);
   const [showCurrentSeasonDetail, setShowCurrentSeasonDetail] = useState(true);
   const [showYear1Detail, setShowYear1Detail] = useState(false);
+  
+  // 당월/누적 토글 상태 (각 섹션별 독립적)
+  const [showMonthlyOrYTD, setShowMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');  // 아이템별 판매(TAG)
+  const [showInventoryMonthlyOrYTD, setShowInventoryMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');  // 기말재고
+  const [showPastSeasonMonthlyOrYTD, setShowPastSeasonMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');  // 과시즌 재고
+  const [showPastSeasonSalesMonthlyOrYTD, setShowPastSeasonSalesMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');  // 시즌별 판매(TAG)
+  
+  // PL 카드용 당월/누적 토글 (각 카드별 독립적)
+  const [showSalesMonthlyOrYTD, setShowSalesMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');
+  const [showDiscountMonthlyOrYTD, setShowDiscountMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');
+  const [showProfitMonthlyOrYTD, setShowProfitMonthlyOrYTD] = useState<'monthly' | 'ytd'>('monthly');
   const [showYear2Detail, setShowYear2Detail] = useState(false);
   const [showYear1OthersDetail, setShowYear1OthersDetail] = useState(false);
   const [showYear2OthersDetail, setShowYear2OthersDetail] = useState(false);
   const [showDiscoveryDetail, setShowDiscoveryDetail] = useState(false);
+  const [showDiscoveryMonthlyOrYTD, setShowDiscoveryMonthlyOrYTD] = useState<'monthly' | 'cumulative'>('monthly');
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [expenseType, setExpenseType] = useState<'당월' | '누적'>('당월');
   const [opexType, setOpexType] = useState<'당월' | '누적'>('당월');
@@ -234,8 +248,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   // ============================================================
   // 디버깅: 데이터 확인
   useEffect(() => {
-    console.log('dashboardData:', dashboardData);
-    console.log('plData:', plData);
   }, []);
   
   const salesSummary = dashboardData?.sales_summary || {};
@@ -330,7 +342,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
       if (store.closed === true && area > 0) {
         const salesPerPyeong = (store.current.net_sales / 1000) / area;
         if (salesPerPyeong < 1) {
-          return; // 폐점 + 저매출 매장 제외
+          return; // 폐점 + 1K HKD 미만 매장 제외
         }
       }
       
@@ -463,45 +475,78 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
     return { newStores, closedStores, renovatedStores };
   }, [allTWStores]);
 
-  const activeTWStores = useMemo(
-    () => allTWStores
-      .filter((store: any) => (store?.current?.net_sales || 0) > 0 && !store.closed && store.channel !== 'Online')
+  const activeTWStores = useMemo(() => {
+    const isCumulative = showOfflineStoreMonthlyOrYTD === 'cumulative';
+    
+    return allTWStores
+      .filter((store: any) => {
+        // 온라인 매장 제외
+        if (store.channel === 'Online') return false;
+        
+        // 누적일 때는 누적 데이터가 있는 매장만 포함 (폐점 매장 포함)
+        if (isCumulative) {
+          const storeData = plData?.channel_direct_profit?.stores?.[store.store_code as keyof typeof plData.channel_direct_profit.stores];
+          const cumulativeNetSales = storeData?.cumulative_net_sales || 0;
+          // 누적 매출이 있거나, 전년에 매출이 있었던 매장 포함 (폐점 매장 포함)
+          const prevCumulativeNetSales = storeData?.cumulative_net_sales_prev || 0;
+          return (cumulativeNetSales > 0 || prevCumulativeNetSales > 0);
+        }
+        
+        // 당월일 때는 당월 매출이 있는 매장 + 폐점 매장 포함
+        const currentSales = store?.current?.net_sales || 0;
+        const previousSales = store?.previous?.net_sales || 0;
+        // 당월 매출이 있거나, 전년에 매출이 있었던 매장 포함 (폐점 매장 포함)
+        return (currentSales > 0 || previousSales > 0);
+      })
       .map((store: any) => {
-        const currentNet = store?.current?.net_sales || 0;
-        const previousNet = store?.previous?.net_sales || 0;
+        const storeData = plData?.channel_direct_profit?.stores?.[store.store_code as keyof typeof plData.channel_direct_profit.stores];
+        
+        let currentNet = 0;
+        let previousNet = 0;
+        let directProfit = 0;
+        let directProfitPrev = 0;
+        
+        if (isCumulative) {
+          // 누적 데이터 사용 (JSON에 직접 저장된 값)
+          currentNet = (storeData?.cumulative_net_sales || 0) * 1000; // K HKD -> HKD
+          previousNet = (storeData?.cumulative_net_sales_prev || 0) * 1000; // K HKD -> HKD
+          directProfit = (storeData?.cumulative_direct_profit || 0); // K HKD 그대로
+          directProfitPrev = (storeData?.cumulative_direct_profit_prev || 0); // K HKD 그대로
+        } else {
+          // 당월 데이터 사용
+          currentNet = store?.current?.net_sales || 0;
+          previousNet = store?.previous?.net_sales || 0;
+          directProfit = (storeData?.direct_profit || 0) * 1000; // K HKD -> HKD
+          directProfitPrev = (storeData?.direct_profit_prev || 0) * 1000; // K HKD -> HKD
+        }
+        
         const yoy = previousNet > 0 ? (currentNet / previousNet) * 100 : 0;
         // 전년 YOY 계산 (전전년 데이터가 있는 경우)
         const prevPrevNet = store?.previous_previous?.net_sales || 0;
         const prevYoy = prevPrevNet > 0 ? (previousNet / prevPrevNet) * 100 : 0;
-        // 직접이익 계산
-        let directProfit = 0;
-        let directProfitPrev = 0;
-        if (plData?.channel_direct_profit?.stores?.[store.store_code as keyof typeof plData.channel_direct_profit.stores]) {
-          const storeData = plData.channel_direct_profit.stores[store.store_code as keyof typeof plData.channel_direct_profit.stores];
-          directProfit = storeData.direct_profit || 0;
-          directProfitPrev = storeData.direct_profit_prev || 0;
-        }
+        
         return {
           ...store,
           shop_nm: store.store_name || store.store_code,
           shop_cd: store.store_code,
           yoy: yoy,
           prev_yoy: prevYoy, // 전년 YOY
-          direct_profit: directProfit,
-          direct_profit_prev: directProfitPrev,
+          direct_profit: isCumulative ? directProfit : (directProfit / 1000), // 누적은 이미 K HKD, 당월은 HKD -> K HKD
+          direct_profit_prev: isCumulative ? directProfitPrev : (directProfitPrev / 1000),
           current: {
             ...store.current,
-            direct_profit: directProfit
+            net_sales: currentNet,
+            direct_profit: isCumulative ? directProfit : (directProfit / 1000)
           },
           previous: {
             ...store.previous,
-            direct_profit: directProfitPrev
+            net_sales: previousNet,
+            direct_profit: isCumulative ? directProfitPrev : (directProfitPrev / 1000)
           }
         };
       })
-      .sort((a: any, b: any) => b.yoy - a.yoy), // YOY 높은 순으로 정렬
-    [allTWStores, plData]
-  );
+      .sort((a: any, b: any) => b.yoy - a.yoy); // YOY 높은 순으로 정렬
+  }, [allTWStores, plData, showOfflineStoreMonthlyOrYTD]);
 
   // 카테고리 통계 계산 함수
   const calculateCategoryStats = (stores: any[]) => {
@@ -571,6 +616,62 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const accStock = dashboardData?.acc_stock_summary || {};
   const endingInventory = dashboardData?.ending_inventory || {};
   const pastSeasonFW = endingInventory?.past_season_fw || {};
+  
+  // 전처리된 데이터 (2512부터 사용) - TAG별 데이터
+  const seasonSalesRate = dashboardData?.season_sales_rate || null;
+  const accStockWeeks = dashboardData?.acc_stock_weeks || null;
+  const monthlyItemByTag = dashboardData?.monthly_item_data || null;  // TAG별 객체
+  const monthlyItemYoy = dashboardData?.monthly_item_yoy || null;
+  const pastSeasonStock = dashboardData?.past_season_stock || null;
+  
+  // 기존 월별 추세 데이터 (배열)
+  const monthlyItemTrend = (() => {
+    const rawData = dashboardData?.monthly_item_trend || dashboardData?.monthly_item_data;
+    
+    // 이미 array면 그대로 반환
+    if (Array.isArray(rawData)) {
+      return rawData;
+    }
+    
+    // object이고 current/previous 구조면 (2512 형식)
+    // 월별 데이터가 아니므로 빈 배열 반환
+    if (rawData && typeof rawData === 'object') {
+      const firstKey = Object.keys(rawData)[0];
+      if (firstKey && rawData[firstKey]?.current !== undefined) {
+        // 이것은 요약 데이터이므로 월별 그래프를 그릴 수 없음
+        console.warn('monthly_item_data가 요약 형식입니다. 월별 데이터가 필요합니다.');
+        return [];
+      }
+      
+      // period 형식 (2501, 2502...)이면 변환
+      const converted = Object.keys(rawData)
+        .filter(key => key.match(/^\d{4}$/)) // period 형식만 필터링
+        .sort() // period 순서대로 정렬
+        .map(period => {
+          const periodData = rawData[period];
+          if (periodData && typeof periodData === 'object') {
+            return {
+              period,
+              당시즌F: periodData['당시즌F'] || periodData['25F'],
+              당시즌S: periodData['당시즌S'] || periodData['25S'],
+              과시즌F: periodData['과시즌F'],
+              과시즌S: periodData['과시즌S'],
+              모자: periodData['모자'],
+              신발: periodData['신발'],
+              가방: periodData['가방'],
+              기타ACC: periodData['기타ACC'],
+              ...periodData
+            };
+          }
+          return null;
+        })
+        .filter(item => item !== null);
+      
+      return converted;
+    }
+    
+    return [];
+  })();
 
   // 아이템별 기말재고 YOY는 ending_inventory 기준 사용 (TAG 재고 기준)
   const seasonFCurrent = endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0;
@@ -583,18 +684,21 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
   const pastSCurrent = endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0;
   const pastSPrevious = endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0;
   const yoyPastS = pastSPrevious > 0 ? (pastSCurrent / pastSPrevious * 100) : 0;         // 과시즌 SS
-  const yoyShoes = endingInventory?.acc_by_category?.SHO?.yoy || 0;             // 신발
-  const yoyHat = endingInventory?.acc_by_category?.HEA?.yoy || 0;               // 모자
-  const yoyBag = endingInventory?.acc_by_category?.BAG?.yoy || 0;               // 가방
+  const yoyShoes = endingInventory?.acc_by_category?.['신발']?.yoy || 0;             // 신발
+  const yoyHat = endingInventory?.acc_by_category?.['모자']?.yoy || 0;               // 모자
+  const yoyBag = endingInventory?.acc_by_category?.['가방']?.yoy || 0;               // 가방
   
-  // 기타ACC = ATC + BOT + WTC
-  const etcAccCurrent = (endingInventory?.acc_by_category?.ATC?.current?.stock_price || 0) + 
+  // 기타ACC: JSON에 이미 합산된 값이 있으면 사용, 없으면 개별 합산
+  const etcAccCurrent = endingInventory?.acc_by_category?.['기타ACC']?.current?.stock_price || 
+                        ((endingInventory?.acc_by_category?.ATC?.current?.stock_price || 0) + 
                         (endingInventory?.acc_by_category?.BOT?.current?.stock_price || 0) + 
-                        (endingInventory?.acc_by_category?.WTC?.current?.stock_price || 0);
-  const etcAccPrevious = (endingInventory?.acc_by_category?.ATC?.previous?.stock_price || 0) + 
+                        (endingInventory?.acc_by_category?.WTC?.current?.stock_price || 0));
+  const etcAccPrevious = endingInventory?.acc_by_category?.['기타ACC']?.previous?.stock_price ||
+                         ((endingInventory?.acc_by_category?.ATC?.previous?.stock_price || 0) + 
                          (endingInventory?.acc_by_category?.BOT?.previous?.stock_price || 0) + 
-                         (endingInventory?.acc_by_category?.WTC?.previous?.stock_price || 0);
-  const yoyEtcAcc = etcAccPrevious > 0 ? (etcAccCurrent / etcAccPrevious * 100) : 0;
+                         (endingInventory?.acc_by_category?.WTC?.previous?.stock_price || 0));
+  const yoyEtcAcc = endingInventory?.acc_by_category?.['기타ACC']?.yoy || 
+                    (etcAccPrevious > 0 ? (etcAccCurrent / etcAccPrevious * 100) : 0);
 
   const pl = plData?.current_month?.total || {};
   const plYoy = plData?.current_month?.yoy || {};
@@ -808,11 +912,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       setEditingCard('executive-summary');
                       if (!ceoInsights['executive-summary-text']) {
                         // 기본 텍스트 설정
-                        const defaultText = `• **매출개선:** 17,683K, YOY 117%
-• **매장효율성 개선:** 평당매출 653 HKD/평/1일, YOY 129%
-• **25F 판매율:** 32.2%, 전년비 +2.0%p
-• **온라인:** 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K
-• **총재고 감소:** 180,260K, YOY 93%`;
+                        const defaultText = `• **당월 실판매출:** 17,236K HKD, YOY 106% (전월비 +943K)
+• **당월 영업이익:** 2,440K HKD, YOY 121% (전월비 +416K)
+• **누적 영업이익:** 14,223K HKD, YOY 106%
+• **온라인 성장:** 5,035K (YOY 125%, 비중 29.2%), 직접이익 1,400K
+• **총재고 효율화:** 165,642K HKD, YOY 90%`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -852,6 +956,23 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     </button>
                   </div>
                 </div>
+              ) : ceoInsightsData ? (
+                // period별 CEO 인사이트 데이터 사용 (최우선)
+                <div className="space-y-2 text-sm text-gray-700">
+                  {ceoInsightsData.executive_summary.items.map((item: string, index: number) => (
+                    <div key={index} className="flex items-start">
+                      <span className="text-green-600 font-bold mr-2">•</span>
+                      <span className="whitespace-pre-wrap">
+                        {item.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i}>{part.slice(2, -2)}</strong>;
+                          }
+                          return <span key={i}>{part}</span>;
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               ) : ceoInsights['executive-summary-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
                   {ceoInsights['executive-summary-text'].split('\n').map((line: string, idx: number) => (
@@ -865,24 +986,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     </div>
                   ))}
                 </div>
-              ) : ceoInsightsData ? (
-                // period별 CEO 인사이트 데이터 사용
-                <div className="space-y-2 text-sm text-gray-700">
-                  {ceoInsightsData.executive_summary.items.map((item: string, index: number) => (
-                    <div key={index} className="flex items-start">
-                      <span className="text-green-600 font-bold mr-2">•</span>
-                      <span className="whitespace-pre-wrap">{item}</span>
-                    </div>
-                  ))}
-                </div>
               ) : (
               <div className="space-y-2 text-sm text-gray-700">
                 {(() => {
                   const insights = [];
                   
-                  // 1. 매출개선
+                  // 1. 당월 실판매출
                   const itemId1 = 'tw-key-performance-1';
-                  const defaultText1 = `매출개선: 17,683K, YOY 117%`;
+                  const defaultText1 = `당월 실판매출: 17,236K HKD, YOY 106% (전월비 +943K)`;
                   insights.push(
                     editingItemId === itemId1 ? (
                       <div key="sales" className="flex items-start">
@@ -909,9 +1020,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )
                   );
 
-                  // 2. 매장효율성 개선
+                  // 2. 당월 영업이익
                   const itemId2 = 'tw-key-performance-2';
-                  const defaultText2 = `매장효율성 개선: 평당매출 653 HKD/평/1일, YOY 129%`;
+                  const defaultText2 = `당월 영업이익: 2,440K HKD, YOY 121% (전월비 +416K)`;
                   insights.push(
                     editingItemId === itemId2 ? (
                       <div key="efficiency" className="flex items-start">
@@ -938,9 +1049,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )
                   );
 
-                  // 3. 25F 판매율
+                  // 3. 누적 영업이익
                   const itemId3 = 'tw-key-performance-3';
-                  const defaultText3 = `25F 판매율: 32.2%, 전년비 +2.0%p`;
+                  const defaultText3 = `누적 영업이익: 14,223K HKD, YOY 106%`;
                   insights.push(
                     editingItemId === itemId3 ? (
                       <div key="sales_rate" className="flex items-start">
@@ -967,9 +1078,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )
                   );
 
-                  // 4. 온라인
+                  // 4. 온라인 성장
                   const itemId4 = 'tw-key-performance-4';
-                  const defaultText4 = `온라인: 5,675K (YOY 118%, 비중 32.1%), 직접이익 1,599K`;
+                  const defaultText4 = `온라인 성장: 5,035K (YOY 125%, 비중 29.2%), 직접이익 1,400K`;
                   insights.push(
                     editingItemId === itemId4 ? (
                       <div key="online" className="flex items-start">
@@ -996,9 +1107,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )
                   );
 
-                  // 5. 총재고 감소
+                  // 5. 총재고 효율화
                   const itemId5 = 'tw-key-performance-5';
-                  const defaultText5 = `총재고 감소: 180,260K, YOY 93%`;
+                  const defaultText5 = `총재고 효율화: 165,642K HKD, YOY 90%`;
                   insights.push(
                     editingItemId === itemId5 ? (
                       <div key="inventory" className="flex items-start">
@@ -1172,8 +1283,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• **Discovery 당월 영업손실:** -38K(전월비 +218K), 누적 영업손실: -2,466K, 오프라인 3개+온라인 2개
-• **할인율 상승:** 25.8% (전월 23.7%), 수익성 관리 필요`;
+                        const defaultText = `• **Discovery 누적 영업손실:** -2,331K (오프라인 3개+온라인 2개)
+• **할인율 상승:** 22.9% (전년 21.1%, +1.8%p)
+• **SKM Tainan(T13) 당월 적자:** -14K HKD`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1212,6 +1324,23 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       취소
                     </button>
                   </div>
+                </div>
+              ) : ceoInsightsData ? (
+                // period별 CEO 인사이트 데이터 사용 (최우선)
+                <div className="space-y-2 text-sm text-gray-700">
+                  {ceoInsightsData.warnings.items.map((item: string, index: number) => (
+                    <div key={index} className="flex items-start">
+                      <span className="text-orange-600 font-bold mr-2">•</span>
+                      <span className="whitespace-pre-wrap">
+                        {item.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i}>{part.slice(2, -2)}</strong>;
+                          }
+                          return <span key={i}>{part}</span>;
+                        })}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               ) : ceoInsights['risk-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
@@ -1501,8 +1630,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('strategy');
                       if (!ceoInsights['strategy-text']) {
-                        const defaultText = `• **성장 모멘텀 유지:** 당월 영업이익 2,610K (14.8%), 매출 YOY 117% 지속
-• **온라인 채널 강화:** 온라인 직접이익률 28.2%, 매출 비중 32.1%로 확대
+                        const defaultText = `• **성장 모멘텀 유지:** 당월 영업이익 2,440K (14.2%), 매출 YOY 106% 지속
+• **온라인 채널 강화:** 온라인 직접이익률 27.8%, 매출 비중 29.2%로 확대
 • **수익성 개선:** 할인율 관리 및 영업비 효율화를 통한 영업이익률 개선`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
@@ -1542,6 +1671,23 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       취소
                     </button>
                   </div>
+                </div>
+              ) : ceoInsightsData ? (
+                // period별 CEO 인사이트 데이터 사용 (최우선)
+                <div className="space-y-2 text-sm text-gray-700">
+                  {ceoInsightsData.opportunities.items.map((item: string, index: number) => (
+                    <div key={index} className="flex items-start">
+                      <span className="text-purple-600 font-bold mr-2">•</span>
+                      <span className="whitespace-pre-wrap">
+                        {item.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i}>{part.slice(2, -2)}</strong>;
+                          }
+                          return <span key={i}>{part}</span>;
+                        })}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               ) : ceoInsights['strategy-text'] ? (
                 <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
@@ -1738,16 +1884,57 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="grid grid-cols-5 gap-4 mb-4">
             {/* 실판매출 카드 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-blue-500 hover:shadow-xl transition-shadow min-h-[400px]">
-              <div className="flex items-center mb-3">
-                <span className="text-2xl mr-2">📊</span>
-                <h3 className="text-sm font-semibold text-gray-600">실판매출 (V-)</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <span className="text-2xl mr-2">📊</span>
+                  <h3 className="text-sm font-semibold text-gray-600">실판매출 (V-)</h3>
+                </div>
+                {/* 당월/누적 토글 버튼 */}
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowSalesMonthlyOrYTD('monthly')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showSalesMonthlyOrYTD === 'monthly'
+                        ? 'bg-blue-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    당월
+                  </button>
+                  <button
+                    onClick={() => setShowSalesMonthlyOrYTD('ytd')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showSalesMonthlyOrYTD === 'ytd'
+                        ? 'bg-blue-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    누적
+                  </button>
+                </div>
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {formatNumber(pl?.net_sales)}K
-              </div>
-              <div className={`text-sm font-semibold mb-3 ${(salesSummary?.total_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                YOY {formatPercent(salesSummary?.total_yoy || 0)}% ({(salesSummary?.total_change || 0) >= 0 ? '+' : '△'}{formatNumber(Math.abs(salesSummary?.total_change || 0))}K)
-              </div>
+              {(() => {
+                const plMonthly = plData?.current_month;
+                const plCumulative = plData?.cumulative;
+                const dataToShow = showSalesMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                const yoyToShow = showSalesMonthlyOrYTD === 'monthly' ? 
+                  plMonthly?.yoy?.net_sales || 0 : 
+                  plCumulative?.yoy?.net_sales || 0;
+                const changeToShow = showSalesMonthlyOrYTD === 'monthly' ?
+                  plMonthly?.change?.net_sales || 0 :
+                  plCumulative?.change?.net_sales || 0;
+                
+                return (
+                  <>
+                    <div className="text-3xl font-bold text-gray-900 mb-2">
+                      {formatNumber(dataToShow?.total?.net_sales || pl?.net_sales)}K
+                    </div>
+                    <div className={`text-sm font-semibold mb-3 ${yoyToShow >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                      YOY {formatPercent(yoyToShow)}% ({changeToShow >= 0 ? '+' : '△'}{formatNumber(Math.abs(changeToShow))}K)
+                    </div>
+                  </>
+                );
+              })()}
               
               {/* 채널별 상세보기 */}
               <div className="border-t pt-3">
@@ -1765,51 +1952,113 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               {showSalesDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
-                  <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
-                    <span>TW (대만)</span>
-                    <span className="text-red-600">
-                      {formatNumber(((twRetail?.current?.net_sales || 0) + (twOutlet?.current?.net_sales || 0) + (twOnline?.current?.net_sales || 0)) / 1000)} 
-                      ({formatPercent(salesSummary?.total_yoy || 0)}%)
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 정상</span>
-                    <span className="font-semibold">
-                      {formatNumber((twRetail?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(twRetail?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 아울렛</span>
-                    <span className="font-semibold">
-                      {formatNumber((twOutlet?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-red-600"> ({formatPercent(twOutlet?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 온라인</span>
-                    <span className="font-semibold">
-                      {formatNumber((twOnline?.current?.net_sales || 0) / 1000)} 
-                      <span className="text-green-600"> ({formatPercent(twOnline?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
+                  {(() => {
+                    const plMonthly = plData?.current_month;
+                    const plCumulative = plData?.cumulative;
+                    const prevMonthly = plData?.prev_month;
+                    const prevCumulative = plData?.cumulative?.prev_cumulative;
+                    
+                    const dataToShow = showSalesMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                    const prevDataToShow = showSalesMonthlyOrYTD === 'monthly' ? prevMonthly : prevCumulative;
+                    
+                    return (
+                      <>
+                        <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
+                          <span>TW (대만)</span>
+                          <span className="text-red-600">
+                            {formatNumber(dataToShow?.total?.net_sales || 0)} 
+                            ({formatPercent(dataToShow?.yoy?.net_sales || 0)}%)
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 정상</span>
+                          <span className="font-semibold">
+                            {formatNumber(dataToShow?.retail?.net_sales || 0)} 
+                            <span className={`${(dataToShow?.retail?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                              {' '}({formatPercent(dataToShow?.retail?.yoy || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 아울렛</span>
+                          <span className="font-semibold">
+                            {formatNumber(dataToShow?.outlet?.net_sales || 0)} 
+                            <span className={`${(dataToShow?.outlet?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                              {' '}({formatPercent(dataToShow?.outlet?.yoy || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 온라인</span>
+                          <span className="font-semibold">
+                            {formatNumber(dataToShow?.online?.net_sales || 0)} 
+                            <span className={`${(dataToShow?.online?.yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                              {' '}({formatPercent(dataToShow?.online?.yoy || 0)}%)
+                            </span>
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>
 
             {/* 할인율 카드 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-purple-500 hover:shadow-xl transition-shadow min-h-[400px]">
-              <div className="flex items-center mb-3">
-                <span className="text-2xl mr-2">🏷️</span>
-                <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <span className="text-2xl mr-2">🏷️</span>
+                  <h3 className="text-sm font-semibold text-gray-600">할인율</h3>
+                </div>
+                {/* 당월/누적 토글 버튼 */}
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowDiscountMonthlyOrYTD('monthly')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showDiscountMonthlyOrYTD === 'monthly'
+                        ? 'bg-purple-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    당월
+                  </button>
+                  <button
+                    onClick={() => setShowDiscountMonthlyOrYTD('ytd')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showDiscountMonthlyOrYTD === 'ytd'
+                        ? 'bg-purple-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    누적
+                  </button>
+                </div>
               </div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {formatPercent((pl as any)?.discount_rate || 0, 1)}%
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent(prevMonthDiscountRate, 1)}%</span> | 
-                <span className="text-green-600"> 전년비 {formatPercent(((pl as any)?.discount_rate || 0) - prevMonthDiscountRate, 1)}%p</span>
-              </div>
+              {(() => {
+                const plMonthly = plData?.current_month;
+                const plCumulative = plData?.cumulative;
+                const prevData = plData?.prev_month;
+                const prevCumulative = plData?.cumulative?.prev_cumulative;
+                
+                const dataToShow = showDiscountMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                const prevToShow = showDiscountMonthlyOrYTD === 'monthly' ? prevData : prevCumulative;
+                const currentRate = dataToShow?.total?.discount_rate || (pl as any)?.discount_rate || 0;
+                const prevRate = prevToShow?.total?.discount_rate || prevMonthDiscountRate;
+                
+                return (
+                  <>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">
+                      {formatPercent(currentRate, 1)}%
+                    </div>
+                    <div className="text-sm font-semibold mb-3">
+                      <span className={currentRate - prevRate > 0 ? 'text-red-600' : 'text-green-600'}>
+                        전년비 {currentRate - prevRate >= 0 ? '+' : '△'}{formatPercent(Math.abs(currentRate - prevRate), 1)}%p
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
               
               {/* 할인 상세보기 */}
               <div className="border-t pt-3">
@@ -1827,52 +2076,134 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               {showDiscountDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">TW (대만)</span>
-                    <span className="font-semibold text-purple-600">
-                      {formatPercent(plData?.current_month?.total?.discount_rate || 0, 1)}%
-                      <span className="text-gray-500"> (전년비 {formatPercent(((plData?.current_month?.total as any)?.discount_rate || 0) - ((plData?.prev_month?.total as any)?.discount_rate || 0), 1)}%p)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 정상</span>
-                    <span className="font-semibold">
-                      {formatPercent(channelDiscountRates?.Retail?.current || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(channelDiscountRates?.Retail?.previous || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 아울렛</span>
-                    <span className="font-semibold">
-                      {formatPercent(channelDiscountRates?.Outlet?.current || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(channelDiscountRates?.Outlet?.previous || 0, 1)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs pl-3">
-                    <span className="text-gray-600">- 온라인</span>
-                    <span className="font-semibold">
-                      {formatPercent(channelDiscountRates?.Online?.current || 0, 1)}%
-                      <span className="text-gray-500"> (전년 {formatPercent(channelDiscountRates?.Online?.previous || 0, 1)}%)</span>
-                    </span>
-                  </div>
+                  {(() => {
+                    const plMonthly = plData?.current_month;
+                    const plCumulative = plData?.cumulative;
+                    const prevMonthly = plData?.prev_month;
+                    const prevCumulative = plData?.cumulative?.prev_cumulative;
+                    
+                    const dataToShow = showDiscountMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                    const prevDataToShow = showDiscountMonthlyOrYTD === 'monthly' ? prevMonthly : prevCumulative;
+                    
+                    return (
+                      <>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">TW (대만)</span>
+                          <span className="font-semibold text-purple-600">
+                            {formatPercent(dataToShow?.total?.discount_rate || 0, 1)}%
+                            {(() => {
+                              const change = (dataToShow?.total?.discount_rate || 0) - (prevDataToShow?.total?.discount_rate || 0);
+                              return (
+                                <span className={change > 0 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({change >= 0 ? '+' : '△'}{formatPercent(Math.abs(change), 1)}%p)
+                                </span>
+                              );
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 정상</span>
+                          <span className="font-semibold">
+                            {formatPercent(dataToShow?.retail?.discount_rate || 0, 1)}%
+                            {(() => {
+                              const change = (dataToShow?.retail?.discount_rate || 0) - (prevDataToShow?.retail?.discount_rate || 0);
+                              return (
+                                <span className={change > 0 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({change >= 0 ? '+' : '△'}{formatPercent(Math.abs(change), 1)}%p)
+                                </span>
+                              );
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 아울렛</span>
+                          <span className="font-semibold">
+                            {formatPercent(dataToShow?.outlet?.discount_rate || 0, 1)}%
+                            {(() => {
+                              const change = (dataToShow?.outlet?.discount_rate || 0) - (prevDataToShow?.outlet?.discount_rate || 0);
+                              return (
+                                <span className={change > 0 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({change >= 0 ? '+' : '△'}{formatPercent(Math.abs(change), 1)}%p)
+                                </span>
+                              );
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs pl-3">
+                          <span className="text-gray-600">- 온라인</span>
+                          <span className="font-semibold">
+                            {formatPercent(dataToShow?.online?.discount_rate || 0, 1)}%
+                            {(() => {
+                              const change = (dataToShow?.online?.discount_rate || 0) - (prevDataToShow?.online?.discount_rate || 0);
+                              return (
+                                <span className={change > 0 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({change >= 0 ? '+' : '△'}{formatPercent(Math.abs(change), 1)}%p)
+                                </span>
+                              );
+                            })()}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>
 
             {/* 영업이익 카드 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-orange-500 hover:shadow-xl transition-shadow min-h-[400px]">
-              <div className="flex items-center mb-3">
-                <span className="text-2xl mr-2">💰</span>
-                <h3 className="text-sm font-semibold text-gray-600">영업이익</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <span className="text-2xl mr-2">💰</span>
+                  <h3 className="text-sm font-semibold text-gray-600">영업이익</h3>
+                </div>
+                {/* 당월/누적 토글 버튼 */}
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowProfitMonthlyOrYTD('monthly')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showProfitMonthlyOrYTD === 'monthly'
+                        ? 'bg-orange-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    당월
+                  </button>
+                  <button
+                    onClick={() => setShowProfitMonthlyOrYTD('ytd')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      showProfitMonthlyOrYTD === 'ytd'
+                        ? 'bg-orange-600 text-white font-semibold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    누적
+                  </button>
+                </div>
               </div>
-              <div className={`text-3xl font-bold mb-2 ${(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatNumber(pl?.operating_profit || 0)}
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className={(plYoy?.operating_profit || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>
-                  YOY {formatPercent(plYoy?.operating_profit || 0)}%
-                </span> | <span className={(pl?.operating_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>이익률 {formatPercent((pl as any)?.operating_profit_rate, 1)}%</span>
-              </div>
+              {(() => {
+                const plMonthly = plData?.current_month;
+                const plCumulative = plData?.cumulative;
+                const dataToShow = showProfitMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                const opProfit = dataToShow?.total?.operating_profit || pl?.operating_profit || 0;
+                const opProfitRate = dataToShow?.total?.operating_profit_rate || (pl as any)?.operating_profit_rate || 0;
+                const yoy = dataToShow?.yoy?.operating_profit || plYoy?.operating_profit || 0;
+                
+                return (
+                  <>
+                    <div className={`text-3xl font-bold mb-2 ${opProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatNumber(opProfit)}
+                    </div>
+                    <div className="text-sm font-semibold mb-3">
+                      <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                        YOY {formatPercent(yoy)}%
+                      </span> | <span className={opProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        이익률 {formatPercent(opProfitRate, 1)}%
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
               
               {/* 채널별 직접이익[이익률] */}
               <div className="border-t pt-3">
@@ -1890,34 +2221,50 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               {showProfitDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">TW 오프라인</span>
-                    <span className="font-semibold text-red-600">
-                      {formatNumber(plData?.channel_direct_profit?.tw_offline?.direct_profit || 0)} 
-                      <span className="text-green-600"> ({formatPercent(plData?.channel_direct_profit?.tw_offline?.yoy || 0)}%)</span> 
-                      <span className="text-red-600"> [{formatPercent(plData?.channel_direct_profit?.tw_offline?.direct_profit_rate || 0, 1)}%]</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">TW 온라인</span>
-                    <span className="font-semibold">
-                      {formatNumber(plData?.channel_direct_profit?.tw_online?.direct_profit || 0)} 
-                      <span className="text-green-600"> ({formatPercent(plData?.channel_direct_profit?.tw_online?.yoy || 0)}%)</span> 
-                      <span className="text-blue-600"> [{formatPercent(plData?.channel_direct_profit?.tw_online?.direct_profit_rate || 0, 1)}%]</span>
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs font-semibold mt-2 pt-2 border-t">
-                    <span className="text-gray-700">전체 직접이익</span>
-                    <span className="text-red-600">
-                      {formatNumber(plData?.channel_direct_profit?.total?.direct_profit || 0)} 
-                      ({formatPercent(plData?.channel_direct_profit?.total?.yoy || 0)}%)
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-gray-700">직접이익률</span>
-                    <span className="text-red-600">{formatPercent(plData?.channel_direct_profit?.total?.direct_profit_rate || 0)}%</span>
-                  </div>
+                  {(() => {
+                    const plMonthly = plData?.current_month;
+                    const plCumulative = plData?.cumulative;
+                    const dataToShow = showProfitMonthlyOrYTD === 'monthly' ? plMonthly : plCumulative;
+                    
+                    // direct_profit 계산 (없는 경우 net_sales * direct_profit_rate로 계산)
+                    const retailDirectProfit = dataToShow?.retail?.direct_profit 
+                      || (dataToShow?.retail?.net_sales || 0) * (dataToShow?.retail?.direct_profit_rate || 0) / 100;
+                    const outletDirectProfit = dataToShow?.outlet?.direct_profit 
+                      || (dataToShow?.outlet?.net_sales || 0) * (dataToShow?.outlet?.direct_profit_rate || 0) / 100;
+                    const onlineDirectProfit = dataToShow?.online?.direct_profit || 0;
+                    
+                    return (
+                      <>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">- 정상</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round(retailDirectProfit))}K
+                            <span className="text-purple-600">
+                              {' '}[{formatPercent(dataToShow?.retail?.direct_profit_rate || 0, 1)}%]
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">- 아울렛</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round(outletDirectProfit))}K
+                            <span className="text-purple-600">
+                              {' '}[{formatPercent(dataToShow?.outlet?.direct_profit_rate || 0, 1)}%]
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-600">- 온라인</span>
+                          <span className="font-semibold">
+                            {formatNumber(Math.round(onlineDirectProfit))}K
+                            <span className="text-purple-600">
+                              {' '}[{formatPercent(dataToShow?.online?.direct_profit_rate || 0, 1)}%]
+                            </span>
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
               
@@ -2025,38 +2372,96 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   
                   {showDiscoveryDetail && (
                     <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                      <div className="text-[10px] text-purple-600 mb-2">
-                        온라인{plData?.discovery?.store_count?.online || 0}개, 오프라인{plData?.discovery?.store_count?.offline || 0}개 (10/1 영업개시)
+                      {/* 당월/누적 토글 */}
+                      <div className="flex gap-1 mb-2">
+                        <button
+                          onClick={() => setShowDiscoveryMonthlyOrYTD('monthly')}
+                          className={`px-2 py-0.5 text-[10px] font-semibold rounded transition-colors ${
+                            showDiscoveryMonthlyOrYTD === 'monthly'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-purple-200 text-purple-600 hover:bg-purple-300'
+                          }`}
+                        >
+                          당월
+                        </button>
+                        <button
+                          onClick={() => setShowDiscoveryMonthlyOrYTD('cumulative')}
+                          className={`px-2 py-0.5 text-[10px] font-semibold rounded transition-colors ${
+                            showDiscoveryMonthlyOrYTD === 'cumulative'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-purple-200 text-purple-600 hover:bg-purple-300'
+                          }`}
+                        >
+                          누적
+                        </button>
                       </div>
-                      <div className="space-y-1 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-purple-700">실판매출</span>
-                          <span className="font-semibold text-purple-900">
-                            {formatNumber(plData?.discovery?.net_sales)} 
-                            <span className="text-purple-600"> (할인율 {formatPercent(plData?.discovery?.discount_rate, 1)}%)</span>
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-purple-700">직접비</span>
-                          <span className="font-semibold text-purple-900">{formatNumber(plData?.discovery?.direct_cost)}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold bg-purple-100 px-2 py-1 rounded">
-                          <span className="text-purple-800">직접손실</span>
-                          <span className="text-red-700">{formatNumber(plData?.discovery?.direct_profit)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] pl-2">
-                          <span className="text-purple-600">• 마케팅비</span>
-                          <span className="text-purple-700">{formatNumber(plData?.discovery?.marketing)}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] pl-2">
-                          <span className="text-purple-600">• 여비교통비</span>
-                          <span className="text-purple-700">{formatNumber(plData?.discovery?.travel)}</span>
-                        </div>
-                        <div className="flex justify-between font-bold bg-red-100 px-2 py-1 rounded mt-1">
-                          <span className="text-red-800">영업손실</span>
-                          <span className="text-red-700">{formatNumber(plData?.discovery?.operating_profit)}</span>
-                        </div>
-                      </div>
+                      
+                      {(() => {
+                        const discoveryData = showDiscoveryMonthlyOrYTD === 'monthly' 
+                          ? plData?.discovery 
+                          : plData?.discovery_cumulative;
+                        
+                        return (
+                          <>
+                            <div className="text-[10px] text-purple-600 mb-2">
+                              온라인{plData?.discovery?.store_count?.online || 0}개, 오프라인{plData?.discovery?.store_count?.offline || 0}개
+                            </div>
+                            <div className="space-y-1 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-purple-700">실판매출</span>
+                                <span className="font-semibold text-purple-900">
+                                  {formatNumber(discoveryData?.net_sales)} 
+                                  <span className="text-purple-600"> (할인율 {formatPercent(discoveryData?.discount_rate, 1)}%)</span>
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-purple-700">직접비</span>
+                                <span className="font-semibold text-purple-900">{formatNumber(discoveryData?.direct_cost)}</span>
+                              </div>
+                              <div className={`flex justify-between font-semibold px-2 py-1 rounded ${
+                                (discoveryData?.direct_profit || 0) >= 0 ? 'bg-green-100' : 'bg-purple-100'
+                              }`}>
+                                <span className={
+                                  (discoveryData?.direct_profit || 0) >= 0 ? 'text-green-800' : 'text-purple-800'
+                                }>
+                                  {(discoveryData?.direct_profit || 0) >= 0 ? '직접이익' : '직접손실'}
+                                </span>
+                                <span className={
+                                  (discoveryData?.direct_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                                }>
+                                  {formatNumber(discoveryData?.direct_profit)}
+                                </span>
+                              </div>
+                              {discoveryData?.marketing > 0 && (
+                                <div className="flex justify-between text-[10px] pl-2">
+                                  <span className="text-purple-600">• 마케팅비</span>
+                                  <span className="text-purple-700">{formatNumber(discoveryData?.marketing)}</span>
+                                </div>
+                              )}
+                              {discoveryData?.travel > 0 && (
+                                <div className="flex justify-between text-[10px] pl-2">
+                                  <span className="text-purple-600">• 여비교통비</span>
+                                  <span className="text-purple-700">{formatNumber(discoveryData?.travel)}</span>
+                                </div>
+                              )}
+                              <div className={`flex justify-between font-bold px-2 py-1 rounded mt-1 ${
+                                (discoveryData?.operating_profit || 0) >= 0 ? 'bg-green-100' : 'bg-red-100'
+                              }`}>
+                                <span className={
+                                  (discoveryData?.operating_profit || 0) >= 0 ? 'text-green-800' : 'text-red-800'
+                                }>
+                                  {(discoveryData?.operating_profit || 0) >= 0 ? '영업이익' : '영업손실'}
+                                </span>
+                                <span className={
+                                  (discoveryData?.operating_profit || 0) >= 0 ? 'text-green-700' : 'text-red-700'
+                                }>
+                                  {formatNumber(discoveryData?.operating_profit)}
+                                </span>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -2127,12 +2532,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         const expenseDetail = plData?.current_month?.total?.expense_detail || {};
                         const expenseDetailPrev = plData?.prev_month?.total?.expense_detail || {};
                         
-                        console.log('당월 영업비 상세 렌더링:', {
-                          expenseDetail,
-                          expenseDetailKeys: Object.keys(expenseDetail),
-                          other_detail: expenseDetail.other_detail
-                        });
-                        
                         // 상세 항목 정의
                         const expenseItems = [
                           { key: 'salary', label: '급여', color: 'red' },
@@ -2169,8 +2568,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           
                           return (
                             <div className="space-y-1">
-                              {expenseItems.map((item) => {
-                                console.log('expenseItems.map - item:', item.key, item);
+                              {expenseItems.filter(item => {
+                                const current = (expenseDetail as any)[item.key] || 0;
+                                return current !== 0; // 0이 아닌 항목만 표시
+                              }).map((item) => {
                                 const current = (expenseDetail as any)[item.key] || 0;
                                 const previous = (expenseDetailPrev as any)[item.key] || 0;
                                 // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
@@ -2199,14 +2600,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                     });
                                   
                                   // 디버깅 로그
-                                  console.log('기타 항목 렌더링:', { 
-                                    itemKey: item.key,
-                                    hasOtherDetail, 
-                                    otherDetailKeys: Object.keys(otherDetail),
-                                    otherDetailValues: Object.values(otherDetail),
-                                    showOtherDetail,
-                                    otherDetail
-                                  });
                                   
                                   return (
                                     <div key={item.key}>
@@ -2214,12 +2607,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
-                                          console.log('기타 토글 클릭:', { 
-                                            showOtherDetail, 
-                                            hasOtherDetail, 
-                                            otherDetail,
-                                            currentShowOtherDetail: showOtherDetail
-                                          });
                                           setShowOtherDetail(!showOtherDetail);
                                         }}
                                         className="flex justify-between items-center w-full text-xs hover:bg-gray-50 rounded px-1 py-0.5 -mx-1"
@@ -2298,8 +2685,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         // 데이터가 있으면 실제 값 표시
                         return (
                           <div className="space-y-1">
-                            {expenseItems.map((item) => {
-                              console.log('expenseItems.map (hasData=true) - item:', item.key, item);
+                            {expenseItems.filter(item => {
+                              const current = (expenseDetail as any)[item.key] || 0;
+                              return current !== 0; // 0이 아닌 항목만 표시
+                            }).map((item) => {
                               const current = (expenseDetail as any)[item.key] || 0;
                               const previous = (expenseDetailPrev as any)[item.key] || 0;
                               const yoy = previous > 0 ? ((current / previous) * 100) : 0;
@@ -2307,7 +2696,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                               
                               // 기타 항목인 경우 토글 기능 추가
                               if (item.key === 'other') {
-                                console.log('기타 항목 처리 시작:', { itemKey: item.key, current, previous });
                                 const otherDetail = expenseDetail.other_detail || {};
                                 const otherDetailPrev = expenseDetailPrev.other_detail || {};
                                 const hasOtherDetail = otherDetail && 
@@ -2317,26 +2705,12 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                     return !isNaN(numVal) && numVal > 0;
                                   });
                                 
-                                console.log('기타 항목 렌더링 (hasData=true):', { 
-                                  hasOtherDetail, 
-                                  otherDetailKeys: Object.keys(otherDetail),
-                                  otherDetailValues: Object.values(otherDetail),
-                                  showOtherDetail,
-                                  otherDetail
-                                });
-                                
                                 return (
                                   <div key={item.key}>
                                     <button
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        console.log('기타 토글 클릭 (hasData=true):', { 
-                                          showOtherDetail, 
-                                          hasOtherDetail, 
-                                          otherDetail,
-                                          currentShowOtherDetail: showOtherDetail
-                                        });
                                         setShowOtherDetail(!showOtherDetail);
                                       }}
                                       className="flex justify-between items-center w-full text-xs hover:bg-gray-50 rounded px-1 py-0.5 -mx-1"
@@ -2486,7 +2860,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         
                         return (
                           <div className="space-y-1">
-                            {expenseItems.map((item) => {
+                            {expenseItems.filter(item => {
+                              const current = (expenseDetail as any)[item.key] || 0;
+                              return current !== 0; // 0이 아닌 항목만 표시
+                            }).map((item) => {
                               const current = (expenseDetail as any)[item.key] || 0;
                               const previous = (expenseDetailPrev as any)[item.key] || 0;
                               // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
@@ -2625,28 +3002,84 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
             {/* 매장효율성 카드 - 평당매출 */}
             <div className="bg-white rounded-lg shadow-lg p-5 border-l-4 border-indigo-500 hover:shadow-xl transition-shadow min-h-[400px]">
-              <div className="flex items-center mb-3">
-                <span className="text-2xl mr-2">🏪</span>
-                <h3 className="text-sm font-semibold text-gray-600">매장효율성 (평당매출)</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <span className="text-2xl mr-2">🏪</span>
+                  <h3 className="text-sm font-semibold text-gray-600">매장효율성 (평당매출)</h3>
+                </div>
+                
+                {/* 당월/누적 토글 */}
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setShowStoreEfficiencyMonthlyOrYTD('monthly')}
+                    className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors ${
+                      showStoreEfficiencyMonthlyOrYTD === 'monthly'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    }`}
+                  >
+                    당월
+                  </button>
+                  <button
+                    onClick={() => setShowStoreEfficiencyMonthlyOrYTD('cumulative')}
+                    className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors ${
+                      showStoreEfficiencyMonthlyOrYTD === 'cumulative'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    }`}
+                  >
+                    누적
+                  </button>
+                </div>
               </div>
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {formatNumber(Math.round(twDailySalesPerPyeong))} HKD
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">평당매출/1일</span>
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className={twSalesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}>
-                  YOY {formatPercent(twSalesPerPyeongYoy)}%
-                </span>
-                <span className="text-gray-600"> (전년 {formatNumber(Math.round(twPrevDailySalesPerPyeong))} HKD)</span>
-              </div>
-              <div className="text-xs text-gray-600 mb-3">
-                (면적: {formatNumber(twTotalArea)}평 | {period ? parseInt(period.slice(2, 4)) : 11}월: {period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30}일)
-              </div>
-              <div className="text-[9px] text-gray-500 mb-3">
-                *폐점 매장 제외
-              </div>
+              
+              {(() => {
+                // 당월 또는 누적 데이터 선택
+                const currentMonth = parseInt(period?.slice(2, 4) || '12');
+                const daysInMonth = currentMonth === 2 ? 29 : [1,3,5,7,8,10,12].includes(currentMonth) ? 31 : 30;
+                const cumulativeDays = Array.from({length: currentMonth}, (_, i) => {
+                  const month = i + 1;
+                  return month === 2 ? 29 : [1,3,5,7,8,10,12].includes(month) ? 31 : 30;
+                }).reduce((sum, days) => sum + days, 0);
+                
+                const salesData = showStoreEfficiencyMonthlyOrYTD === 'monthly' 
+                  ? plData?.current_month?.offline?.net_sales || 0
+                  : plData?.cumulative?.offline?.net_sales || 0;
+                
+                const prevSalesData = showStoreEfficiencyMonthlyOrYTD === 'monthly'
+                  ? plData?.prev_month?.offline?.net_sales || 0
+                  : plData?.cumulative?.prev_cumulative?.offline?.net_sales || 0;
+                
+                const days = showStoreEfficiencyMonthlyOrYTD === 'monthly' ? daysInMonth : cumulativeDays;
+                
+                // 전년도는 당시 운영 중이던 매장 면적 사용 (폐점 매장 포함)
+                const dailySalesPerPyeong = twTotalArea > 0 ? (salesData * 1000) / twTotalArea / days : 0;
+                const prevDailySalesPerPyeong = twPrevTotalArea > 0 ? (prevSalesData * 1000) / twPrevTotalArea / days : 0;
+                const salesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
+                
+                return (
+                  <>
+                    <div className="text-3xl font-bold text-green-600 mb-2">
+                      {formatNumber(Math.round(dailySalesPerPyeong))} HKD
+                    </div>
+                    <div className="text-sm font-semibold mb-3">
+                      <span className="text-gray-600">평당매출/1일</span>
+                    </div>
+                    <div className="text-sm font-semibold mb-3">
+                      <span className={salesPerPyeongYoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                        YOY {formatPercent(salesPerPyeongYoy)}%
+                      </span>
+                      <span className="text-gray-600"> (전년 {formatNumber(Math.round(prevDailySalesPerPyeong))} HKD)</span>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-3">
+                      (면적: {formatNumber(twTotalArea)}평 | {showStoreEfficiencyMonthlyOrYTD === 'monthly' ? `${currentMonth}월: ${daysInMonth}일` : `누적: ${cumulativeDays}일`})
+                    </div>
+                    <div className="text-[9px] text-gray-500 mb-3">
+                      *폐점 매장 제외
+                    </div>
+                  </>
+                );
+              })()}
               
               {/* 평당매출 상세보기 */}
               <div className="border-t pt-3">
@@ -2668,20 +3101,67 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     <div className="bg-indigo-50 rounded p-2">
                       <div className="text-xs font-semibold text-indigo-800 mb-1">📊 평당매출 계산기준</div>
                       <div className="px-2 pb-2 text-xs text-indigo-700 space-y-1">
-                        <div className="font-semibold text-indigo-800 mb-1">당월</div>
-                        <div>• <span className="font-semibold">계산식:</span> (PL 매출 ÷ 총 면적 × 1000) ÷ 일수</div>
-                        <div>• <span className="font-semibold">매출:</span> {formatNumber(plData?.current_month?.offline?.net_sales || 0)} K HKD (PL 데이터)</div>
-                        <div>• <span className="font-semibold">면적:</span> {formatNumber(twTotalArea)}평 (폐점+저매출 제외)</div>
-                        <div>• <span className="font-semibold">일수:</span> {period ? parseInt(period.slice(2, 4)) : 11}월 {period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30}일</div>
-                        
-                        <div className="font-semibold text-indigo-800 mb-1 mt-2 pt-2 border-t border-indigo-200">전년</div>
-                        <div>• <span className="font-semibold">매출:</span> {formatNumber(plData?.prev_month?.offline?.net_sales || 0)} K HKD (PL 데이터)</div>
-                        <div>• <span className="font-semibold">면적:</span> {formatNumber(twPrevTotalArea)}평</div>
-                        <div>• <span className="font-semibold">평당매출/1일:</span> {formatNumber(Math.round(twPrevDailySalesPerPyeong))} HKD</div>
-                        
-                        <div className="pt-1 mt-1 border-t border-indigo-200">
-                          <span className="font-semibold">YOY:</span> <span className={twSalesPerPyeongYoy >= 100 ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}>{formatPercent(twSalesPerPyeongYoy)}%</span>
-                      </div>
+                        {(() => {
+                          const currentMonth = parseInt(period?.slice(2, 4) || '12');
+                          const daysInMonth = currentMonth === 2 ? 29 : [1,3,5,7,8,10,12].includes(currentMonth) ? 31 : 30;
+                          const cumulativeDays = Array.from({length: currentMonth}, (_, i) => {
+                            const month = i + 1;
+                            return month === 2 ? 29 : [1,3,5,7,8,10,12].includes(month) ? 31 : 30;
+                          }).reduce((sum, days) => sum + days, 0);
+                          
+                          if (showStoreEfficiencyMonthlyOrYTD === 'monthly') {
+                            const salesData = plData?.current_month?.offline?.net_sales || 0;
+                            const prevSalesData = plData?.prev_month?.offline?.net_sales || 0;
+                            const dailySalesPerPyeong = twTotalArea > 0 ? (salesData * 1000) / twTotalArea / daysInMonth : 0;
+                            const prevDailySalesPerPyeong = twPrevTotalArea > 0 ? (prevSalesData * 1000) / twPrevTotalArea / daysInMonth : 0;
+                            const salesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
+                            
+                            return (
+                              <>
+                                <div className="font-semibold text-indigo-800 mb-1">당월</div>
+                                <div>• <span className="font-semibold">계산식:</span> (PL 매출 ÷ 총 면적 × 1000) ÷ 일수</div>
+                                <div>• <span className="font-semibold">매출:</span> {formatNumber(salesData)} K HKD (PL 데이터)</div>
+                                <div>• <span className="font-semibold">면적:</span> {formatNumber(twTotalArea)}평 (폐점+1K HKD 미만 제외)</div>
+                                <div>• <span className="font-semibold">일수:</span> {currentMonth}월 {daysInMonth}일</div>
+                                
+                                <div className="font-semibold text-indigo-800 mb-1 mt-2 pt-2 border-t border-indigo-200">전년</div>
+                                <div>• <span className="font-semibold">매출:</span> {formatNumber(prevSalesData)} K HKD (PL 데이터)</div>
+                                <div>• <span className="font-semibold">면적:</span> {formatNumber(twPrevTotalArea)}평 (당시 운영 매장)</div>
+                                <div>• <span className="font-semibold">평당매출/1일:</span> {formatNumber(Math.round(prevDailySalesPerPyeong))} HKD</div>
+                                
+                                <div className="pt-1 mt-1 border-t border-indigo-200">
+                                  <span className="font-semibold">YOY:</span> <span className={salesPerPyeongYoy >= 100 ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}>{formatPercent(salesPerPyeongYoy)}%</span>
+                                </div>
+                              </>
+                            );
+                          } else {
+                            // 누적 모드
+                            const salesData = plData?.cumulative?.offline?.net_sales || 0;
+                            const prevSalesData = plData?.cumulative?.prev_cumulative?.offline?.net_sales || 0;
+                            const dailySalesPerPyeong = twTotalArea > 0 ? (salesData * 1000) / twTotalArea / cumulativeDays : 0;
+                            const prevDailySalesPerPyeong = twPrevTotalArea > 0 ? (prevSalesData * 1000) / twPrevTotalArea / cumulativeDays : 0;
+                            const salesPerPyeongYoy = prevDailySalesPerPyeong > 0 ? (dailySalesPerPyeong / prevDailySalesPerPyeong) * 100 : 0;
+                            
+                            return (
+                              <>
+                                <div className="font-semibold text-indigo-800 mb-1">누적 (1~{currentMonth}월)</div>
+                                <div>• <span className="font-semibold">계산식:</span> (PL 누적매출 ÷ 총 면적 × 1000) ÷ 누적일수</div>
+                                <div>• <span className="font-semibold">누적매출:</span> {formatNumber(salesData)} K HKD (PL 데이터)</div>
+                                <div>• <span className="font-semibold">면적:</span> {formatNumber(twTotalArea)}평 (폐점+1K HKD 미만 제외)</div>
+                                <div>• <span className="font-semibold">누적일수:</span> 1~{currentMonth}월 총 {cumulativeDays}일</div>
+                                
+                                <div className="font-semibold text-indigo-800 mb-1 mt-2 pt-2 border-t border-indigo-200">전년 누적</div>
+                                <div>• <span className="font-semibold">누적매출:</span> {formatNumber(prevSalesData)} K HKD (PL 데이터)</div>
+                                <div>• <span className="font-semibold">면적:</span> {formatNumber(twPrevTotalArea)}평 (당시 운영 매장)</div>
+                                <div>• <span className="font-semibold">평당매출/1일:</span> {formatNumber(Math.round(prevDailySalesPerPyeong))} HKD</div>
+                                
+                                <div className="pt-1 mt-1 border-t border-indigo-200">
+                                  <span className="font-semibold">YOY:</span> <span className={salesPerPyeongYoy >= 100 ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}>{formatPercent(salesPerPyeongYoy)}%</span>
+                                </div>
+                              </>
+                            );
+                          }
+                        })()}
                         
                         <div className="pt-1 mt-1 border-t border-indigo-200 text-[10px]">
                           <span className="font-semibold">※ 참고:</span> 평당매출이 1 K HKD/평 미만인 폐점 매장은 제외됩니다.
@@ -2849,12 +3329,24 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </div>
               
               <div className="text-3xl font-bold text-indigo-600 mb-1">
-                {formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0, 1)}%
+                {seasonSalesRate ? 
+                  formatPercent(seasonSalesRate.current?.sales_rate || 0, 1) : 
+                  formatPercent(seasonSales?.current_season_f?.accumulated?.sales_rate || 0, 1)
+                }%
               </div>
               <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatPercent((seasonSales?.current_season_f?.accumulated?.sales_rate || 0) - (seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)}%</span> | 
-                <span className={(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}> 
-                  전년비 {(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? '+' : ''}{formatPercent(Math.abs(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)}%p
+                <span className="text-gray-600">전년 {seasonSalesRate ? 
+                  formatPercent(seasonSalesRate.previous?.sales_rate || 0, 1) :
+                  formatPercent((seasonSales?.current_season_f?.accumulated?.sales_rate || 0) - (seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)
+                }%</span> | 
+                <span className={seasonSalesRate ? 
+                  ((seasonSalesRate.current?.sales_rate || 0) - (seasonSalesRate.previous?.sales_rate || 0) >= 0 ? 'text-green-600' : 'text-red-600') :
+                  ((seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? 'text-green-600' : 'text-red-600')
+                }> 
+                  전년비 {seasonSalesRate ?
+                    ((seasonSalesRate.current?.sales_rate || 0) - (seasonSalesRate.previous?.sales_rate || 0) >= 0 ? '+' : '△') + formatPercent(Math.abs((seasonSalesRate.current?.sales_rate || 0) - (seasonSalesRate.previous?.sales_rate || 0)), 1) :
+                    ((seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0) >= 0 ? '+' : '△') + formatPercent(Math.abs(seasonSales?.current_season_f?.accumulated?.sales_rate_change || 0), 1)
+                  }%p
                 </span>
               </div>
               
@@ -2863,15 +3355,39 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">누적입고</span>
                   <span className="text-sm font-bold text-red-600">
-                    {formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.net_acp_p || 0))}K 
-                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%) 🔽
+                    {seasonSalesRate ? 
+                      `${formatNumber(Math.round(seasonSalesRate.current?.net_ac_pp || 0))}K` :
+                      `${formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.net_acp_p || 0))}K`
+                    }
+                    {seasonSalesRate ? 
+                      ` (${formatPercent(seasonSalesRate.yoy?.inbound_yoy || 0)}%)` :
+                      ` (${formatPercent(seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0)}%)`
+                    }
+                    {(() => {
+                      const yoy = seasonSalesRate ? 
+                        seasonSalesRate.yoy?.inbound_yoy || 0 :
+                        seasonSales?.current_season_f?.accumulated?.net_acp_p_yoy || 0;
+                      return yoy >= 100 ? ' 🔺' : ' 🔽';
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-700">누적판매</span>
                   <span className="text-sm font-bold text-green-600">
-                    {formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0))}K 
-                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0)}%) ✓
+                    {seasonSalesRate ?
+                      `${formatNumber(Math.round(seasonSalesRate.current?.ac_sales_gross || 0))}K` :
+                      `${formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0))}K`
+                    }
+                    {seasonSalesRate ?
+                      ` (${formatPercent(seasonSalesRate.yoy?.sales_yoy || 0)}%)` :
+                      ` (${formatPercent(seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0)}%)`
+                    }
+                    {(() => {
+                      const yoy = seasonSalesRate ?
+                        seasonSalesRate.yoy?.sales_yoy || 0 :
+                        seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0;
+                      return yoy >= 100 ? ' 🔺' : ' 🔽';
+                    })()}
                   </span>
                 </div>
               </div>
@@ -2893,26 +3409,41 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               {showCurrentSeasonDetail && (
                 <>
-                  {/* 서브카테고리별 입고/판매율 */}
+                  {/* 카테고리별 입고/판매율 */}
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-xs font-semibold text-gray-700 mb-2">카테고리별 입고YOY/판매YOY/판매율</div>
                     <div className="space-y-1">
                       {(() => {
-                        const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
-                        // 입고 높은순으로 이미 정렬되어 있음, TOP5만 표시
-                        return subcategoryDetail.slice(0, 5).map((item: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-xs">
-                            <span className="text-gray-600">{item.subcategory_code}</span>
-                            <span className="font-semibold">
-                              <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
-                              <span className={(item.ac_sales_gross_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>{formatPercent(item.ac_sales_gross_yoy || 0)}%</span> / 
-                              <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
-                            </span>
-                          </div>
-                        ));
+                        // 전처리 데이터 우선 사용
+                        if (seasonSalesRate?.category_detail && seasonSalesRate.category_detail.length > 0) {
+                          // 입고금액 기준 TOP 5 표시
+                          return seasonSalesRate.category_detail.map((item: any, idx: number) => (
+                            <div key={idx} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{item.category}</span>
+                              <span className="font-semibold">
+                                <span className={(item.inbound_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.inbound_yoy || 0)}%</span> / 
+                                <span className={(item.sales_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>{formatPercent(item.sales_yoy || 0)}%</span> / 
+                                <span className={(item.rate_2512 || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.rate_2512 || 0, 1)}%</span>
+                              </span>
+                            </div>
+                          ));
+                        } else {
+                          // 기존 데이터 사용
+                          const subcategoryDetail = seasonSales?.current_season_f?.accumulated?.subcategory_detail || [];
+                          return subcategoryDetail.slice(0, 5).map((item: any, idx: number) => (
+                            <div key={idx} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{item.subcategory_code}</span>
+                              <span className="font-semibold">
+                                <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> / 
+                                <span className={(item.ac_sales_gross_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}>{formatPercent(item.ac_sales_gross_yoy || 0)}%</span> / 
+                                <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
+                              </span>
+                            </div>
+                          ));
+                        }
                       })()}
                       <div className="mt-2 pt-2 border-t text-xs text-gray-500">
-                        * 누적입고YOY / 누적판매YOY / 판매율 (입고 높은순)
+                        * 누적입고YOY / 누적판매YOY / 판매율 (입고금액 기준 TOP 5)
                       </div>
                     </div>
                   </div>
@@ -2926,15 +3457,70 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <span className="text-2xl mr-2">📦</span>
                 <h3 className="text-sm font-semibold text-gray-600">ACC 재고주수</h3>
               </div>
-              <div className={`text-3xl font-bold mb-2 ${(accStock?.total?.current?.stock_weeks || 0) >= 35 ? 'text-red-600' : (accStock?.total?.current?.stock_weeks || 0) >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
-                {formatStockWeeks(accStock?.total?.current?.stock_weeks || 0)}주
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatStockWeeks(accStock?.total?.previous?.stock_weeks || 0)}주</span> | 
-                <span className={((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? 'text-red-600' : 'text-green-600'}>
-                  {((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)))}주
-                </span>
-              </div>
+              {(() => {
+                // 새로운 전처리 데이터 우선 사용
+                const newAccData = dashboardData?.acc_stock_weeks;
+                
+                if (newAccData && newAccData.total) {
+                  const totalCurrentWeeks = newAccData.total.current?.weeks || 0;
+                  const totalPrevWeeks = newAccData.total.previous?.weeks || 0;
+                  const weeksChange = newAccData.total.weeks_change || 0;
+                  
+                  return (
+                    <>
+                      <div className={`text-3xl font-bold mb-2 ${totalCurrentWeeks >= 35 ? 'text-red-600' : totalCurrentWeeks >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {formatStockWeeks(totalCurrentWeeks)}주
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatStockWeeks(totalPrevWeeks)}주</span> | 
+                        <span className={weeksChange >= 0 ? 'text-red-600' : 'text-green-600'}>
+                          {weeksChange >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs(weeksChange))}주
+                        </span>
+                      </div>
+                    </>
+                  );
+                } else if (accStockWeeks && accStockWeeks[period]) {
+                  // 구버전 전처리 데이터
+                  const currentPeriod = parseInt(period);
+                  const prevPeriod = currentPeriod - 100;
+                  
+                  const categories = ['모자', '신발', '가방', '기타ACC'];
+                  const totalCurrentWeeks = categories.reduce((sum, cat) => 
+                    sum + (accStockWeeks[currentPeriod]?.[cat]?.stock_weeks || 0), 0) / categories.length;
+                  const totalPrevWeeks = accStockWeeks[prevPeriod] ? 
+                    categories.reduce((sum, cat) => 
+                      sum + (accStockWeeks[prevPeriod]?.[cat]?.stock_weeks || 0), 0) / categories.length : 0;
+                  
+                  return (
+                    <>
+                      <div className={`text-3xl font-bold mb-2 ${totalCurrentWeeks >= 35 ? 'text-red-600' : totalCurrentWeeks >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {formatStockWeeks(totalCurrentWeeks)}주
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatStockWeeks(totalPrevWeeks)}주</span> | 
+                        <span className={(totalCurrentWeeks - totalPrevWeeks) >= 0 ? 'text-red-600' : 'text-green-600'}>
+                          {(totalCurrentWeeks - totalPrevWeeks) >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs(totalCurrentWeeks - totalPrevWeeks))}주
+                        </span>
+                      </div>
+                    </>
+                  );
+                } else {
+                  // 기존 데이터 사용
+                  return (
+                    <>
+                      <div className={`text-3xl font-bold mb-2 ${(accStock?.total?.current?.stock_weeks || 0) >= 35 ? 'text-red-600' : (accStock?.total?.current?.stock_weeks || 0) >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {formatStockWeeks(accStock?.total?.current?.stock_weeks || 0)}주
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatStockWeeks(accStock?.total?.previous?.stock_weeks || 0)}주</span> | 
+                        <span className={((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? 'text-red-600' : 'text-green-600'}>
+                          {((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)) >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs((accStock?.total?.current?.stock_weeks || 0) - (accStock?.total?.previous?.stock_weeks || 0)))}주
+                        </span>
+                      </div>
+                    </>
+                  );
+                }
+              })()}
               
               <div className="bg-pink-50 rounded p-2 mb-3">
                 <div className="text-xs text-pink-800">
@@ -2959,25 +3545,80 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               {showAccInventoryDetail && (
                   <div className="mt-3 pt-3 border-t space-y-1">
                     {(() => {
-                    const categoryMapping = [
-                      { key: '신발', stockKey: 'SHO' },
-                      { key: '모자', stockKey: 'HEA' },
-                      { key: '가방', stockKey: 'BAG' },
-                      { key: '기타ACC', stockKey: 'ATC' }
-                    ];
-                    return categoryMapping.map(({ key, stockKey }) => {
-                      const item = accStock?.by_category ? (accStock.by_category as any)[stockKey] : undefined;
-                        if (!item) return null;
-                        return (
-                          <div key={key} className="flex justify-between text-xs">
-                          <span className="text-gray-600">{key}</span>
-                            <span className="font-semibold text-green-600">
-                              {formatStockWeeks(item.current?.stock_weeks || 0)}주 
-                              <span className="text-gray-500"> (△{formatStockWeeks((item.current?.stock_weeks || 0) - (item.previous?.stock_weeks || 0))}주)</span>
-                            </span>
-                          </div>
-                        );
-                      });
+                      // 새로운 전처리 데이터 우선 사용
+                      const newAccData = dashboardData?.acc_stock_weeks;
+                      
+                      if (newAccData) {
+                        const categories = [
+                          { key: 'hat', label: '모자' },
+                          { key: 'shoes', label: '신발' },
+                          { key: 'bag', label: '가방' },
+                          { key: 'etc', label: '기타ACC' }
+                        ];
+                        
+                        return categories.map(({ key, label }) => {
+                          const currentWeeks = newAccData[key]?.current?.weeks || 0;
+                          const weeksChange = newAccData[key]?.weeks_change || 0;
+                          const prevWeeks = newAccData[key]?.previous?.weeks || 0;
+                          
+                          return (
+                            <div key={key} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{label}</span>
+                              <span className={`font-semibold ${currentWeeks >= 35 ? 'text-red-600' : currentWeeks >= 25 ? 'text-yellow-600' : 'text-green-600'}`}>
+                                {formatStockWeeks(currentWeeks)}주 
+                                <span className={weeksChange >= 0 ? 'text-red-500' : 'text-green-500'}>
+                                  {' '}({weeksChange >= 0 ? '▲' : '▼'}{formatStockWeeks(Math.abs(weeksChange))}주)
+                                </span>
+                              </span>
+                            </div>
+                          );
+                        });
+                      } else if (accStockWeeks && accStockWeeks[period]) {
+                        // 구버전 전처리 데이터
+                        const currentPeriod = parseInt(period);
+                        const prevPeriod = currentPeriod - 100;
+                        const categories = [
+                          { key: '모자', label: '모자' },
+                          { key: '신발', label: '신발' },
+                          { key: '가방', label: '가방' },
+                          { key: '기타ACC', label: '기타ACC' }
+                        ];
+                        
+                        return categories.map(({ key, label }) => {
+                          const currentWeeks = accStockWeeks[currentPeriod]?.[key]?.stock_weeks || 0;
+                          const prevWeeks = accStockWeeks[prevPeriod]?.[key]?.stock_weeks || 0;
+                          return (
+                            <div key={key} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{label}</span>
+                              <span className="font-semibold text-green-600">
+                                {formatStockWeeks(currentWeeks)}주 
+                                <span className="text-gray-500"> (△{formatStockWeeks(currentWeeks - prevWeeks)}주)</span>
+                              </span>
+                            </div>
+                          );
+                        });
+                      } else {
+                        // 기존 데이터 사용
+                        const categoryMapping = [
+                          { key: '신발', stockKey: 'SHO' },
+                          { key: '모자', stockKey: 'HEA' },
+                          { key: '가방', stockKey: 'BAG' },
+                          { key: '기타ACC', stockKey: 'ATC' }
+                        ];
+                        return categoryMapping.map(({ key, stockKey }) => {
+                          const item = accStock?.by_category ? (accStock.by_category as any)[stockKey] : undefined;
+                          if (!item) return null;
+                          return (
+                            <div key={key} className="flex justify-between text-xs">
+                              <span className="text-gray-600">{key}</span>
+                              <span className="font-semibold text-green-600">
+                                {formatStockWeeks(item.current?.stock_weeks || 0)}주 
+                                <span className="text-gray-500"> (△{formatStockWeeks((item.current?.stock_weeks || 0) - (item.previous?.stock_weeks || 0))}주)</span>
+                              </span>
+                            </div>
+                          );
+                        });
+                      }
                     })()}
                   </div>
               )}
@@ -2989,111 +3630,384 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <span className="text-2xl mr-2">🏭</span>
                 <h3 className="text-sm font-semibold text-gray-600">기말재고 (TAG)</h3>
               </div>
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {formatNumber(endingInventory?.total?.current)}
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatNumber(endingInventory?.total?.previous)}</span> | 
-                <span className="text-green-600"> YOY {formatPercent(endingInventory?.total?.yoy || 0)}%</span>
-              </div>
+              {(() => {
+                // 새로운 TAG 데이터 우선 사용
+                const tagData = dashboardData?.ending_inventory?.by_tag;
+                
+                if (tagData) {
+                  // 전체 합계 계산 (세부 항목 제외)
+                  const mainTags = ['25F', '25S', '과시즌F', '과시즌S', '신발', '모자', '가방', '기타ACC'];
+                  const totalCurrent = mainTags.reduce((sum, tag) => 
+                    sum + (tagData[tag]?.current?.stock_price || 0), 0);
+                  const totalPrevious = mainTags.reduce((sum, tag) => 
+                    sum + (tagData[tag]?.previous?.stock_price || 0), 0);
+                  const totalYoy = totalPrevious > 0 ? (totalCurrent / totalPrevious * 100) : 0;
+                  
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-green-600 mb-2">
+                        {formatNumber(Math.round(totalCurrent))}
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatNumber(Math.round(totalPrevious))}</span> | 
+                        <span className={totalYoy >= 100 ? 'text-red-600' : 'text-green-600'}> YOY {formatPercent(totalYoy)}%</span>
+                      </div>
+                    </>
+                  );
+                } else {
+                  // 기존 데이터 사용
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-green-600 mb-2">
+                        {formatNumber(endingInventory?.total?.current)}
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatNumber(endingInventory?.total?.previous)}</span> | 
+                        <span className="text-green-600"> YOY {formatPercent(endingInventory?.total?.yoy || 0)}%</span>
+                      </div>
+                    </>
+                  );
+                }
+              })()}
               
               {/* 아이템별 상세보기 */}
               <div className="border-t pt-3">
-                <button 
-                  onClick={() => setShowEndInventoryDetail(!showEndInventoryDetail)}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
-                >
-                  <span>아이템별 기말재고</span>
-                  {showEndInventoryDetail ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
+                <div className="flex items-center justify-between mb-2">
+                  <button 
+                    onClick={() => setShowEndInventoryDetail(!showEndInventoryDetail)}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
+                  >
+                    <span>아이템별 기말재고</span>
+                    {showEndInventoryDetail ? (
+                      <ChevronDown className="w-4 h-4 ml-1" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    )}
+                  </button>
+                  
+                  {/* 당월/누적 토글 버튼 */}
+                  {showEndInventoryDetail && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setShowInventoryMonthlyOrYTD('monthly')}
+                        className={`px-2 py-1 text-xs rounded ${
+                          showInventoryMonthlyOrYTD === 'monthly'
+                            ? 'bg-blue-600 text-white font-semibold'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        당월
+                      </button>
+                      <button
+                        onClick={() => setShowInventoryMonthlyOrYTD('ytd')}
+                        className={`px-2 py-1 text-xs rounded ${
+                          showInventoryMonthlyOrYTD === 'ytd'
+                            ? 'bg-blue-600 text-white font-semibold'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        누적
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               </div>
               {showEndInventoryDetail && (
                 <div className="mt-3 pt-3 border-t space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">25F</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0)} 
-                      <span className={yoySeasonF >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonF)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">25S</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.by_season?.['당시즌_SS']?.current?.stock_price || 0)} 
-                      <span className={yoySeasonS >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonS)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">과시즌 F</span>
-                    <span className="font-semibold">
-                      {formatNumber(pastSeasonFW?.total?.current || 0)} 
-                      <span className="text-red-600"> ({formatPercent(pastSeasonFW?.total?.yoy || 0)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">과시즌 S</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0)} 
-                      <span className="text-red-600"> ({formatPercent(yoyPastS)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">신발</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.acc_by_category?.SHO?.current?.stock_price || 0)} 
-                      <span className="text-green-600"> ({formatPercent(yoyShoes)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">모자</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.acc_by_category?.HEA?.current?.stock_price || 0)} 
-                      <span className="text-green-600"> ({formatPercent(yoyHat)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">가방</span>
-                    <span className="font-semibold">
-                      {formatNumber(endingInventory?.acc_by_category?.BAG?.current?.stock_price || 0)} 
-                      <span className="text-green-600"> ({formatPercent(yoyBag)}%)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">기타ACC</span>
-                    <span className="font-semibold">
-                      {formatNumber(etcAccCurrent)} 
-                      <span className={yoyEtcAcc >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoyEtcAcc)}%)</span>
-                    </span>
-                  </div>
+                  {(() => {
+                    // 새로운 TAG 데이터 우선 사용
+                    const tagData = dashboardData?.ending_inventory?.by_tag;
+                    
+                    if (tagData) {
+                      const tags = ['25F', '25S', '과시즌F', '과시즌S', '신발', '모자', '가방', '기타ACC'];
+                      
+                      return tags.map(tag => {
+                        const data = tagData[tag];
+                        if (!data) return null;
+                        
+                        const current = data.current?.stock_price || 0;
+                        const yoy = data.yoy || 0;
+                        
+                        return (
+                          <div key={tag} className="flex justify-between text-xs">
+                            <span className="text-gray-600">{tag}</span>
+                            <span className="font-semibold">
+                              {formatNumber(Math.round(current))} 
+                              <span className={yoy >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoy)}%)</span>
+                            </span>
+                          </div>
+                        );
+                      });
+                    } else {
+                      // 기존 데이터 사용
+                      return (
+                        <>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">25F</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.by_season?.['당시즌_의류']?.current?.stock_price || 0)} 
+                              <span className={yoySeasonF >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonF)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">25S</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.by_season?.['당시즌_SS']?.current?.stock_price || 0)} 
+                              <span className={yoySeasonS >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoySeasonS)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">과시즌 F</span>
+                            <span className="font-semibold">
+                              {formatNumber(pastSeasonFW?.total?.current || 0)} 
+                              <span className="text-red-600"> ({formatPercent(pastSeasonFW?.total?.yoy || 0)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">과시즌 S</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0)} 
+                              <span className="text-red-600"> ({formatPercent(yoyPastS)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">신발</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.acc_by_category?.['신발']?.current?.stock_price || 0)} 
+                              <span className="text-green-600"> ({formatPercent(yoyShoes)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">모자</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.acc_by_category?.['모자']?.current?.stock_price || 0)} 
+                              <span className="text-green-600"> ({formatPercent(yoyHat)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">가방</span>
+                            <span className="font-semibold">
+                              {formatNumber(endingInventory?.acc_by_category?.['가방']?.current?.stock_price || 0)} 
+                              <span className="text-green-600"> ({formatPercent(yoyBag)}%)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">기타ACC</span>
+                            <span className="font-semibold">
+                              {formatNumber(etcAccCurrent)} 
+                              <span className={yoyEtcAcc >= 100 ? 'text-red-600' : 'text-green-600'}> ({formatPercent(yoyEtcAcc)}%)</span>
+                            </span>
+                          </div>
+                        </>
+                      );
+                    }
+                  })()}
                   
                   {/* 아이템별 판매(TAG) */}
-                  {dashboardData?.monthly_item_data && dashboardData?.monthly_item_yoy && (
-                    <div className="border-t pt-3 mt-3">
+                  <div className="border-t pt-3 mt-3">
+                    <div className="flex items-center justify-between mb-2">
                       <button 
                         onClick={() => setShowEndSalesDetail(!showEndSalesDetail)}
                         className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
                       >
                         <span>아이템별 판매(TAG)</span>
                         {showEndSalesDetail ? (
-                          <ChevronDown className="w-4 h-4 ml-2" />
+                          <ChevronDown className="w-4 h-4 ml-1" />
                         ) : (
-                          <ChevronRight className="w-4 h-4 ml-2" />
+                          <ChevronRight className="w-4 h-4 ml-1" />
                         )}
                       </button>
-                      {showEndSalesDetail && (
-                    <div className="mt-3 pt-3 border-t space-y-1">
-                      {(() => {
-                        const monthlyData = (dashboardData.monthly_item_data || []) as any[];
-                        const monthlyYoy = (dashboardData.monthly_item_yoy || {}) as any;
-                        const currentMonthData = monthlyData[monthlyData.length - 1] || {};
-                        const currentPeriodIndex = monthlyData.length - 1;
-                        
-                        return (
-                          <>
+                      
+                      {/* 당월/누적 토글 버튼 */}
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setShowMonthlyOrYTD('monthly')}
+                          className={`px-2 py-1 text-xs rounded ${
+                            showMonthlyOrYTD === 'monthly'
+                              ? 'bg-blue-600 text-white font-semibold'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          당월
+                        </button>
+                        <button
+                          onClick={() => setShowMonthlyOrYTD('ytd')}
+                          className={`px-2 py-1 text-xs rounded ${
+                            showMonthlyOrYTD === 'ytd'
+                              ? 'bg-blue-600 text-white font-semibold'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          누적
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {showEndSalesDetail && (
+                      <div className="mt-3 pt-3 border-t space-y-1">
+                        {(() => {
+                          if (showMonthlyOrYTD === 'ytd') {
+                            // 누적 데이터 사용 - CSV 전처리 파일에서 생성된 데이터
+                            const tagYtdData = dashboardData?.tag_ytd_sales;
+                            
+                            if (!tagYtdData) return <div className="text-xs text-gray-500">누적 데이터 없음</div>;
+                            
+                            return (
+                              <>
+                                {/* 25F */}
+                                {tagYtdData['25F'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">25F</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['25F'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['25F'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['25F'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 25S */}
+                                {tagYtdData['25S'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">25S</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['25S'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['25S'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['25S'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 과시즌F */}
+                                {tagYtdData['과시즌F'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">과시즌F</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['과시즌F'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['과시즌F'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['과시즌F'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 과시즌S */}
+                                {tagYtdData['과시즌S'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">과시즌S</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['과시즌S'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['과시즌S'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['과시즌S'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 신발 */}
+                                {tagYtdData['신발'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">신발</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['신발'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['신발'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['신발'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 모자 */}
+                                {tagYtdData['모자'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">모자</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['모자'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['모자'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['모자'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 가방 */}
+                                {tagYtdData['가방'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">가방</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['가방'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['가방'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['가방'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {/* 기타ACC */}
+                                {tagYtdData['기타ACC'] && (
+                                  <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600">기타ACC</span>
+                                    <span className="font-semibold">
+                                      {formatNumber(Math.round(tagYtdData['기타ACC'].current.gross_sales / 1000))} 
+                                      <span className={tagYtdData['기타ACC'].yoy >= 100 ? 'text-green-600' : 'text-red-600'}>
+                                        {' '}({formatPercent(tagYtdData['기타ACC'].yoy)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          }
+                          
+                          // 당월 데이터 (기존 로직)
+                          const salesTagDataWithYTD = dashboardData?.monthly_item_by_tag_with_ytd;
+                          const salesTagData = dashboardData?.monthly_item_by_tag;
+                          
+                          if (salesTagDataWithYTD) {
+                            const tags = ['25F', '25S', '과시즌F', '과시즌S', '신발', '모자', '가방', '기타ACC'];
+                            const periodType = showMonthlyOrYTD;
+                            
+                            return tags.map(tag => {
+                              const data = salesTagDataWithYTD[tag]?.[periodType];
+                              if (!data) return null;
+                              
+                              const current = data.current?.gross_sales || 0;
+                              const yoy = data.yoy || 0;
+                              
+                              return (
+                                <div key={tag} className="flex justify-between text-xs">
+                                  <span className="text-gray-600">{tag}</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(Math.round(current))} 
+                                    <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
+                                  </span>
+                                </div>
+                              );
+                            });
+                          } else if (salesTagData) {
+                            const tags = ['25F', '25S', '과시즌F', '과시즌S', '신발', '모자', '가방', '기타ACC'];
+                            
+                            return tags.map(tag => {
+                              const data = salesTagData[tag];
+                              if (!data) return null;
+                              
+                              const current = data.current?.gross_sales || 0;
+                              const yoy = data.yoy || 0;
+                              
+                              return (
+                                <div key={tag} className="flex justify-between text-xs">
+                                  <span className="text-gray-600">{tag}</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(Math.round(current))} 
+                                    <span className={yoy >= 100 ? 'text-green-600' : 'text-red-600'}> ({formatPercent(yoy)}%)</span>
+                                  </span>
+                                </div>
+                              );
+                            });
+                          } else if (monthlyItemByTag && monthlyItemYoy) {
+                            // 기존 데이터 사용
+                            const monthlyData = (monthlyItemByTag || []) as any[];
+                            const monthlyYoy = (dashboardData.monthly_item_yoy || {}) as any;
+                            const currentMonthData = monthlyData[monthlyData.length - 1] || {};
+                            const currentPeriodIndex = monthlyData.length - 1;
+                            
+                            return (
+                              <>
                             {/* 25F */}
                             <div className="flex justify-between text-xs">
                               <span className="text-gray-600">25F</span>
@@ -3168,11 +4082,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                             </div>
                           </>
                         );
-                      })()}
+                          } else {
+                            return null;
+                          }
+                        })()}
                       </div>
                     )}
                   </div>
-                  )}
                 </div>
               )}
             </div>
@@ -3183,85 +4099,164 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <span className="text-2xl mr-2">📦</span>
                 <h3 className="text-sm font-semibold text-gray-600">과시즌 재고 (TAG)</h3>
               </div>
-              <div className="text-3xl font-bold text-red-600 mb-2">
-                {formatNumber((pastSeasonFW?.total?.current || 0) + (endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0))}
-              </div>
-              <div className="text-sm font-semibold mb-3">
-                <span className="text-gray-600">전년 {formatNumber((pastSeasonFW?.total?.previous || 0) + (endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0))}</span> | 
-                <span className="text-red-600"> YOY {formatPercent((((pastSeasonFW?.total?.current || 0) + (endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0)) / ((pastSeasonFW?.total?.previous || 1) + (endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0))) * 100)}% 🔴</span>
-              </div>
+              {(() => {
+                // 새로운 TAG 데이터 우선 사용
+                const tagData = dashboardData?.ending_inventory?.by_tag;
+                
+                if (tagData && tagData['과시즌F'] && tagData['과시즌S']) {
+                  const pastFCurrent = tagData['과시즌F']?.current?.stock_price || 0;
+                  const pastFPrevious = tagData['과시즌F']?.previous?.stock_price || 0;
+                  const pastSCurrent = tagData['과시즌S']?.current?.stock_price || 0;
+                  const pastSPrevious = tagData['과시즌S']?.previous?.stock_price || 0;
+                  
+                  const totalCurrent = pastFCurrent + pastSCurrent;
+                  const totalPrevious = pastFPrevious + pastSPrevious;
+                  const totalYoy = totalPrevious > 0 ? (totalCurrent / totalPrevious * 100) : 0;
+                  
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-red-600 mb-2">
+                        {formatNumber(Math.round(totalCurrent))}
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatNumber(Math.round(totalPrevious))}</span> | 
+                        <span className="text-red-600"> YOY {formatPercent(totalYoy)}% 🔴</span>
+                      </div>
+                    </>
+                  );
+                } else {
+                  // 기존 데이터 사용
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-red-600 mb-2">
+                        {formatNumber((pastSeasonFW?.total?.current || 0) + (endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0))}
+                      </div>
+                      <div className="text-sm font-semibold mb-3">
+                        <span className="text-gray-600">전년 {formatNumber((pastSeasonFW?.total?.previous || 0) + (endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0))}</span> | 
+                        <span className="text-red-600"> YOY {formatPercent((((pastSeasonFW?.total?.current || 0) + (endingInventory?.by_season?.['과시즌_SS']?.current?.stock_price || 0)) / ((pastSeasonFW?.total?.previous || 1) + (endingInventory?.by_season?.['과시즌_SS']?.previous?.stock_price || 0))) * 100)}% 🔴</span>
+                      </div>
+                    </>
+                  );
+                }
+              })()}
               
               {/* 재고 시즌별 상세보기 */}
               <div className="border-t pt-3">
-                <button 
-                  onClick={() => setShowPastSeasonDetail(!showPastSeasonDetail)}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
-                >
-                  <span>시즌별 재고</span>
-                  {showPastSeasonDetail ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
+                <div className="flex items-center justify-between mb-2">
+                  <button 
+                    onClick={() => setShowPastSeasonDetail(!showPastSeasonDetail)}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
+                  >
+                    <span>시즌별 재고</span>
+                    {showPastSeasonDetail ? (
+                      <ChevronDown className="w-4 h-4 ml-1" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    )}
+                  </button>
+                  
+                  {/* 당월/누적 토글 버튼 */}
+                  {showPastSeasonDetail && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setShowPastSeasonMonthlyOrYTD('monthly')}
+                        className={`px-2 py-1 text-xs rounded ${
+                          showPastSeasonMonthlyOrYTD === 'monthly'
+                            ? 'bg-blue-600 text-white font-semibold'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        당월
+                      </button>
+                      <button
+                        onClick={() => setShowPastSeasonMonthlyOrYTD('ytd')}
+                        className={`px-2 py-1 text-xs rounded ${
+                          showPastSeasonMonthlyOrYTD === 'ytd'
+                            ? 'bg-blue-600 text-white font-semibold'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        누적
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               </div>
               {showPastSeasonDetail && (
                 <>
                   <div className="mt-3 pt-3 border-t space-y-1">
-                    <div>
-                      <button
-                        onClick={() => setShowYear1Detail(!showYear1Detail)}
-                        className="w-full flex justify-between items-center text-xs hover:bg-gray-50 rounded px-1 py-0.5 -mx-1"
-                      >
-                        <span className="text-gray-600">1년차 (24FW)</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">
-                            {formatNumber(pastSeasonFW?.by_year?.['1년차']?.current?.stock_price || 0)} 
-                            <span className="text-green-600"> ({formatPercent(pastSeasonFW?.by_year?.['1년차']?.yoy || 0)}%)</span>
-                          </span>
-                          {showYear1Detail ? (
-                            <ChevronDown className="w-3 h-3 text-gray-500" />
-                          ) : (
-                            <ChevronRight className="w-3 h-3 text-gray-500" />
-                          )}
-                        </div>
-                      </button>
-                      {/* 1년차 subcategory top5 */}
-                      {showYear1Detail && (pastSeasonFW?.by_year?.['1년차']?.subcategory_top5 || []).length > 0 && (
-                        <div className="mt-2 ml-2 pt-2 border-l-2 border-gray-200 pl-2 space-y-1">
-                          {(pastSeasonFW?.by_year?.['1년차']?.subcategory_top5 || []).map((item: any, idx: number) => (
-                            <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-gray-600">{item.subcategory_code}</span>
+                    {(() => {
+                      // 새로운 TAG 데이터 우선 사용
+                      const tagData = dashboardData?.ending_inventory?.by_tag;
+                      
+                      if (tagData) {
+                        return (
+                          <>
+                            {/* 과시즌F 합계 */}
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-600 font-semibold">🍁 과시즌F 합</span>
                               <span className="font-semibold">
-                                {formatNumber(item.stock_price || 0)}K
-                                <span className={item.yoy >= 100 ? 'text-red-600' : 'text-gray-600'}> ({formatPercent(item.yoy || 0)}%)</span>
+                                {formatNumber(Math.round(tagData['과시즌F']?.current?.stock_price || 0))} 
+                                <span className="text-red-600"> ({formatPercent(tagData['과시즌F']?.yoy || 0)}%)</span>
                               </span>
                             </div>
-                          ))}
-                          {/* Top5 제외 나머지 */}
-                          {pastSeasonFW?.by_year?.['1년차']?.others && (
-                            <div className="pt-1 border-t border-gray-200 mt-1">
+                            
+                            {/* 1년차 (24F) */}
+                            <div className="flex justify-between text-xs ml-4">
+                              <span className="text-gray-600">1년차 (24FW)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(tagData['과시즌F_1년차(24F)']?.current?.stock_price || 0))} 
+                                <span className="text-green-600"> ({formatPercent(tagData['과시즌F_1년차(24F)']?.yoy || 0)}%)</span>
+                              </span>
+                            </div>
+                            
+                            {/* 2년차 (23F) */}
+                            <div className="flex justify-between text-xs ml-4">
+                              <span className="text-gray-600">2년차 (23FW)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(tagData['과시즌F_2년차(23F)']?.current?.stock_price || 0))} 
+                                <span className="text-red-600"> ({formatPercent(tagData['과시즌F_2년차(23F)']?.yoy || 0)}%)</span>
+                              </span>
+                            </div>
+                            
+                            {/* 과시즌S 합계 */}
+                            <div className="flex justify-between text-xs mt-2">
+                              <span className="text-gray-600 font-semibold">🌸 과시즌S</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(tagData['과시즌S']?.current?.stock_price || 0))} 
+                                <span className={tagData['과시즌S']?.yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(tagData['과시즌S']?.yoy || 0)}%)
+                                </span>
+                              </span>
+                            </div>
+                          </>
+                        );
+                      } else {
+                        // 기존 상세 데이터 표시
+                        return (
+                          <>
+                            <div>
                               <button
-                                onClick={() => setShowYear1OthersDetail(!showYear1OthersDetail)}
+                                onClick={() => setShowYear1Detail(!showYear1Detail)}
                                 className="w-full flex justify-between items-center text-xs hover:bg-gray-50 rounded px-1 py-0.5 -mx-1"
                               >
-                                <span className="text-gray-500 italic">기타</span>
+                                <span className="text-gray-600">1년차 (24FW)</span>
                                 <div className="flex items-center gap-2">
                                   <span className="font-semibold">
-                                    {formatNumber(pastSeasonFW.by_year['1년차'].others.stock_price || 0)}K
-                                    <span className={pastSeasonFW.by_year['1년차'].others.yoy >= 100 ? 'text-red-600' : 'text-gray-600'}> ({formatPercent(pastSeasonFW.by_year['1년차'].others.yoy || 0)}%)</span>
+                                    {formatNumber(pastSeasonFW?.by_year?.['1년차']?.current?.stock_price || 0)} 
+                                    <span className="text-green-600"> ({formatPercent(pastSeasonFW?.by_year?.['1년차']?.yoy || 0)}%)</span>
                                   </span>
-                                  {showYear1OthersDetail ? (
+                                  {showYear1Detail ? (
                                     <ChevronDown className="w-3 h-3 text-gray-500" />
                                   ) : (
                                     <ChevronRight className="w-3 h-3 text-gray-500" />
                                   )}
                                 </div>
                               </button>
-                              {/* 기타 항목 상세 내역 */}
-                              {showYear1OthersDetail && (pastSeasonFW?.by_year?.['1년차']?.others?.subcategory_top5 || []).length > 0 && (
-                                <div className="mt-1 ml-3 pt-1 border-l-2 border-gray-300 pl-2 space-y-1">
-                                  {(pastSeasonFW.by_year['1년차'].others.subcategory_top5 || []).map((item: any, idx: number) => (
+                              {/* 1년차 subcategory top5 */}
+                              {showYear1Detail && (pastSeasonFW?.by_year?.['1년차']?.subcategory_top5 || []).length > 0 && (
+                                <div className="mt-2 ml-2 pt-2 border-l-2 border-gray-200 pl-2 space-y-1">
+                                  {(pastSeasonFW?.by_year?.['1년차']?.subcategory_top5 || []).map((item: any, idx: number) => (
                                     <div key={idx} className="flex justify-between text-xs">
                                       <span className="text-gray-600">{item.subcategory_code}</span>
                                       <span className="font-semibold">
@@ -3270,13 +4265,45 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                       </span>
                                     </div>
                                   ))}
+                                  {/* Top5 제외 나머지 */}
+                                  {pastSeasonFW?.by_year?.['1년차']?.others && (
+                                    <div className="pt-1 border-t border-gray-200 mt-1">
+                                      <button
+                                        onClick={() => setShowYear1OthersDetail(!showYear1OthersDetail)}
+                                        className="w-full flex justify-between items-center text-xs hover:bg-gray-50 rounded px-1 py-0.5 -mx-1"
+                                      >
+                                        <span className="text-gray-500 italic">기타</span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-semibold">
+                                            {formatNumber(pastSeasonFW.by_year['1년차'].others.stock_price || 0)}K
+                                            <span className={pastSeasonFW.by_year['1년차'].others.yoy >= 100 ? 'text-red-600' : 'text-gray-600'}> ({formatPercent(pastSeasonFW.by_year['1년차'].others.yoy || 0)}%)</span>
+                                          </span>
+                                          {showYear1OthersDetail ? (
+                                            <ChevronDown className="w-3 h-3 text-gray-500" />
+                                          ) : (
+                                            <ChevronRight className="w-3 h-3 text-gray-500" />
+                                          )}
+                                        </div>
+                                      </button>
+                                      {/* 기타 항목 상세 내역 */}
+                                      {showYear1OthersDetail && (pastSeasonFW?.by_year?.['1년차']?.others?.subcategory_top5 || []).length > 0 && (
+                                        <div className="mt-1 ml-3 pt-1 border-l-2 border-gray-300 pl-2 space-y-1">
+                                          {(pastSeasonFW.by_year['1년차'].others.subcategory_top5 || []).map((item: any, idx: number) => (
+                                            <div key={idx} className="flex justify-between text-xs">
+                                              <span className="text-gray-600">{item.subcategory_code}</span>
+                                              <span className="font-semibold">
+                                                {formatNumber(item.stock_price || 0)}K
+                                                <span className={item.yoy >= 100 ? 'text-red-600' : 'text-gray-600'}> ({formatPercent(item.yoy || 0)}%)</span>
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
                     <div>
                       <button
                         onClick={() => setShowYear2Detail(!showYear2Detail)}
@@ -3361,6 +4388,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         <span className="text-red-600"> ({formatPercent(yoyPastS)}%)</span>
                       </span>
                     </div>
+                          </>
+                        );
+                      }
+                    })()}
                   </div>
                 </>
               )}
@@ -3368,73 +4399,256 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               {/* 시즌별 판매(TAG) - 항상 제목 표시 */}
               <div className="border-t pt-3 mt-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-blue-600 font-semibold">시즌별 판매(TAG)</span>
-                  <button 
-                    onClick={() => setShowPastSeasonSalesDetail(!showPastSeasonSalesDetail)}
-                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
-                  >
-                    {showPastSeasonSalesDetail ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
-            </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-blue-600 font-semibold">시즌별 판매(TAG)</span>
+                    <button 
+                      onClick={() => setShowPastSeasonSalesDetail(!showPastSeasonSalesDetail)}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center"
+                    >
+                      {showPastSeasonSalesDetail ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* 당월/누적 토글 버튼 */}
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setShowPastSeasonSalesMonthlyOrYTD('monthly')}
+                      className={`px-2 py-1 text-xs rounded ${
+                        showPastSeasonSalesMonthlyOrYTD === 'monthly'
+                          ? 'bg-blue-600 text-white font-semibold'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      당월
+                    </button>
+                    <button
+                      onClick={() => setShowPastSeasonSalesMonthlyOrYTD('ytd')}
+                      className={`px-2 py-1 text-xs rounded ${
+                        showPastSeasonSalesMonthlyOrYTD === 'ytd'
+                          ? 'bg-blue-600 text-white font-semibold'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      누적
+                    </button>
+                  </div>
+                </div>
+                
                 {showPastSeasonSalesDetail && (
-                  endingInventory?.past_season_sales ? (
-                    <div className="mt-3 pt-3 border-t space-y-1">
-                      <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
-                      {(() => {
-                        const pastSeasonSales = endingInventory.past_season_sales;
-                        const fw1year = pastSeasonSales?.fw?.by_year?.['1년차'] || {};
-                        const fw2year = pastSeasonSales?.fw?.by_year?.['2년차'] || {};
-                        const fw3year = pastSeasonSales?.fw?.by_year?.['3년차_이상'] || {};
-                        const fwTotalCurrent = (fw1year.current || 0) + (fw2year.current || 0) + (fw3year.current || 0);
-                        const fwTotalPrevious = (fw1year.previous || 0) + (fw2year.previous || 0) + (fw3year.previous || 0);
-                        const fwTotalYoy = fwTotalPrevious > 0 ? (fwTotalCurrent / fwTotalPrevious) * 100 : 0;
-                        return (
-                          <div className="flex justify-between text-xs pl-2 mb-1">
-                            <span className="text-gray-600 font-semibold">전체</span>
-                            <span className="font-semibold">
-                              {formatNumber(Math.round(fwTotalCurrent))} 
-                              <span className={fwTotalYoy >= 100 ? 'text-red-600' : 'text-green-600'}>
-                                {' '}({formatPercent(fwTotalYoy)}%)
-                              </span>
-                            </span>
-          </div>
-                        );
-                      })()}
-                      <div className="flex justify-between text-xs pl-2">
-                        <span className="text-gray-600">1년차 (24FW)</span>
-                        <span className="font-semibold">
-                          {formatNumber(endingInventory.past_season_sales?.fw?.by_year?.['1년차']?.current || 0)} 
-                          <span className="text-green-600"> ({formatPercent(endingInventory.past_season_sales?.fw?.by_year?.['1년차']?.yoy || 0)}%)</span>
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-xs pl-2">
-                        <span className="text-gray-600">2년차 (23FW)</span>
-                        <span className="font-semibold">
-                          {formatNumber(endingInventory.past_season_sales?.fw?.by_year?.['2년차']?.current || 0)} 
-                          <span className="text-red-600"> ({formatPercent(endingInventory.past_season_sales?.fw?.by_year?.['2년차']?.yoy || 0)}%)</span>
-                        </span>
-                      </div>
+                  (() => {
+                    // 누적 모드일 때는 CSV 전처리된 season_sales_detail 사용
+                    if (showPastSeasonSalesMonthlyOrYTD === 'ytd' && dashboardData?.season_sales_detail) {
+                      const seasonData = dashboardData.season_sales_detail;
                       
-                      <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
-                      <div className="flex justify-between text-xs pl-2">
-                        <span className="text-gray-600">전체</span>
-                        <span className="font-semibold">
-                          {formatNumber(endingInventory.past_season_sales?.ss?.current || 0)} 
-                          <span className={(endingInventory.past_season_sales?.ss?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
-                            {' '}({formatPercent(endingInventory.past_season_sales?.ss?.yoy || 0)}%)
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-3 pt-3 border-t text-xs text-gray-500 text-center py-2">
-                      데이터가 없습니다
-                    </div>
-                  )
+                      return (
+                        <div className="mt-3 pt-3 border-t space-y-1">
+                          <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                          
+                          {/* 전체 */}
+                          {seasonData['과시즌F'] && (
+                            <div className="flex justify-between text-xs font-semibold">
+                              <span className="text-gray-600">전체</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌F'].current.gross_sales))} 
+                                <span className={seasonData['과시즌F'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌F'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* 1년차 (24FW) */}
+                          {seasonData['과시즌F_1년차(24F)'] && (
+                            <div className="flex justify-between text-xs pl-2">
+                              <span className="text-gray-600">1년차 (24FW)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌F_1년차(24F)'].current.gross_sales))} 
+                                <span className={seasonData['과시즌F_1년차(24F)'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌F_1년차(24F)'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* 2년차 (23FW) */}
+                          {seasonData['과시즌F_2년차(23F)'] && (
+                            <div className="flex justify-between text-xs pl-2">
+                              <span className="text-gray-600">2년차 (23FW)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌F_2년차(23F)'].current.gross_sales))} 
+                                <span className={seasonData['과시즌F_2년차(23F)'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌F_2년차(23F)'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                          
+                          {/* 과시즌S 전체 */}
+                          {seasonData['과시즌S'] && (
+                            <div className="flex justify-between text-xs pl-2">
+                              <span className="text-gray-600">전체</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌S'].current.gross_sales))} 
+                                <span className={seasonData['과시즌S'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌S'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* 1년차 (24S) */}
+                          {seasonData['과시즌S_1년차(24S)'] && (
+                            <div className="flex justify-between text-xs pl-2">
+                              <span className="text-gray-600">1년차 (24S)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌S_1년차(24S)'].current.gross_sales))} 
+                                <span className={seasonData['과시즌S_1년차(24S)'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌S_1년차(24S)'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* 2년차 (23S) */}
+                          {seasonData['과시즌S_2년차(23S)'] && (
+                            <div className="flex justify-between text-xs pl-2">
+                              <span className="text-gray-600">2년차 (23S)</span>
+                              <span className="font-semibold">
+                                {formatNumber(Math.round(seasonData['과시즌S_2년차(23S)'].current.gross_sales))} 
+                                <span className={seasonData['과시즌S_2년차(23S)'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                  {' '}({formatPercent(seasonData['과시즌S_2년차(23S)'].yoy)}%)
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                    
+                    // 당월 모드: 새로운 TAG 데이터 우선 사용
+                    const salesTagDataWithYTD = dashboardData?.monthly_item_by_tag_with_ytd;
+                    
+                    if (salesTagDataWithYTD) {
+                      const periodType = showPastSeasonSalesMonthlyOrYTD;
+                      const tags = ['과시즌F', '과시즌F_1년차(24F)', '과시즌F_2년차(23F)', '과시즌S'];
+                      
+                      return (
+                        <div className="mt-3 pt-3 border-t space-y-1">
+                          <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                          {tags.filter(tag => tag.startsWith('과시즌F')).map(tag => {
+                            const data = salesTagDataWithYTD[tag]?.[periodType];
+                            if (!data) return null;
+                            
+                            const current = data.current?.gross_sales || 0;
+                            const yoy = data.yoy || 0;
+                            let label = tag;
+                            if (tag === '과시즌F') label = '전체';
+                            else if (tag === '과시즌F_1년차(24F)') label = '1년차 (24FW)';
+                            else if (tag === '과시즌F_2년차(23F)') label = '2년차 (23FW)';
+                            
+                            return (
+                              <div key={tag} className={`flex justify-between text-xs ${tag === '과시즌F' ? 'font-semibold' : 'pl-2'}`}>
+                                <span className="text-gray-600">{label}</span>
+                                <span className="font-semibold">
+                                  {formatNumber(Math.round(current))} 
+                                  <span className={yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                    {' '}({formatPercent(yoy)}%)
+                                  </span>
+                                </span>
+                              </div>
+                            );
+                          })}
+                          
+                          <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                          {(() => {
+                            const data = salesTagDataWithYTD['과시즌S']?.[periodType];
+                            if (!data) return null;
+                            
+                            const current = data.current?.gross_sales || 0;
+                            const yoy = data.yoy || 0;
+                            
+                            return (
+                              <div className="flex justify-between text-xs pl-2">
+                                <span className="text-gray-600">전체</span>
+                                <span className="font-semibold">
+                                  {formatNumber(Math.round(current))} 
+                                  <span className={yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                    {' '}({formatPercent(yoy)}%)
+                                  </span>
+                                </span>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      );
+                    } else if (endingInventory?.past_season_sales) {
+                      // 기존 데이터 사용
+                      return (
+                        <div className="mt-3 pt-3 border-t space-y-1">
+                          <div className="text-xs font-semibold text-gray-700 mb-2">🍂 과시즌F</div>
+                          {(() => {
+                            const pastSeasonSales = endingInventory.past_season_sales;
+                            const fw1year = pastSeasonSales?.fw?.by_year?.['1년차'] || {};
+                            const fw2year = pastSeasonSales?.fw?.by_year?.['2년차'] || {};
+                            const fw3year = pastSeasonSales?.fw?.by_year?.['3년차_이상'] || {};
+                            const fwTotalCurrent = (fw1year.current || 0) + (fw2year.current || 0) + (fw3year.current || 0);
+                            const fwTotalPrevious = (fw1year.previous || 0) + (fw2year.previous || 0) + (fw3year.previous || 0);
+                            const fwTotalYoy = fwTotalPrevious > 0 ? (fwTotalCurrent / fwTotalPrevious) * 100 : 0;
+                            return (
+                              <>
+                                <div className="flex justify-between text-xs pl-2 mb-1">
+                                  <span className="text-gray-600 font-semibold">전체</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(Math.round(fwTotalCurrent))} 
+                                    <span className={fwTotalYoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                      {' '}({formatPercent(fwTotalYoy)}%)
+                                    </span>
+                                  </span>
+                                </div>
+                                <div className="flex justify-between text-xs pl-2">
+                                  <span className="text-gray-600">1년차 (24FW)</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(endingInventory.past_season_sales?.fw?.by_year?.['1년차']?.current || 0)} 
+                                    <span className="text-green-600"> ({formatPercent(endingInventory.past_season_sales?.fw?.by_year?.['1년차']?.yoy || 0)}%)</span>
+                                  </span>
+                                </div>
+                                <div className="flex justify-between text-xs pl-2">
+                                  <span className="text-gray-600">2년차 (23FW)</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(endingInventory.past_season_sales?.fw?.by_year?.['2년차']?.current || 0)} 
+                                    <span className="text-red-600"> ({formatPercent(endingInventory.past_season_sales?.fw?.by_year?.['2년차']?.yoy || 0)}%)</span>
+                                  </span>
+                                </div>
+                                
+                                <div className="text-xs font-semibold text-gray-700 mt-3 mb-2">☀️ 과시즌S</div>
+                                <div className="flex justify-between text-xs pl-2">
+                                  <span className="text-gray-600">전체</span>
+                                  <span className="font-semibold">
+                                    {formatNumber(endingInventory.past_season_sales?.ss?.current || 0)} 
+                                    <span className={(endingInventory.past_season_sales?.ss?.yoy || 0) >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                      {' '}({formatPercent(endingInventory.past_season_sales?.ss?.yoy || 0)}%)
+                                    </span>
+                                  </span>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="mt-3 pt-3 border-t text-xs text-gray-500 text-center py-2">
+                          데이터가 없습니다
+                        </div>
+                      );
+                    }
+                  })()
                 )}
               </div>
             </div>
@@ -4161,13 +5375,29 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
           <ResponsiveContainer width="100%" height={250}>
             <BarChart 
-              data={(dashboardData?.monthly_channel_data || []).map((item: any) => ({
-                month: `${item.period.slice(2, 4)}월`,
-                'TW Retail': Math.round((item.TW_Retail || 0) / 1000),
-                'TW Outlet': Math.round((item.TW_Outlet || 0) / 1000),
-                'TW Online': Math.round((item.TW_Online || 0) / 1000),
-                total: Math.round((item.total || 0) / 1000),
-              }))} 
+              data={(dashboardData?.monthly_channel_data || []).map((item: any, idx: number) => {
+                const isLastMonth = idx === (dashboardData?.monthly_channel_data || []).length - 1;
+                
+                // 마지막 월(12월)은 PL 데이터 사용
+                if (isLastMonth) {
+                  return {
+                    month: `${item.period.slice(2, 4)}월`,
+                    'TW Retail': Math.round(plData?.current_month?.retail?.net_sales || 0),
+                    'TW Outlet': Math.round(plData?.current_month?.outlet?.net_sales || 0),
+                    'TW Online': Math.round(plData?.current_month?.online?.net_sales || 0),
+                    total: Math.round(plData?.current_month?.total?.net_sales || 0),
+                  };
+                }
+                
+                // 나머지 월은 기존 데이터 사용
+                return {
+                  month: `${item.period.slice(2, 4)}월`,
+                  'TW Retail': Math.round((item.TW_Retail || 0) / 1000),
+                  'TW Outlet': Math.round((item.TW_Outlet || 0) / 1000),
+                  'TW Online': Math.round((item.TW_Online || 0) / 1000),
+                  total: Math.round((item.total || 0) / 1000),
+                };
+              })} 
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               onClick={(data: any) => {
                 if (data && data.activePayload && data.activePayload[0]) {
@@ -4203,9 +5433,21 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               {/* 비중 % 레이블 */}
               <Bar dataKey="TW Retail" stackId="a" fill="#93C5FD">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
-                  const total = (item.total || 0) / 1000;
-                  const v = (item.TW_Retail || 0) / 1000;
-                  const pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  const isLastMonth = index === (dashboardData?.monthly_channel_data || []).length - 1;
+                  let total, v, pct;
+                  
+                  if (isLastMonth) {
+                    // 12월은 PL 데이터 사용
+                    total = plData?.current_month?.total?.net_sales || 0;
+                    v = plData?.current_month?.retail?.net_sales || 0;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  } else {
+                    // 나머지 월은 기존 데이터
+                    total = (item.total || 0) / 1000;
+                    v = (item.TW_Retail || 0) / 1000;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  }
+                  
                   return (
                     <text 
                       key={`label-tw-retail-${index}`} 
@@ -4223,9 +5465,21 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </Bar>
               <Bar dataKey="TW Outlet" stackId="a" fill="#C4B5FD">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
-                  const total = (item.total || 0) / 1000;
-                  const v = (item.TW_Outlet || 0) / 1000;
-                  const pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  const isLastMonth = index === (dashboardData?.monthly_channel_data || []).length - 1;
+                  let total, v, pct;
+                  
+                  if (isLastMonth) {
+                    // 12월은 PL 데이터 사용
+                    total = plData?.current_month?.total?.net_sales || 0;
+                    v = plData?.current_month?.outlet?.net_sales || 0;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  } else {
+                    // 나머지 월은 기존 데이터
+                    total = (item.total || 0) / 1000;
+                    v = (item.TW_Outlet || 0) / 1000;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  }
+                  
                   return (
                     <text 
                       key={`label-tw-outlet-${index}`} 
@@ -4243,9 +5497,21 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </Bar>
               <Bar dataKey="TW Online" stackId="a" fill="#F9A8D4">
                 {(dashboardData?.monthly_channel_data || []).map((item: any, index: number) => {
-                  const total = (item.total || 0) / 1000;
-                  const v = (item.TW_Online || 0) / 1000;
-                  const pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  const isLastMonth = index === (dashboardData?.monthly_channel_data || []).length - 1;
+                  let total, v, pct;
+                  
+                  if (isLastMonth) {
+                    // 12월은 PL 데이터 사용
+                    total = plData?.current_month?.total?.net_sales || 0;
+                    v = plData?.current_month?.online?.net_sales || 0;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  } else {
+                    // 나머지 월은 기존 데이터
+                    total = (item.total || 0) / 1000;
+                    v = (item.TW_Online || 0) / 1000;
+                    pct = total > 0 ? ((v / total) * 100).toFixed(1) : '0.0';
+                  }
+                  
                   return (
                     <text 
                       key={`label-tw-online-${index}`} 
@@ -4304,13 +5570,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       return {
                       month: `${item.period.slice(2, 4)}월`,
                         twRetail: isLastMonth 
-                          ? Math.round(twRetail?.yoy || 0)
+                          ? Math.round(plData?.current_month?.retail?.yoy || 0)
                           : (dashboardData?.monthly_channel_yoy?.['TW_Retail']?.[idx] || 0),
                         twOutlet: isLastMonth 
-                          ? Math.round(twOutlet?.yoy || 0)
+                          ? Math.round(plData?.current_month?.outlet?.yoy || 0)
                           : (dashboardData?.monthly_channel_yoy?.['TW_Outlet']?.[idx] || 0),
                         twOnline: isLastMonth 
-                          ? Math.round(twOnline?.yoy || 0)
+                          ? Math.round(plData?.current_month?.online?.yoy || 0)
                           : (dashboardData?.monthly_channel_yoy?.['TW_Online']?.[idx] || 0),
                       };
                     })} 
@@ -4366,13 +5632,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       const isLastMonth = idx === (dashboardData?.monthly_channel_data || []).length - 1;
                       let yoy = 0;
                       if (isLastMonth) {
-                        // 마지막 월(10월)은 카드의 YOY 사용
+                        // 마지막 월은 PL 데이터의 YOY 사용
                         if (selectedChannel === 'TW Retail') {
-                          yoy = Math.round(twRetail?.yoy || 0);
+                          yoy = Math.round(plData?.current_month?.retail?.yoy || 0);
                         } else if (selectedChannel === 'TW Outlet') {
-                          yoy = Math.round(twOutlet?.yoy || 0);
+                          yoy = Math.round(plData?.current_month?.outlet?.yoy || 0);
                         } else if (selectedChannel === 'TW Online') {
-                          yoy = Math.round(twOnline?.yoy || 0);
+                          yoy = Math.round(plData?.current_month?.online?.yoy || 0);
                         }
                       } else {
                         // 나머지 월은 monthly_channel_yoy 사용
@@ -4448,13 +5714,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                   const isLastMonth = idx === (dashboardData?.monthly_channel_data || []).length - 1;
                                   let yoy = 0;
                                   if (isLastMonth) {
-                                    // 마지막 월(10월)은 카드의 YOY 사용
+                                    // 마지막 월은 PL 데이터의 YOY 사용
                                     if (channel === 'TW Retail') {
-                                      yoy = Math.round(twRetail?.yoy || 0);
+                                      yoy = Math.round(plData?.current_month?.retail?.yoy || 0);
                                     } else if (channel === 'TW Outlet') {
-                                      yoy = Math.round(twOutlet?.yoy || 0);
+                                      yoy = Math.round(plData?.current_month?.outlet?.yoy || 0);
                                     } else if (channel === 'TW Online') {
-                                      yoy = Math.round(twOnline?.yoy || 0);
+                                      yoy = Math.round(plData?.current_month?.online?.yoy || 0);
                                     }
                                   } else {
                                     // 나머지 월은 monthly_channel_yoy 사용
@@ -4486,13 +5752,13 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           const channelKey = selectedChannel.replace(' ', '_');
                           let yoy = 0;
                           if (isLastMonth) {
-                            // 마지막 월(10월)은 카드의 YOY 사용
+                            // 마지막 월은 PL 데이터의 YOY 사용
                             if (selectedChannel === 'TW Retail') {
-                              yoy = Math.round(twRetail?.yoy || 0);
+                              yoy = Math.round(plData?.current_month?.retail?.yoy || 0);
                             } else if (selectedChannel === 'TW Outlet') {
-                              yoy = Math.round(twOutlet?.yoy || 0);
+                              yoy = Math.round(plData?.current_month?.outlet?.yoy || 0);
                             } else if (selectedChannel === 'TW Online') {
-                              yoy = Math.round(twOnline?.yoy || 0);
+                              yoy = Math.round(plData?.current_month?.online?.yoy || 0);
                             }
                           } else {
                             // 나머지 월은 monthly_channel_yoy 사용
@@ -4787,14 +6053,14 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           </div>
           
           <ResponsiveContainer width="100%" height={250}>
-            {(!dashboardData?.monthly_item_data ||
-              dashboardData.monthly_item_data.length === 0) ? (
+            {(!monthlyItemTrend ||
+              (Array.isArray(monthlyItemTrend) && monthlyItemTrend.length === 0)) ? (
               <div className="flex items-center justify-center h-full text-gray-500 text-sm">
                 monthly_item_data가 없습니다. 데이터를 생성해주세요.
               </div>
             ) : salesPriceType === '할인율' ? (
               <LineChart 
-                data={(dashboardData?.monthly_item_data || []).map((item: any) => {
+                data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any) => {
                   const calc = (gross: number, net: number): string => {
                     if (gross === 0) return "0";
                     return ((gross - net) / gross * 100).toFixed(1);
@@ -4914,7 +6180,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </LineChart>
             ) : (
               <BarChart 
-                data={(dashboardData?.monthly_item_data || []).map((item: any) => {
+                data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any) => {
                   const month = parseInt(item.period.slice(2, 4));
                   
                   // 1~6월: 24F(당시즌F)를 과시즌F로 이동
@@ -5068,8 +6334,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               {selectedItem === '전체' ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
-                    data={(dashboardData?.monthly_item_data || []).map((item: any, idx: number) => {
-                      const isLastMonth = idx === (dashboardData?.monthly_item_data || []).length - 1;
+                    data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any, idx: number) => {
+                      const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                       // 마지막 월(10월)은 카드의 YOY 사용 - monthly_item_data의 마지막 월과 전년 동월 비교
                       let 당시즌F = (dashboardData?.monthly_item_yoy as any)?.['당시즌F']?.[idx] || 0;
                       let 당시즌S = (dashboardData?.monthly_item_yoy as any)?.['당시즌S']?.[idx] || 0;
@@ -5099,7 +6365,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         
                         // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
                         const lastMonthData = item;
-                        const prevYearMonth = (dashboardData?.monthly_item_data || []).find((d: any) => {
+                        const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
                           const period = d.period;
                           const year = parseInt(period.slice(0, 2));
                           const month = parseInt(period.slice(2, 4));
@@ -5152,8 +6418,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               ) : (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
-                    data={(dashboardData?.monthly_item_data || []).map((item: any, idx: number) => {
-                      const isLastMonth = idx === (dashboardData?.monthly_item_data || []).length - 1;
+                    data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any, idx: number) => {
+                      const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                       let yoy = dashboardData?.monthly_item_yoy ? ((dashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] || 0) : 0;
                       
                       if (isLastMonth) {
@@ -5182,7 +6448,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         } else {
                           // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
                           const lastMonthData = item;
-                          const prevYearMonth = (dashboardData?.monthly_item_data || []).find((d: any) => {
+                          const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
                             const period = d.period;
                             const year = parseInt(period.slice(0, 2));
                             const month = parseInt(period.slice(2, 4));
@@ -5240,7 +6506,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <thead>
                     <tr>
                       <th className="border border-gray-300 px-1 py-1 text-left font-semibold">{selectedItem === '전체' ? '아이템' : selectedItem}</th>
-                      {(dashboardData?.monthly_item_data || []).map((item: any) => (
+                      {(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any) => (
                         <th key={item.period} className="border border-gray-300 px-1 py-1 text-center font-semibold">{`${item.period.slice(2, 4)}월`}</th>
                       ))}
                     </tr>
@@ -5251,8 +6517,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         {['당시즌F', '당시즌S', '과시즌F', '과시즌S', '모자', '신발', '가방', '기타ACC'].map((item) => (
                           <tr key={item}>
                             <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">{item}</td>
-                            {((dashboardData?.monthly_item_data || [])).map((monthData: any, idx: number) => {
-                              const isLastMonth = idx === (dashboardData?.monthly_item_data || []).length - 1;
+                            {((Array.isArray(monthlyItemTrend) ? monthlyItemTrend : [])).map((monthData: any, idx: number) => {
+                              const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                               let yoy = (dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[item]?.[idx] : 0) || 0;
                               
                               if (isLastMonth) {
@@ -5280,7 +6546,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                   yoy = Math.round(atcSales?.yoy || 0);
                                 } else {
                                   // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                                  const prevYearMonth = (dashboardData?.monthly_item_data || []).find((d: any) => {
+                                  const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
                                     const period = d.period;
                                     const year = parseInt(period.slice(0, 2));
                                     const month = parseInt(period.slice(2, 4));
@@ -5310,8 +6576,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     ) : (
                       <tr>
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">YOY</td>
-                        {((dashboardData?.monthly_item_data || [])).map((monthData: any, idx: number) => {
-                          const isLastMonth = idx === (dashboardData?.monthly_item_data || []).length - 1;
+                        {((Array.isArray(monthlyItemTrend) ? monthlyItemTrend : [])).map((monthData: any, idx: number) => {
+                          const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                           let yoy = (dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] : 0) || 0;
                           
                           if (isLastMonth) {
@@ -5335,7 +6601,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                               yoy = Math.round(bagSales?.yoy || 0);
                             } else {
                               // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                              const prevYearMonth = (dashboardData?.monthly_item_data || []).find((d: any) => {
+                              const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
                                 const period = d.period;
                                 const year = parseInt(period.slice(0, 2));
                                 const month = parseInt(period.slice(2, 4));
@@ -5375,7 +6641,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <h4 className="text-xs font-bold text-blue-800 mb-1">📈 주요 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
-                      const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+                      const monthlyData = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []) as any[];
                       if (monthlyData.length === 0) return <div>데이터 없음</div>;
                       
                       const totals = monthlyData.map((item: any) => {
@@ -5408,7 +6674,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <h4 className="text-xs font-bold text-purple-800 mb-1">🎯 아이템 트렌드</h4>
                   <div className="space-y-0.5 text-xs text-purple-700">
                     {(() => {
-                      const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+                      const monthlyData = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []) as any[];
                       if (monthlyData.length === 0) return <div>데이터 없음</div>;
                       
                       const latest = monthlyData[monthlyData.length - 1] || {};
@@ -5446,7 +6712,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   <h4 className="text-xs font-bold text-blue-800 mb-1">📈 {selectedItem} 인사이트</h4>
                   <div className="space-y-0.5 text-xs text-blue-700">
                     {(() => {
-                      const monthlyData = (dashboardData?.monthly_item_data || []) as any[];
+                      const monthlyData = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []) as any[];
                       if (monthlyData.length === 0) return <div>데이터 없음</div>;
                       
                       const itemData = monthlyData.map((item: any) => {
@@ -5984,19 +7250,19 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                             } else if (itemKey === '과시즌SS') {
                               yoyValue = Math.round(endingInventory?.by_season?.['과시즌_SS']?.yoy || 0);
                             } else if (itemKey === '모자') {
-                              yoyValue = Math.round(endingInventory?.acc_by_category?.HEA?.yoy || 0);
+                              yoyValue = Math.round(endingInventory?.acc_by_category?.['모자']?.yoy || 0);
                             } else if (itemKey === '신발') {
-                              yoyValue = Math.round(endingInventory?.acc_by_category?.SHO?.yoy || 0);
+                              yoyValue = Math.round(endingInventory?.acc_by_category?.['신발']?.yoy || 0);
                             } else if (itemKey === '가방외') {
                               // 가방외는 ATC + BAG + WTC 합계
                               const atcYoy = endingInventory?.acc_by_category?.ATC?.yoy || 0;
-                              const bagYoy = endingInventory?.acc_by_category?.BAG?.yoy || 0;
+                              const bagYoy = endingInventory?.acc_by_category?.['가방']?.yoy || 0;
                               const wtcYoy = endingInventory?.acc_by_category?.WTC?.yoy || 0;
                               const atcCurrent = endingInventory?.acc_by_category?.ATC?.current?.stock_price || 0;
-                              const bagCurrent = endingInventory?.acc_by_category?.BAG?.current?.stock_price || 0;
+                              const bagCurrent = endingInventory?.acc_by_category?.['가방']?.current?.stock_price || 0;
                               const wtcCurrent = endingInventory?.acc_by_category?.WTC?.current?.stock_price || 0;
                               const atcPrev = endingInventory?.acc_by_category?.ATC?.previous?.stock_price || 0;
-                              const bagPrev = endingInventory?.acc_by_category?.BAG?.previous?.stock_price || 0;
+                              const bagPrev = endingInventory?.acc_by_category?.['가방']?.previous?.stock_price || 0;
                               const wtcPrev = endingInventory?.acc_by_category?.WTC?.previous?.stock_price || 0;
                               const totalCurrent = atcCurrent + bagCurrent + wtcCurrent;
                               const totalPrev = atcPrev + bagPrev + wtcPrev;
@@ -6094,16 +7360,16 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                 } else if (itemKey === '과시즌SS') {
                                   yoyValue = Math.round(endingInventory?.by_season?.['과시즌_SS']?.yoy || 0);
                                 } else if (itemKey === '모자') {
-                                  yoyValue = Math.round(endingInventory?.acc_by_category?.HEA?.yoy || 0);
+                                  yoyValue = Math.round(endingInventory?.acc_by_category?.['모자']?.yoy || 0);
                                 } else if (itemKey === '신발') {
-                                  yoyValue = Math.round(endingInventory?.acc_by_category?.SHO?.yoy || 0);
+                                  yoyValue = Math.round(endingInventory?.acc_by_category?.['신발']?.yoy || 0);
                                 } else if (itemKey === '가방외') {
                                   // 가방외는 ATC + BAG + WTC 합계
                                   const atcCurrent = endingInventory?.acc_by_category?.ATC?.current?.stock_price || 0;
-                                  const bagCurrent = endingInventory?.acc_by_category?.BAG?.current?.stock_price || 0;
+                                  const bagCurrent = endingInventory?.acc_by_category?.['가방']?.current?.stock_price || 0;
                                   const wtcCurrent = endingInventory?.acc_by_category?.WTC?.current?.stock_price || 0;
                                   const atcPrev = endingInventory?.acc_by_category?.ATC?.previous?.stock_price || 0;
-                                  const bagPrev = endingInventory?.acc_by_category?.BAG?.previous?.stock_price || 0;
+                                  const bagPrev = endingInventory?.acc_by_category?.['가방']?.previous?.stock_price || 0;
                                   const wtcPrev = endingInventory?.acc_by_category?.WTC?.previous?.stock_price || 0;
                                   const totalCurrent = atcCurrent + bagCurrent + wtcCurrent;
                                   const totalPrev = atcPrev + bagPrev + wtcPrev;
@@ -6165,8 +7431,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
               <h4 className="text-xs font-bold text-green-800 mb-1">✓ Positive Sign</h4>
               <div className="space-y-0.5 text-xs text-green-700">
-                <div>• 신발 재고 YOY {Math.round((dashboardData?.ending_inventory?.acc_by_category?.SHO?.yoy || 0))}% 개선</div>
-                <div>• 가방외 재고 YOY {Math.round((dashboardData?.ending_inventory?.acc_by_category?.BAG?.yoy || 0))}% 개선</div>
+                <div>• 신발 재고 YOY {Math.round((dashboardData?.ending_inventory?.acc_by_category?.['신발']?.yoy || 0))}% 개선</div>
+                <div>• 가방외 재고 YOY {Math.round((dashboardData?.ending_inventory?.acc_by_category?.['가방']?.yoy || 0))}% 개선</div>
                 <div>• 9월 임시매장 운영으로 과시즌SS 대폭 소진</div>
               </div>
             </div>
@@ -6178,9 +7444,33 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
       <div className="mb-4">
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              오프라인 매장별 현황 (실판V-, 25년 10월 기준)
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-lg font-semibold text-gray-900">
+                오프라인 매장별 현황 (실판V-, 25년 12월 기준)
+              </h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowOfflineStoreMonthlyOrYTD('monthly')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
+                    showOfflineStoreMonthlyOrYTD === 'monthly'
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  당월
+                </button>
+                <button
+                  onClick={() => setShowOfflineStoreMonthlyOrYTD('cumulative')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
+                    showOfflineStoreMonthlyOrYTD === 'cumulative'
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  누적
+                </button>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1.5 bg-purple-600 text-white text-xs font-semibold rounded hover:bg-purple-700 transition-colors"
@@ -6211,7 +7501,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
           <div className="grid grid-cols-4 gap-4 w-full">
             {/* 전체 매장 요약 */}
             <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-4 border border-slate-600 min-w-0 shadow-lg">
-              <h4 className="text-base font-bold text-white mb-3">오프라인 매장 요약</h4>
+              <h4 className="text-base font-bold text-white mb-3">오프라인 매장 요약 (25년 12월)</h4>
               <div className="space-y-3 text-xs">
                 {/* 매장 수 */}
                 <div>
@@ -6220,6 +7510,9 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   </div>
                   <div className="text-xs text-slate-300 mb-2">
                     실판매출 YOY {formatYoy(totalSalesPerStoreYoy)}%
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    전년: {totalStorePrevious}개 매장
                   </div>
                   <div className="text-[10px] text-slate-400 italic">
                     * 종료매장·온라인 제외
@@ -6230,8 +7523,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <div className="pt-2 border-t border-slate-600">
                   <div className="flex items-center justify-between">
                     <div className="text-slate-300 text-[10px]">전체 직접이익</div>
-                    <div className={`font-bold text-sm ${(plData?.channel_direct_profit?.total?.direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {formatNumber(plData?.channel_direct_profit?.total?.direct_profit || 0)}K HKD
+                    <div className={`font-bold text-sm ${(() => {
+                      const directProfit = showOfflineStoreMonthlyOrYTD === 'monthly'
+                        ? (plData?.channel_direct_profit?.total?.direct_profit || 0)
+                        : (plData?.cumulative?.offline?.direct_profit || 0);
+                      return directProfit >= 0 ? 'text-green-400' : 'text-red-400';
+                    })()}`}>
+                      {formatNumber(showOfflineStoreMonthlyOrYTD === 'monthly'
+                        ? (plData?.channel_direct_profit?.total?.direct_profit || 0)
+                        : (plData?.cumulative?.offline?.direct_profit || 0))}K HKD
                     </div>
                   </div>
                 </div>
@@ -6243,26 +7543,45 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     {(() => {
                       const retailStores = activeTWStores.filter((s: any) => s.channel === 'Retail');
                       const outletStores = activeTWStores.filter((s: any) => s.channel === 'Outlet');
-                      const retailYoy = retailStores.length > 0 
-                        ? retailStores.reduce((sum: number, s: any) => sum + s.yoy, 0) / retailStores.length 
-                        : 0;
-                      const outletYoy = outletStores.length > 0 
-                        ? outletStores.reduce((sum: number, s: any) => sum + s.yoy, 0) / outletStores.length 
-                        : 0;
-                      const retailProfit = retailStores.reduce((sum: number, s: any) => sum + (s.direct_profit || 0), 0);
-                      const outletProfit = outletStores.reduce((sum: number, s: any) => sum + (s.direct_profit || 0), 0);
+                      // PL 데이터에서 YOY 가져오기 (당월/누적에 따라)
+                      const retailYoy = showOfflineStoreMonthlyOrYTD === 'monthly'
+                        ? (plData?.current_month?.retail?.yoy || 0)
+                        : (plData?.cumulative?.retail?.yoy || 0);
+                      const outletYoy = showOfflineStoreMonthlyOrYTD === 'monthly'
+                        ? (plData?.current_month?.outlet?.yoy || 0)
+                        : (plData?.cumulative?.outlet?.yoy || 0);
+                      
+                      // 직접이익 계산 (당월/누적에 따라)
+                      let retailProfit = 0;
+                      let outletProfit = 0;
+                      
+                      if (showOfflineStoreMonthlyOrYTD === 'monthly') {
+                        // 당월: 매장별 합계
+                        retailProfit = retailStores.reduce((sum: number, s: any) => sum + (s.direct_profit || 0), 0);
+                        outletProfit = outletStores.reduce((sum: number, s: any) => sum + (s.direct_profit || 0), 0);
+                      } else {
+                        // 누적: PL 데이터에서 계산 (net_sales * direct_profit_rate / 100)
+                        const retailNetSales = plData?.cumulative?.retail?.net_sales || 0;
+                        const retailDirectProfitRate = plData?.cumulative?.retail?.direct_profit_rate || 0;
+                        retailProfit = retailNetSales * retailDirectProfitRate / 100;
+                        
+                        const outletNetSales = plData?.cumulative?.outlet?.net_sales || 0;
+                        const outletDirectProfitRate = plData?.cumulative?.outlet?.direct_profit_rate || 0;
+                        outletProfit = outletNetSales * outletDirectProfitRate / 100;
+                      }
+                      
                       return (
                         <>
                           <div className="bg-blue-700 rounded px-2 py-1.5 flex items-center gap-1.5">
                             <span className="text-white text-xs font-semibold">리테일</span>
                             <span className="text-white text-xs font-bold ml-auto">
-                              {retailStores.length}개 | YOY {formatYoy(retailYoy)}% | {retailProfit >= 0 ? '+' : ''}{formatNumber(retailProfit)}K
+                              {retailStores.length}개 | YOY {formatYoy(retailYoy)}% | {retailProfit >= 0 ? '+' : ''}{formatNumber(Math.round(retailProfit))}K
                             </span>
                           </div>
                           <div className={`rounded px-2 py-1.5 flex items-center gap-1.5 ${outletProfit >= 0 ? 'bg-blue-700' : 'bg-red-600'}`}>
                             <span className="text-white text-xs font-semibold">아울렛</span>
                             <span className="text-white text-xs font-bold ml-auto">
-                              {outletStores.length}개 | YOY {formatYoy(outletYoy)}% | {outletProfit >= 0 ? '+' : ''}{formatNumber(outletProfit)}K
+                              {outletStores.length}개 | YOY {formatYoy(outletYoy)}% | {outletProfit >= 0 ? '+' : ''}{formatNumber(Math.round(outletProfit))}K
                             </span>
                           </div>
                         </>
@@ -6303,27 +7622,22 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             {(() => {
                       const storeAreas = (storeAreasData as any)?.store_areas || {};
                       
-                      // 전체 평당매출 계산
-                      let totalSales = 0;
-                      let totalPrevSales = 0;
-                      let totalArea = 0;
-                      let totalPrevArea = 0;
+                      // 상단 매장효율성 카드의 평당매출과 동일하게 계산
+                      let overallAvgSalesPerPyeong = 0;
+                      let overallPrevAvgSalesPerPyeong = 0;
+                      let overallYoy = 0;
                       
-                      activeTWStores.forEach((store: any) => {
-                        const area = storeAreas[store.shop_cd] || 0;
-                        if (area > 0 && store.current?.net_sales > 0) {
-                          totalSales += store.current.net_sales;
-                          totalArea += area;
-                        }
-                        if (area > 0 && store.previous?.net_sales > 0) {
-                          totalPrevSales += store.previous.net_sales;
-                          totalPrevArea += area;
-                        }
-                      });
-                      
-                      const overallAvgSalesPerPyeong = totalArea > 0 ? (totalSales / totalArea / 30) : 0; // 1K HKD/평/1일
-                      const overallPrevAvgSalesPerPyeong = totalPrevArea > 0 ? (totalPrevSales / totalPrevArea / 30) : 0; // 1K HKD/평/1일
-                      const overallYoy = overallPrevAvgSalesPerPyeong > 0 ? (overallAvgSalesPerPyeong / overallPrevAvgSalesPerPyeong) * 100 : 0;
+                      if (showOfflineStoreMonthlyOrYTD === 'monthly') {
+                        // 당월: twDailySalesPerPyeong 사용
+                        overallAvgSalesPerPyeong = twDailySalesPerPyeong;
+                        overallPrevAvgSalesPerPyeong = twPrevDailySalesPerPyeong;
+                        overallYoy = twSalesPerPyeongYoy;
+                      } else {
+                        // 누적: 연간 누적을 일평균으로 환산
+                        overallAvgSalesPerPyeong = twSalesPerPyeong > 0 ? (twSalesPerPyeong / 365) : 0;
+                        overallPrevAvgSalesPerPyeong = twPrevSalesPerPyeong > 0 ? (twPrevSalesPerPyeong / 365) : 0;
+                        overallYoy = overallPrevAvgSalesPerPyeong > 0 ? (overallAvgSalesPerPyeong / overallPrevAvgSalesPerPyeong) * 100 : 0;
+                      }
               
                       // 대형 흑자매장 계산
                       const largeStores = storeCategories?.large_profit?.stores || [];
@@ -6331,25 +7645,30 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       let largeTotalPrevSales = 0;
                       let largeTotalArea = 0;
                       let largeTotalPrevArea = 0;
+                      const daysForCalc = showOfflineStoreMonthlyOrYTD === 'monthly'
+                        ? (period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30)
+                        : 365;
               
                       largeStores.forEach((store: any) => {
                 const storeCode = store.shop_cd || store.store_code;
                         const area = storeAreas[storeCode] || 0;
                         if (area > 0) {
-                          const storeData = plData?.channel_direct_profit?.stores?.[storeCode];
-                          if (storeData?.net_sales > 0) {
-                            largeTotalSales += storeData.net_sales;
+                          // activeTWStores에서 이미 누적 데이터로 변환되어 있음
+                          const netSales = store.current?.net_sales || 0;
+                          const netSalesPrev = store.previous?.net_sales || 0;
+                          if (netSales > 0) {
+                            largeTotalSales += netSales;
                             largeTotalArea += area;
                           }
-                          if (storeData?.net_sales_prev > 0) {
-                            largeTotalPrevSales += storeData.net_sales_prev;
+                          if (netSalesPrev > 0) {
+                            largeTotalPrevSales += netSalesPrev;
                             largeTotalPrevArea += area;
                           }
                         }
                       });
                       
-                      const largeAvgSalesPerPyeong = largeTotalArea > 0 ? (largeTotalSales / largeTotalArea / 30) : 0; // 1K HKD/평/1일
-                      const largePrevAvgSalesPerPyeong = largeTotalPrevArea > 0 ? (largeTotalPrevSales / largeTotalPrevArea / 30) : 0; // 1K HKD/평/1일
+                      const largeAvgSalesPerPyeong = largeTotalArea > 0 ? (largeTotalSales / largeTotalArea / daysForCalc) : 0; // 1K HKD/평/1일
+                      const largePrevAvgSalesPerPyeong = largeTotalPrevArea > 0 ? (largeTotalPrevSales / largeTotalPrevArea / daysForCalc) : 0; // 1K HKD/평/1일
                       const largeYoy = largePrevAvgSalesPerPyeong > 0 ? (largeAvgSalesPerPyeong / largePrevAvgSalesPerPyeong) * 100 : 0;
                       
                       // 중소형 흑자매장 계산
@@ -6363,20 +7682,22 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         const storeCode = store.shop_cd || store.store_code;
                         const area = storeAreas[storeCode] || 0;
                         if (area > 0) {
-                          const storeData = plData?.channel_direct_profit?.stores?.[storeCode];
-                          if (storeData?.net_sales > 0) {
-                            smallTotalSales += storeData.net_sales;
+                          // activeTWStores에서 이미 누적 데이터로 변환되어 있음
+                          const netSales = store.current?.net_sales || 0;
+                          const netSalesPrev = store.previous?.net_sales || 0;
+                          if (netSales > 0) {
+                            smallTotalSales += netSales;
                             smallTotalArea += area;
                           }
-                          if (storeData?.net_sales_prev > 0) {
-                            smallTotalPrevSales += storeData.net_sales_prev;
+                          if (netSalesPrev > 0) {
+                            smallTotalPrevSales += netSalesPrev;
                             smallTotalPrevArea += area;
                           }
                         }
                       });
                       
-                      const smallAvgSalesPerPyeong = smallTotalArea > 0 ? (smallTotalSales / smallTotalArea / 30) : 0; // 1K HKD/평/1일
-                      const smallPrevAvgSalesPerPyeong = smallTotalPrevArea > 0 ? (smallTotalPrevSales / smallTotalPrevArea / 30) : 0; // 1K HKD/평/1일
+                      const smallAvgSalesPerPyeong = smallTotalArea > 0 ? (smallTotalSales / smallTotalArea / daysForCalc) : 0; // 1K HKD/평/1일
+                      const smallPrevAvgSalesPerPyeong = smallTotalPrevArea > 0 ? (smallTotalPrevSales / smallTotalPrevArea / daysForCalc) : 0; // 1K HKD/평/1일
                       const smallYoy = smallPrevAvgSalesPerPyeong > 0 ? (smallAvgSalesPerPyeong / smallPrevAvgSalesPerPyeong) * 100 : 0;
                       
                       // 매장 분류 (대형: 40평 이상, 중소형: 40평 미만, 아울렛: TU로 시작)
@@ -6394,6 +7715,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       
                       // 대형 매장 평당매출
                       let largeRegularTotalSales = 0, largeRegularTotalArea = 0, largeRegularPrevTotalSales = 0, largeRegularPrevTotalArea = 0;
+                      const daysForCalculation = showOfflineStoreMonthlyOrYTD === 'monthly' 
+                        ? (period ? parseInt(period.slice(2, 4)) === 2 ? 29 : [1,3,5,7,8,10,12].includes(parseInt(period.slice(2, 4))) ? 31 : 30 : 30)
+                        : 365; // 누적일 때는 연간 일수 사용
+                      
                       largeRegularStores.forEach((s: any) => {
                         const area = storeAreas[s.shop_cd] || 0;
                         if (area > 0) {
@@ -6401,8 +7726,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           if (s.previous?.net_sales > 0) { largeRegularPrevTotalSales += s.previous.net_sales; largeRegularPrevTotalArea += area; }
                 }
               });
-                      const largeRegularAvgSalesPerPyeong = largeRegularTotalArea > 0 ? (largeRegularTotalSales / largeRegularTotalArea / 30) : 0; // 1K HKD/평/1일
-                      const largeRegularPrevAvgSalesPerPyeong = largeRegularPrevTotalArea > 0 ? (largeRegularPrevTotalSales / largeRegularPrevTotalArea / 30) : 0;
+                      const largeRegularAvgSalesPerPyeong = largeRegularTotalArea > 0 ? (largeRegularTotalSales / largeRegularTotalArea / daysForCalculation) : 0; // 1K HKD/평/1일
+                      const largeRegularPrevAvgSalesPerPyeong = largeRegularPrevTotalArea > 0 ? (largeRegularPrevTotalSales / largeRegularPrevTotalArea / daysForCalculation) : 0;
                       const largeRegularYoy = largeRegularPrevAvgSalesPerPyeong > 0 ? (largeRegularAvgSalesPerPyeong / largeRegularPrevAvgSalesPerPyeong) * 100 : 0;
                       
                       // 중소형 매장 평당매출
@@ -6414,8 +7739,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           if (s.previous?.net_sales > 0) { smallRegularPrevTotalSales += s.previous.net_sales; smallRegularPrevTotalArea += area; }
                         }
                       });
-                      const smallRegularAvgSalesPerPyeong = smallRegularTotalArea > 0 ? (smallRegularTotalSales / smallRegularTotalArea / 30) : 0; // 1K HKD/평/1일
-                      const smallRegularPrevAvgSalesPerPyeong = smallRegularPrevTotalArea > 0 ? (smallRegularPrevTotalSales / smallRegularPrevTotalArea / 30) : 0;
+                      const smallRegularAvgSalesPerPyeong = smallRegularTotalArea > 0 ? (smallRegularTotalSales / smallRegularTotalArea / daysForCalculation) : 0; // 1K HKD/평/1일
+                      const smallRegularPrevAvgSalesPerPyeong = smallRegularPrevTotalArea > 0 ? (smallRegularPrevTotalSales / smallRegularPrevTotalArea / daysForCalculation) : 0;
                       const smallRegularYoy = smallRegularPrevAvgSalesPerPyeong > 0 ? (smallRegularAvgSalesPerPyeong / smallRegularPrevAvgSalesPerPyeong) * 100 : 0;
                       
                       // 아울렛 매장 평당매출
@@ -6427,8 +7752,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           if (s.previous?.net_sales > 0) { outletPrevTotalSales += s.previous.net_sales; outletPrevTotalArea += area; }
                         }
                       });
-                      const outletAvgSalesPerPyeong = outletTotalArea > 0 ? (outletTotalSales / outletTotalArea / 30) : 0; // 1K HKD/평/1일
-                      const outletPrevAvgSalesPerPyeong = outletPrevTotalArea > 0 ? (outletPrevTotalSales / outletPrevTotalArea / 30) : 0;
+                      const outletAvgSalesPerPyeong = outletTotalArea > 0 ? (outletTotalSales / outletTotalArea / daysForCalculation) : 0; // 1K HKD/평/1일
+                      const outletPrevAvgSalesPerPyeong = outletPrevTotalArea > 0 ? (outletPrevTotalSales / outletPrevTotalArea / daysForCalculation) : 0;
                       const outletYoy = outletPrevAvgSalesPerPyeong > 0 ? (outletAvgSalesPerPyeong / outletPrevAvgSalesPerPyeong) * 100 : 0;
                       
                       // 비교 분석 계산
@@ -6512,7 +7837,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               return (
                 <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-500 min-w-0">
-                  <h4 className="text-sm font-bold text-blue-800 mb-2">🏢 대형 정상</h4>
+                  <h4 className="text-sm font-bold text-blue-800 mb-2">🏢 대형 정상 (40평 이상)</h4>
                   <div className="text-xs text-blue-700 mb-2 font-semibold">{largeRegularStores.length}개 매장</div>
                   <div className="mb-2 text-left pl-2">
                     <span className="text-[10px] font-bold text-gray-600">전년→당년</span>
@@ -6532,34 +7857,47 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         ? (store.yoy >= 100 ? '흑↑' : '흑↓')
                         : (store.yoy >= 100 ? '적↑' : '적↓');
                       const area = storeAreas[store.shop_cd] || 0;
+                      // 폐점 매장 판단: 2512 당월 매출이 0이면 폐점 (누적 뷰에서도 당월 기준)
+                      const currentMonthSales = plData?.channel_direct_profit?.stores?.[store.shop_cd]?.net_sales || 0;
+                      const isClosed = currentMonthSales === 0;
                       
                       return (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
+                        <div key={idx} className={`flex justify-between items-center rounded px-2 py-1.5 ${isClosed ? 'bg-gray-300' : 'bg-white'}`}>
                           <div className="flex items-center gap-1">
-                            {!isNewStore && (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                              {prevCategory}
-                          </span>
-                            )}
-                            {isNewStore ? (
-                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
-                                신규
+                            {isClosed ? (
+                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-gray-500 text-white">
+                                영업종료
                               </span>
                             ) : (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                              {currentCategory}
-                            </span>
+                              <>
+                                {!isNewStore && (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                                  {prevCategory}
+                              </span>
+                                )}
+                                {isNewStore ? (
+                                  <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
+                                    신규
+                                  </span>
+                                ) : (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                                  {currentCategory}
+                                </span>
+                                )}
+                              </>
                             )}
-                            <span className="font-semibold text-blue-900 text-xs">{formatStoreName(store.shop_nm)}</span>
+                            <span className={`font-semibold text-xs ${isClosed ? 'text-gray-600' : 'text-blue-900'}`}>{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
                               <span className="text-[10px] text-gray-500">({Math.round(area)}평)</span>
                             )}
                           </div>
                           <div className="text-right">
-                            {!isNewStore && (
+                            {!isNewStore && !isClosed && (
                             <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
-                            <div className="font-bold text-blue-600 text-xs">+{Math.round(store.direct_profit)}K</div>
+                            <div className={`font-bold text-xs ${isClosed ? 'text-gray-600' : store.direct_profit < 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                              {store.direct_profit < 0 ? '' : '+'}{formatNumber(Math.round(store.direct_profit), 0)}K
+                            </div>
                             </div>
                               </div>
                             );
@@ -6602,7 +7940,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               
               return (
                 <div className="bg-green-50 rounded-lg p-4 border-2 border-green-500 min-w-0">
-                  <h4 className="text-sm font-bold text-green-800 mb-2">🏪 중소형 정상</h4>
+                  <h4 className="text-sm font-bold text-green-800 mb-2">🏪 중소형 정상 (40평 미만)</h4>
                   <div className="text-xs text-green-700 mb-2 font-semibold">{smallRegularStores.length}개 매장</div>
                   <div className="mb-2 text-left pl-2">
                     <span className="text-[10px] font-bold text-gray-600">전년→당년</span>
@@ -6621,34 +7959,47 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         ? (store.yoy >= 100 ? '흑↑' : '흑↓')
                         : (store.yoy >= 100 ? '적↑' : '적↓');
                       const area = storeAreas[store.shop_cd] || 0;
+                      // 폐점 매장 판단: 2512 당월 매출이 0이면 폐점 (누적 뷰에서도 당월 기준)
+                      const currentMonthSales = plData?.channel_direct_profit?.stores?.[store.shop_cd]?.net_sales || 0;
+                      const isClosed = currentMonthSales === 0;
                       
                       return (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
+                        <div key={idx} className={`flex justify-between items-center rounded px-2 py-1.5 ${isClosed ? 'bg-gray-300' : 'bg-white'}`}>
                           <div className="flex items-center gap-1">
-                            {!isNewStore && (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                              {prevCategory}
-                            </span>
-                            )}
-                            {isNewStore ? (
-                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
-                                신규
+                            {isClosed ? (
+                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-gray-500 text-white">
+                                영업종료
                               </span>
                             ) : (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                              {currentCategory}
-                            </span>
+                              <>
+                                {!isNewStore && (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                                  {prevCategory}
+                                </span>
+                                )}
+                                {isNewStore ? (
+                                  <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
+                                    신규
+                                  </span>
+                                ) : (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                                  {currentCategory}
+                                </span>
+                                )}
+                              </>
                             )}
-                            <span className="font-semibold text-green-900 text-xs">{formatStoreName(store.shop_nm)}</span>
+                            <span className={`font-semibold text-xs ${isClosed ? 'text-gray-600' : 'text-green-900'}`}>{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
                               <span className="text-[10px] text-gray-500">({Math.round(area)}평)</span>
                             )}
                           </div>
                           <div className="text-right">
-                            {!isNewStore && (
+                            {!isNewStore && !isClosed && (
                             <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
-                            <div className="font-bold text-green-600 text-xs">+{Math.round(store.direct_profit)}K</div>
+                            <div className={`font-bold text-xs ${isClosed ? 'text-gray-600' : store.direct_profit < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                              {store.direct_profit < 0 ? '' : '+'}{formatNumber(Math.round(store.direct_profit), 0)}K
+                            </div>
                           </div>
                         </div>
                       );
@@ -6706,39 +8057,50 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         ? (store.yoy >= 100 ? '흑↑' : '흑↓')
                         : (store.yoy >= 100 ? '적↑' : '적↓');
                       const area = storeAreas[store.shop_cd] || 0;
+                      // 폐점 매장 판단: 2512 당월 매출이 0이면 폐점 (누적 뷰에서도 당월 기준)
+                      const currentMonthSales = plData?.channel_direct_profit?.stores?.[store.shop_cd]?.net_sales || 0;
+                      const isClosed = currentMonthSales === 0;
                       
                       return (
-                        <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
+                        <div key={idx} className={`flex justify-between items-center rounded px-2 py-1.5 ${isClosed ? 'bg-gray-300' : 'bg-white'}`}>
                           <div className="flex items-center gap-1">
-                            {!isNewStore && (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
-                              {prevCategory}
-                            </span>
-                            )}
-                            {isNewStore ? (
-                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
-                                신규
+                            {isClosed ? (
+                              <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-gray-500 text-white">
+                                영업종료
                               </span>
                             ) : (
-                            <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
-                              {currentCategory}
-                            </span>
+                              <>
+                                {!isNewStore && (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[prevCategory as keyof typeof categoryColors]}`}>
+                                  {prevCategory}
+                                </span>
+                                )}
+                                {isNewStore ? (
+                                  <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
+                                    신규
+                                  </span>
+                                ) : (
+                                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${categoryColors[currentCategory as keyof typeof categoryColors]}`}>
+                                  {currentCategory}
+                                </span>
+                                )}
+                              </>
                             )}
-                            <span className="font-semibold text-purple-900 text-xs">{formatStoreName(store.shop_nm)}</span>
+                            <span className={`font-semibold text-xs ${isClosed ? 'text-gray-600' : 'text-purple-900'}`}>{formatStoreName(store.shop_nm)}</span>
                             {area > 0 && (
                               <span className="text-[10px] text-gray-500">({Math.round(area)}평)</span>
                             )}
                         </div>
                           <div className="text-right">
-                            {!isNewStore && (
+                            {!isNewStore && !isClosed && (
                             <div className="text-[10px] text-gray-600">매출 YOY {formatYoy(store.yoy)}%</div>
                             )}
-                            <div className="font-bold text-purple-600 text-xs">+{Math.round(store.direct_profit)}K</div>
+                            <div className={`font-bold text-xs ${isClosed ? 'text-gray-600' : 'text-purple-600'}`}>+{formatNumber(Math.round(store.direct_profit), 0)}K</div>
                         </div>
                         </div>
                       );
                     })}
-                      </div>
+                  </div>
                   <div className="border-t border-purple-300 pt-2 mt-3">
                     <div className="text-xs text-purple-700 mb-1">
                       <span className="font-semibold">직접이익 합계</span>: +{formatNumber(totalProfit, 0)}K
@@ -6751,117 +8113,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               );
             })()}
             
-            {/* 적자매장 */}
-            {(() => {
-              const lossCat = storeCategories?.loss_all;
-              if (!lossCat || lossCat.count === 0) return null;
-              
-              const improvingStores = lossCat.improving_stores || [];
-              const deterioratingStores = lossCat.deteriorating_stores || [];
-              
-              // 적자매장들의 합계 인건비율, 임차료율, 감가상각비율 계산
-              let totalLaborCost = 0;
-              let totalRent = 0;
-              let totalDepreciation = 0;
-              let totalNetSales = 0;
-              
-              const allLossStores = [...improvingStores, ...deterioratingStores];
-              allLossStores.forEach((store: any) => {
-                const storeCode = store.shop_cd || store.store_code;
-                const storeData = plData?.channel_direct_profit?.stores?.[storeCode as keyof typeof plData.channel_direct_profit.stores];
-                if (storeData) {
-                  totalLaborCost += storeData.labor_cost || 0;
-                  totalRent += storeData.rent || 0;
-                  totalDepreciation += storeData.depreciation || 0;
-                  totalNetSales += storeData.net_sales || 0;
-                }
-              });
-              
-              const laborCostRatio = totalNetSales > 0 ? (totalLaborCost / totalNetSales) * 100 : 0;
-              const rentRatio = totalNetSales > 0 ? (totalRent / totalNetSales) * 100 : 0;
-              const depreciationRatio = totalNetSales > 0 ? (totalDepreciation / totalNetSales) * 100 : 0;
-              
-              return (
-                <div className="bg-red-50 rounded-lg p-4 border-2 border-red-400 min-w-0">
-                  <h4 className="text-sm font-bold text-red-800 mb-2">적자매장</h4>
-                  <div className="text-xs text-red-700 mb-3 font-semibold">{lossCat.count}개 매장</div>
-                  
-                  {/* 매출개선 적자매장 */}
-                  {improvingStores.length > 0 && (
-                    <div className="mb-3">
-                      <div className="text-xs text-yellow-700 mb-1.5 font-semibold">매출개선 ({improvingStores.length}개)</div>
-                      <div className="space-y-1.5">
-                        {improvingStores.map((store: any, idx: number) => {
-                          const netSales = (store.current?.net_sales || 0) / 1000;
-                          const loss = store.direct_profit || 0;
-                          return (
-                            <div key={idx} className="flex justify-between items-center bg-yellow-50 rounded px-2 py-1.5 border border-yellow-200">
-                              <span className="font-semibold text-yellow-900 text-xs">{store.shop_nm}</span>
-                          <div className="text-right">
-                                <div className="text-[10px] text-green-600">YOY {formatYoy(store.yoy)}% ↑</div>
-                                <div className="text-[10px] text-gray-600">매출 {formatNumber(netSales, 0)}K</div>
-                                <div className="font-bold text-yellow-700 text-xs">{formatNumber(loss, 0)}K</div>
-                            </div>
-                          </div>
-                          );
-                        })}
-                        </div>
-                    </div>
-                  )}
-                  
-                  {/* 매출악화 적자매장 */}
-                  {deterioratingStores.length > 0 && (
-                    <div className="mb-3">
-                      <div className="text-xs text-red-700 mb-1.5 font-semibold">매출악화 ({deterioratingStores.length}개)</div>
-                      <div className="space-y-1.5">
-                        {deterioratingStores.map((store: any, idx: number) => {
-                          const netSales = (store.current?.net_sales || 0) / 1000;
-                          const loss = store.direct_profit || 0;
-                            return (
-                            <div key={idx} className="flex justify-between items-center bg-white rounded px-2 py-1.5">
-                              <span className="font-semibold text-red-900 text-xs">{store.shop_nm}</span>
-                              <div className="text-right">
-                                <div className="text-[10px] text-red-600">YOY {formatYoy(store.yoy)}% ↓</div>
-                                <div className="text-[10px] text-gray-600">매출 {formatNumber(netSales, 0)}K</div>
-                                <div className="font-bold text-red-600 text-xs">{formatNumber(loss, 0)}K</div>
-                              </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                    </div>
-                    )}
-                  
-                  <div className="border-t border-red-300 pt-2 mt-3">
-                    <div className="text-xs text-red-700 mb-1">
-                      <span className="font-semibold">적자매장 ({lossCat.count}개)</span>: {formatNumber(lossCat.total_direct_profit || 0, 0)}K
-                  </div>
-                    <div className="text-[10px] text-red-600 flex items-center">
-                      <span>우선 조치 계획</span>
-                      <span className="ml-1">→</span>
-                    </div>
-                    {/* 합계 비율 표시 */}
-                    <div className="mt-2 pt-2 border-t border-red-200">
-                      <div className="text-[10px] text-red-700 font-semibold mb-1">합계 비율 (실판매출 대비)</div>
-                      <div className="grid grid-cols-3 gap-2 text-[10px] text-red-600">
-                        <div>
-                          <div className="font-semibold">인건비율</div>
-                          <div>{formatPercent(laborCostRatio, 1)}%</div>
-                        </div>
-                        <div>
-                          <div className="font-semibold">임차료율</div>
-                          <div>{formatPercent(rentRatio, 1)}%</div>
-                        </div>
-                        <div>
-                          <div className="font-semibold">감가상각비율</div>
-                          <div>{formatPercent(depreciationRatio, 1)}%</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
           </div>
         </div>
       </div>

@@ -149,7 +149,7 @@ def get_mlb_expense_detail(pl_data, period):
             row['SHOP_CD'] == 'T99' and 
             row['BRD_CD'] == 'M'):  # MLB만
             
-            account_cd = row['ACCOUNT_CD'].strip()
+            account_cd = row.get('ACCOUNT_CD', '').strip() if 'ACCOUNT_CD' in row else ''
             account_nm = row['ACCOUNT_NM'].strip()
             value = clean_number(row['VALUE'])
             
@@ -191,7 +191,7 @@ def aggregate_pl_by_period(pl_data, period, country=None, channel=None):
             continue
         
         account_nm = row['ACCOUNT_NM'].strip()
-        account_cd = row['ACCOUNT_CD'].strip()
+        account_cd = row.get('ACCOUNT_CD', '').strip() if 'ACCOUNT_CD' in row else ''
         value = clean_number(row['VALUE'])
         
         # 계정별 집계
@@ -201,6 +201,8 @@ def aggregate_pl_by_period(pl_data, period, country=None, channel=None):
             result['TAG'] += value
         elif account_nm == '매출원가' or account_cd == 'COGS':
             result['매출원가'] += value
+        elif account_nm == '매출원가합계':  # 매출원가합계 사용 (매출원가보다 정확)
+            result['매출원가합계'] += value
         elif account_nm == '매출총이익':
             result['매출총이익'] += value
         elif account_nm == '판매관리비':
@@ -274,7 +276,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
             }
         
         account_nm = row['ACCOUNT_NM'].strip()
-        account_cd = row['ACCOUNT_CD'].strip()
+        account_cd = row.get('ACCOUNT_CD', '').strip() if 'ACCOUNT_CD' in row else ''
         value = clean_number(row['VALUE'])
         
         # 실매출액
@@ -321,7 +323,7 @@ def calculate_store_direct_profit(pl_data, latest_period, prev_period):
             continue
         
         account_nm = row['ACCOUNT_NM'].strip()
-        account_cd = row['ACCOUNT_CD'].strip()
+        account_cd = row.get('ACCOUNT_CD', '').strip() if 'ACCOUNT_CD' in row else ''
         value = clean_number(row['VALUE'])
         
         # 실매출액
@@ -418,7 +420,7 @@ def calculate_cumulative_store_data(pl_data, periods):
                 }
             
             account_nm = row['ACCOUNT_NM'].strip()
-            account_cd = row['ACCOUNT_CD'].strip()
+            account_cd = row.get('ACCOUNT_CD', '').strip() if 'ACCOUNT_CD' in row else ''
             value = clean_number(row['VALUE'])
             
             # 각 계정 매핑
@@ -482,6 +484,14 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
     cumulative_total = defaultdict(float)
     prev_cumulative_total = defaultdict(float)
     
+    cumulative_tw_retail = defaultdict(float)
+    cumulative_tw_outlet = defaultdict(float)
+    cumulative_tw_online = defaultdict(float)
+    
+    prev_cumulative_tw_retail = defaultdict(float)
+    prev_cumulative_tw_outlet = defaultdict(float)
+    prev_cumulative_tw_online = defaultdict(float)
+    
     for period in cumulative_periods:
         # 대만 누적 (리테일+아울렛+온라인)
         period_data_tw_retail = aggregate_pl_by_period(pl_data, period, 'TW', 'Retail')
@@ -489,6 +499,9 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         period_data_tw_online = aggregate_pl_by_period(pl_data, period, 'TW', 'Online')
         for key in set(list(period_data_tw_retail.keys()) + list(period_data_tw_outlet.keys()) + list(period_data_tw_online.keys())):
             cumulative_total[key] += period_data_tw_retail[key] + period_data_tw_outlet[key] + period_data_tw_online[key]
+            cumulative_tw_retail[key] += period_data_tw_retail[key]
+            cumulative_tw_outlet[key] += period_data_tw_outlet[key]
+            cumulative_tw_online[key] += period_data_tw_online[key]
     
     for period in prev_cumulative_periods:
         # 전년 대만 누적 (리테일+아울렛+온라인)
@@ -497,6 +510,9 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
         period_data_tw_online = aggregate_pl_by_period(pl_data, period, 'TW', 'Online')
         for key in set(list(period_data_tw_retail.keys()) + list(period_data_tw_outlet.keys()) + list(period_data_tw_online.keys())):
             prev_cumulative_total[key] += period_data_tw_retail[key] + period_data_tw_outlet[key] + period_data_tw_online[key]
+            prev_cumulative_tw_retail[key] += period_data_tw_retail[key]
+            prev_cumulative_tw_outlet[key] += period_data_tw_outlet[key]
+            prev_cumulative_tw_online[key] += period_data_tw_online[key]
     
     # 계산된 지표들
     def calculate_metrics(current, prev, cumulative, prev_cumulative):
@@ -641,18 +657,55 @@ def calculate_pl_summary(pl_data, latest_period, prev_period):
     
     metrics_total = calculate_metrics(current_month_total, prev_month_total, cumulative_total, prev_cumulative_total)
     
+    # 채널별 직접이익률 계산
+    def calculate_direct_profit_rate(data):
+        if data.get('실판', 0) > 0:
+            direct_profit = data.get('매출총이익', 0) - data.get('직접비_합계', 0)
+            return (direct_profit / data['실판']) * 100
+        return 0
+    
+    # 직접이익률 계산 및 저장
+    retail_profit_rate = calculate_direct_profit_rate(current_month_tw_retail)
+    outlet_profit_rate = calculate_direct_profit_rate(current_month_tw_outlet)
+    online_profit_rate = calculate_direct_profit_rate(current_month_tw_online)
+    
+    print(f"\n채널별 직접이익률 (당월):")
+    print(f"  Retail: {retail_profit_rate:.2f}%")
+    print(f"  Outlet: {outlet_profit_rate:.2f}%")
+    print(f"  Online: {online_profit_rate:.2f}%")
+    
+    current_month_tw_retail['direct_profit_rate'] = retail_profit_rate
+    current_month_tw_outlet['direct_profit_rate'] = outlet_profit_rate
+    current_month_tw_online['direct_profit_rate'] = online_profit_rate
+    
+    cumulative_tw_retail['direct_profit_rate'] = calculate_direct_profit_rate(cumulative_tw_retail)
+    cumulative_tw_outlet['direct_profit_rate'] = calculate_direct_profit_rate(cumulative_tw_outlet)
+    cumulative_tw_online['direct_profit_rate'] = calculate_direct_profit_rate(cumulative_tw_online)
+    
     return {
         'current_month': {
             'total': current_month_total,
+            'retail': current_month_tw_retail,
+            'outlet': current_month_tw_outlet,
+            'online': current_month_tw_online,
         },
         'prev_month': {
             'total': prev_month_total,
+            'retail': prev_month_tw_retail,
+            'outlet': prev_month_tw_outlet,
+            'online': prev_month_tw_online,
         },
         'cumulative': {
             'total': cumulative_total,
+            'retail': cumulative_tw_retail,
+            'outlet': cumulative_tw_outlet,
+            'online': cumulative_tw_online,
         },
         'prev_cumulative': {
             'total': prev_cumulative_total,
+            'retail': prev_cumulative_tw_retail,
+            'outlet': prev_cumulative_tw_outlet,
+            'online': prev_cumulative_tw_online,
         },
         'metrics': {
             'total': metrics_total,
@@ -1313,10 +1366,25 @@ def main(target_period_short=None):
                 'operating_profit': (current_tw_offline.get('매출총이익', 0) - current_tw_offline.get('직접비_합계', 0)) - (sg_a * current_tw_offline.get('실판', 0) / net_sales) if net_sales > 0 else 0,
                 'operating_profit_rate': ((current_tw_offline.get('매출총이익', 0) - current_tw_offline.get('직접비_합계', 0) - (sg_a * current_tw_offline.get('실판', 0) / net_sales)) / current_tw_offline.get('실판', 1) * 100) if current_tw_offline.get('실판', 0) > 0 and net_sales > 0 else 0,
             },
+            'retail': {
+                'tag_sales': current_tw_offline_retail.get('TAG', 0),
+                'net_sales': current_tw_offline_retail.get('실판', 0),
+                'discount_rate': ((current_tw_offline_retail.get('TAG', 0) / 1.05 - current_tw_offline_retail.get('실판', 0)) / (current_tw_offline_retail.get('TAG', 0) / 1.05) * 100) if current_tw_offline_retail.get('TAG', 0) > 0 else 0,
+                'yoy': (current_tw_offline_retail.get('실판', 0) / prev_tw_offline_retail.get('실판', 1) * 100) if prev_tw_offline_retail.get('실판', 0) > 0 else 0,
+                'direct_profit_rate': pl_summary['current_month']['retail'].get('direct_profit_rate', 0),
+            },
+            'outlet': {
+                'tag_sales': current_tw_offline_outlet.get('TAG', 0),
+                'net_sales': current_tw_offline_outlet.get('실판', 0),
+                'discount_rate': ((current_tw_offline_outlet.get('TAG', 0) / 1.05 - current_tw_offline_outlet.get('실판', 0)) / (current_tw_offline_outlet.get('TAG', 0) / 1.05) * 100) if current_tw_offline_outlet.get('TAG', 0) > 0 else 0,
+                'yoy': (current_tw_offline_outlet.get('실판', 0) / prev_tw_offline_outlet.get('실판', 1) * 100) if prev_tw_offline_outlet.get('실판', 0) > 0 else 0,
+                'direct_profit_rate': pl_summary['current_month']['outlet'].get('direct_profit_rate', 0),
+            },
             'online': {
                 'tag_sales': current_tw_online.get('TAG', 0),
                 'net_sales': current_tw_online.get('실판', 0),
                 'discount_rate': ((current_tw_online.get('TAG', 0) / 1.05 - current_tw_online.get('실판', 0)) / (current_tw_online.get('TAG', 0) / 1.05) * 100) if current_tw_online.get('TAG', 0) > 0 else 0,
+                'yoy': (current_tw_online.get('실판', 0) / prev_tw_online.get('실판', 1) * 100) if prev_tw_online.get('실판', 0) > 0 else 0,
                 'cogs': current_tw_online.get('매출원가', 0),
                 'cogs_rate': (current_tw_online.get('매출원가', 0) / current_tw_online.get('TAG', 1) * 100) if current_tw_online.get('TAG', 0) > 0 else 0,
                 'gross_profit': current_tw_online.get('매출총이익', 0),
@@ -1391,10 +1459,25 @@ def main(target_period_short=None):
                 'operating_profit': (cumulative_tw_offline.get('매출총이익', 0) - cumulative_tw_offline.get('직접비_합계', 0)) - (cum_sg_a * cumulative_tw_offline.get('실판', 0) / cum_net_sales) if cum_net_sales > 0 else 0,
                 'operating_profit_rate': ((cumulative_tw_offline.get('매출총이익', 0) - cumulative_tw_offline.get('직접비_합계', 0) - (cum_sg_a * cumulative_tw_offline.get('실판', 0) / cum_net_sales)) / cumulative_tw_offline.get('실판', 1) * 100) if cumulative_tw_offline.get('실판', 0) > 0 and cum_net_sales > 0 else 0,
             },
+            'retail': {
+                'tag_sales': cumulative_tw_offline_retail.get('TAG', 0),
+                'net_sales': cumulative_tw_offline_retail.get('실판', 0),
+                'discount_rate': ((cumulative_tw_offline_retail.get('TAG', 0) / 1.05 - cumulative_tw_offline_retail.get('실판', 0)) / (cumulative_tw_offline_retail.get('TAG', 0) / 1.05) * 100) if cumulative_tw_offline_retail.get('TAG', 0) > 0 else 0,
+                'yoy': (cumulative_tw_offline_retail.get('실판', 0) / prev_cumulative_tw_offline_retail.get('실판', 1) * 100) if prev_cumulative_tw_offline_retail.get('실판', 0) > 0 else 0,
+                'direct_profit_rate': pl_summary['cumulative']['retail'].get('direct_profit_rate', 0),
+            },
+            'outlet': {
+                'tag_sales': cumulative_tw_offline_outlet.get('TAG', 0),
+                'net_sales': cumulative_tw_offline_outlet.get('실판', 0),
+                'discount_rate': ((cumulative_tw_offline_outlet.get('TAG', 0) / 1.05 - cumulative_tw_offline_outlet.get('실판', 0)) / (cumulative_tw_offline_outlet.get('TAG', 0) / 1.05) * 100) if cumulative_tw_offline_outlet.get('TAG', 0) > 0 else 0,
+                'yoy': (cumulative_tw_offline_outlet.get('실판', 0) / prev_cumulative_tw_offline_outlet.get('실판', 1) * 100) if prev_cumulative_tw_offline_outlet.get('실판', 0) > 0 else 0,
+                'direct_profit_rate': pl_summary['cumulative']['outlet'].get('direct_profit_rate', 0),
+            },
             'online': {
                 'tag_sales': cumulative_tw_online.get('TAG', 0),
                 'net_sales': cumulative_tw_online.get('실판', 0),
                 'discount_rate': ((cumulative_tw_online.get('TAG', 0) / 1.05 - cumulative_tw_online.get('실판', 0)) / (cumulative_tw_online.get('TAG', 0) / 1.05) * 100) if cumulative_tw_online.get('TAG', 0) > 0 else 0,
+                'yoy': (cumulative_tw_online.get('실판', 0) / prev_cumulative_tw_online.get('실판', 1) * 100) if prev_cumulative_tw_online.get('실판', 0) > 0 else 0,
                 'cogs': cumulative_tw_online.get('매출원가', 0),
                 'cogs_rate': (cumulative_tw_online.get('매출원가', 0) / cumulative_tw_online.get('TAG', 1) * 100) if cumulative_tw_online.get('TAG', 0) > 0 else 0,
                 'gross_profit': cumulative_tw_online.get('매출총이익', 0),
@@ -1410,6 +1493,7 @@ def main(target_period_short=None):
                 'total': {
                     'tag_sales': cum_tag_sales_prev,
                     'net_sales': cum_net_sales_prev,
+                    'discount_rate': ((cum_tag_sales_prev / 1.05 - cum_net_sales_prev) / (cum_tag_sales_prev / 1.05) * 100) if cum_tag_sales_prev > 0 else 0,
                     'gross_profit': cum_gross_profit_prev,
                     'direct_cost': cum_direct_cost_prev,
                     'direct_profit': cum_direct_profit_prev,
@@ -1425,6 +1509,16 @@ def main(target_period_short=None):
                         'other': cum_expense_detail_prev.get('other', 0),
                         'other_detail': cum_expense_detail_prev.get('other_detail', {})
                     },
+                },
+                'retail': {
+                    'tag_sales': prev_cumulative_tw_offline_retail.get('TAG', 0),
+                    'net_sales': prev_cumulative_tw_offline_retail.get('실판', 0),
+                    'discount_rate': ((prev_cumulative_tw_offline_retail.get('TAG', 0) / 1.05 - prev_cumulative_tw_offline_retail.get('실판', 0)) / (prev_cumulative_tw_offline_retail.get('TAG', 0) / 1.05) * 100) if prev_cumulative_tw_offline_retail.get('TAG', 0) > 0 else 0,
+                },
+                'outlet': {
+                    'tag_sales': prev_cumulative_tw_offline_outlet.get('TAG', 0),
+                    'net_sales': prev_cumulative_tw_offline_outlet.get('실판', 0),
+                    'discount_rate': ((prev_cumulative_tw_offline_outlet.get('TAG', 0) / 1.05 - prev_cumulative_tw_offline_outlet.get('실판', 0)) / (prev_cumulative_tw_offline_outlet.get('TAG', 0) / 1.05) * 100) if prev_cumulative_tw_offline_outlet.get('TAG', 0) > 0 else 0,
                 },
                 'offline': {
                     'tag_sales': prev_cumulative_tw_offline.get('TAG', 0),
@@ -1519,10 +1613,21 @@ def main(target_period_short=None):
                 'offline': prev_offline_count if discovery_data else 0
             }
         } if discovery_data else None,
+        'discovery_cumulative': {
+            'net_sales': discovery_cumulative.get('실판', 0) if discovery_data else 0,
+            'discount_rate': ((discovery_cumulative.get('TAG', 0) / 1.05 - discovery_cumulative.get('실판', 0)) / (discovery_cumulative.get('TAG', 0) / 1.05) * 100) if discovery_data and discovery_cumulative.get('TAG', 0) > 0 else 0,
+            'direct_cost': discovery_cumulative.get('판매관리비', 0) if discovery_data else 0,
+            'direct_profit': discovery_cumulative.get('매출총이익', 0) - discovery_cumulative.get('판매관리비', 0) if discovery_data else 0,
+            'marketing': discovery_cumulative.get('마케팅비', 0) if discovery_data else 0,
+            'travel': discovery_cumulative.get('여비교통비', 0) if discovery_data else 0,
+            'sg_a': discovery_cumulative_sg_a if discovery_data else 0,
+            'operating_profit': discovery_cumulative_op_profit if discovery_data else 0,
+        } if discovery_data else None,
         'prev_month': {
             'total': {
                 'tag_sales': tag_sales_prev,
                 'net_sales': net_sales_prev,
+                'discount_rate': ((tag_sales_prev / 1.05 - net_sales_prev) / (tag_sales_prev / 1.05) * 100) if tag_sales_prev > 0 else 0,
                 'cogs': cogs_prev,
                 'gross_profit': gross_profit_prev,
                 'direct_cost': direct_cost_prev,
@@ -1545,6 +1650,16 @@ def main(target_period_short=None):
                 'sg_a': (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
                 'operating_profit': (prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0)) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev) if net_sales_prev > 0 else 0,
                 'operating_profit_rate': ((prev_tw_offline.get('매출총이익', 0) - prev_tw_offline.get('직접비_합계', 0) - (sg_a_prev * prev_tw_offline.get('실판', 0) / net_sales_prev)) / prev_tw_offline.get('실판', 1) * 100) if prev_tw_offline.get('실판', 0) > 0 and net_sales_prev > 0 else 0,
+            },
+            'retail': {
+                'tag_sales': prev_tw_offline_retail.get('TAG', 0),
+                'net_sales': prev_tw_offline_retail.get('실판', 0),
+                'discount_rate': ((prev_tw_offline_retail.get('TAG', 0) / 1.05 - prev_tw_offline_retail.get('실판', 0)) / (prev_tw_offline_retail.get('TAG', 0) / 1.05) * 100) if prev_tw_offline_retail.get('TAG', 0) > 0 else 0,
+            },
+            'outlet': {
+                'tag_sales': prev_tw_offline_outlet.get('TAG', 0),
+                'net_sales': prev_tw_offline_outlet.get('실판', 0),
+                'discount_rate': ((prev_tw_offline_outlet.get('TAG', 0) / 1.05 - prev_tw_offline_outlet.get('실판', 0)) / (prev_tw_offline_outlet.get('TAG', 0) / 1.05) * 100) if prev_tw_offline_outlet.get('TAG', 0) > 0 else 0,
             },
             'online': {
                 'tag_sales': prev_tw_online.get('TAG', 0),
@@ -1582,13 +1697,14 @@ def main(target_period_short=None):
     print(f"\nP&L 데이터가 {output_file}에 저장되었습니다.")
     print(f"Public 폴더에도 복사: {public_file}")
     
-    # 기본 파일로도 복사 (최신 데이터)
-    if target_period_short:
-        default_output = 'components/dashboard/taiwan-pl-data.json'
-        default_public = 'public/dashboard/taiwan-pl-data.json'
-        shutil.copy(output_file, default_output)
-        shutil.copy(output_file, default_public)
-        print(f"기본 파일로도 복사: {default_output}, {default_public}")
+    # 기본 파일로도 복사 - 비활성화 (Period별 파일만 사용하여 이전 데이터 보호)
+    # if target_period_short:
+    #     default_output = 'components/dashboard/taiwan-pl-data.json'
+    #     default_public = 'public/dashboard/taiwan-pl-data.json'
+    #     shutil.copy(output_file, default_output)
+    #     shutil.copy(output_file, default_public)
+    #     print(f"기본 파일로도 복사: {default_output}, {default_public}")
+    print("기본 파일 복사 생략 (Period별 독립 데이터 유지)")
 
 if __name__ == '__main__':
     import sys

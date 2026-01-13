@@ -202,6 +202,132 @@ npm start
 
 ## 데이터 처리 주의사항
 
+### CSV 전처리 규칙 (대만 재고 데이터) - 2512 기준
+
+#### 전처리 목적
+- 대만 재고 데이터(`TW_Inventory_2312_2512_v5.2.csv`)를 대시보드용으로 정제
+- TWD → HKD 환율 변환, VAT 제외, Tag 기반 분류 적용
+- 전처리 스크립트: `preprocess_tw_final.py`
+
+#### 전처리 규칙 상세
+
+**1. 공통 규칙**
+
+**입력 파일:**
+- 재고 Raw Data: `TW_Inventory_2312_2512_v5.2.csv`
+- 환율표: `TW_Exchange Rate 2512.csv`
+- **환율 적용**: 당월 환율(4.02)을 전년 동월(2412)에도 동일 적용
+
+**브랜드 필터:**
+- `Brand == 'MLB'`인 로우만 유지, 나머지 제거
+
+**부가세 및 매출액 처리:**
+- **실판매출(NET SALES)** = `Gross_Sales ÷ 1.05` (VAT 제외)
+- **택매출(GROSS SALES)** = VAT 적용 안 함
+- 원본 CSV의 `Net_Sales`는 이미 부가세가 포함된 상태이므로 반드시 1.05로 나눔
+
+**환율 적용:**
+- `TW_Exchange Rate 2512`에서 읽은 당월 환율(4.02)을 모든 금액 컬럼에 적용
+- 대상: Gross_Sales, Net_Sales, COGS, Stock_Cost, Stock_Price, Net_AcP_P, AC_Sales_Gross 등
+
+**2. Period 및 시즌 구분**
+
+**Period:**
+- 당월 Period = `2512`
+- 전년 동월 Period = `2412`
+
+**시즌 구분:**
+- 당시즌 = `25F`
+- 전년 당시즌 = `24F`
+- 과시즌F = `24F`, `23F`, `22F`, `21F`...
+- 과시즌S = `24S`, `23S`, `22S`, `21S`...
+
+**악세사리(ACC) 판별:**
+- **시즌코드 끝자리가 'N'인 경우 = 악세사리**
+- 악세사리 내 카테고리 분류:
+  - `HEA` → 모자
+  - `SHO` → 신발
+  - `BAG` → 가방
+  - `ATC`, `WTC`, `BOT` 등 → 기타ACC
+
+**3. 아이템별 판매 Tag (ITEM_SALES_TAG)**
+
+**목적:** Gross Sales 기준 아이템 분류
+
+**Tag 규칙:**
+- 시즌 Tag:
+  - `25F` → `25F`
+  - `25S` → `25S`
+  - `26S` → `26S`
+  - `24F`, `23F`, `22F`... → `과시즌F`
+  - `24S`, `23S`, `22S`... → `과시즌S`
+
+- ACC 카테고리 Tag (시즌코드 끝자리 'N'):
+  - `HEA` → `모자`
+  - `SHO` → `신발`
+  - `BAG` → `가방`
+  - 그 외 → `기타ACC`
+
+**4. 아이템별 기말재고 Tag (ITEM_ENDING_STOCK_TAG)**
+
+**목적:** Stock Price 기준 아이템 분류
+
+**Tag 규칙:** 판매 Tag와 동일
+
+**5. 출력 형식**
+
+**파일명:** `TW_Inventory_Processed_2512.csv`
+
+**컬럼 순서:**
+```
+PERIOD, BRAND, ITEM_CODE, ITEM_DESC1, ITEM_DESC2, SEASON, CATEGORY, SUBCATEGORY,
+STORE_CODE, STORE_NAME, GROSS_SALES, NET_SALES, NET_AC_PP, AC_SALES_GROSS,
+STOCK_COST, STOCK_PRICE, STOCK_QTY, SALES_QTY,
+ITEM_SALES_TAG, ITEM_ENDING_STOCK_TAG
+```
+
+**숫자 형식:** 소수점 2자리까지 반올림
+
+#### 전처리 스크립트 실행
+
+```bash
+# 1단계: CSV 전처리
+python preprocess_tw_final.py
+
+# 2단계: 대시보드 JSON 생성
+python generate_taiwan_2512.py
+
+# 3단계: 누적/CEO 인사이트 생성
+python generate_taiwan_cumulative_2512.py
+python generate_taiwan_ceo_insights_2512.py
+```
+
+#### 전처리 결과 검증
+
+**2512 악세사리 (N시즌):**
+- **판매 (Gross Sales):**
+  - 모자: 3,413 K HKD
+  - 신발: 4,528 K HKD
+  - 가방: 1,036 K HKD
+  - 기타ACC: 287 K HKD
+  - **합계**: 9,264 K HKD
+
+- **재고 (Stock Price):**
+  - 모자: 26,440 K HKD
+  - 신발: 34,729 K HKD
+  - 가방: 8,053 K HKD
+  - 기타ACC: 2,265 K HKD
+  - **합계**: 71,487 K HKD
+
+**2412 악세사리 재고:**
+- 모자: 8,587 K HKD
+- 신발: 9,248 K HKD
+- 가방: 2,303 K HKD
+- 기타ACC: 667 K HKD
+- **합계**: 20,805 K HKD
+
+**YOY:** 344%
+
 ### 대만 데이터 환율 처리
 
 대만 재고수불 CSV 파일의 데이터를 처리할 때:

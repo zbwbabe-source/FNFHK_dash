@@ -1575,13 +1575,14 @@ def main(target_period_short=None):
     print(f"\nP&L 데이터가 {output_file}에 저장되었습니다.")
     print(f"Public 폴더에도 복사: {public_file}")
     
-    # 기본 파일로도 복사 (최신 데이터)
-    if target_period_short:
-        default_output = 'components/dashboard/hongkong-pl-data.json'
-        default_public = 'public/dashboard/hongkong-pl-data.json'
-        shutil.copy(output_file, default_output)
-        shutil.copy(output_file, default_public)
-        print(f"기본 파일로도 복사: {default_output}, {default_public}")
+    # 기본 파일로도 복사 - 비활성화 (Period별 파일만 사용하여 이전 데이터 보호)
+    # if target_period_short:
+    #     default_output = 'components/dashboard/hongkong-pl-data.json'
+    #     default_public = 'public/dashboard/hongkong-pl-data.json'
+    #     shutil.copy(output_file, default_output)
+    #     shutil.copy(output_file, default_public)
+    #     print(f"기본 파일로도 복사: {default_output}, {default_public}")
+    print("기본 파일 복사 생략 (Period별 독립 데이터 유지)")
 
 if __name__ == '__main__':
     import sys

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import plData from './taiwan-pl-data.json';
+import { ChevronDown, ChevronRight, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import plData from './taiwan-pl-data-2512.json';
 import storeAreasData from './taiwan-store-areas.json';
-import dashboardData from './taiwan-dashboard-data.json';
+import dashboardData from './taiwan-dashboard-data-2512.json';
 import storeLocationsData from './taiwan-store-locations.json';
 
 interface RegionalData {
@@ -95,16 +96,15 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     const plStores = (plData as any)?.channel_direct_profit?.stores || {};
     const storeAreas = (storeAreasData as any)?.store_areas || {};
 
-    // 현재 월 일수 (10월 = 31일)
-    // 참고: channel_direct_profit.stores는 월별 데이터이므로 월별 일수로 나눔
-    const currentMonthDays = 31;
+    // 누적 기준 일수 (1년 = 365일)
+    const cumulativeDays = 365;
 
     // REGION_ORDER 상수 순서대로 명시적으로 생성
     const data = REGION_ORDER.map((region, index) => {
       const regionData = regionSummary[region] || {};
       const storeCodes = regionData.store_codes || [];
       
-      // 금년 (2510) 데이터
+      // 금년 (2512) 누적 데이터
       let totalSales = 0;
       let totalArea = 0;
       let totalDirectProfit = 0;
@@ -112,7 +112,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       let totalLaborCost = 0;
       let activeStoreCount = 0;
 
-      // 전년 (2410) 데이터 (폐점 매장 포함)
+      // 전년 (2412) 누적 데이터 (폐점 매장 포함)
       let totalSalesPrev = 0;
       let totalAreaPrev = 0;
       let totalDirectProfitPrev = 0;
@@ -129,14 +129,18 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         
         if (!plStore || area === 0) return;
         
-        const netSales = plStore.net_sales || 0;
-        const netSalesPrev = plStore.net_sales_prev || 0;
+        // 누적 데이터 사용
+        const netSales = plStore.cumulative_net_sales || plStore.net_sales || 0;
+        const netSalesPrev = plStore.cumulative_net_sales_prev || plStore.net_sales_prev || 0;
+        const directProfit = plStore.cumulative_direct_profit || plStore.direct_profit || 0;
+        const directProfitPrev = plStore.cumulative_direct_profit_prev || plStore.direct_profit_prev || 0;
 
-        // 금년 데이터 (영업중인 매장만)
-        if (netSales > 0) {
+        // 금년 데이터 (영업중인 매장만) - 2512 월별 매출이 0이 아니면 영업중
+        const currentMonthSales = plStore.net_sales || 0;
+        if (currentMonthSales > 0) {
           totalSales += netSales;
           totalArea += area;
-          totalDirectProfit += plStore.direct_profit || 0;
+          totalDirectProfit += directProfit;
           totalRent += plStore.rent || 0;
           totalLaborCost += plStore.labor_cost || 0;
           activeStoreCount++;
@@ -146,7 +150,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         if (netSalesPrev > 0) {
           totalSalesPrev += netSalesPrev;
           totalAreaPrev += area;
-          totalDirectProfitPrev += plStore.direct_profit_prev || 0;
+          totalDirectProfitPrev += directProfitPrev;
           totalRentPrev += plStore.rent_prev || 0;
           totalLaborCostPrev += plStore.labor_cost_prev || 0;
           activeStoreCountPrev++;
@@ -162,9 +166,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       const laborCostPerPyeong = totalArea > 0 ? totalLaborCost / totalArea : 0;
       const laborCostPerPyeongPrev = totalAreaPrev > 0 ? totalLaborCostPrev / totalAreaPrev : 0;
       
-      // 일평균 평당매출 (월별 기준)
-      const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
-      const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
+      // 일평균 평당매출 (누적 기준, 365일)
+      const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
+      const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
 
       // YOY 계산
       const yoy = salesPerPyeongPrev > 0 ? ((salesPerPyeong - salesPerPyeongPrev) / salesPerPyeongPrev) * 100 : 0;
@@ -217,7 +221,7 @@ const TaiwanRegionalAnalysis: React.FC = () => {
     const inefficientStores: any[] = []; // 비효율 매장 (T15만)
     const reviewStores: any[] = []; // 재계약 검토중 (T04, T07, T09)
     const newStores: any[] = [];
-    const currentMonthDays = 31;
+    const cumulativeDays = 365; // 누적 기준 일수
 
     Object.keys(plStores).forEach((storeCode: string) => {
       if (storeCode.startsWith('TE')) return; // 온라인 제외
@@ -229,15 +233,17 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       
       if (!plStore || area === 0) return;
 
-      const netSales = plStore.net_sales || 0;
-      const netSalesPrev = plStore.net_sales_prev || 0;
+      // 누적 데이터 사용
+      const netSales = plStore.cumulative_net_sales || plStore.net_sales || 0;
+      const netSalesPrev = plStore.cumulative_net_sales_prev || plStore.net_sales_prev || 0;
+      const currentMonthSales = plStore.net_sales || 0; // 2512 월별 매출 (폐점 판단용)
 
-      // 폐점 매장: 전년 매출 있고, 금년 매출 없음
-      if (netSalesPrev > 0 && netSales === 0) {
+      // 폐점 매장: 전년 누적 매출 있고, 금년 2512 월별 매출 없음
+      if (netSalesPrev > 0 && currentMonthSales === 0) {
         const salesPerPyeongPrev = netSalesPrev / area;
-        const directProfitPrev = plStore.direct_profit_prev || 0;
+        const directProfitPrev = plStore.cumulative_direct_profit_prev || plStore.direct_profit_prev || 0;
         const directProfitPerPyeongPrev = directProfitPrev / area;
-        const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / currentMonthDays;
+        const dailySalesPerPyeongPrev = (salesPerPyeongPrev * 1000) / cumulativeDays;
 
         const storeData = {
           storeCode,
@@ -262,12 +268,12 @@ const TaiwanRegionalAnalysis: React.FC = () => {
         }
       }
 
-      // 신규 매장: 전년 매출 없고, 금년 매출 있음
+      // 신규 매장: 전년 누적 매출 없고, 금년 누적 매출 있음
       if (netSalesPrev === 0 && netSales > 0) {
         const salesPerPyeong = netSales / area;
-        const directProfit = plStore.direct_profit || 0;
+        const directProfit = plStore.cumulative_direct_profit || plStore.direct_profit || 0;
         const directProfitPerPyeong = directProfit / area;
-        const dailySalesPerPyeong = (salesPerPyeong * 1000) / currentMonthDays;
+        const dailySalesPerPyeong = (salesPerPyeong * 1000) / cumulativeDays;
 
         newStores.push({
           storeCode,
@@ -553,8 +559,17 @@ const TaiwanRegionalAnalysis: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-6 shadow-lg">
+          <div className="mb-4">
+            <Link 
+              href="/taiwan?period=2512"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-semibold"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              대시보드로 돌아가기
+            </Link>
+          </div>
           <h1 className="text-3xl font-bold mb-2">대만법인 지역별 분석 (전년 대비)</h1>
-          <p className="text-blue-100">2511 vs 2411 (누적 기준, 단위: 1K HKD)</p>
+          <p className="text-blue-100">2512 vs 2412 (누적 기준, 단위: 1K HKD)</p>
         </div>
 
         {/* 매장 포트폴리오 변화 분석 */}
@@ -581,8 +596,9 @@ const TaiwanRegionalAnalysis: React.FC = () => {
 
                 const avgSalesPerPyeongPrev = totalPrev.area > 0 ? totalPrev.sales / totalPrev.area : 0;
                 const avgSalesPerPyeongCurr = totalCurr.area > 0 ? totalCurr.sales / totalCurr.area : 0;
-                const avgDailySalesPrev = (avgSalesPerPyeongPrev * 1000) / 31;
-                const avgDailySalesCurr = (avgSalesPerPyeongCurr * 1000) / 31;
+                const cumulativeDays = 365; // 누적 기준 일수
+                const avgDailySalesPrev = (avgSalesPerPyeongPrev * 1000) / cumulativeDays;
+                const avgDailySalesCurr = (avgSalesPerPyeongCurr * 1000) / cumulativeDays;
                 const yoy = avgSalesPerPyeongPrev > 0 ? ((avgSalesPerPyeongCurr - avgSalesPerPyeongPrev) / avgSalesPerPyeongPrev) * 100 : 0;
                 const profitRatePrev = totalPrev.sales > 0 ? (totalPrev.profit / totalPrev.sales) * 100 : 0;
                 const profitRateCurr = totalCurr.sales > 0 ? (totalCurr.profit / totalCurr.sales) * 100 : 0;

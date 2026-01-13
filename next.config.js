@@ -11,6 +11,33 @@ const nextConfig = {
       fullUrl: false,
     },
   },
+  // Webpack 설정: 큰 파일 처리
+  webpack: (config, { dev, isServer }) => {
+    // 개발 모드에서 청크 로딩 타임아웃 증가
+    if (dev && !isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // 큰 컴포넌트를 별도 청크로 분리
+            dashboard: {
+              name: 'dashboard',
+              test: /[\\/]components[\\/]dashboard[\\/]/,
+              priority: 10,
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
+  // 개발 서버 설정
+  devIndicators: {
+    buildActivityPosition: 'bottom-right',
+  },
 }
 
 module.exports = nextConfig

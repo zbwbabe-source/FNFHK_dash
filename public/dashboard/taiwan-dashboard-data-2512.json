@@ -4,13 +4,13 @@
     "previous_period": "2412",
     "last_year": 2025,
     "last_month": 12,
-    "generated_at": "2026-01-11T21:22:03.827915"
+    "generated_at": "2026-01-13T20:49:38.475727"
   },
   "sales_summary": {
-    "total_net_sales": 17191.672220252865,
+    "total_net_sales": 17234.43757403459,
     "total_yoy": 100.63764954009118,
-    "total_change": 108.92803970223292,
-    "same_store_yoy": 100.63764954009118,
+    "total_change": 109.19900497512519,
+    "same_store_yoy": 100.63764954009116,
     "same_store_count": 28
   },
   "country_channel_summary": {
@@ -18,32 +18,32 @@
       "country": "TW",
       "channel": "Retail",
       "current": {
-        "net_sales": 9880114.852889048
+        "net_sales": 9904692.253020618
       },
       "previous": {
-        "net_sales": 10193793.217535162
+        "net_sales": 10219150.912106145
       },
-      "yoy": 96.92284944424289
+      "yoy": 96.92284944424294
     },
     "TW_Online": {
       "country": "TW",
       "channel": "Online",
       "current": {
-        "net_sales": 5023215.171924855
+        "net_sales": 5035710.7320540175
       },
       "previous": {
-        "net_sales": 4239308.755760372
+        "net_sales": 4249854.299928929
       },
-      "yoy": 118.49137350751609
+      "yoy": 118.49137350751604
     },
     "TW_Outlet": {
       "country": "TW",
       "channel": "Outlet",
       "current": {
-        "net_sales": 2288342.19543897
+        "net_sales": 2294034.588959962
       },
       "previous": {
-        "net_sales": 2649642.2072551115
+        "net_sales": 2656233.357024403
       },
       "yoy": 86.36419623650133
     }
@@ -56,28 +56,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 908940.4466501239,
-        "net_sales": 737736.9727047143,
+        "gross_sales": 911201.4925373134,
+        "net_sales": 739572.1393034827,
         "sales_qty": 96993970.0,
-        "stock_price": 3078091.8114143913,
-        "stock_cost": 902105.9553349874,
-        "discount_rate": 18.8354995727581
+        "stock_price": 3085748.7562189056,
+        "stock_cost": 904350.0000000003,
+        "discount_rate": 18.835499572758053
       },
       "previous": {
-        "gross_sales": 915022.3325062034,
-        "net_sales": 739294.1037457165,
-        "sales_qty": 1438.0,
-        "stock_price": 3233816.377171215,
-        "stock_cost": 945655.8312655085,
-        "discount_rate": 19.204802169054773
+        "gross_sales": 917298.5074626866,
+        "net_sales": 741133.143804786,
+        "sales_qty": 88363970.0,
+        "stock_price": 3241860.696517413,
+        "stock_cost": 948008.2089552238,
+        "discount_rate": 19.20480216905472
       },
       "previous_previous": {
-        "gross_sales": 1111637.717121588,
-        "net_sales": 889927.6852180075,
-        "sales_qty": 78998636.0,
-        "stock_price": 4086270.471464019,
-        "stock_cost": 1199379.1563275433,
-        "discount_rate": 19.944450290663397
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -88,28 +88,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 942816.3771712158,
-        "net_sales": 786192.366773012,
+        "gross_sales": 945161.6915422886,
+        "net_sales": 788148.0691779202,
         "sales_qty": 71203640.0,
-        "stock_price": 2445900.744416873,
-        "stock_cost": 716444.6650124069,
-        "discount_rate": 16.61235572382944
+        "stock_price": 2451985.0746268667,
+        "stock_cost": 718226.8656716421,
+        "discount_rate": 16.612355723829424
       },
       "previous": {
-        "gross_sales": 893741.9354838711,
-        "net_sales": 764521.5644570483,
-        "sales_qty": 1473.0,
-        "stock_price": 2254985.1116625317,
-        "stock_cost": 657573.200992556,
-        "discount_rate": 14.458353792794004
+        "gross_sales": 895965.1741293533,
+        "net_sales": 766423.3593935084,
+        "sales_qty": 61675837.0,
+        "stock_price": 2260594.5273631853,
+        "stock_cost": 659208.9552238807,
+        "discount_rate": 14.458353792794016
       },
       "previous_previous": {
-        "gross_sales": 908831.2655086847,
-        "net_sales": 766299.4210090985,
-        "sales_qty": 53600795.0,
-        "stock_price": 2434344.9131513643,
-        "stock_cost": 712113.1513647641,
-        "discount_rate": 15.682982079166171
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -120,28 +120,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 1050933.0024813896,
-        "net_sales": 852376.4622474298,
+        "gross_sales": 1053547.2636815922,
+        "net_sales": 854496.801705757,
         "sales_qty": 65981360.0,
-        "stock_price": 2141734.491315136,
-        "stock_cost": 621679.9007444169,
-        "discount_rate": 18.893358545705766
+        "stock_price": 2147062.1890547276,
+        "stock_cost": 623226.368159204,
+        "discount_rate": 18.893358545705745
       },
       "previous": {
-        "gross_sales": 1125449.1315136477,
-        "net_sales": 944496.5142384492,
-        "sales_qty": 2296.0,
-        "stock_price": 1832007.4441687344,
-        "stock_cost": 526301.4888337469,
-        "discount_rate": 16.078258200069016
+        "gross_sales": 1128248.7562189053,
+        "net_sales": 946846.0080549632,
+        "sales_qty": 55910430.0,
+        "stock_price": 1836564.6766169164,
+        "stock_cost": 527610.6965174128,
+        "discount_rate": 16.078258200068955
       },
       "previous_previous": {
-        "gross_sales": 971434.2431761785,
-        "net_sales": 837358.1472291149,
-        "sales_qty": 47165145.0,
-        "stock_price": 2215429.2803970226,
-        "stock_cost": 641327.7915632755,
-        "discount_rate": 13.801870470274096
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -156,24 +156,24 @@
         "net_sales": 0.0,
         "sales_qty": 33550223.0,
         "stock_price": 0.0,
-        "stock_cost": -8454.342431761786,
+        "stock_cost": -8475.37313432836,
         "discount_rate": 0
       },
       "previous": {
-        "gross_sales": 608848.635235732,
-        "net_sales": 517745.2440033086,
-        "sales_qty": 1007.0,
-        "stock_price": 1842069.4789081882,
-        "stock_cost": 533615.1364764267,
-        "discount_rate": 14.963225005366116
+        "gross_sales": 610363.1840796019,
+        "net_sales": 519033.167495854,
+        "sales_qty": 30362818.0,
+        "stock_price": 1846651.7412935328,
+        "stock_cost": 534942.5373134329,
+        "discount_rate": 14.963225005366127
       },
       "previous_previous": {
-        "gross_sales": 671042.1836228289,
-        "net_sales": 571316.5544133286,
-        "sales_qty": 24798040.0,
-        "stock_price": 2279630.272952854,
-        "stock_cost": 664665.2605459057,
-        "discount_rate": 14.861305539854527
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -188,23 +188,23 @@
         "net_sales": 0.0,
         "sales_qty": 16648985.0,
         "stock_price": 0.0,
-        "stock_cost": 33.25062034739454,
+        "stock_cost": 33.333333333333336,
         "discount_rate": 0
       },
       "previous": {
         "gross_sales": 0.0,
         "net_sales": 0.0,
-        "sales_qty": 0.0,
+        "sales_qty": 16648985.0,
         "stock_price": 0.0,
-        "stock_cost": 33.25062034739454,
+        "stock_cost": 33.333333333333336,
         "discount_rate": 0
       },
       "previous_previous": {
-        "gross_sales": 0.0,
-        "net_sales": 0.0,
-        "sales_qty": 16648985.0,
-        "stock_price": 2888.33746898263,
-        "stock_cost": 857.0719602977667,
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
         "discount_rate": 0
       },
       "closed": false
@@ -216,28 +216,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 1004255.5831265508,
-        "net_sales": 825006.0262318325,
+        "gross_sales": 1006753.7313432837,
+        "net_sales": 827058.2800284291,
         "sales_qty": 36449294.0,
-        "stock_price": 2577133.995037221,
-        "stock_cost": 762055.5831265508,
-        "discount_rate": 17.84899779562692
+        "stock_price": 2583544.7761194026,
+        "stock_cost": 763951.2437810947,
+        "discount_rate": 17.84899779562693
       },
       "previous": {
-        "gross_sales": 795732.0099255581,
-        "net_sales": 654277.4429871204,
-        "sales_qty": 1129.0,
-        "stock_price": 2334456.575682382,
-        "stock_cost": 688494.5409429282,
-        "discount_rate": 17.776659123172767
+        "gross_sales": 797711.4427860696,
+        "net_sales": 655904.9988154465,
+        "sales_qty": 28118646.0,
+        "stock_price": 2340263.6815920393,
+        "stock_cost": 690207.2139303484,
+        "discount_rate": 17.776659123172784
       },
       "previous_previous": {
-        "gross_sales": 759126.5508684863,
-        "net_sales": 611627.7915632753,
-        "sales_qty": 20355479.0,
-        "stock_price": 2773672.4565756815,
-        "stock_cost": 819657.8163771712,
-        "discount_rate": 19.430061975366765
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -252,24 +252,24 @@
         "net_sales": 0.0,
         "sales_qty": 40990852.0,
         "stock_price": 0.0,
-        "stock_cost": -4262.531017369727,
+        "stock_cost": -4273.134328358209,
         "discount_rate": 0
       },
       "previous": {
-        "gross_sales": 1368548.3870967743,
-        "net_sales": 1133656.6229469453,
-        "sales_qty": 2068.0,
-        "stock_price": 2946503.7220843676,
-        "stock_cost": 865096.2779156326,
-        "discount_rate": 17.163570273764762
+        "gross_sales": 1371952.736318408,
+        "net_sales": 1136476.6642975598,
+        "sales_qty": 35003188.0,
+        "stock_price": 2953833.333333332,
+        "stock_cost": 867248.2587064679,
+        "discount_rate": 17.163570273764744
       },
       "previous_previous": {
-        "gross_sales": 1374565.7568238212,
-        "net_sales": 1151268.1082358502,
-        "sales_qty": 25112806.0,
-        "stock_price": 3173290.322580645,
-        "stock_cost": 932368.982630273,
-        "discount_rate": 16.24495936112507
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -280,28 +280,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 1647789.0818858559,
-        "net_sales": 1332449.9586435067,
+        "gross_sales": 1651888.0597014925,
+        "net_sales": 1335764.5107794357,
         "sales_qty": 53742670.0,
-        "stock_price": 3266225.806451611,
-        "stock_cost": 966409.4292803969,
-        "discount_rate": 19.137104785367974
+        "stock_price": 3274350.7462686566,
+        "stock_cost": 968813.432835821,
+        "discount_rate": 19.137104785367992
       },
       "previous": {
-        "gross_sales": 1430952.8535980156,
-        "net_sales": 1154981.9213045016,
-        "sales_qty": 2046.0,
-        "stock_price": 2699312.655086849,
-        "stock_cost": 796693.7965260545,
-        "discount_rate": 19.285815853374018
+        "gross_sales": 1434512.4378109456,
+        "net_sales": 1157855.0106609813,
+        "sales_qty": 37792210.0,
+        "stock_price": 2706027.36318408,
+        "stock_cost": 798675.6218905475,
+        "discount_rate": 19.285815853373936
       },
       "previous_previous": {
-        "gross_sales": 1449722.0843672454,
-        "net_sales": 1180705.4236086493,
-        "sales_qty": 23350734.0,
-        "stock_price": 2791282.8784119105,
-        "stock_cost": 823878.4119106701,
-        "discount_rate": 18.55642979157711
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -320,20 +320,20 @@
         "discount_rate": 0
       },
       "previous": {
-        "gross_sales": 741235.7320099258,
-        "net_sales": 632781.7558785299,
-        "sales_qty": 1238.0,
-        "stock_price": 2259662.53101737,
-        "stock_cost": 665914.1439205958,
-        "discount_rate": 14.63150944400824
+        "gross_sales": 743079.60199005,
+        "net_sales": 634355.8398483772,
+        "sales_qty": 20203455.0,
+        "stock_price": 2265283.582089552,
+        "stock_cost": 667570.6467661692,
+        "discount_rate": 14.631509444008223
       },
       "previous_previous": {
-        "gross_sales": 704655.0868486351,
-        "net_sales": 591683.8000708969,
-        "sales_qty": 13759535.0,
-        "stock_price": 2717255.583126551,
-        "stock_cost": 802689.8263027294,
-        "discount_rate": 16.032139536942744
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -344,28 +344,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 1079873.4491315132,
-        "net_sales": 867109.2993028472,
+        "gross_sales": 1082559.701492537,
+        "net_sales": 869266.287609571,
         "sales_qty": 38375204.0,
-        "stock_price": 2797736.972704714,
-        "stock_cost": 827121.5880893293,
-        "discount_rate": 19.702692940527548
+        "stock_price": 2804696.517412936,
+        "stock_cost": 829179.104477612,
+        "discount_rate": 19.702692940527534
       },
       "previous": {
-        "gross_sales": 1049821.3399503725,
-        "net_sales": 854773.4845799359,
-        "sales_qty": 1534.0,
-        "stock_price": 2689394.5409429283,
-        "stock_cost": 792233.0024813896,
-        "discount_rate": 18.579147512819365
+        "gross_sales": 1052432.8358208956,
+        "net_sales": 856899.7867803837,
+        "sales_qty": 27763408.0,
+        "stock_price": 2696084.5771144275,
+        "stock_cost": 794203.7313432836,
+        "discount_rate": 18.57914751281934
       },
       "previous_previous": {
-        "gross_sales": 1135967.7419354843,
-        "net_sales": 943264.7997164126,
-        "sales_qty": 17155328.0,
-        "stock_price": 2593928.0397022334,
-        "stock_cost": 765586.6004962778,
-        "discount_rate": 16.963768873466485
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -376,28 +376,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 731724.5657568239,
-        "net_sales": 610089.0937019971,
+        "gross_sales": 733544.776119403,
+        "net_sales": 611606.7282634448,
         "sales_qty": 25230333.0,
-        "stock_price": 2776372.208436724,
-        "stock_cost": 820866.253101737,
-        "discount_rate": 16.623122653948215
+        "stock_price": 2783278.6069651744,
+        "stock_cost": 822908.2089552238,
+        "discount_rate": 16.623122653948204
       },
       "previous": {
-        "gross_sales": 529890.8188585608,
-        "net_sales": 447830.320217417,
-        "sales_qty": 784.0,
-        "stock_price": 2559781.6377171217,
-        "stock_cost": 754211.166253102,
-        "discount_rate": 15.486303162962992
+        "gross_sales": 531208.9552238808,
+        "net_sales": 448944.32598910213,
+        "sales_qty": 17421079.0,
+        "stock_price": 2566149.253731344,
+        "stock_cost": 756087.3134328359,
+        "discount_rate": 15.486303162963026
       },
       "previous_previous": {
-        "gross_sales": 711429.2803970224,
-        "net_sales": 558423.2541651897,
-        "sales_qty": 10325736.0,
-        "stock_price": 2728595.5334987594,
-        "stock_cost": 805265.2605459059,
-        "discount_rate": 21.506849724605893
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -408,28 +408,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 1078153.8461538458,
-        "net_sales": 879719.2484934421,
+        "gross_sales": 1080835.8208955226,
+        "net_sales": 881907.6048329782,
         "sales_qty": 31874761.0,
-        "stock_price": 3447751.8610421843,
-        "stock_cost": 1019238.2133995035,
-        "discount_rate": 18.405035456515762
+        "stock_price": 3456328.3582089553,
+        "stock_cost": 1021773.631840796,
+        "discount_rate": 18.405035456515783
       },
       "previous": {
-        "gross_sales": 902146.4019851115,
-        "net_sales": 746634.0541179247,
-        "sales_qty": 1381.0,
-        "stock_price": 3246215.8808933003,
-        "stock_cost": 956733.7468982632,
-        "discount_rate": 17.23803891751855
+        "gross_sales": 904390.5472636815,
+        "net_sales": 748491.3527600096,
+        "sales_qty": 21924653.0,
+        "stock_price": 3254291.044776119,
+        "stock_cost": 959113.6815920399,
+        "discount_rate": 17.2380389175185
       },
       "previous_previous": {
-        "gross_sales": 838729.5285359801,
-        "net_sales": 699781.4013943048,
-        "sales_qty": 12940693.0,
-        "stock_price": 4004923.076923078,
-        "stock_cost": 1182395.0372208436,
-        "discount_rate": 16.566499975768373
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -440,28 +440,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 722310.1736972705,
-        "net_sales": 557565.1660167788,
+        "gross_sales": 724106.9651741296,
+        "net_sales": 558952.1440416964,
         "sales_qty": 24407424.0,
-        "stock_price": 2612166.2531017372,
-        "stock_cost": 772368.2382133994,
-        "discount_rate": 22.80806967416998
+        "stock_price": 2618664.179104478,
+        "stock_cost": 774289.552238806,
+        "discount_rate": 22.808069674169968
       },
       "previous": {
-        "gross_sales": 693794.0446650123,
-        "net_sales": 546518.9649060614,
-        "sales_qty": 975.0,
-        "stock_price": 2247481.389578163,
-        "stock_cost": 662089.8263027297,
-        "discount_rate": 21.227492638692272
+        "gross_sales": 695519.9004975127,
+        "net_sales": 547878.4648187633,
+        "sales_qty": 16913075.0,
+        "stock_price": 2253072.1393034835,
+        "stock_cost": 663736.815920398,
+        "discount_rate": 21.227492638692276
       },
       "previous_previous": {
-        "gross_sales": 647508.6848635236,
-        "net_sales": 508697.1523100556,
-        "sales_qty": 10453798.0,
-        "stock_price": 2388446.65012407,
-        "stock_cost": 705127.7915632754,
-        "discount_rate": 21.437786982382402
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -472,28 +472,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 810672.4565756823,
-        "net_sales": 665597.3059198863,
+        "gross_sales": 812689.054726368,
+        "net_sales": 667253.0206112297,
         "sales_qty": 16520753.0,
-        "stock_price": 2678620.3473945404,
-        "stock_cost": 791618.8585607939,
-        "discount_rate": 17.895655573226215
+        "stock_price": 2685283.582089553,
+        "stock_cost": 793588.0597014925,
+        "discount_rate": 17.89565557322617
       },
       "previous": {
-        "gross_sales": 472032.25806451606,
-        "net_sales": 405816.37717121583,
-        "sales_qty": 732.0,
-        "stock_price": 2455642.679900744,
-        "stock_cost": 724100.2481389577,
-        "discount_rate": 14.027829615884011
+        "gross_sales": 473206.4676616915,
+        "net_sales": 406825.8706467664,
+        "sales_qty": 9464822.0,
+        "stock_price": 2461751.2437810944,
+        "stock_cost": 725901.4925373134,
+        "discount_rate": 14.027829615883954
       },
       "previous_previous": {
-        "gross_sales": 527248.1389578163,
-        "net_sales": 451659.2224979323,
-        "sales_qty": 3325751.0,
-        "stock_price": 2993774.193548387,
-        "stock_cost": 884676.9230769229,
-        "discount_rate": 14.336497537819026
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -512,20 +512,20 @@
         "discount_rate": 0
       },
       "previous": {
-        "gross_sales": 241173.69727047143,
-        "net_sales": 202531.72633817798,
-        "sales_qty": 404.0,
-        "stock_price": 1774692.307692307,
-        "stock_cost": 522362.7791563274,
+        "gross_sales": 241773.631840796,
+        "net_sales": 203035.53660270083,
+        "sales_qty": 3483117.0,
+        "stock_price": 1779106.9651741297,
+        "stock_cost": 523662.18905472645,
         "discount_rate": 16.02246487474845
       },
       "previous_previous": {
-        "gross_sales": 252208.43672456575,
-        "net_sales": 215138.60333215175,
-        "sales_qty": 1094783.0,
-        "stock_price": 2460635.235732011,
-        "stock_cost": 725839.7022332506,
-        "discount_rate": 14.698094113678517
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -536,28 +536,28 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 674880.8933002482,
-        "net_sales": 530601.4415691836,
+        "gross_sales": 676559.7014925376,
+        "net_sales": 531921.3456526889,
         "sales_qty": 13621588.0,
-        "stock_price": 2597635.2357320106,
-        "stock_cost": 767838.9578163773,
-        "discount_rate": 21.378505920581162
+        "stock_price": 2604097.014925373,
+        "stock_cost": 769749.0049751245,
+        "discount_rate": 21.378505920581215
       },
       "previous": {
-        "gross_sales": 547575.682382134,
-        "net_sales": 447933.1206427981,
-        "sales_qty": 812.0,
-        "stock_price": 2462942.928039702,
-        "stock_cost": 725737.9652605456,
-        "discount_rate": 18.19703923042347
+        "gross_sales": 548937.8109452738,
+        "net_sales": 449047.38213693444,
+        "sales_qty": 7719881.0,
+        "stock_price": 2469069.6517412947,
+        "stock_cost": 727543.2835820896,
+        "discount_rate": 18.19703923042349
       },
       "previous_previous": {
-        "gross_sales": 554004.9627791564,
-        "net_sales": 449879.9480089803,
-        "sales_qty": 2199202.0,
-        "stock_price": 2933900.7444168734,
-        "stock_cost": 867062.2828784117,
-        "discount_rate": 18.794960653030028
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -568,12 +568,12 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 647977.6674937964,
-        "net_sales": 551152.310055536,
+        "gross_sales": 649589.5522388063,
+        "net_sales": 552523.3357024401,
         "sales_qty": 5652671.0,
-        "stock_price": 2828610.4218362286,
-        "stock_cost": 835917.6178660048,
-        "discount_rate": 14.942699771236706
+        "stock_price": 2835646.7661691536,
+        "stock_cost": 837997.014925373,
+        "discount_rate": 14.942699771236784
       },
       "previous": {
         "gross_sales": 0,
@@ -600,12 +600,12 @@
       "brand": "MLB",
       "channel": "Retail",
       "current": {
-        "gross_sales": 826637.7171215878,
-        "net_sales": 684519.2012288786,
+        "gross_sales": 828694.0298507466,
+        "net_sales": 686221.9853115373,
         "sales_qty": 3750066.0,
-        "stock_price": 2593600.4962779153,
-        "stock_cost": 766883.8709677415,
-        "discount_rate": 17.192358024453103
+        "stock_price": 2600052.23880597,
+        "stock_cost": 768791.5422885574,
+        "discount_rate": 17.19235802445319
       },
       "previous": {
         "gross_sales": 0,
@@ -635,24 +635,24 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 0.0,
-        "stock_price": 552694.789081886,
-        "stock_cost": 164827.29528535975,
+        "stock_price": 554069.6517412938,
+        "stock_cost": 165237.3134328358,
         "discount_rate": 0
       },
       "previous": {
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 0.0,
-        "stock_price": 622732.0099255581,
-        "stock_cost": 185195.28535980146,
+        "stock_price": 624281.094527363,
+        "stock_cost": 185655.97014925373,
         "discount_rate": 0
       },
       "previous_previous": {
-        "gross_sales": 0.0,
-        "net_sales": 0.0,
-        "sales_qty": 0.0,
-        "stock_price": 347002.4813895781,
-        "stock_cost": 103848.88337468979,
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
         "discount_rate": 0
       },
       "closed": false
@@ -664,28 +664,28 @@
       "brand": "MLB",
       "channel": "Online",
       "current": {
-        "gross_sales": 2657034.7394540943,
-        "net_sales": 1826371.0268226399,
+        "gross_sales": 2663644.2786069666,
+        "net_sales": 1830914.238332149,
         "sales_qty": 107603535.0,
-        "stock_price": 437729.52853598015,
-        "stock_cost": 129940.9429280397,
-        "discount_rate": 31.262809638767457
+        "stock_price": 438818.4079601992,
+        "stock_cost": 130264.17910447765,
+        "discount_rate": 31.262809638767493
       },
       "previous": {
-        "gross_sales": 2672126.550868487,
-        "net_sales": 1880923.5495687122,
-        "sales_qty": 3845.0,
-        "stock_price": 9436.724565756822,
-        "stock_cost": 2846.153846153846,
-        "discount_rate": 29.60948840700004
+        "gross_sales": 2678773.631840796,
+        "net_sales": 1885602.4638711212,
+        "sales_qty": 81809439.0,
+        "stock_price": 9460.19900497513,
+        "stock_cost": 2853.233830845771,
+        "discount_rate": 29.60948840700006
       },
       "previous_previous": {
-        "gross_sales": 2574347.3945409423,
-        "net_sales": 1833014.06120761,
-        "sales_qty": 52986914.0,
-        "stock_price": -50553.34987593049,
-        "stock_cost": -14900.496277915634,
-        "discount_rate": 28.796942281580723
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -696,28 +696,28 @@
       "brand": "MLB",
       "channel": "Online",
       "current": {
-        "gross_sales": 2761756.823821338,
-        "net_sales": 1999334.987593052,
+        "gross_sales": 2768626.865671643,
+        "net_sales": 2004308.4577114428,
         "sales_qty": 94774663.0,
-        "stock_price": 240091.81141439202,
-        "stock_cost": 71122.33250620346,
-        "discount_rate": 27.606407256861658
+        "stock_price": 240689.05472636825,
+        "stock_cost": 71299.25373134327,
+        "discount_rate": 27.606407256861743
       },
       "previous": {
-        "gross_sales": 2286399.5037220833,
-        "net_sales": 1716209.3820158322,
-        "sales_qty": 3130.0,
-        "stock_price": -17652.605459057067,
-        "stock_cost": -5146.898263027293,
-        "discount_rate": 24.938341736779822
+        "gross_sales": 2292087.064676618,
+        "net_sales": 1720478.559583037,
+        "sales_qty": 67591509.0,
+        "stock_price": -17696.517412935325,
+        "stock_cost": -5159.701492537313,
+        "discount_rate": 24.93834173677985
       },
       "previous_previous": {
-        "gross_sales": 1551729.5285359805,
-        "net_sales": 1296247.1936665487,
-        "sales_qty": 46890784.0,
-        "stock_price": -52243.176178660055,
-        "stock_cost": -15454.094292803968,
-        "discount_rate": 16.464359939742412
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -728,28 +728,28 @@
       "brand": "MLB",
       "channel": "Online",
       "current": {
-        "gross_sales": 1458550.8684863516,
-        "net_sales": 1197509.1575091577,
+        "gross_sales": 1462179.1044776123,
+        "net_sales": 1200488.0360104241,
         "sales_qty": 25954840.0,
-        "stock_price": 78305.21091811413,
-        "stock_cost": 23021.09181141439,
-        "discount_rate": 17.897333347591545
+        "stock_price": 78500.00000000001,
+        "stock_cost": 23078.358208955233,
+        "discount_rate": 17.897333347591616
       },
       "previous": {
-        "gross_sales": 775689.8263027294,
-        "net_sales": 642175.8241758241,
-        "sales_qty": 1548.0,
-        "stock_price": -8362.282878411912,
-        "stock_cost": -2426.0545905707195,
-        "discount_rate": 17.212292542663658
+        "gross_sales": 777619.4029850747,
+        "net_sales": 643773.2764747692,
+        "sales_qty": 12256464.0,
+        "stock_price": -8383.084577114427,
+        "stock_cost": -2432.089552238806,
+        "discount_rate": 17.21229254266363
       },
       "previous_previous": {
-        "gross_sales": 407965.2605459058,
-        "net_sales": 328804.206546142,
-        "sales_qty": 4125777.0,
-        "stock_price": -5109.181141439206,
-        "stock_cost": -1499.0074441687343,
-        "discount_rate": 19.403871274195488
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -770,18 +770,18 @@
       "previous": {
         "gross_sales": 0.0,
         "net_sales": 0.0,
-        "sales_qty": 0.0,
+        "sales_qty": 811252.0,
         "stock_price": 0.0,
         "stock_cost": 0.0,
         "discount_rate": 0
       },
       "previous_previous": {
-        "gross_sales": 124297.76674937965,
-        "net_sales": 103778.329197684,
-        "sales_qty": 482943.0,
-        "stock_price": 0.0,
-        "stock_cost": 0.0,
-        "discount_rate": 16.508291410471426
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -792,28 +792,28 @@
       "brand": "MLB",
       "channel": "Outlet",
       "current": {
-        "gross_sales": 1124962.7791563282,
-        "net_sales": 606358.974358974,
+        "gross_sales": 1127761.194029851,
+        "net_sales": 607867.3300165836,
         "sales_qty": 76931216.0,
-        "stock_price": 4810972.704714638,
-        "stock_cost": 1432634.2431761792,
-        "discount_rate": 46.09964119757667
+        "stock_price": 4822940.298507463,
+        "stock_cost": 1436198.0099502492,
+        "discount_rate": 46.09964119757664
       },
       "previous": {
-        "gross_sales": 1252962.7791563272,
-        "net_sales": 724819.5675292449,
-        "sales_qty": 1627.0,
-        "stock_price": 5072009.925558312,
-        "stock_cost": 1510772.4565756826,
-        "discount_rate": 42.151548347086845
+        "gross_sales": 1256079.60199005,
+        "net_sales": 726622.6012793176,
+        "sales_qty": 61823719.0,
+        "stock_price": 5084626.86567164,
+        "stock_cost": 1514530.597014926,
+        "discount_rate": 42.15154834708687
       },
       "previous_previous": {
-        "gross_sales": 1206205.955334988,
-        "net_sales": 631028.4768994442,
-        "sales_qty": 47670874.0,
-        "stock_price": 4205925.558312654,
-        "stock_cost": 1254033.7468982637,
-        "discount_rate": 47.68484817137262
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -824,28 +824,28 @@
       "brand": "MLB",
       "channel": "Outlet",
       "current": {
-        "gross_sales": 791761.7866004963,
-        "net_sales": 420936.31100082694,
+        "gross_sales": 793731.3432835821,
+        "net_sales": 421983.4162520731,
         "sales_qty": 50216913.0,
-        "stock_price": 3762957.816377171,
-        "stock_cost": 1113310.421836229,
-        "discount_rate": 46.83548535372532
+        "stock_price": 3772318.4079601993,
+        "stock_cost": 1116079.8507462686,
+        "discount_rate": 46.83548535372528
       },
       "previous": {
-        "gross_sales": 1066176.1786600493,
-        "net_sales": 619437.788018433,
-        "sales_qty": 1393.0,
-        "stock_price": 4523598.014888337,
-        "stock_cost": 1340269.4789081896,
-        "discount_rate": 41.900991560613264
+        "gross_sales": 1068828.3582089553,
+        "net_sales": 620978.6780383795,
+        "sales_qty": 39029185.0,
+        "stock_price": 4534850.746268658,
+        "stock_cost": 1343603.482587065,
+        "discount_rate": 41.90099156061327
       },
       "previous_previous": {
-        "gross_sales": 1057168.7344913157,
-        "net_sales": 569168.3800070897,
-        "sales_qty": 26397591.0,
-        "stock_price": 3784779.1563275424,
-        "stock_cost": 1121336.2282878412,
-        "discount_rate": 46.16106573744258
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -856,28 +856,28 @@
       "brand": "MLB",
       "channel": "Outlet",
       "current": {
-        "gross_sales": 2498640.198511167,
-        "net_sales": 1261046.910079168,
+        "gross_sales": 2504855.7213930367,
+        "net_sales": 1264183.842691305,
         "sales_qty": 57696799.0,
-        "stock_price": 4502069.478908187,
-        "stock_cost": 1334462.7791563277,
-        "discount_rate": 49.530672290049125
+        "stock_price": 4513268.6567164175,
+        "stock_cost": 1337782.3383084578,
+        "discount_rate": 49.53067229004915
       },
       "previous": {
-        "gross_sales": 2328714.640198511,
-        "net_sales": 1305384.8517074327,
-        "sales_qty": 2906.0,
-        "stock_price": 5644736.972704712,
-        "stock_cost": 1675685.3598014892,
-        "discount_rate": 43.94397539424774
+        "gross_sales": 2334507.462686568,
+        "net_sales": 1308632.077706705,
+        "sales_qty": 29791011.0,
+        "stock_price": 5658778.606965175,
+        "stock_cost": 1679853.731343284,
+        "discount_rate": 43.94397539424775
       },
       "previous_previous": {
-        "gross_sales": 2202017.369727048,
-        "net_sales": 1207961.715703651,
-        "sales_qty": 3743318.0,
-        "stock_price": 3813265.5086848624,
-        "stock_cost": 1131646.1538461538,
-        "discount_rate": 45.142952443949866
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0,
+        "stock_cost": 0,
+        "discount_rate": 0
       },
       "closed": false
     },
@@ -891,24 +891,24 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 0.0,
-        "stock_price": 46502017.369727,
-        "stock_cost": 13730757.320099259,
+        "stock_price": 46617694.02985074,
+        "stock_cost": 13764913.432835823,
         "discount_rate": 0
       },
       "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 49065032.33830844,
+        "stock_cost": 14493020.398009945,
+        "discount_rate": 0
+      },
+      "previous_previous": {
         "gross_sales": 0,
         "net_sales": 0,
         "sales_qty": 0,
         "stock_price": 0,
         "stock_cost": 0,
-        "discount_rate": 0
-      },
-      "previous_previous": {
-        "gross_sales": 0.0,
-        "net_sales": 0.0,
-        "sales_qty": 0.0,
-        "stock_price": 45360354.83870965,
-        "stock_cost": 13400503.72208437,
         "discount_rate": 0
       },
       "closed": false
@@ -923,24 +923,24 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 0.0,
-        "stock_price": 68502285.3598015,
-        "stock_cost": 20202702.977667496,
+        "stock_price": 68672689.05472644,
+        "stock_cost": 20252958.457711425,
         "discount_rate": 0
       },
       "previous": {
+        "gross_sales": 0.0,
+        "net_sales": 0.0,
+        "sales_qty": 0.0,
+        "stock_price": 81729743.78109458,
+        "stock_cost": 24138844.278606974,
+        "discount_rate": 0
+      },
+      "previous_previous": {
         "gross_sales": 0,
         "net_sales": 0,
         "sales_qty": 0,
         "stock_price": 0,
         "stock_cost": 0,
-        "discount_rate": 0
-      },
-      "previous_previous": {
-        "gross_sales": 0.0,
-        "net_sales": 0.0,
-        "sales_qty": 0.0,
-        "stock_price": 96645722.0843673,
-        "stock_cost": 28563979.652605463,
         "discount_rate": 0
       },
       "closed": false
@@ -1079,10 +1079,10 @@
       "season_code": "21N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 890523.5732009925,
-        "net_sales": 787601.5597305918,
+        "gross_sales": 892738.8059701492,
+        "net_sales": 789560.7675906183,
         "sales_qty": 94550364.0,
-        "stock_price": 5298821.3399503715
+        "stock_price": 5312002.487562189
       },
       "previous": {
         "gross_sales": 0,
@@ -1114,7 +1114,7 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 60289361.0,
-        "stock_price": -1583.1265508684862
+        "stock_price": -1587.0646766169157
       },
       "previous": {
         "gross_sales": 0,
@@ -1127,10 +1127,10 @@
       "season_code": "22N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 664578.163771712,
-        "net_sales": 524434.3613375872,
+        "gross_sales": 666231.3432835822,
+        "net_sales": 525738.9244254916,
         "sales_qty": 84653973.0,
-        "stock_price": 4773861.042183623
+        "stock_price": 4785736.318407961
       },
       "previous": {
         "gross_sales": 0,
@@ -1146,7 +1146,7 @@
         "gross_sales": 0.0,
         "net_sales": 0.0,
         "sales_qty": 37583554.0,
-        "stock_price": -1436.7245657568237
+        "stock_price": -1440.2985074626868
       },
       "previous": {
         "gross_sales": 0,
@@ -1159,10 +1159,10 @@
       "season_code": "23F",
       "season_type": "과시즌F",
       "current": {
-        "gross_sales": 1997784.119106699,
-        "net_sales": 878170.1524282167,
+        "gross_sales": 2002753.7313432833,
+        "net_sales": 880354.6552949538,
         "sales_qty": 69449127.0,
-        "stock_price": 13450511.166253107
+        "stock_price": 13483970.149253724
       },
       "previous": {
         "gross_sales": 0,
@@ -1175,10 +1175,10 @@
       "season_code": "23N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 1487012.4069478905,
-        "net_sales": 816971.5231005553,
+        "gross_sales": 1490711.4427860698,
+        "net_sales": 819003.7905709548,
         "sales_qty": 100112825.0,
-        "stock_price": 11909632.754342431
+        "stock_price": 11939258.706467662
       },
       "previous": {
         "gross_sales": 0,
@@ -1191,10 +1191,10 @@
       "season_code": "23S",
       "season_type": "과시즌S",
       "current": {
-        "gross_sales": 16769.230769230766,
-        "net_sales": 7593.524754815076,
+        "gross_sales": 16810.94527363184,
+        "net_sales": 7612.414119876807,
         "sales_qty": 59296732.0,
-        "stock_price": 2568.2382133995034
+        "stock_price": 2574.626865671642
       },
       "previous": {
         "gross_sales": 0,
@@ -1207,10 +1207,10 @@
       "season_code": "24F",
       "season_type": "과시즌F",
       "current": {
-        "gross_sales": 2121327.5434243176,
-        "net_sales": 1228778.6836819088,
+        "gross_sales": 2126604.477611941,
+        "net_sales": 1231835.347074153,
         "sales_qty": 49723569.0,
-        "stock_price": 12264119.106699746
+        "stock_price": 12294626.86567165
       },
       "previous": {
         "gross_sales": 0,
@@ -1223,26 +1223,26 @@
       "season_code": "24N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 2089052.1091811415,
-        "net_sales": 1568185.986056953,
+        "gross_sales": 2094248.7562189053,
+        "net_sales": 1572086.9462212755,
         "sales_qty": 61107881.0,
-        "stock_price": 14527141.439205954
+        "stock_price": 14563278.606965175
       },
       "previous": {
-        "gross_sales": 21741843.672456563,
-        "net_sales": 16397033.676001424,
-        "sales_qty": 543583647.0,
-        "stock_price": 196627411.91066974
+        "gross_sales": 0,
+        "net_sales": 0,
+        "sales_qty": 0,
+        "stock_price": 0
       }
     },
     "24S_과시즌S": {
       "season_code": "24S",
       "season_type": "과시즌S",
       "current": {
-        "gross_sales": 699163.7717121589,
-        "net_sales": 403129.3867422899,
+        "gross_sales": 700902.9850746269,
+        "net_sales": 404132.19616204704,
         "sales_qty": 47935526.0,
-        "stock_price": 12477615.384615388
+        "stock_price": 12508654.228855725
       },
       "previous": {
         "gross_sales": 0,
@@ -1255,10 +1255,10 @@
       "season_code": "25F",
       "season_type": "당시즌F",
       "current": {
-        "gross_sales": 9029588.089330016,
-        "net_sales": 7280515.183740986,
+        "gross_sales": 9052049.75124378,
+        "net_sales": 7298625.918028903,
         "sales_qty": 32923315.0,
-        "stock_price": 32401131.513647646
+        "stock_price": 32481731.3432836
       },
       "previous": {
         "gross_sales": 0,
@@ -1271,10 +1271,10 @@
       "season_code": "25N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 3845305.210918114,
-        "net_sales": 3222855.2522746073,
+        "gross_sales": 3854870.646766169,
+        "net_sales": 3230872.3051409614,
         "sales_qty": 36589635.0,
-        "stock_price": 30191975.18610422
+        "stock_price": 30267079.601990055
       },
       "previous": {
         "gross_sales": 0,
@@ -1287,10 +1287,10 @@
       "season_code": "25S",
       "season_type": "과시즌S",
       "current": {
-        "gross_sales": 183178.66004962777,
-        "net_sales": 147277.3248257119,
+        "gross_sales": 183634.32835820894,
+        "net_sales": 147643.6863302535,
         "sales_qty": 32360964.0,
-        "stock_price": 19821300.248138953
+        "stock_price": 19870606.965174127
       },
       "previous": {
         "gross_sales": 0,
@@ -1303,10 +1303,10 @@
       "season_code": "26N",
       "season_type": "N시즌",
       "current": {
-        "gross_sales": 264980.14888337464,
-        "net_sales": 218177.4784355428,
+        "gross_sales": 265639.30348258716,
+        "net_sales": 218720.20848140263,
         "sales_qty": 339756.0,
-        "stock_price": 4607550.868486353
+        "stock_price": 4619012.437810945
       },
       "previous": {
         "gross_sales": 0,
@@ -1319,10 +1319,10 @@
       "season_code": "26S",
       "season_type": "과시즌S",
       "current": {
-        "gross_sales": 130409.42928039702,
-        "net_sales": 107981.80314309344,
+        "gross_sales": 130733.83084577112,
+        "net_sales": 108250.41459369818,
         "sales_qty": 156746.0,
-        "stock_price": 3507496.2779156333
+        "stock_price": 3516221.393034827
       },
       "previous": {
         "gross_sales": 0,
@@ -1337,44 +1337,44 @@
       "category": "ATC",
       "category_name": "가방외",
       "current": {
-        "stock_price": 2259161.29032258,
+        "stock_price": 2264781.094527364,
         "sales_qty_1m": 9986150.0,
         "sales_qty_6m": 55386678.0,
-        "stock_months_1m": 0.2262294568299675,
-        "stock_months_6m": 0.24473335884010736
+        "stock_months_1m": 0.22679221667282826,
+        "stock_months_6m": 0.2453421482899585
       }
     },
     "BAG": {
       "category": "BAG",
       "category_name": "가방외",
       "current": {
-        "stock_price": 8032756.823821343,
+        "stock_price": 8052738.805970151,
         "sales_qty_1m": 48617565.0,
         "sales_qty_6m": 273711749.0,
-        "stock_months_1m": 0.16522334723718357,
-        "stock_months_6m": 0.1760850278404675
+        "stock_months_1m": 0.16563435058851983,
+        "stock_months_6m": 0.17652305029778206
       }
     },
     "HEA": {
       "category": "HEA",
       "category_name": "모자",
       "current": {
-        "stock_price": 26373935.48387097,
+        "stock_price": 26439542.288557217,
         "sales_qty_1m": 141018665.0,
         "sales_qty_6m": 782854267.0,
-        "stock_months_1m": 0.1870244303041088,
-        "stock_months_6m": 0.20213674444112828
+        "stock_months_1m": 0.18748966520536284,
+        "stock_months_6m": 0.20263957216361866
       }
     },
     "SHO": {
       "category": "SHO",
       "category_name": "신발",
       "current": {
-        "stock_price": 34643129.03225807,
+        "stock_price": 34729305.970149264,
         "sales_qty_1m": 177660022.0,
         "sales_qty_6m": 994779601.0,
-        "stock_months_1m": 0.19499676203044752,
-        "stock_months_6m": 0.20894957434249642
+        "stock_months_1m": 0.19548182860266258,
+        "stock_months_6m": 0.20946934940304993
       }
     },
     "WTC": {
@@ -1403,85 +1403,85 @@
   "trend_data": [
     {
       "period": "2501",
-      "gross_sales": 25073451.612903222,
-      "net_sales": 17690635.70837764,
+      "gross_sales": 25135823.38308458,
+      "net_sales": 17734642.264866147,
       "sales_qty": 801751184.0,
       "discount_rate": 29.44475303402687
     },
     {
       "period": "2502",
-      "gross_sales": 14440491.315136475,
-      "net_sales": 10774159.990547085,
+      "gross_sales": 14476412.935323386,
+      "net_sales": 10800961.3835584,
       "sales_qty": 818820192.0,
-      "discount_rate": 25.38924226730675
+      "discount_rate": 25.389242267306745
     },
     {
       "period": "2503",
-      "gross_sales": 13453109.181141438,
-      "net_sales": 9751049.509630153,
+      "gross_sales": 13486574.626865674,
+      "net_sales": 9775305.851693911,
       "sales_qty": 834831364.0,
-      "discount_rate": 27.518245943479226
+      "discount_rate": 27.51824594347923
     },
     {
       "period": "2504",
-      "gross_sales": 13803679.900744416,
-      "net_sales": 10321852.770885028,
+      "gross_sales": 13838017.412935324,
+      "net_sales": 10347529.021558873,
       "sales_qty": 851192141.0,
-      "discount_rate": 25.223905182498598
+      "discount_rate": 25.22390518249859
     },
     {
       "period": "2505",
-      "gross_sales": 17230833.746898264,
-      "net_sales": 13148823.585017132,
+      "gross_sales": 17273696.51741294,
+      "net_sales": 13181532.101397775,
       "sales_qty": 871617943.0,
-      "discount_rate": 23.69014884503739
+      "discount_rate": 23.690148845037378
     },
     {
       "period": "2506",
-      "gross_sales": 15028620.34739454,
-      "net_sales": 11341145.220371025,
+      "gross_sales": 15066004.97512438,
+      "net_sales": 11369357.024401803,
       "sales_qty": 889440703.0,
-      "discount_rate": 24.536351586410266
+      "discount_rate": 24.536351586410245
     },
     {
       "period": "2507",
-      "gross_sales": 14350077.17121588,
-      "net_sales": 10905701.524282169,
+      "gross_sales": 14385773.880597016,
+      "net_sales": 10932830.135039091,
       "sales_qty": 906450966.0,
-      "discount_rate": 24.00248866844157
+      "discount_rate": 24.00248866844156
     },
     {
       "period": "2508",
-      "gross_sales": 14544373.945409428,
-      "net_sales": 11208334.396786008,
+      "gross_sales": 14580553.980099505,
+      "net_sales": 11236215.825633736,
       "sales_qty": 923682766.0,
-      "discount_rate": 22.93697591346899
+      "discount_rate": 22.936975913468995
     },
     {
       "period": "2509",
-      "gross_sales": 12798106.69975186,
-      "net_sales": 9485323.880420653,
+      "gross_sales": 12829942.786069654,
+      "net_sales": 9508919.213456526,
       "sales_qty": 938861356.0,
-      "discount_rate": 25.884944523828963
+      "discount_rate": 25.884944523828974
     },
     {
       "period": "2510",
-      "gross_sales": 17665803.970223323,
-      "net_sales": 13063040.29304029,
+      "gross_sales": 17709748.756218906,
+      "net_sales": 13095535.418147359,
       "sales_qty": 959821640.0,
-      "discount_rate": 26.054651602277723
+      "discount_rate": 26.05465160227772
     },
     {
       "period": "2511",
-      "gross_sales": 23844181.141439203,
-      "net_sales": 17682643.74335342,
+      "gross_sales": 23903495.024875626,
+      "net_sales": 17726630.419331912,
       "sales_qty": 988247133.0,
-      "discount_rate": 25.840842935795116
+      "discount_rate": 25.840842935795134
     },
     {
       "period": "2512",
-      "gross_sales": 23419672.45657568,
-      "net_sales": 17191672.220252864,
+      "gross_sales": 23477930.348258708,
+      "net_sales": 17234437.57403459,
       "sales_qty": 1016144571.0,
       "discount_rate": 26.59302877899193
     }
@@ -1489,87 +1489,87 @@
   "monthly_channel_data": [
     {
       "period": "2501",
-      "TW_Retail": 10452783.173815448,
-      "TW_Outlet": 4098771.830320216,
-      "TW_Online": 3139080.7042419976,
-      "total": 17690635.708377663
+      "TW_Retail": 10478785.122009004,
+      "TW_Outlet": 4108967.7801468847,
+      "TW_Online": 3146889.3627102603,
+      "total": 17734642.264866147
     },
     {
       "period": "2502",
-      "TW_Retail": 5705644.334160464,
-      "TW_Outlet": 1815762.2592461302,
-      "TW_Online": 3252753.3971404973,
-      "total": 10774159.99054709
+      "TW_Retail": 5719837.479270317,
+      "TW_Outlet": 1820279.0807865437,
+      "TW_Online": 3260844.8235015394,
+      "total": 10800961.3835584
     },
     {
       "period": "2503",
-      "TW_Retail": 5164126.196384271,
-      "TW_Outlet": 1463023.7504431054,
-      "TW_Online": 3123899.5628027874,
-      "total": 9751049.509630164
+      "TW_Retail": 5176972.2814498935,
+      "TW_Outlet": 1466663.1130063985,
+      "TW_Online": 3131670.457237622,
+      "total": 9775305.851693913
     },
     {
       "period": "2504",
-      "TW_Retail": 5873741.935483878,
-      "TW_Outlet": 1803668.202764976,
-      "TW_Online": 2644442.6326361806,
-      "total": 10321852.770885034
+      "TW_Retail": 5888353.233830847,
+      "TW_Outlet": 1808154.9395877763,
+      "TW_Online": 2651020.848140253,
+      "total": 10347529.021558877
     },
     {
       "period": "2505",
-      "TW_Retail": 8218083.6582772015,
-      "TW_Outlet": 1744822.8760486837,
-      "TW_Online": 3185917.05069124,
-      "total": 13148823.585017124
+      "TW_Retail": 8238526.652452018,
+      "TW_Outlet": 1749163.2314617382,
+      "TW_Online": 3193842.217484009,
+      "total": 13181532.101397764
     },
     {
       "period": "2506",
-      "TW_Retail": 6500938.201583368,
-      "TW_Outlet": 1660031.903580291,
-      "TW_Online": 3180175.115207375,
-      "total": 11341145.220371034
+      "TW_Retail": 6517109.689646998,
+      "TW_Outlet": 1664161.3361762606,
+      "TW_Online": 3188085.998578535,
+      "total": 11369357.024401793
     },
     {
       "period": "2507",
-      "TW_Retail": 6400126.905352715,
-      "TW_Outlet": 1641004.6082949303,
-      "TW_Online": 2864570.010634529,
-      "total": 10905701.524282174
+      "TW_Retail": 6416047.619047626,
+      "TW_Outlet": 1645086.7093105896,
+      "TW_Online": 2871695.8066808805,
+      "total": 10932830.135039095
     },
     {
       "period": "2508",
-      "TW_Retail": 6951828.429634883,
-      "TW_Outlet": 1799989.601796052,
-      "TW_Online": 2456516.3653550753,
-      "total": 11208334.396786012
+      "TW_Retail": 6969121.535181245,
+      "TW_Outlet": 1804467.1878701726,
+      "TW_Online": 2462627.1025823276,
+      "total": 11236215.825633746
     },
     {
       "period": "2509",
-      "TW_Retail": 5187041.474654372,
-      "TW_Outlet": 1494885.7379179955,
-      "TW_Online": 2803396.6678482774,
-      "total": 9485323.880420646
+      "TW_Retail": 5199944.562899795,
+      "TW_Outlet": 1498604.3591565986,
+      "TW_Online": 2810370.2914001434,
+      "total": 9508919.213456538
     },
     {
       "period": "2510",
-      "TW_Retail": 7747191.5396431545,
-      "TW_Outlet": 1811347.276379533,
-      "TW_Online": 3504501.4770176033,
-      "total": 13063040.29304029
+      "TW_Retail": 7766463.160388531,
+      "TW_Outlet": 1815853.115375504,
+      "TW_Online": 3513219.1423833203,
+      "total": 13095535.418147355
     },
     {
       "period": "2511",
-      "TW_Retail": 9730553.704360157,
-      "TW_Outlet": 2277351.0575446067,
-      "TW_Online": 5674738.981448662,
-      "total": 17682643.743353426
+      "TW_Retail": 9754759.061833689,
+      "TW_Outlet": 2283016.109926558,
+      "TW_Online": 5688855.247571662,
+      "total": 17726630.41933191
     },
     {
       "period": "2512",
-      "TW_Retail": 9880114.852889048,
-      "TW_Outlet": 2288342.19543897,
-      "TW_Online": 5023215.171924855,
-      "total": 17191672.22025287
+      "TW_Retail": 9904692.253020618,
+      "TW_Outlet": 2294034.588959962,
+      "TW_Online": 5035710.7320540175,
+      "total": 17234437.574034598
     }
   ],
   "monthly_channel_yoy": {
@@ -1620,196 +1620,196 @@
     {
       "period": "2501",
       "당시즌F": {
-        "gross_sales": 5246131.51364764,
-        "net_sales": 4314307.92863051
+        "gross_sales": 6342773.6318408055,
+        "net_sales": 5281336.413172232
       },
       "당시즌S": {
-        "gross_sales": 1367096.7741935481,
-        "net_sales": 1129071.7239749501
+        "gross_sales": 1370497.512437811,
+        "net_sales": 1131880.360104241
       },
       "과시즌F": {
-        "gross_sales": 5533330.024813896,
-        "net_sales": 2606144.3932411657
+        "gross_sales": 6597370.646766174,
+        "net_sales": 3249954.0393271735
       },
       "과시즌S": {
-        "gross_sales": 662503.7220843672,
-        "net_sales": 411550.0413564929
+        "gross_sales": 738475.1243781094,
+        "net_sales": 452607.4389954988
       },
       "모자": {
-        "gross_sales": 4551436.724565753,
-        "net_sales": 3679014.7701760572
+        "gross_sales": 2685203.9800995043,
+        "net_sales": 2285552.001895287
       },
       "신발": {
-        "gross_sales": 6620503.722084366,
-        "net_sales": 4734236.322816969
+        "gross_sales": 6306335.820895525,
+        "net_sales": 4514970.859985786
       },
       "가방외": {
-        "gross_sales": 1092449.131513647,
-        "net_sales": 816310.5281814968
+        "gross_sales": 1095166.6666666663,
+        "net_sales": 818341.1513859276
       },
       "가방": {
-        "gross_sales": 955131.5136476426,
-        "net_sales": 661447.9498995629
+        "gross_sales": 795184.0796019897,
+        "net_sales": 571264.8661454632
       },
       "기타ACC": {
-        "gross_sales": 299238.21339950373,
-        "net_sales": 246463.1927212571
+        "gross_sales": 299982.5870646766,
+        "net_sales": 247076.28524046432
       }
     },
     {
       "period": "2502",
       "당시즌F": {
-        "gross_sales": 1488253.1017369726,
-        "net_sales": 1232967.978258302
+        "gross_sales": 1887079.6019900495,
+        "net_sales": 1587118.9291637058
       },
       "당시즌S": {
-        "gross_sales": 1473895.7816377159,
-        "net_sales": 1216200.6380716055
+        "gross_sales": 1477562.1890547264,
+        "net_sales": 1219226.0127931766
       },
       "과시즌F": {
-        "gross_sales": 2151729.528535981,
-        "net_sales": 1044532.1989838119
+        "gross_sales": 2642129.3532338315,
+        "net_sales": 1340984.3638948116
       },
       "과시즌S": {
-        "gross_sales": 481166.25310173706,
-        "net_sales": 314351.1757060144
+        "gross_sales": 555706.4676616915,
+        "net_sales": 356627.57640369586
       },
       "모자": {
-        "gross_sales": 3332322.580645158,
-        "net_sales": 2753541.297412264
+        "gross_sales": 2522024.8756218925,
+        "net_sales": 2161030.0876569534
       },
       "신발": {
-        "gross_sales": 4508672.456575681,
-        "net_sales": 3426441.451022094
+        "gross_sales": 4384960.199004975,
+        "net_sales": 3347893.627102583
       },
       "가방외": {
-        "gross_sales": 1004451.6129032262,
-        "net_sales": 786125.2510929931
+        "gross_sales": 1006950.248756219,
+        "net_sales": 788080.786543473
       },
       "가방": {
-        "gross_sales": 853781.6377171219,
-        "net_sales": 652909.1338768753
+        "gross_sales": 796019.9004975122,
+        "net_sales": 614676.6169154227
       },
       "기타ACC": {
-        "gross_sales": 210406.94789081893,
-        "net_sales": 172973.886328725
+        "gross_sales": 210930.34825870645,
+        "net_sales": 173404.16962805024
       }
     },
     {
       "period": "2503",
       "당시즌F": {
-        "gross_sales": 343369.72704714636,
-        "net_sales": 282783.64646106586
+        "gross_sales": 430353.2338308455,
+        "net_sales": 359113.0063965885
       },
       "당시즌S": {
-        "gross_sales": 2616141.4392059534,
-        "net_sales": 2174863.050927567
+        "gross_sales": 2634875.6218905477,
+        "net_sales": 2190925.610045017
       },
       "과시즌F": {
-        "gross_sales": 923230.7692307694,
-        "net_sales": 459900.98073969025
+        "gross_sales": 1120629.3532338315,
+        "net_sales": 577154.702677091
       },
       "과시즌S": {
-        "gross_sales": 1439000.0000000005,
-        "net_sales": 863580.2906770651
+        "gross_sales": 1519358.2089552232,
+        "net_sales": 913056.1478322671
       },
       "모자": {
-        "gross_sales": 3802650.1240694774,
-        "net_sales": 2856279.333569656
+        "gross_sales": 3512256.21890547,
+        "net_sales": 2656436.3894811673
       },
       "신발": {
-        "gross_sales": 3113538.4615384624,
-        "net_sales": 2286009.216589861
+        "gross_sales": 3050900.4975124416,
+        "net_sales": 2248928.216062546
       },
       "가방외": {
-        "gross_sales": 1215178.6600496275,
-        "net_sales": 827632.9906652486
+        "gross_sales": 1218201.4925373131,
+        "net_sales": 829691.7791992424
       },
       "가방": {
-        "gross_sales": 1078545.905707196,
-        "net_sales": 704408.1295049037
+        "gross_sales": 1039062.1890547262,
+        "net_sales": 680907.6048329783
       },
       "기타ACC": {
-        "gross_sales": 178694.7890818859,
-        "net_sales": 148414.98286659573
+        "gross_sales": 179139.3034825871,
+        "net_sales": 148784.1743662639
       }
     },
     {
       "period": "2504",
       "당시즌F": {
-        "gross_sales": 89411.91066997519,
-        "net_sales": 71075.26881720428
+        "gross_sales": 102830.84577114432,
+        "net_sales": 82027.9554607913
       },
       "당시즌S": {
-        "gross_sales": 3793888.3374689794,
-        "net_sales": 3131327.6615857272
+        "gross_sales": 4009313.4328358197,
+        "net_sales": 3314694.3852167744
       },
       "과시즌F": {
-        "gross_sales": 408074.44168734486,
-        "net_sales": 209582.41758241752
+        "gross_sales": 487323.38308457704,
+        "net_sales": 258747.216299455
       },
       "과시즌S": {
-        "gross_sales": 2031595.5334987591,
-        "net_sales": 1162201.110717239
+        "gross_sales": 2198865.6716417917,
+        "net_sales": 1252541.814735846
       },
       "모자": {
-        "gross_sales": 3159394.540942927,
-        "net_sales": 2633455.039584073
+        "gross_sales": 2940300.995024876,
+        "net_sales": 2481636.342099028
       },
       "신발": {
-        "gross_sales": 3564915.6327543426,
-        "net_sales": 2545443.932411675
+        "gross_sales": 3341101.990049754,
+        "net_sales": 2387699.123430467
       },
       "가방외": {
-        "gross_sales": 756399.5037220841,
-        "net_sales": 568767.340186695
+        "gross_sales": 758281.0945273633,
+        "net_sales": 570182.184316513
       },
       "가방": {
-        "gross_sales": 623560.794044665,
-        "net_sales": 448863.5235732008
+        "gross_sales": 571390.5472636817,
+        "net_sales": 414389.9549869699
       },
       "기타ACC": {
-        "gross_sales": 186426.79900744415,
-        "net_sales": 155405.64811532554
+        "gross_sales": 186890.5472636817,
+        "net_sales": 155792.22932954275
       }
     },
     {
       "period": "2505",
       "당시즌F": {
-        "gross_sales": 60364.764267990075,
-        "net_sales": 47199.101973295525
+        "gross_sales": 73044.776119403,
+        "net_sales": 57558.161573086945
       },
       "당시즌S": {
-        "gross_sales": 5123129.032258069,
-        "net_sales": 4176097.3650005893
+        "gross_sales": 5676537.313432835,
+        "net_sales": 4647961.620469083
       },
       "과시즌F": {
-        "gross_sales": 184590.57071960304,
-        "net_sales": 106389.69632518018
+        "gross_sales": 220485.07462686574,
+        "net_sales": 128775.64558161575
       },
       "과시즌S": {
-        "gross_sales": 2122746.8982630265,
-        "net_sales": 1204713.9312300596
+        "gross_sales": 2429848.2587064677,
+        "net_sales": 1363574.9822316975
       },
       "모자": {
-        "gross_sales": 4401598.014888334,
-        "net_sales": 3653100.555358617
+        "gross_sales": 4109253.7313432842,
+        "net_sales": 3438655.5318644885
       },
       "신발": {
-        "gross_sales": 4297692.307692307,
-        "net_sales": 3158194.0210327297
+        "gross_sales": 3721226.368159205,
+        "net_sales": 2739879.4124615
       },
       "가방외": {
-        "gross_sales": 1040712.1588089333,
-        "net_sales": 803128.9140966554
+        "gross_sales": 1043300.995024875,
+        "net_sales": 805126.7472162996
       },
       "가방": {
-        "gross_sales": 814558.3126550869,
-        "net_sales": 608031.6672574735
+        "gross_sales": 778547.263681592,
+        "net_sales": 583775.645581616
       },
       "기타ACC": {
-        "gross_sales": 264096.7741935483,
-        "net_sales": 220801.84331797238
+        "gross_sales": 264753.7313432836,
+        "net_sales": 221351.10163468367
       }
     },
     {
@@ -1819,270 +1819,270 @@
         "net_sales": 0.0
       },
       "당시즌S": {
-        "gross_sales": 3912357.3200992574,
-        "net_sales": 3271425.0265863147
+        "gross_sales": 4237398.0099502485,
+        "net_sales": 3551855.9583037174
       },
       "과시즌F": {
-        "gross_sales": 261620.34739454088,
-        "net_sales": 167074.79617157028
+        "gross_sales": 293703.98009950266,
+        "net_sales": 188348.96943852174
       },
       "과시즌S": {
-        "gross_sales": 2166942.9280397017,
-        "net_sales": 1182326.1254874156
+        "gross_sales": 2631196.5174129354,
+        "net_sales": 1373707.1783937444
       },
       "모자": {
-        "gross_sales": 3666354.838709674,
-        "net_sales": 3063479.144511403
+        "gross_sales": 3436977.6119403006,
+        "net_sales": 2913451.7886756686
       },
       "신발": {
-        "gross_sales": 4006104.2183622853,
-        "net_sales": 2881898.617511519
+        "gross_sales": 3448962.686567165,
+        "net_sales": 2565123.904288083
       },
       "가방외": {
-        "gross_sales": 1015240.6947890818,
-        "net_sales": 774941.5101028002
+        "gross_sales": 1017766.1691542285,
+        "net_sales": 776869.2253020613
       },
       "가방": {
-        "gross_sales": 816081.8858560792,
-        "net_sales": 596618.6931348223
+        "gross_sales": 771400.4975124381,
+        "net_sales": 570012.3193556027
       },
       "기타ACC": {
-        "gross_sales": 245754.34243176182,
-        "net_sales": 206343.6133758713
+        "gross_sales": 246365.67164179112,
+        "net_sales": 206856.90594645828
       }
     },
     {
       "period": "2507",
       "당시즌F": {
-        "gross_sales": 436255.58312655083,
-        "net_sales": 366688.88101146155
+        "gross_sales": 437340.7960199005,
+        "net_sales": 367601.0424070125
       },
       "당시즌S": {
-        "gross_sales": 3061101.736972706,
-        "net_sales": 2570950.490369846
+        "gross_sales": 3327057.462686568,
+        "net_sales": 2800057.0954750055
       },
       "과시즌F": {
-        "gross_sales": 272548.3870967742,
-        "net_sales": 169809.76013234086
+        "gross_sales": 324243.78109452734,
+        "net_sales": 203813.07746979396
       },
       "과시즌S": {
-        "gross_sales": 1810900.7444168744,
-        "net_sales": 994502.4223088739
+        "gross_sales": 2162047.263681593,
+        "net_sales": 1144129.5901445153
       },
       "모자": {
-        "gross_sales": 3885213.3995037205,
-        "net_sales": 3254332.0335578388
+        "gross_sales": 3703940.298507461,
+        "net_sales": 3150153.2812129823
       },
       "신발": {
-        "gross_sales": 3817049.875930519,
-        "net_sales": 2766060.498641144
+        "gross_sales": 3361482.5870646783,
+        "net_sales": 2481769.9597251844
       },
       "가방외": {
-        "gross_sales": 1067007.4441687337,
-        "net_sales": 783357.4382606641
+        "gross_sales": 1069661.691542289,
+        "net_sales": 785306.088604596
       },
       "가방": {
-        "gross_sales": 868173.6972704713,
-        "net_sales": 604358.9743589741
+        "gross_sales": 820400.4975124375,
+        "net_sales": 577153.281212983
       },
       "기타ACC": {
-        "gross_sales": 248642.6799007445,
-        "net_sales": 207636.2991846862
+        "gross_sales": 249261.1940298508,
+        "net_sales": 208152.80739161323
       }
     },
     {
       "period": "2508",
       "당시즌F": {
-        "gross_sales": 1574506.2034739456,
-        "net_sales": 1327083.540115798
+        "gross_sales": 1578422.8855721403,
+        "net_sales": 1330384.7429519068
       },
       "당시즌S": {
-        "gross_sales": 2272032.258064516,
-        "net_sales": 1918740.6357083775
+        "gross_sales": 2432400.497512437,
+        "net_sales": 2057967.5432361998
       },
       "과시즌F": {
-        "gross_sales": 603952.8535980149,
-        "net_sales": 367460.4750088621
+        "gross_sales": 675094.5273631839,
+        "net_sales": 414443.25989102124
       },
       "과시즌S": {
-        "gross_sales": 1443493.7965260546,
-        "net_sales": 771533.498759305
+        "gross_sales": 1699104.4776119404,
+        "net_sales": 875398.2468609336
       },
       "모자": {
-        "gross_sales": 3826833.002481384,
-        "net_sales": 3229565.1660167812
+        "gross_sales": 3665887.3134328364,
+        "net_sales": 3138027.007818053
       },
       "신발": {
-        "gross_sales": 3879647.642679898,
-        "net_sales": 2883775.0206782455
+        "gross_sales": 3583388.059701496,
+        "net_sales": 2708052.3572613117
       },
       "가방외": {
-        "gross_sales": 943908.1885856085,
-        "net_sales": 710176.0604986405
+        "gross_sales": 946256.2189054727,
+        "net_sales": 711942.6676143091
       },
       "가방": {
-        "gross_sales": 711501.2406947891,
-        "net_sales": 507992.9103154907
+        "gross_sales": 679990.049751244,
+        "net_sales": 488041.69628050266
       },
       "기타ACC": {
-        "gross_sales": 265605.459057072,
-        "net_sales": 223345.38579699871
+        "gross_sales": 266266.1691542288,
+        "net_sales": 223900.97133380716
       }
     },
     {
       "period": "2509",
       "당시즌F": {
-        "gross_sales": 2243057.0719603,
-        "net_sales": 1867454.5669384394
+        "gross_sales": 2425845.77114428,
+        "net_sales": 2030928.9267945993
       },
       "당시즌S": {
-        "gross_sales": 895593.052109182,
-        "net_sales": 748670.6841545546
+        "gross_sales": 976708.9552238808,
+        "net_sales": 817147.3584458663
       },
       "과시즌F": {
-        "gross_sales": 666885.8560794045,
-        "net_sales": 395051.6365355076
+        "gross_sales": 773945.2736318405,
+        "net_sales": 464894.5747453209
       },
       "과시즌S": {
-        "gross_sales": 1083186.1042183626,
-        "net_sales": 561838.591516011
+        "gross_sales": 1245699.0049751247,
+        "net_sales": 630538.0241648898
       },
       "모자": {
-        "gross_sales": 3300801.488833745,
-        "net_sales": 2721883.965496866
+        "gross_sales": 2965353.233830846,
+        "net_sales": 2471718.0762852407
       },
       "신발": {
-        "gross_sales": 3247704.714640197,
-        "net_sales": 2402975.067942808
+        "gross_sales": 3078126.865671646,
+        "net_sales": 2304284.0559109217
       },
       "가방외": {
-        "gross_sales": 1360878.411910671,
-        "net_sales": 787449.3678364644
+        "gross_sales": 1364263.6815920402,
+        "net_sales": 789408.1971096905
       },
       "가방": {
-        "gross_sales": 1156538.461538462,
-        "net_sales": 607961.2430580169
+        "gross_sales": 1124995.024875622,
+        "net_sales": 589179.1044776118
       },
       "기타ACC": {
-        "gross_sales": 238674.93796526064,
-        "net_sales": 199732.24624837528
+        "gross_sales": 239268.6567164179,
+        "net_sales": 200229.09263207772
       }
     },
     {
       "period": "2510",
       "당시즌F": {
-        "gross_sales": 4142322.580645159,
-        "net_sales": 3411963.369963368
+        "gross_sales": 5150718.905472637,
+        "net_sales": 4305870.172944797
       },
       "당시즌S": {
-        "gross_sales": 379454.09429280396,
-        "net_sales": 316217.1806687935
+        "gross_sales": 460818.40796019894,
+        "net_sales": 380783.46363421006
       },
       "과시즌F": {
-        "gross_sales": 1927734.4913151357,
-        "net_sales": 1037403.993855607
+        "gross_sales": 2193582.0895522386,
+        "net_sales": 1204310.3529969202
       },
       "과시즌S": {
-        "gross_sales": 1088347.394540943,
-        "net_sales": 568803.4975776909
+        "gross_sales": 1194358.208955224,
+        "net_sales": 612509.3579720446
       },
       "모자": {
-        "gross_sales": 5205903.22580645,
-        "net_sales": 4346035.212099726
+        "gross_sales": 3946228.8557213927,
+        "net_sales": 3308686.5671641775
       },
       "신발": {
-        "gross_sales": 3594099.2555831266,
-        "net_sales": 2643172.870140614
+        "gross_sales": 3432796.019900499,
+        "net_sales": 2542091.9213456535
       },
       "가방외": {
-        "gross_sales": 1327942.9280397028,
-        "net_sales": 739444.1687344909
+        "gross_sales": 1331246.268656717,
+        "net_sales": 741283.5820895521
       },
       "가방": {
-        "gross_sales": 1143330.0248138956,
-        "net_sales": 572665.9576982158
+        "gross_sales": 1106067.164179105,
+        "net_sales": 551309.8791755507
       },
       "기타ACC": {
-        "gross_sales": 224620.347394541,
-        "net_sales": 189502.30414746536
+        "gross_sales": 225179.10447761213,
+        "net_sales": 189973.70291400148
       }
     },
     {
       "period": "2511",
       "당시즌F": {
-        "gross_sales": 6782253.10173697,
-        "net_sales": 5416779.156327541
+        "gross_sales": 9013373.134328363,
+        "net_sales": 7368316.986496095
       },
       "당시즌S": {
-        "gross_sales": 229605.459057072,
-        "net_sales": 188867.0684154555
+        "gross_sales": 296905.472636816,
+        "net_sales": 241140.25112532577
       },
       "과시즌F": {
-        "gross_sales": 3573972.704714642,
-        "net_sales": 1928972.9410374567
+        "gross_sales": 4180485.0746268663,
+        "net_sales": 2278402.0374318887
       },
       "과시즌S": {
-        "gross_sales": 1003942.9280397025,
-        "net_sales": 553881.365945882
+        "gross_sales": 1041360.6965174126,
+        "net_sales": 570423.3593935089
       },
       "모자": {
-        "gross_sales": 6477436.724565753,
-        "net_sales": 5399889.400921661
+        "gross_sales": 3887019.9004975148,
+        "net_sales": 3286327.6474769018
       },
       "신발": {
-        "gross_sales": 4595081.88585608,
-        "net_sales": 3434142.030012998
+        "gross_sales": 4299522.388059703,
+        "net_sales": 3220017.531390666
       },
       "가방외": {
-        "gross_sales": 1181888.3374689827,
-        "net_sales": 760111.7806924257
+        "gross_sales": 1184828.3582089543,
+        "net_sales": 762002.6060175316
       },
       "가방": {
-        "gross_sales": 991109.1811414395,
-        "net_sales": 583467.8010161881
+        "gross_sales": 923517.4129353232,
+        "net_sales": 545436.8633025349
       },
       "기타ACC": {
-        "gross_sales": 260662.53101736977,
-        "net_sales": 216028.35873803613
+        "gross_sales": 261310.94527363198,
+        "net_sales": 216565.74271499648
       }
     },
     {
       "period": "2512",
       "당시즌F": {
-        "gross_sales": 6021354.838709671,
-        "net_sales": 4672674.937965255
+        "gross_sales": 9052049.75124378,
+        "net_sales": 7298625.918028903
       },
       "당시즌S": {
-        "gross_sales": 137893.30024813896,
-        "net_sales": 115133.16790736147
+        "gross_sales": 183634.32835820894,
+        "net_sales": 147643.6863302535
       },
       "과시즌F": {
-        "gross_sales": 3544942.9280397026,
-        "net_sales": 1794938.4379061793
+        "gross_sales": 4129358.2089552227,
+        "net_sales": 2112190.002369107
       },
       "과시즌S": {
-        "gross_sales": 835550.8684863528,
-        "net_sales": 512149.35602032376
+        "gross_sales": 848447.7611940304,
+        "net_sales": 519995.02487562207
       },
       "모자": {
-        "gross_sales": 6735856.079404461,
-        "net_sales": 5624062.152900862
+        "gross_sales": 3413278.6069651726,
+        "net_sales": 2904572.139303484
       },
       "신발": {
-        "gross_sales": 4824280.39702233,
-        "net_sales": 3528428.4532671617
+        "gross_sales": 4528084.57711443,
+        "net_sales": 3304776.119402986
       },
       "가방외": {
-        "gross_sales": 1319794.0446650113,
-        "net_sales": 944285.7142857147
+        "gross_sales": 1323077.1144278613,
+        "net_sales": 946634.6837242366
       },
       "가방": {
-        "gross_sales": 1089712.1588089326,
-        "net_sales": 748962.5428335102
+        "gross_sales": 1036019.9004975122,
+        "net_sales": 719095.2380952386
       },
       "기타ACC": {
-        "gross_sales": 286344.9131513649,
-        "net_sales": 226974.831619993
+        "gross_sales": 287057.2139303483,
+        "net_sales": 227539.44562899787
       }
     }
   ],
@@ -2096,80 +2096,80 @@
       0,
       74,
       118,
-      102,
-      100,
-      107,
-      80
+      105,
+      113,
+      122,
+      97
     ],
     "당시즌S": [
       107,
       51,
-      73,
-      79,
-      121,
-      110,
-      115,
-      128,
-      93,
-      70,
-      50,
-      61
+      74,
+      83,
+      127,
+      111,
+      116,
+      129,
+      96,
+      81,
+      61,
+      74
     ],
     "과시즌F": [
-      148,
-      86,
-      109,
-      91,
-      71,
-      97,
-      109,
-      124,
-      70,
-      107,
+      140,
+      83,
+      96,
+      94,
+      73,
+      87,
+      103,
       116,
-      85
+      73,
+      102,
+      111,
+      76
     ],
     "과시즌S": [
-      201,
-      54,
-      151,
-      107,
-      99,
-      111,
+      170,
+      52,
+      143,
       102,
       97,
-      89,
-      146,
-      166,
-      165
+      110,
+      99,
+      91,
+      85,
+      131,
+      147,
+      151
     ],
     "모자": [
-      130,
-      85,
-      111,
+      148,
+      90,
+      118,
       103,
       145,
-      122,
-      128,
-      127,
+      125,
+      132,
+      130,
       126,
-      168,
-      152,
-      126
+      166,
+      135,
+      118
     ],
     "신발": [
-      126,
+      125,
       71,
-      72,
-      87,
-      109,
-      99,
-      105,
+      71,
+      84,
+      104,
+      97,
+      104,
       98,
       95,
       102,
-      104,
-      104
+      106,
+      111
     ],
     "가방외": [
       111,
@@ -2186,18 +2186,18 @@
       120
     ],
     "가방": [
-      91,
-      67,
-      100,
-      63,
+      101,
+      71,
+      105,
+      62,
+      82,
       80,
+      95,
       79,
-      93,
-      77,
-      93,
+      92,
       96,
-      90,
-      113
+      95,
+      125
     ],
     "기타ACC": [
       145,
@@ -2218,468 +2218,468 @@
     {
       "period": "2501",
       "F당시즌": {
-        "stock_price": 19695.51861042183,
+        "stock_price": 21738.062189054734,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 16481.630272952854,
+        "stock_price": 16752.52985074627,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 24473.263027295292,
+        "stock_price": 28347.88557213929,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 33054.39702233251,
+        "stock_price": 37347.330845771154,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 31221.12406947889,
+        "stock_price": 23989.43781094528,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 40013.87344913152,
+        "stock_price": 37174.85820895524,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 14525.789081885861,
+        "stock_price": 14561.92288557215,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 13321.970223325066,
+        "stock_price": 13355.109452736326,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 21214.230769230766,
+        "stock_price": 21267.002487562186,
         "stock_weeks": 0
       }
     },
     {
       "period": "2502",
       "F당시즌": {
-        "stock_price": 18197.337468982634,
+        "stock_price": 19838.850746268672,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 27573.248138957813,
+        "stock_price": 28201.315920398014,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 22113.43176178661,
+        "stock_price": 25497.062189054705,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 32696.80645161291,
+        "stock_price": 36915.507462686575,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 30091.215880893276,
+        "stock_price": 23347.41293532339,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 37638.91315136477,
+        "stock_price": 34929.48756218907,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 14925.238213399507,
+        "stock_price": 14962.365671641795,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 13776.399503722083,
+        "stock_price": 13810.66915422886,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 23801.36972704715,
+        "stock_price": 23860.57711442788,
         "stock_weeks": 0
       }
     },
     {
       "period": "2503",
       "F당시즌": {
-        "stock_price": 17883.037220843667,
+        "stock_price": 19437.639303482596,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 35153.401985111646,
+        "stock_price": 36760.86069651742,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 20915.84863523574,
+        "stock_price": 24101.27611940298,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 31132.741935483875,
+        "stock_price": 35269.82835820897,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 28938.80397022331,
+        "stock_price": 22152.75621890548,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 37790.816377171206,
+        "stock_price": 34519.68905472637,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 13825.595533498752,
+        "stock_price": 13859.987562189057,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 12898.029776674935,
+        "stock_price": 12930.114427860704,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 25585.014888337475,
+        "stock_price": 25648.659203980096,
         "stock_weeks": 0
       }
     },
     {
       "period": "2504",
       "F당시즌": {
-        "stock_price": 17852.982630272945,
+        "stock_price": 19393.992537313432,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 34324.39205955337,
+        "stock_price": 36984.348258706465,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 20312.15136476426,
+        "stock_price": 23417.619402985085,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 29080.317617865996,
+        "stock_price": 33050.28109452736,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 27272.6699751861,
+        "stock_price": 20709.82587064677,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 36479.952853598006,
+        "stock_price": 32177.64925373135,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 12932.317617865998,
+        "stock_price": 12964.487562189059,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 12041.285359801486,
+        "stock_price": 12071.238805970155,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 24439.72704714638,
+        "stock_price": 24500.52238805973,
         "stock_weeks": 0
       }
     },
     {
       "period": "2505",
       "F당시즌": {
-        "stock_price": 17734.178660049627,
+        "stock_price": 19262.064676616912,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 29202.625310173687,
+        "stock_price": 31582.33582089551,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 16767.012406947888,
+        "stock_price": 19453.61194029851,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 26728.82630272951,
+        "stock_price": 30298.808457711442,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 23660.81637717122,
+        "stock_price": 17848.78358208955,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 35817.99503722084,
+        "stock_price": 31838.763681592045,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 12240.679900744417,
+        "stock_price": 12271.129353233833,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 11341.307692307693,
+        "stock_price": 11369.519900497515,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 21855.622828784108,
+        "stock_price": 21909.990049751235,
         "stock_weeks": 0
       }
     },
     {
       "period": "2506",
       "F당시즌": {
-        "stock_price": 2562.9478908188585,
+        "stock_price": 2569.3233830845775,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 25341.4987593052,
+        "stock_price": 27390.41791044778,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 34066.60049627792,
+        "stock_price": 38248.57213930348,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 24148.240694789085,
+        "stock_price": 27208.151741293543,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 24134.382133995034,
+        "stock_price": 18607.606965174124,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 33376.816377171206,
+        "stock_price": 29963.703980099508,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 11900.339950372208,
+        "stock_price": 11929.94278606965,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 10840.047146401987,
+        "stock_price": 10867.012437810943,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 20096.44416873448,
+        "stock_price": 20146.43532338309,
         "stock_weeks": 0
       }
     },
     {
       "period": "2507",
       "F당시즌": {
-        "stock_price": 10905.538461538461,
+        "stock_price": 11445.930348258706,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 22222.531017369714,
+        "stock_price": 24007.26865671641,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 33688.657568238224,
+        "stock_price": 37817.75124378109,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 21898.06947890819,
+        "stock_price": 24602.077114427866,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 24422.280397022325,
+        "stock_price": 18575.529850746276,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 34601.21588089328,
+        "stock_price": 31657.243781094534,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 11422.111662531017,
+        "stock_price": 11450.524875621884,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 10286.09677419355,
+        "stock_price": 10311.684079601982,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 21610.784119106695,
+        "stock_price": 21664.542288557204,
         "stock_weeks": 0
       }
     },
     {
       "period": "2508",
       "F당시즌": {
-        "stock_price": 29001.26799007445,
+        "stock_price": 32842.50497512438,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 20078.421836228274,
+        "stock_price": 21693.68905472636,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 33079.03970223327,
+        "stock_price": 37106.4502487562,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 20022.096774193546,
+        "stock_price": 22467.437810945292,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 29103.875930521077,
+        "stock_price": 20199.047263681594,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 33689.01488833746,
+        "stock_price": 31074.97014925374,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 11516.349875930517,
+        "stock_price": 11544.997512437814,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 10580.295285359796,
+        "stock_price": 10606.614427860697,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 23616.0322580645,
+        "stock_price": 23674.778606965177,
         "stock_weeks": 0
       }
     },
     {
       "period": "2509",
       "F당시즌": {
-        "stock_price": 35782.62531017367,
+        "stock_price": 42412.7462686567,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 19180.473945409423,
+        "stock_price": 20732.609452736335,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 32524.223325062037,
+        "stock_price": 36460.75373134326,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 18799.066997518607,
+        "stock_price": 21093.83084577114,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 32379.15136476429,
+        "stock_price": 21634.89303482587,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 39069.17121588088,
+        "stock_price": 35842.00497512438,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 11515.861042183618,
+        "stock_price": 11544.507462686568,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 10757.181141439201,
+        "stock_price": 10783.940298507467,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 23866.98014888337,
+        "stock_price": 23926.35074626865,
         "stock_weeks": 0
       }
     },
     {
       "period": "2510",
       "F당시즌": {
-        "stock_price": 41858.687344913174,
+        "stock_price": 48972.995024875636,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 19110.91811414392,
+        "stock_price": 20808.8631840796,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 31665.878411910682,
+        "stock_price": 35434.094527363166,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 17765.73697270472,
+        "stock_price": 19742.87810945274,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 38262.573200992556,
+        "stock_price": 27679.616915422896,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 40862.19602977669,
+        "stock_price": 37359.0,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 11165.838709677422,
+        "stock_price": 11193.614427860695,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 10329.610421836229,
+        "stock_price": 10355.305970149255,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 24098.90818858561,
+        "stock_price": 24158.85572139305,
         "stock_weeks": 0
       }
     },
     {
       "period": "2511",
       "F당시즌": {
-        "stock_price": 34341.263027295296,
+        "stock_price": 39231.57213930348,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 18520.53349875931,
+        "stock_price": 20014.05472636816,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 27178.421836228317,
+        "stock_price": 30244.43283582089,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 15960.516129032261,
+        "stock_price": 17302.092039801,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 34214.76923076923,
+        "stock_price": 26635.323383084582,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 39399.387096774204,
+        "stock_price": 36609.34328358211,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 10645.560794044664,
+        "stock_price": 10672.04228855721,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 9898.866004962778,
+        "stock_price": 9923.49004975124,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 21214.21339950372,
+        "stock_price": 21266.98507462688,
         "stock_weeks": 0
       }
     },
     {
       "period": "2512",
       "F당시즌": {
-        "stock_price": 28722.20099255584,
+        "stock_price": 32481.7313432836,
         "stock_weeks": 0
       },
       "S당시즌": {
-        "stock_price": 18412.076923076926,
+        "stock_price": 19870.606965174127,
         "stock_weeks": 0
       },
       "과시즌FW": {
-        "stock_price": 23464.45409429281,
+        "stock_price": 25777.009950248754,
         "stock_weeks": 0
       },
       "과시즌SS": {
-        "stock_price": 14699.841191067002,
+        "stock_price": 16026.009950248763,
         "stock_weeks": 0
       },
       "모자": {
-        "stock_price": 32386.692307692312,
+        "stock_price": 26439.542288557215,
         "stock_weeks": 0
       },
       "신발": {
-        "stock_price": 37253.52109181142,
+        "stock_price": 34729.30597014926,
         "stock_weeks": 0
       },
       "가방외": {
-        "stock_price": 10291.918114143922,
+        "stock_price": 10317.51990049751,
         "stock_weeks": 0
       },
       "가방": {
-        "stock_price": 9048.744416873447,
+        "stock_price": 9071.253731343282,
         "stock_weeks": 0
       },
       "기타ACC": {
-        "stock_price": 19363.841191067007,
+        "stock_price": 19412.00995024876,
         "stock_weeks": 0
       }
     }
@@ -2692,82 +2692,82 @@
       0,
       0,
       0,
-      168,
-      95,
-      91,
-      109,
-      105,
-      166
+      149,
+      100,
+      96,
+      111,
+      104,
+      116
     ],
     "S당시즌": [
-      93,
-      90,
-      84,
+      95,
+      92,
+      87,
       92,
       88,
       86,
       83,
       80,
       80,
+      82,
       81,
-      81,
-      30451
+      81
     ],
     "과시즌FW": [
-      94,
-      93,
-      91,
-      91,
-      83,
-      83,
-      83,
-      83,
-      84,
+      89,
+      88,
+      87,
       86,
-      80,
-      282
+      79,
+      79,
+      79,
+      79,
+      79,
+      81,
+      75,
+      73
     ],
     "과시즌SS": [
+      118,
+      121,
+      119,
+      123,
+      125,
+      124,
+      124,
       125,
       128,
-      126,
-      130,
-      134,
-      134,
-      135,
-      137,
-      142,
-      142,
-      134,
-      460
+      127,
+      120,
+      90
     ],
     "모자": [
+      95,
       87,
+      81,
+      83,
+      78,
       82,
-      78,
-      78,
-      73,
-      75,
-      72,
-      86,
-      89,
-      102,
-      98,
-      292
+      79,
+      88,
+      92,
+      114,
+      114,
+      105
     ],
     "신발": [
-      67,
       66,
-      70,
-      69,
-      72,
+      65,
       68,
+      67,
       70,
-      73,
+      66,
+      69,
+      74,
       89,
+      96,
       95,
-      93,
-      381
+      90
     ],
     "가방외": [
       96,
@@ -2781,7 +2781,7 @@
       76,
       77,
       76,
-      347
+      73
     ],
     "가방": [
       92,
@@ -2795,7 +2795,7 @@
       75,
       74,
       73,
-      363
+      70
     ],
     "기타ACC": [
       114,
@@ -2809,111 +2809,111 @@
       105,
       110,
       103,
-      328
+      96
     ]
   },
   "offline_store_efficiency": {
     "total": {
       "current": {
         "store_count": 16,
-        "net_sales": 12168457.048328014,
-        "sales_per_store": 760528.5655205009
+        "net_sales": 12198726.841980573,
+        "sales_per_store": 762420.4276237858
       },
       "previous": {
         "store_count": 18,
-        "net_sales": 12843435.424790261,
-        "sales_per_store": 713524.1902661256
+        "net_sales": 12875384.26913054,
+        "sales_per_store": 715299.1260628077
       },
-      "yoy": 106.58763583570222
+      "yoy": 106.58763583570219
     }
   },
   "season_sales": {
     "current_season_f": {
       "season_code": "25F",
       "december": {
-        "total_net_sales": 7280.51518374099,
+        "total_net_sales": 7298.6259180289035,
         "subcategory_top5": [
           {
             "subcategory_code": "BN",
             "subcategory_name": "Beanie",
-            "net_sales": 1914.5215644570485
+            "net_sales": 1919.2840559109216
           },
           {
             "subcategory_code": "DJ",
             "subcategory_name": "JUMPER",
-            "net_sales": 1137.9839300484462
+            "net_sales": 1140.8147358445865
           },
           {
             "subcategory_code": "MT",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_sales": 697.0374571664893
+            "net_sales": 698.7713811892916
           },
           {
             "subcategory_code": "PT",
             "subcategory_name": "PANTS",
-            "net_sales": 384.0094529126787
+            "net_sales": 384.96470030798395
           },
           {
             "subcategory_code": "DV",
             "subcategory_name": "VEST",
-            "net_sales": 319.578872740163
+            "net_sales": 320.3738450604122
           }
         ]
       },
       "accumulated": {
-        "total_net_sales": 7280.51518374099,
+        "total_net_sales": 7298.6259180289035,
         "periods": "2025년 7~12월",
-        "net_acp_p": 59990.25310173697,
-        "ac_sales_gross": 27589.12158808933,
-        "stock_price": 32401.13151364764,
+        "net_acp_p": 60139.48258706468,
+        "ac_sales_gross": 27657.7512437811,
+        "stock_price": 32481.731343283587,
         "sales_rate": 45.98934020381806,
-        "sales_rate_change": -11.231862945264638,
-        "net_acp_p_yoy": 134.6866733571545,
+        "sales_rate_change": -1.628466048580826,
+        "net_acp_p_yoy": 112.0822975356108,
         "ac_sales_gross_yoy": 108.24923107269532,
         "subcategory_detail": [
           {
             "subcategory_code": "DJ",
             "subcategory_name": "JUMPER",
-            "net_acp_p": 9022.585607940446,
-            "ac_sales_gross": 3365.5136476426796,
+            "net_acp_p": 9045.02985074627,
+            "ac_sales_gross": 3373.885572139304,
             "sales_rate": 37.300988806144595,
-            "net_acp_p_yoy": 200.52490167055277,
+            "net_acp_p_yoy": 188.36383453664888,
             "ac_sales_gross_yoy": 113.20563531696779
           },
           {
             "subcategory_code": "MT",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_acp_p": 6924.277915632753,
-            "ac_sales_gross": 2528.610421836228,
+            "net_acp_p": 6941.50248756219,
+            "ac_sales_gross": 2534.900497512438,
             "sales_rate": 36.518037731088945,
-            "net_acp_p_yoy": 97.42697735477518,
+            "net_acp_p_yoy": 73.41711606022106,
             "ac_sales_gross_yoy": 79.58318071878911
           },
           {
             "subcategory_code": "TS",
             "subcategory_name": "T/SHIRTS",
-            "net_acp_p": 6581.29776674938,
-            "ac_sales_gross": 4169.1612903225805,
-            "sales_rate": 63.348619650464535,
-            "net_acp_p_yoy": 145.31092742679976,
+            "net_acp_p": 6597.669154228857,
+            "ac_sales_gross": 4179.532338308458,
+            "sales_rate": 63.34861965046452,
+            "net_acp_p_yoy": 131.32732416906074,
             "ac_sales_gross_yoy": 116.04022868635188
           },
           {
             "subcategory_code": "BN",
             "subcategory_name": "Beanie",
-            "net_acp_p": 6463.838709677419,
-            "ac_sales_gross": 4486.617866004963,
-            "sales_rate": 69.41104299659837,
-            "net_acp_p_yoy": 307.18514998248816,
-            "ac_sales_gross_yoy": 280.8426333651747
+            "net_acp_p": 6479.917910447762,
+            "ac_sales_gross": 4497.778606965175,
+            "sales_rate": 69.41104299659838,
+            "net_acp_p_yoy": 235.76218938253012,
+            "ac_sales_gross_yoy": 280.8426333651748
           },
           {
             "subcategory_code": "PT",
             "subcategory_name": "PANTS",
-            "net_acp_p": 3359.0719602977665,
-            "ac_sales_gross": 1446.1588089330023,
-            "sales_rate": 43.0523318948132,
-            "net_acp_p_yoy": 101.51244397418296,
+            "net_acp_p": 3367.4278606965177,
+            "ac_sales_gross": 1449.756218905473,
+            "sales_rate": 43.05233189481321,
+            "net_acp_p_yoy": 82.38275404380866,
             "ac_sales_gross_yoy": 83.7087382545323
           }
         ]
@@ -2922,219 +2922,219 @@
     "previous_season_f": {
       "season_code": "24F",
       "december": {
-        "total_net_sales": 7543.942100909842,
+        "total_net_sales": 7562.708126036486,
         "subcategory_top5": [
           {
             "subcategory_code": "DJ",
             "subcategory_name": "JUMPER",
-            "net_sales": 1390.0602623183265
+            "net_sales": 1393.5181236673775
           },
           {
             "subcategory_code": "MT",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_sales": 1046.3291976840364
+            "net_sales": 1048.9320066334992
           },
           {
             "subcategory_code": "BN",
             "subcategory_name": "Beanie",
-            "net_sales": 831.4919059435189
+            "net_sales": 833.560293769249
           },
           {
             "subcategory_code": "PT",
             "subcategory_name": "PANTS",
-            "net_sales": 585.4375516956162
+            "net_sales": 586.8938640132671
           },
           {
             "subcategory_code": "HD",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_sales": 357.60368663594477
+            "net_sales": 358.4932480454869
           }
         ],
         "subcategory_detail": [
           {
             "subcategory_code": "ET",
             "subcategory_name": "ACCESSARY",
-            "net_sales": 9.735082122178895
+            "net_sales": 9.759298744373373
           },
           {
             "subcategory_code": "GL",
             "subcategory_name": "GLOVE",
-            "net_sales": 0.42301784237268103
+            "net_sales": 0.4240701255626629
           },
           {
             "subcategory_code": "MF",
             "subcategory_name": "MUFFLER",
-            "net_sales": 128.3275434243176
+            "net_sales": 128.6467661691542
           },
           {
             "subcategory_code": "CR",
             "subcategory_name": "Crossbody Bag",
-            "net_sales": 28.14557485525227
+            "net_sales": 28.215588723051415
           },
           {
             "subcategory_code": "DP",
             "subcategory_name": "PANTS",
-            "net_sales": 48.392532198983815
+            "net_sales": 48.51291163231462
           },
           {
             "subcategory_code": "LG",
             "subcategory_name": "PANTS",
-            "net_sales": 20.84036393713813
+            "net_sales": 20.892205638474298
           },
           {
             "subcategory_code": "PT",
             "subcategory_name": "PANTS",
-            "net_sales": 585.4375516956162
+            "net_sales": 586.8938640132671
           },
           {
             "subcategory_code": "SK",
             "subcategory_name": "SKIRT",
-            "net_sales": 61.52120997282288
+            "net_sales": 61.67424780857617
           },
           {
             "subcategory_code": "WP",
             "subcategory_name": "PANTS",
-            "net_sales": 115.31135531135526
+            "net_sales": 115.59819947879652
           },
           {
             "subcategory_code": "BN",
             "subcategory_name": "Beanie",
-            "net_sales": 831.4919059435189
+            "net_sales": 833.560293769249
           },
           {
             "subcategory_code": "WM",
             "subcategory_name": "Winter Headwear",
-            "net_sales": 97.37705305447241
+            "net_sales": 97.61928452973231
           },
           {
             "subcategory_code": "HD",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_sales": 357.60368663594477
+            "net_sales": 358.4932480454869
           },
           {
             "subcategory_code": "KP",
             "subcategory_name": "Sweater Pullover",
-            "net_sales": 178.86943164362518
+            "net_sales": 179.31438047855963
           },
           {
             "subcategory_code": "MT",
             "subcategory_name": "SWEAT SHIRTS",
-            "net_sales": 1046.3291976840364
+            "net_sales": 1048.9320066334992
           },
           {
             "subcategory_code": "PQ",
             "subcategory_name": "Polo shirt",
-            "net_sales": 0.5411792508566702
+            "net_sales": 0.5425254678986023
           },
           {
             "subcategory_code": "TS",
             "subcategory_name": "T/SHIRTS",
-            "net_sales": 246.60971286777738
+            "net_sales": 247.22316986496094
           },
           {
             "subcategory_code": "WS",
             "subcategory_name": "WOVEN SHIRTS",
-            "net_sales": 50.039229587616674
+            "net_sales": 50.16370528310827
           },
           {
             "subcategory_code": "DJ",
             "subcategory_name": "JUMPER",
-            "net_sales": 1390.0602623183265
+            "net_sales": 1393.5181236673775
           },
           {
             "subcategory_code": "DV",
             "subcategory_name": "VEST",
-            "net_sales": 303.6807278742762
+            "net_sales": 304.436152570481
           },
           {
             "subcategory_code": "FD",
             "subcategory_name": "Fleece Jumper",
-            "net_sales": 251.2123360510457
+            "net_sales": 251.83724235963047
           },
           {
             "subcategory_code": "JP",
             "subcategory_name": "JUMPER",
-            "net_sales": 351.6072314781992
+            "net_sales": 352.48187633262273
           },
           {
             "subcategory_code": "KC",
             "subcategory_name": "Knit Cardigan",
-            "net_sales": 177.08164953326238
+            "net_sales": 177.52215114901685
           },
           {
             "subcategory_code": "WJ",
             "subcategory_name": "Windbreaker",
-            "net_sales": 107.60155973059196
+            "net_sales": 107.86922530206112
           },
           {
             "subcategory_code": "WB",
             "subcategory_name": "Winter Boots",
-            "net_sales": 330.06522509748305
+            "net_sales": 330.8862828713576
           },
           {
             "subcategory_code": "S1",
             "subcategory_name": "T-Shirt & Sweatpants",
-            "net_sales": 7.084485407066051
+            "net_sales": 7.10210850509358
           },
           {
             "subcategory_code": "S2",
             "subcategory_name": "Sweatshirt & Sweatpants",
-            "net_sales": 8.479971641261963
+            "net_sales": 8.501066098081024
           },
           {
             "subcategory_code": "SO",
             "subcategory_name": "SOCKS",
-            "net_sales": 7.80125251092993
+            "net_sales": 7.8206586117033865
           },
           {
             "subcategory_code": "DS",
             "subcategory_name": "SKIRT",
-            "net_sales": 8.920477372090273
+            "net_sales": 8.942667614309407
           },
           {
             "subcategory_code": "SP",
             "subcategory_name": "SHORT PANTS",
-            "net_sales": 0.6120760959470637
+            "net_sales": 0.6135986733001658
           },
           {
             "subcategory_code": "CB",
             "subcategory_name": "Beret",
-            "net_sales": 63.088739217771455
+            "net_sales": 63.24567638000474
           },
           {
             "subcategory_code": "CP",
             "subcategory_name": "CAP",
-            "net_sales": 169.3711449840482
+            "net_sales": 169.79246624022747
           },
           {
             "subcategory_code": "HT",
             "subcategory_name": "Hat",
-            "net_sales": 200.4950963015479
+            "net_sales": 200.99384032219857
           },
           {
             "subcategory_code": "DR",
             "subcategory_name": "DENIM SHIRT",
-            "net_sales": 23.699633699633697
+            "net_sales": 23.758588012319358
           },
           {
             "subcategory_code": "OP",
             "subcategory_name": "ONEPIECE",
-            "net_sales": 5.221079995273544
+            "net_sales": 5.234067756455817
           },
           {
             "subcategory_code": "TR",
             "subcategory_name": "T/SHIRTS",
-            "net_sales": 222.15053763440864
+            "net_sales": 222.70315091210622
           },
           {
             "subcategory_code": "DK",
             "subcategory_name": "DENIM JACKET",
-            "net_sales": 20.6184568120052
+            "net_sales": 20.669746505567403
           },
           {
             "subcategory_code": "PD",
             "subcategory_name": "Padded Jumper",
-            "net_sales": 88.09452912678718
+            "net_sales": 88.3136697465056
           },
           {
             "subcategory_code": "TP",
@@ -3149,101 +3149,101 @@
         ]
       },
       "accumulated": {
-        "total_net_sales": 7543.942100909842,
+        "total_net_sales": 7562.708126036486,
         "periods": "2024년 7~12월",
-        "net_acp_p": 44540.60049627791,
-        "ac_sales_gross": 25486.667493796525,
-        "stock_price": 19053.93300248139,
-        "sales_rate": 57.2212031490827
+        "net_acp_p": 53656.53980099503,
+        "ac_sales_gross": 25550.06716417911,
+        "stock_price": 28106.472636815924,
+        "sales_rate": 47.617806252398886
       }
     },
     "current_season_s": {
       "season_code": "25S",
       "accumulated": {
-        "total_net_sales": 20957.564693371143,
-        "net_acp_p": 43767.27543424317,
-        "ac_sales_gross": 25355.19851116625
+        "total_net_sales": 21009.697938877045,
+        "net_acp_p": 43876.149253731346,
+        "ac_sales_gross": 25418.27114427861
       }
     },
     "previous_season_s": {
       "season_code": "24S",
       "accumulated": {
-        "total_net_sales": 22307.12017015243,
-        "net_acp_p": 27218.625310173695,
-        "ac_sales_gross": 27158.16129032258
+        "total_net_sales": 22362.6105188344,
+        "net_acp_p": 49938.054726368166,
+        "ac_sales_gross": 27225.71890547264
       }
     }
   },
   "acc_stock_summary": {
     "total": {
       "current": {
-        "stock_weeks": 36.92305488965692
+        "stock_weeks": 36.923054889656925
       },
       "previous": {
-        "stock_weeks": 12.976326821168032
+        "stock_weeks": 53.16341506540103
       },
-      "stock_weeks_change": 23.946728068488888
+      "stock_weeks_change": -16.240360175744108
     },
     "by_category": {
       "ATC": {
         "category": "ATC",
         "category_name": "가방외",
         "current": {
-          "stock_price": 2259.16129032258,
-          "gross_sales_6m": 1524.5508684863523,
-          "stock_weeks": 38.528195262323514
+          "stock_price": 2264.7810945273636,
+          "gross_sales_6m": 1528.3432835820895,
+          "stock_weeks": 38.528195262323536
         },
         "previous": {
-          "stock_price": 665.6153846153846,
-          "gross_sales_6m": 1174.2258064516132,
-          "stock_weeks": 14.738221477431935
+          "stock_price": 2987.6592039801,
+          "gross_sales_6m": 1177.1467661691543,
+          "stock_weeks": 65.98934095217164
         },
-        "stock_weeks_change": 23.78997378489158
+        "stock_weeks_change": -27.46114568984811
       },
       "BAG": {
         "category": "BAG",
         "category_name": "가방외",
         "current": {
-          "stock_price": 8032.756823821343,
-          "gross_sales_6m": 5676.868486352357,
-          "stock_weeks": 36.78994465372079
+          "stock_price": 8052.738805970151,
+          "gross_sales_6m": 5690.990049751244,
+          "stock_weeks": 36.789944653720774
         },
         "previous": {
-          "stock_price": 2297.3200992555826,
-          "gross_sales_6m": 4778.967741935483,
-          "stock_weeks": 12.498582498582497
+          "stock_price": 11165.544776119403,
+          "gross_sales_6m": 4790.855721393035,
+          "stock_weeks": 60.59547209547209
         },
-        "stock_weeks_change": 24.29136215513829
+        "stock_weeks_change": -23.805527441751316
       },
       "HEA": {
         "category": "HEA",
         "category_name": "모자",
         "current": {
-          "stock_price": 26373.93548387097,
-          "gross_sales_6m": 21528.155583126554,
-          "stock_weeks": 31.85234888947496
+          "stock_price": 26439.542288557215,
+          "gross_sales_6m": 21581.708208955224,
+          "stock_weeks": 31.852348889474964
         },
         "previous": {
-          "stock_price": 8565.28039702233,
-          "gross_sales_6m": 16297.397022332507,
-          "stock_weeks": 13.664592573735302
+          "stock_price": 25077.604477611945,
+          "gross_sales_6m": 16337.937810945274,
+          "stock_weeks": 39.908201632467
         },
-        "stock_weeks_change": 18.18775631573966
+        "stock_weeks_change": -8.055852742992034
       },
       "SHO": {
         "category": "SHO",
         "category_name": "신발",
         "current": {
-          "stock_price": 34643.12903225807,
-          "gross_sales_6m": 22228.106699751857,
-          "stock_weeks": 40.52173075310841
+          "stock_price": 34729.30597014926,
+          "gross_sales_6m": 22283.40049751244,
+          "stock_weeks": 40.5217307531084
         },
         "previous": {
-          "stock_price": 9224.645161290322,
-          "gross_sales_6m": 21795.95781637717,
-          "stock_weeks": 11.003910734922393
+          "stock_price": 38793.009950248765,
+          "gross_sales_6m": 21850.17661691542,
+          "stock_weeks": 46.16064558149342
         },
-        "stock_weeks_change": 29.517820018186015
+        "stock_weeks_change": -5.638914828385019
       },
       "WTC": {
         "category": "WTC",
@@ -3280,26 +3280,26 @@
       "ATC": {
         "category": "ATC",
         "category_name": "가방외",
-        "net_sales": 226.97483161999287,
+        "net_sales": 227.53944562899787,
         "yoy": 107.56468536754997
       },
       "BAG": {
         "category": "BAG",
         "category_name": "가방외",
-        "net_sales": 717.3108826657212,
-        "yoy": 124.72437004002698
+        "net_sales": 719.0952380952382,
+        "yoy": 124.72437004002701
       },
       "HEA": {
         "category": "HEA",
         "category_name": "모자",
-        "net_sales": 2897.36476426799,
+        "net_sales": 2904.572139303483,
         "yoy": 117.79310984903513
       },
       "SHO": {
         "category": "SHO",
         "category_name": "신발",
-        "net_sales": 3296.575682382134,
-        "yoy": 110.91113646573349
+        "net_sales": 3304.776119402985,
+        "yoy": 110.91113646573348
       },
       "WTC": {
         "category": "WTC",
@@ -3317,15 +3317,15 @@
   },
   "ending_inventory": {
     "total": {
-      "current": 165230.7047146402,
-      "previous": 52685.46401985111,
-      "yoy": 313.61725247856543
+      "current": 165641.72636815923,
+      "previous": 183611.29850746272,
+      "yoy": 90.21325360401332
     },
     "by_season": {
       "과시즌_FW": {
         "season_type": "과시즌F",
         "current": {
-          "stock_price": 25713.047146401987
+          "stock_price": 25777.009950248754
         },
         "previous": {
           "stock_price": 0.0
@@ -3335,295 +3335,273 @@
       "과시즌_SS": {
         "season_type": "과시즌S",
         "current": {
-          "stock_price": 15986.243176178665
+          "stock_price": 16026.009950248761
         },
         "previous": {
-          "stock_price": 3580.4540942928047
+          "stock_price": 17739.273631840788
         },
-        "yoy": 446.48647225111813
+        "yoy": 90.34197387588162
       },
       "당시즌_의류": {
         "season_type": "당시즌F",
         "current": {
-          "stock_price": 32401.131513647644
+          "stock_price": 32481.7313432836
         },
         "previous": {
-          "stock_price": 19053.933002481375
+          "stock_price": 28106.472636815906
         },
-        "yoy": 170.04957196725778
+        "yoy": 115.56672999491464
       },
       "당시즌_SS": {
         "season_type": "당시즌S",
         "current": {
-          "stock_price": 19821.300248138952
+          "stock_price": 19870.606965174127
         },
         "previous": {
-          "stock_price": 66.44665012406948
+          "stock_price": 24500.870646766172
         },
-        "yoy": 29830.398087982667
+        "yoy": 81.10163614857832
       }
     },
     "acc_by_category": {
-      "ATC": {
-        "category": "ATC",
-        "category_name": "가방외",
-        "current": {
-          "stock_price": 2909.6426799007445
-        },
-        "previous": {
-          "stock_price": 841.3746898263026
-        },
-        "yoy": 345.82008647079994
-      },
-      "BAG": {
-        "category": "BAG",
-        "category_name": "가방외",
-        "current": {
-          "stock_price": 9048.74441687345
-        },
-        "previous": {
-          "stock_price": 2493.042183622829
-        },
-        "yoy": 362.9599401211909
-      },
-      "HEA": {
-        "category": "HEA",
-        "category_name": "모자",
-        "current": {
-          "stock_price": 32386.692307692305
-        },
-        "previous": {
-          "stock_price": 11077.22828784119
-        },
-        "yoy": 292.3718051675547
-      },
-      "SHO": {
+      "신발": {
         "category": "SHO",
         "category_name": "신발",
         "current": {
-          "stock_price": 37253.52109181141
+          "stock_price": 34729.30597014925
         },
         "previous": {
-          "stock_price": 9780.555831265507
+          "stock_price": 38793.009950248765
         },
-        "yoy": 380.89370107906404
+        "yoy": 89.52464893724121
       },
-      "WTC": {
-        "category": "WTC",
-        "category_name": "가방외",
+      "모자": {
+        "category": "HEA",
+        "category_name": "모자",
         "current": {
-          "stock_price": 467.9305210918114
+          "stock_price": 26439.542288557215
         },
         "previous": {
-          "stock_price": 102.15136476426798
+          "stock_price": 25077.604477611945
         },
-        "yoy": 458.0756431122015
+        "yoy": 105.43089277989507
       },
-      "BOT": {
-        "category": "BOT",
-        "category_name": "가방외",
+      "가방": {
+        "category": "BAG",
+        "category_name": "가방",
         "current": {
-          "stock_price": 15986.26799007444
+          "stock_price": 8052.73880597015
         },
         "previous": {
-          "stock_price": 4964.379652605459
+          "stock_price": 11165.544776119403
         },
-        "yoy": 322.01944872778523
+        "yoy": 72.12132473099882
+      },
+      "기타ACC": {
+        "category": "기타ACC",
+        "category_name": "기타ACC",
+        "current": {
+          "stock_price": 2264.781094527363
+        },
+        "previous": {
+          "stock_price": 2987.6592039801
+        },
+        "yoy": 75.804532575545
       }
     },
     "past_season_fw": {
       "total": {
-        "current": 25713.047146401983,
-        "previous": 9231.76923076923,
-        "yoy": 278.5278369036903
+        "current": 25777.00995024876,
+        "previous": 35240.8631840796,
+        "yoy": 73.14522863870647
       },
       "by_year": {
-        "1년차": {
+        "3년차 이상": {
           "current": {
-            "stock_price": 12264.119106699745
+            "stock_price": -1.5870646766169156
           },
           "previous": {
-            "stock_price": 6940.831265508686
+            "stock_price": 1.6592039800995027
           },
-          "yoy": 176.69524928007198,
+          "yoy": -95.65217391304348
+        },
+        "1년차": {
+          "current": {
+            "stock_price": 12294.62686567165
+          },
+          "previous": {
+            "stock_price": 26412.298507462692
+          },
+          "yoy": 46.548871398670016,
           "subcategory_top5": [
             {
               "subcategory_code": "MT",
               "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 3321.235732009925,
-              "yoy": 359.00435861329044
+              "stock_price": 3329.497512437811,
+              "yoy": 71.33021570273257
             },
             {
               "subcategory_code": "PT",
               "subcategory_name": "PANTS",
-              "stock_price": 1204.848635235732,
-              "yoy": 166.1263172300534
+              "stock_price": 1207.8457711442788,
+              "yoy": 73.85772826420938
             },
             {
               "subcategory_code": "HD",
               "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 1153.223325062035,
-              "yoy": 231.5559497177478
+              "stock_price": 1156.0920398009953,
+              "yoy": 97.93446858188055
             },
             {
               "subcategory_code": "KC",
               "subcategory_name": "Knit Cardigan",
-              "stock_price": 1002.4789081885856,
-              "yoy": 378.8508786736436
+              "stock_price": 1004.9726368159205,
+              "yoy": 87.79571364618239
             },
             {
               "subcategory_code": "TR",
               "subcategory_name": "T/SHIRTS",
-              "stock_price": 877.8163771712159,
-              "yoy": 184.93290327302384
+              "stock_price": 880.0000000000001,
+              "yoy": 57.952780671922
             },
             {
               "subcategory_code": "JP",
               "subcategory_name": "JUMPER",
-              "stock_price": 765.2034739454094,
-              "yoy": 61.46923219521725
+              "stock_price": 767.1069651741294,
+              "yoy": 22.937805200069917
             },
             {
               "subcategory_code": "DJ",
               "subcategory_name": "JUMPER",
-              "stock_price": 460.53846153846155,
-              "yoy": 101.4058265582656
+              "stock_price": 461.68407960199005,
+              "yoy": 55.400601177878805
             }
           ],
           "others": {
-            "stock_price": 3478.774193548387,
-            "yoy": 165.79206603556037,
+            "stock_price": 3487.4278606965177,
+            "yoy": 34.70580007748455,
             "subcategory_top5": [
               {
                 "subcategory_code": "HT",
                 "subcategory_name": "Hat",
-                "stock_price": 302.81637717121583,
-                "yoy": 152.82265133869313
+                "stock_price": 303.56965174129357,
+                "yoy": 21.827668114272633
               },
               {
                 "subcategory_code": "WJ",
                 "subcategory_name": "Windbreaker",
-                "stock_price": 298.2853598014888,
-                "yoy": 138.83191278035713
+                "stock_price": 299.02736318407966,
+                "yoy": 55.19313856481036
               },
               {
                 "subcategory_code": "TS",
                 "subcategory_name": "T/SHIRTS",
-                "stock_price": 297.77171215880895,
-                "yoy": 232.3009020868017
+                "stock_price": 298.51243781094524,
+                "yoy": 50.18127684130853
               },
               {
                 "subcategory_code": "DK",
                 "subcategory_name": "DENIM JACKET",
-                "stock_price": 277.3225806451613,
-                "yoy": 318.6706965869237
+                "stock_price": 278.0124378109453,
+                "yoy": 54.14383644599472
               },
               {
                 "subcategory_code": "KP",
                 "subcategory_name": "Sweater Pullover",
-                "stock_price": 253.60545905707195,
-                "yoy": 179.7576333192627
+                "stock_price": 254.23631840796023,
+                "yoy": 44.32758074799512
               }
             ]
           }
         },
         "2년차": {
           "current": {
-            "stock_price": 13450.511166253107
+            "stock_price": 13483.970149253724
           },
           "previous": {
-            "stock_price": 2289.2828784119106
+            "stock_price": 8826.905472636814
           },
-          "yoy": 587.5425572388768,
+          "yoy": 152.75987933771006,
           "subcategory_top5": [
             {
               "subcategory_code": "JP",
               "subcategory_name": "JUMPER",
-              "stock_price": 2543.8833746898263,
-              "yoy": 3427.5660314276165
+              "stock_price": 2550.2114427860697,
+              "yoy": 3074.294539238912
             },
             {
               "subcategory_code": "MT",
               "subcategory_name": "SWEAT SHIRTS",
-              "stock_price": 2396.6178660049623,
-              "yoy": 542.5776224797622
+              "stock_price": 2402.5796019900504,
+              "yoy": 134.36890907699694
             },
             {
               "subcategory_code": "BQ",
               "subcategory_name": "Shoulder Bag",
-              "stock_price": 944.9652605459057,
+              "stock_price": 947.31592039801,
               "yoy": 0
             },
             {
               "subcategory_code": "PT",
               "subcategory_name": "PANTS",
-              "stock_price": 875.1588089330024,
-              "yoy": 287.38388579251
+              "stock_price": 877.3358208955224,
+              "yoy": 143.993483958944
             },
             {
               "subcategory_code": "TR",
               "subcategory_name": "T/SHIRTS",
-              "stock_price": 697.0794044665012,
-              "yoy": 1388.5083036773426
+              "stock_price": 698.8134328358209,
+              "yoy": 235.67761204047045
             },
             {
               "subcategory_code": "KC",
               "subcategory_name": "Knit Cardigan",
-              "stock_price": 648.9280397022333,
-              "yoy": 357.68036654585245
+              "stock_price": 650.542288557214,
+              "yoy": 95.91359201936477
             },
             {
               "subcategory_code": "HT",
               "subcategory_name": "Hat",
-              "stock_price": 628.7245657568238,
-              "yoy": 1915.8865784499058
+              "stock_price": 630.2885572139304,
+              "yoy": 1167.0935052970979
             }
           ],
           "others": {
-            "stock_price": 4715.153846153846,
-            "yoy": 401.08132409961775,
+            "stock_price": 4726.883084577115,
+            "yoy": 89.76078051250657,
             "subcategory_top5": [
               {
                 "subcategory_code": "OP",
                 "subcategory_name": "ONEPIECE",
-                "stock_price": 499.1389578163772,
-                "yoy": 14725.695461200587
+                "stock_price": 500.3805970149255,
+                "yoy": 1657.8999423061073
               },
               {
                 "subcategory_code": "DK",
                 "subcategory_name": "DENIM JACKET",
-                "stock_price": 436.8436724565757,
+                "stock_price": 437.9303482587065,
                 "yoy": 0
               },
               {
                 "subcategory_code": "HD",
                 "subcategory_name": "SWEAT SHIRTS",
-                "stock_price": 421.8163771712159,
-                "yoy": 149.96559450923655
+                "stock_price": 422.8656716417911,
+                "yoy": 49.401056651148195
               },
               {
                 "subcategory_code": "DR",
                 "subcategory_name": "DENIM SHIRT",
-                "stock_price": 373.24317617866,
+                "stock_price": 374.1716417910448,
                 "yoy": 0
               },
               {
                 "subcategory_code": "CP",
                 "subcategory_name": "CAP",
-                "stock_price": 332.6004962779156,
-                "yoy": 260.891060202036
+                "stock_price": 333.42786069651737,
+                "yoy": 120.09389755490048
               }
             ]
           }
-        },
-        "3년차 이상": {
-          "current": {
-            "stock_price": -1.5831265508684862
-          },
-          "previous": {
-            "stock_price": 1.6550868486352355
-          },
-          "yoy": -95.65217391304348
         }
       }
     },
@@ -3631,16 +3609,16 @@
       "fw": {
         "by_year": {
           "1년차": {
-            "current": 2020.3119461183976,
-            "previous": 3778.745125841899,
-            "yoy": 53.465155199327576,
-            "change": -1758.4331797235018
+            "current": 2025.3375977256578,
+            "previous": 3788.1449893390172,
+            "yoy": 53.465155199327604,
+            "change": -1762.8073916133596
           },
           "2년차": {
-            "current": 1902.6515420063804,
-            "previous": 786.3712631454567,
-            "yoy": 241.95334076627398,
-            "change": 1116.2802788609235
+            "current": 1907.3845060412225,
+            "previous": 788.3274105662167,
+            "yoy": 241.95334076627404,
+            "change": 1119.057095475006
           },
           "3년차_이상": {
             "current": 0.0,
@@ -3651,60 +3629,273 @@
         }
       },
       "ss": {
-        "current": 806.0404112017018,
-        "previous": 528.1862223797707,
-        "yoy": 152.60534581346036
+        "current": 808.0454868514574,
+        "previous": 529.5001184553424,
+        "yoy": 152.6053458134603
       }
     }
   },
   "acc_sales_data": {
     "current": {
       "total": {
-        "net_sales": 218177.4784355428,
-        "gross_sales": 252362.04655559492
+        "net_sales": 7155982.942430707,
+        "gross_sales": 8823276.474769017
       },
       "categories": {
         "신발": {
-          "net_sales": 29914.68746307455,
-          "gross_sales": 33167.90736145574
+          "net_sales": 3304776.119402986,
+          "gross_sales": 4312461.502013741
         },
         "모자": {
-          "net_sales": 13109.771948481624,
-          "gross_sales": 13779.983457402808
+          "net_sales": 2904572.139303484,
+          "gross_sales": 3250741.530443023
         },
         "가방": {
-          "net_sales": 146578.99090157147,
-          "gross_sales": 171000.8271298594
+          "net_sales": 719095.2380952386,
+          "gross_sales": 986685.6195214407
         },
         "기타ACC": {
-          "net_sales": 28574.028122415217,
-          "gross_sales": 34413.32860687698
+          "net_sales": 227539.44562899787,
+          "gross_sales": 273387.8227908079
         }
       }
     },
     "previous": {
       "total": {
-        "net_sales": 0,
-        "gross_sales": 0
+        "net_sales": 6233571.191660741,
+        "gross_sales": 7510774.697938883
       },
       "categories": {
         "신발": {
-          "net_sales": 0,
-          "gross_sales": 0
+          "net_sales": 2979661.2177209184,
+          "gross_sales": 3755970.1492537307
         },
         "모자": {
-          "net_sales": 0,
-          "gross_sales": 0
+          "net_sales": 2465825.159914712,
+          "gross_sales": 2782418.858090501
         },
         "가방": {
-          "net_sales": 0,
-          "gross_sales": 0
+          "net_sales": 576547.5005922768,
+          "gross_sales": 727211.5612414124
         },
         "기타ACC": {
-          "net_sales": 0,
-          "gross_sales": 0
+          "net_sales": 211537.31343283577,
+          "gross_sales": 245174.12935323393
         }
       }
+    }
+  },
+  "tag_ytd_sales": {
+    "25F": {
+      "current": {
+        "gross_sales": 111184160.0,
+        "stock_price": 130576560.0
+      },
+      "previous": {
+        "gross_sales": 102711270.0,
+        "stock_price": 112988020.0
+      },
+      "yoy": 108.2
+    },
+    "25S": {
+      "current": {
+        "gross_sales": 108876511.0,
+        "stock_price": 79879840.0
+      },
+      "previous": {
+        "gross_sales": 113542900.0,
+        "stock_price": 98493500.0
+      },
+      "yoy": 95.9
+    },
+    "과시즌F": {
+      "current": {
+        "gross_sales": 130547220.0,
+        "stock_price": 103623580.0
+      },
+      "previous": {
+        "gross_sales": 113965220.0,
+        "stock_price": 141668270.0
+      },
+      "yoy": 114.6
+    },
+    "과시즌S": {
+      "current": {
+        "gross_sales": 72897610.0,
+        "stock_price": 50295140.0
+      },
+      "previous": {
+        "gross_sales": 69517620.0,
+        "stock_price": 54615130.0
+      },
+      "yoy": 104.9
+    },
+    "신발": {
+      "current": {
+        "gross_sales": 187078290.0,
+        "stock_price": 139611810.0
+      },
+      "previous": {
+        "gross_sales": 193660090.0,
+        "stock_price": 155947900.0
+      },
+      "yoy": 96.6
+    },
+    "모자": {
+      "current": {
+        "gross_sales": 163966657.0,
+        "stock_price": 106286960.0
+      },
+      "previous": {
+        "gross_sales": 129429513.0,
+        "stock_price": 100811970.0
+      },
+      "yoy": 126.7
+    },
+    "가방": {
+      "current": {
+        "gross_sales": 41979230.0,
+        "stock_price": 32372010.0
+      },
+      "previous": {
+        "gross_sales": 41036940.0,
+        "stock_price": 44885490.0
+      },
+      "yoy": 102.3
+    },
+    "기타ACC": {
+      "current": {
+        "gross_sales": 11723950.0,
+        "stock_price": 9104420.0
+      },
+      "previous": {
+        "gross_sales": 10011490.0,
+        "stock_price": 12010390.0
+      },
+      "yoy": 117.1
+    }
+  },
+  "season_sales_detail": {
+    "25F": {
+      "current": {
+        "gross_sales": 27657.7512437811,
+        "gross_sales_twd": 111184160.0
+      },
+      "previous": {
+        "gross_sales": 25550.06716417911,
+        "gross_sales_twd": 102711270.0
+      },
+      "yoy": 108.2
+    },
+    "25S": {
+      "current": {
+        "gross_sales": 27083.709203980103,
+        "gross_sales_twd": 108876511.0
+      },
+      "previous": {
+        "gross_sales": 28244.50248756219,
+        "gross_sales_twd": 113542900.0
+      },
+      "yoy": 95.9
+    },
+    "과시즌F": {
+      "current": {
+        "gross_sales": 32474.4328358209,
+        "gross_sales_twd": 130547220.0
+      },
+      "previous": {
+        "gross_sales": 28349.55721393035,
+        "gross_sales_twd": 113965220.0
+      },
+      "yoy": 114.6
+    },
+    "과시즌F_1년차(24F)": {
+      "current": {
+        "gross_sales": 16176.527363184081,
+        "gross_sales_twd": 65029640.0
+      },
+      "previous": {
+        "gross_sales": 19646.671641791047,
+        "gross_sales_twd": 78979620.0
+      },
+      "yoy": 82.3
+    },
+    "과시즌F_2년차(23F)": {
+      "current": {
+        "gross_sales": 12364.233830845773,
+        "gross_sales_twd": 49704220.0
+      },
+      "previous": {
+        "gross_sales": 8432.79104477612,
+        "gross_sales_twd": 33899820.0
+      },
+      "yoy": 146.6
+    },
+    "과시즌F_3년차(22F)": {
+      "current": {
+        "gross_sales": 3933.671641791045,
+        "gross_sales_twd": 15813360.0
+      },
+      "previous": {
+        "gross_sales": 270.0945273631841,
+        "gross_sales_twd": 1085780.0
+      },
+      "yoy": 1456.4
+    },
+    "과시즌S": {
+      "current": {
+        "gross_sales": 18133.733830845773,
+        "gross_sales_twd": 72897610.0
+      },
+      "previous": {
+        "gross_sales": 17292.940298507463,
+        "gross_sales_twd": 69517620.0
+      },
+      "yoy": 104.9
+    },
+    "신발": {
+      "current": {
+        "gross_sales": 46536.8880597015,
+        "gross_sales_twd": 187078290.0
+      },
+      "previous": {
+        "gross_sales": 48174.151741293535,
+        "gross_sales_twd": 193660090.0
+      },
+      "yoy": 96.6
+    },
+    "모자": {
+      "current": {
+        "gross_sales": 40787.72562189055,
+        "gross_sales_twd": 163966657.0
+      },
+      "previous": {
+        "gross_sales": 32196.39626865672,
+        "gross_sales_twd": 129429513.0
+      },
+      "yoy": 126.7
+    },
+    "가방": {
+      "current": {
+        "gross_sales": 10442.594527363186,
+        "gross_sales_twd": 41979230.0
+      },
+      "previous": {
+        "gross_sales": 10208.194029850747,
+        "gross_sales_twd": 41036940.0
+      },
+      "yoy": 102.3
+    },
+    "기타ACC": {
+      "current": {
+        "gross_sales": 2916.4054726368163,
+        "gross_sales_twd": 11723950.0
+      },
+      "previous": {
+        "gross_sales": 2490.4203980099505,
+        "gross_sales_twd": 10011490.0
+      },
+      "yoy": 117.1
     }
   }
 }
