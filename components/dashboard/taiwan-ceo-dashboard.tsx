@@ -2569,11 +2569,20 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           return (
                             <div className="space-y-1">
                               {expenseItems.filter(item => {
-                                const current = (expenseDetail as any)[item.key] || 0;
+                                let current = (expenseDetail as any)[item.key] || 0;
+                                // 지급수수료인 경우 기타 수수료 포함
+                                if (item.key === 'fee') {
+                                  current += (expenseDetail as any).other_fee || 0;
+                                }
                                 return current !== 0; // 0이 아닌 항목만 표시
                               }).map((item) => {
-                                const current = (expenseDetail as any)[item.key] || 0;
-                                const previous = (expenseDetailPrev as any)[item.key] || 0;
+                                let current = (expenseDetail as any)[item.key] || 0;
+                                let previous = (expenseDetailPrev as any)[item.key] || 0;
+                                // 지급수수료인 경우 기타 수수료 포함
+                                if (item.key === 'fee') {
+                                  current += (expenseDetail as any).other_fee || 0;
+                                  previous += (expenseDetailPrev as any).other_fee || 0;
+                                }
                                 // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
                                 let yoy = 0;
                                 let showYoy = false;
@@ -2630,7 +2639,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                       </button>
                                       {showOtherDetail && hasOtherDetail && (
                                         <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                          {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
+                                          {Object.entries(otherDetail).filter(([key]) => key !== 'other_fee').map(([key, value]: [string, any]) => {
                                             if (value === 0) return null;
                                             const prevValue = (otherDetailPrev as any)[key] || 0;
                                             let detailYoy = 0;
@@ -2686,11 +2695,29 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         return (
                           <div className="space-y-1">
                             {expenseItems.filter(item => {
-                              const current = (expenseDetail as any)[item.key] || 0;
+                              let current = (expenseDetail as any)[item.key] || 0;
+                              // 지급수수료인 경우 기타 수수료 포함 (other_detail 안에 있음)
+                              if (item.key === 'fee') {
+                                current += (expenseDetail as any)?.other_detail?.other_fee || 0;
+                              }
+                              // 기타 항목인 경우 기타 수수료 제외 (지급수수료에 포함되었으므로)
+                              if (item.key === 'other') {
+                                current -= (expenseDetail as any)?.other_detail?.other_fee || 0;
+                              }
                               return current !== 0; // 0이 아닌 항목만 표시
                             }).map((item) => {
-                              const current = (expenseDetail as any)[item.key] || 0;
-                              const previous = (expenseDetailPrev as any)[item.key] || 0;
+                              let current = (expenseDetail as any)[item.key] || 0;
+                              let previous = (expenseDetailPrev as any)[item.key] || 0;
+                              // 지급수수료인 경우 기타 수수료 포함 (other_detail 안에 있음)
+                              if (item.key === 'fee') {
+                                current += (expenseDetail as any)?.other_detail?.other_fee || 0;
+                                previous += (expenseDetailPrev as any)?.other_detail?.other_fee || 0;
+                              }
+                              // 기타 항목인 경우 기타 수수료 제외 (지급수수료에 포함되었으므로)
+                              if (item.key === 'other') {
+                                current -= (expenseDetail as any)?.other_detail?.other_fee || 0;
+                                previous -= (expenseDetailPrev as any)?.other_detail?.other_fee || 0;
+                              }
                               const yoy = previous > 0 ? ((current / previous) * 100) : 0;
                               const colorClass = yoy >= 100 ? 'text-red-600' : 'text-green-600';
                               
@@ -2734,7 +2761,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                     </button>
                                     {showOtherDetail && hasOtherDetail && (
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                        {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
+                                        {Object.entries(otherDetail).filter(([key]) => key !== 'other_fee').map(([key, value]: [string, any]) => {
                                           if (value === 0) return null;
                                           const prevValue = (otherDetailPrev as any)[key] || 0;
                                           const detailYoy = prevValue > 0 ? ((value / prevValue) * 100) : 0;
@@ -2861,11 +2888,24 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         return (
                           <div className="space-y-1">
                             {expenseItems.filter(item => {
-                              const current = (expenseDetail as any)[item.key] || 0;
+                              let current = (expenseDetail as any)[item.key] || 0;
+                              // 지급수수료인 경우 기타 수수료 포함 (other_detail 안에 있음)
+                              if (item.key === 'fee') {
+                                current += (expenseDetail as any)?.other_detail?.other_fee || 0;
+                              }
+                              // 기타 항목인 경우 기타 수수료 제외 (지급수수료에 포함되었으므로)
+                              if (item.key === 'other') {
+                                current -= (expenseDetail as any)?.other_detail?.other_fee || 0;
+                              }
                               return current !== 0; // 0이 아닌 항목만 표시
                             }).map((item) => {
-                              const current = (expenseDetail as any)[item.key] || 0;
-                              const previous = (expenseDetailPrev as any)[item.key] || 0;
+                              let current = (expenseDetail as any)[item.key] || 0;
+                              let previous = (expenseDetailPrev as any)[item.key] || 0;
+                              // 지급수수료인 경우 기타 수수료 포함 (other_detail 안에 있음)
+                              if (item.key === 'fee') {
+                                current += (expenseDetail as any)?.other_detail?.other_fee || 0;
+                                previous += (expenseDetailPrev as any)?.other_detail?.other_fee || 0;
+                              }
                               // YOY 계산: previous가 0이 아니면 계산 (음수도 포함)
                               let yoy = 0;
                               let showYoy = false;
@@ -2943,7 +2983,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                                     </button>
                                     {(showOtherDetailCumulative && otherDetail && Object.keys(otherDetail).length > 0) && (
                                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-2">
-                                        {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
+                                        {Object.entries(otherDetail).filter(([key]) => key !== 'other_fee').map(([key, value]: [string, any]) => {
                                           if (value === 0) return null;
                                           const prevValue = (otherDetailPrev as any)[key] || 0;
                                           let detailYoy = 0;
@@ -9123,10 +9163,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   // 기타 직접비 상세 항목 (매장별 데이터에서 합산)
                   // 운반비는 물류비 카드에서 별도 표시하므로 제외
                   const storesForOther = plData?.channel_direct_profit?.stores || {};
+                  const otherFeeValue = Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.other_fee || 0), 0);
+                  const feeValue = Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.fee || 0), 0);
                   const otherDetailItems = {
-                    other_fee: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.other_fee || 0), 0),
                     marketing: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.marketing || 0), 0),
-                    fee: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.fee || 0), 0),
+                    fee: feeValue + otherFeeValue, // 기타 수수료를 지급수수료에 합산
                     depreciation: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.depreciation || 0), 0),
                     maintenance: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.maintenance || 0), 0),
                     insurance: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.insurance || 0), 0),
@@ -9137,9 +9178,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     uniform: Object.values(storesForOther).reduce((sum: number, store: any) => sum + (store.uniform || 0), 0)
                   };
                   
-                  // 한글 라벨 매핑 및 내림차순 정렬 (운반비 제외)
+                  // 한글 라벨 매핑 및 내림차순 정렬 (운반비 제외, 기타 수수료는 지급수수료에 포함)
                   const otherItems = [
-                    { label: '기타 수수료', value: otherDetailItems.other_fee },
                     { label: '광고선전비', value: otherDetailItems.marketing },
                     { label: '지급수수료', value: otherDetailItems.fee },
                     { label: '감가상각비', value: otherDetailItems.depreciation },
@@ -9238,10 +9278,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   // 기타 직접비 상세 항목 (CSV에서 계산된 실제 누적 데이터)
                   // 운반비는 물류비 카드에서 별도 표시하므로 제외
                   const cumulativeStoresForOther = plData?.channel_direct_profit?.cumulative_stores || {};
+                  const cumulativeOtherFeeValue = Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.other_fee || 0), 0);
+                  const cumulativeFeeValue = Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.fee || 0), 0);
                   const otherDetailItemsCumulative = {
-                    other_fee: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.other_fee || 0), 0),
                     marketing: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.marketing || 0), 0),
-                    fee: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.fee || 0), 0),
+                    fee: cumulativeFeeValue + cumulativeOtherFeeValue, // 기타 수수료를 지급수수료에 합산
                     depreciation: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.depreciation || 0), 0),
                     maintenance: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.maintenance || 0), 0),
                     insurance: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.insurance || 0), 0),
@@ -9252,9 +9293,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     uniform: Object.values(cumulativeStoresForOther).reduce((sum: number, store: any) => sum + (store.uniform || 0), 0)
                   };
                   
-                  // 한글 라벨 매핑 및 내림차순 정렬 (운반비 제외)
+                  // 한글 라벨 매핑 및 내림차순 정렬 (운반비 제외, 기타 수수료는 지급수수료에 포함)
                   const otherItems = [
-                    { label: '기타 수수료', value: otherDetailItemsCumulative.other_fee },
                     { label: '광고선전비', value: otherDetailItemsCumulative.marketing },
                     { label: '지급수수료', value: otherDetailItemsCumulative.fee },
                     { label: '감가상각비', value: otherDetailItemsCumulative.depreciation },
@@ -9413,10 +9453,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             )}
           </div>
 
-          {/* 급여 (본사) */}
+          {/* 급여 */}
           <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold text-gray-700">급여 (본사)</div>
+              <div className="text-sm font-semibold text-gray-700">급여</div>
               <div className="text-xs font-bold px-2 py-1 rounded bg-blue-100 text-blue-700">
                 {opexType}
               </div>
@@ -9712,21 +9752,31 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(pl?.expense_detail?.fee)}K</div>
-                <div className={`text-xs mb-3 ${(plYoy?.sg_a || 0) >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
-                  YOY {formatPercent((pl?.expense_detail?.fee || 0) / (plData?.prev_month?.total?.expense_detail?.fee || 1) * 100)}% ({((pl?.expense_detail?.fee || 0) - (plData?.prev_month?.total?.expense_detail?.fee || 0)) >= 0 ? '+' : ''}{formatNumber((pl?.expense_detail?.fee || 0) - (plData?.prev_month?.total?.expense_detail?.fee || 0))}K)
-                </div>
-                
-                <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">{formatPercent(((pl?.expense_detail?.fee || 0) / (pl?.sg_a || 1)) * 100, 1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">{formatPercent(((pl?.expense_detail?.fee || 0) / (pl?.net_sales || 1)) * 100, 1)}%</span>
-                  </div>
-                </div>
+                {(() => {
+                  const feeValue = (pl?.expense_detail?.fee || 0) + (pl?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 포함 (other_detail 안에 있음)
+                  const feePrev = (plData?.prev_month?.total?.expense_detail?.fee || 0) + (plData?.prev_month?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 포함
+                  const feeYoy = feePrev > 0 ? (feeValue / feePrev * 100) : 0;
+                  const feeChange = feeValue - feePrev;
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(feeValue)}K</div>
+                      <div className={`text-xs mb-3 ${feeYoy >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
+                        YOY {formatPercent(feeYoy)}% ({feeChange >= 0 ? '+' : ''}{formatNumber(feeChange)}K)
+                      </div>
+                      
+                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">전체 영업비 중</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatPercent((feeValue / (pl?.sg_a || 1)) * 100, 1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">매출대비율</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatPercent((feeValue / (pl?.net_sales || 1)) * 100, 1)}%</span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* 당월 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">
@@ -9746,8 +9796,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const prevMonthData = plData?.prev_month?.total;
                     const expenseDetail = currentMonthData?.expense_detail || {};
                     const expenseDetailPrev = prevMonthData?.expense_detail || {};
-                    const current = (expenseDetail as any).fee || 0;
-                    const prev = (expenseDetailPrev as any).fee || 0;
+                    const current = ((expenseDetail as any).fee || 0) + ((expenseDetail as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함 (other_detail 안에 있음)
+                    const prev = ((expenseDetailPrev as any).fee || 0) + ((expenseDetailPrev as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
@@ -9782,21 +9832,31 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(plData?.cumulative?.total?.expense_detail?.fee)}K</div>
-                <div className={`text-xs mb-3 ${((plData?.cumulative?.total?.expense_detail?.fee || 0) / (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.fee || 1) * 100) >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
-                  YOY {formatPercent((plData?.cumulative?.total?.expense_detail?.fee || 0) / (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.fee || 1) * 100)}% ({((plData?.cumulative?.total?.expense_detail?.fee || 0) - (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.fee || 0)) >= 0 ? '+' : ''}{formatNumber((plData?.cumulative?.total?.expense_detail?.fee || 0) - (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.fee || 0))}K)
-                </div>
-                
-                <div className="border-t pt-3 space-y-1.5 border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">전체 영업비 중</span>
-                    <span className="text-xs font-semibold text-gray-800">{formatPercent(((plData?.cumulative?.total?.expense_detail?.fee || 0) / (plData?.cumulative?.total?.sg_a || 1)) * 100, 1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">매출대비율</span>
-                    <span className="text-xs font-semibold text-gray-800">{formatPercent(((plData?.cumulative?.total?.expense_detail?.fee || 0) / (plData?.cumulative?.total?.net_sales || 1)) * 100, 1)}%</span>
-                  </div>
-                </div>
+                {(() => {
+                  const cumulativeFeeValue = (plData?.cumulative?.total?.expense_detail?.fee || 0) + (plData?.cumulative?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 포함 (other_detail 안에 있음)
+                  const cumulativeFeePrev = (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.fee || 0) + (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 포함
+                  const cumulativeFeeYoy = cumulativeFeePrev > 0 ? (cumulativeFeeValue / cumulativeFeePrev * 100) : 0;
+                  const cumulativeFeeChange = cumulativeFeeValue - cumulativeFeePrev;
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(cumulativeFeeValue)}K</div>
+                      <div className={`text-xs mb-3 ${cumulativeFeeYoy >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
+                        YOY {formatPercent(cumulativeFeeYoy)}% ({cumulativeFeeChange >= 0 ? '+' : ''}{formatNumber(cumulativeFeeChange)}K)
+                      </div>
+                      
+                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">전체 영업비 중</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatPercent((cumulativeFeeValue / (plData?.cumulative?.total?.sg_a || 1)) * 100, 1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">매출대비율</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatPercent((cumulativeFeeValue / (plData?.cumulative?.total?.net_sales || 1)) * 100, 1)}%</span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* 누적 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">
@@ -9816,8 +9876,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
                     const expenseDetail = cumulativeData?.expense_detail || {};
                     const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
-                    const current = (expenseDetail as any).fee || 0;
-                    const prev = (expenseDetailPrev as any).fee || 0;
+                    const current = ((expenseDetail as any).fee || 0) + ((expenseDetail as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함 (other_detail 안에 있음)
+                    const prev = ((expenseDetailPrev as any).fee || 0) + ((expenseDetailPrev as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함
                     const change = current - prev;
                     const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
                     const currentSales = cumulativeData?.net_sales || 0;
@@ -9861,20 +9921,48 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
             
             {opexType === '당월' ? (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(pl?.expense_detail?.other)}K</div>
-                <div className={`text-xs mb-3 ${(plYoy?.sg_a || 0) >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
-                  YOY {formatPercent((pl?.expense_detail?.other || 0) / (plData?.prev_month?.total?.expense_detail?.other || 1) * 100)}% ({((pl?.expense_detail?.other || 0) - (plData?.prev_month?.total?.expense_detail?.other || 0)) >= 0 ? '+' : ''}{formatNumber((pl?.expense_detail?.other || 0) - (plData?.prev_month?.total?.expense_detail?.other || 0))}K)
-                </div>
+                {(() => {
+                  const otherValue = (pl?.expense_detail?.other || 0) - (pl?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 제외
+                  const otherPrev = (plData?.prev_month?.total?.expense_detail?.other || 0) - (plData?.prev_month?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 제외
+                  const otherYoy = otherPrev > 0 ? (otherValue / otherPrev * 100) : 0;
+                  const otherChange = otherValue - otherPrev;
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(otherValue)}K</div>
+                      <div className={`text-xs mb-3 ${otherYoy >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
+                        YOY {formatPercent(otherYoy)}% ({otherChange >= 0 ? '+' : ''}{formatNumber(otherChange)}K)
+                      </div>
+                    </>
+                  );
+                })()}
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   {(() => {
-                    const otherItems = [
-                      { label: '운반비', value: pl?.expense_detail?.other_detail?.logistics || 0 },
-                      { label: '임차료', value: pl?.expense_detail?.rent || 0 },
-                      { label: '감가상각비', value: pl?.expense_detail?.other_detail?.depreciation || 0 },
-                      { label: '여비교통비', value: pl?.expense_detail?.travel || 0 },
-                      { label: '보험료', value: pl?.expense_detail?.insurance || 0 }
-                    ].sort((a, b) => b.value - a.value);
+                    const otherDetail = pl?.expense_detail?.other_detail || {};
+                    const otherDetailLabels: {[key: string]: string} = {
+                      'logistics': '운반비',
+                      'maintenance': '유지보수비',
+                      'supplies': '소모품비',
+                      'utilities': '수도광열비',
+                      'communication': '통신비',
+                      'uniform': '피복비(유니폼)',
+                      'depreciation': '감가상각비',
+                      'duty_free': '면세점 직접비',
+                      'govt_license': '정부세금 및 라이센스',
+                      'rent_free': '임대료 면제/할인',
+                      'retirement': '퇴직연금',
+                      'transport': '운반비(기타)',
+                      'var_rent': '매출연동 임대료',
+                      'bonus': '최종지급금'
+                    };
+                    const otherItems = Object.entries(otherDetail)
+                      .filter(([key]) => key !== 'other_fee') // 기타 수수료 제외
+                      .map(([key, value]: [string, any]) => ({
+                        label: otherDetailLabels[key] || key,
+                        value: value || 0
+                      }))
+                      .filter(item => item.value > 0)
+                      .sort((a, b) => b.value - a.value);
                     
                     return otherItems.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center">
@@ -9905,12 +9993,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const expenseDetailPrev = prevMonthData?.expense_detail || {};
                     const current = (expenseDetail as any).other || 0;
                     const prev = (expenseDetailPrev as any).other || 0;
-                    const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    // 기타 수수료는 지급수수료에 포함되었으므로 기타에서 제외
+                    const currentAdjusted = current - ((expenseDetail as any)?.other_detail?.other_fee || 0);
+                    const prevAdjusted = prev - ((expenseDetailPrev as any)?.other_detail?.other_fee || 0);
+                    const change = currentAdjusted - prevAdjusted;
+                    const changeRate = prevAdjusted !== 0 ? (change / prevAdjusted) * 100 : 0;
                     const currentSales = currentMonthData?.net_sales || 0;
                     const prevSales = prevMonthData?.net_sales || 0;
-                    const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
-                    const prevRatio = prevSales !== 0 ? (prev / prevSales) * 100 : 0;
+                    const currentRatio = currentSales !== 0 ? (currentAdjusted / currentSales) * 100 : 0;
+                    const prevRatio = prevSales !== 0 ? (prevAdjusted / prevSales) * 100 : 0;
                     const ratioChange = currentRatio - prevRatio;
 
                     // other_detail 분석
@@ -9945,10 +10036,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                             <span className="text-pink-600 mr-1">•</span>
                             <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
                           </div>
-                          {Object.keys(otherDetail).length > 0 && (
+                          {Object.keys(otherDetail).filter(key => key !== 'other_fee').length > 0 && (
                             <>
                               <div className="font-semibold text-pink-800 mb-1 mt-2">상세 항목:</div>
-                              {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
+                              {Object.entries(otherDetail).filter(([key]) => key !== 'other_fee').map(([key, value]: [string, any]) => {
                                 const prevValue = (otherDetailPrev as any)[key] || 0;
                                 if (value === 0 && prevValue === 0) return null;
                                 const itemChange = value - prevValue;
@@ -9977,20 +10068,48 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(plData?.cumulative?.total?.expense_detail?.other)}K</div>
-                <div className={`text-xs mb-3 ${((plData?.cumulative?.total?.expense_detail?.other || 0) / (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other || 1) * 100) >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
-                  YOY {formatPercent((plData?.cumulative?.total?.expense_detail?.other || 0) / (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other || 1) * 100)}% ({((plData?.cumulative?.total?.expense_detail?.other || 0) - (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other || 0)) >= 0 ? '+' : ''}{formatNumber((plData?.cumulative?.total?.expense_detail?.other || 0) - (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other || 0))}K)
-                </div>
+                {(() => {
+                  const cumulativeOtherValue = (plData?.cumulative?.total?.expense_detail?.other || 0) - (plData?.cumulative?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 제외
+                  const cumulativeOtherPrev = (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other || 0) - (plData?.cumulative?.prev_cumulative?.total?.expense_detail?.other_detail?.other_fee || 0); // 기타 수수료 제외
+                  const cumulativeOtherYoy = cumulativeOtherPrev > 0 ? (cumulativeOtherValue / cumulativeOtherPrev * 100) : 0;
+                  const cumulativeOtherChange = cumulativeOtherValue - cumulativeOtherPrev;
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(cumulativeOtherValue)}K</div>
+                      <div className={`text-xs mb-3 ${cumulativeOtherYoy >= 100 ? 'text-red-600' : 'text-blue-600'}`}>
+                        YOY {formatPercent(cumulativeOtherYoy)}% ({cumulativeOtherChange >= 0 ? '+' : ''}{formatNumber(cumulativeOtherChange)}K)
+                      </div>
+                    </>
+                  );
+                })()}
                 
                 <div className="border-t pt-3 space-y-1.5 border-gray-200">
                   {(() => {
-                    const otherItems = [
-                      { label: '운반비', value: plData?.cumulative?.total?.expense_detail?.other_detail?.logistics || 0 },
-                      { label: '임차료', value: plData?.cumulative?.total?.expense_detail?.rent || 0 },
-                      { label: '감가상각비', value: plData?.cumulative?.total?.expense_detail?.other_detail?.depreciation || 0 },
-                      { label: '여비교통비', value: plData?.cumulative?.total?.expense_detail?.travel || 0 },
-                      { label: '보험료', value: plData?.cumulative?.total?.expense_detail?.insurance || 0 }
-                    ].sort((a, b) => b.value - a.value);
+                    const otherDetail = plData?.cumulative?.total?.expense_detail?.other_detail || {};
+                    const otherDetailLabels: {[key: string]: string} = {
+                      'logistics': '운반비',
+                      'maintenance': '유지보수비',
+                      'supplies': '소모품비',
+                      'utilities': '수도광열비',
+                      'communication': '통신비',
+                      'uniform': '피복비(유니폼)',
+                      'depreciation': '감가상각비',
+                      'duty_free': '면세점 직접비',
+                      'govt_license': '정부세금 및 라이센스',
+                      'rent_free': '임대료 면제/할인',
+                      'retirement': '퇴직연금',
+                      'transport': '운반비(기타)',
+                      'var_rent': '매출연동 임대료',
+                      'bonus': '최종지급금'
+                    };
+                    const otherItems = Object.entries(otherDetail)
+                      .filter(([key]) => key !== 'other_fee') // 기타 수수료 제외
+                      .map(([key, value]: [string, any]) => ({
+                        label: otherDetailLabels[key] || key,
+                        value: value || 0
+                      }))
+                      .filter(item => item.value > 0)
+                      .sort((a, b) => b.value - a.value);
                     
                     return otherItems.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center">
@@ -10021,12 +10140,15 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
                     const current = (expenseDetail as any).other || 0;
                     const prev = (expenseDetailPrev as any).other || 0;
-                    const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
+                    // 기타 수수료는 지급수수료에 포함되었으므로 기타에서 제외
+                    const currentAdjusted = current - ((expenseDetail as any)?.other_detail?.other_fee || 0);
+                    const prevAdjusted = prev - ((expenseDetailPrev as any)?.other_detail?.other_fee || 0);
+                    const change = currentAdjusted - prevAdjusted;
+                    const changeRate = prevAdjusted !== 0 ? (change / prevAdjusted) * 100 : 0;
                     const currentSales = cumulativeData?.net_sales || 0;
                     const prevSales = prevCumulativeData?.net_sales || 0;
-                    const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
-                    const prevRatio = prevSales !== 0 ? (prev / prevSales) * 100 : 0;
+                    const currentRatio = currentSales !== 0 ? (currentAdjusted / currentSales) * 100 : 0;
+                    const prevRatio = prevSales !== 0 ? (prevAdjusted / prevSales) * 100 : 0;
                     const ratioChange = currentRatio - prevRatio;
 
                     // other_detail 분석
@@ -10061,10 +10183,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                             <span className="text-pink-600 mr-1">•</span>
                             <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
                           </div>
-                          {Object.keys(otherDetail).length > 0 && (
+                          {Object.keys(otherDetail).filter(key => key !== 'other_fee').length > 0 && (
                             <>
                               <div className="font-semibold text-pink-800 mb-1 mt-2">상세 항목:</div>
-                              {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
+                              {Object.entries(otherDetail).filter(([key]) => key !== 'other_fee').map(([key, value]: [string, any]) => {
                                 const prevValue = (otherDetailPrev as any)[key] || 0;
                                 if (value === 0 && prevValue === 0) return null;
                                 const itemChange = value - prevValue;
