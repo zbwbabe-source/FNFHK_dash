@@ -6,7 +6,7 @@ import HongKongStoreDashboard from '@/components/dashboard/hongkong-store-dashbo
 
 function HongKongStoresDashboardContent() {
   const searchParams = useSearchParams();
-  const period = searchParams.get('period') || '2511'; // 기본값 2511
+  const period = searchParams.get('period') || '2512'; // 기본값 2512
 
   return <HongKongStoreDashboard period={period} />;
 }

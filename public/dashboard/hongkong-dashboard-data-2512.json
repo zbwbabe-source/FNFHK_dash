@@ -3263,6 +3263,188 @@
         "previous": 628.119,
         "yoy": 135.91325847490683
       }
+    },
+    "by_tag": {
+      "26S": {
+        "current": {
+          "stock_price": 11239951.0
+        },
+        "previous": {
+          "stock_price": 6727521.0
+        },
+        "yoy": 167.1
+      },
+      "25F": {
+        "current": {
+          "stock_price": 40466005.0
+        },
+        "previous": {
+          "stock_price": 84298540.0
+        },
+        "yoy": 48.0
+      },
+      "25S": {
+        "current": {
+          "stock_price": 37580376.0
+        },
+        "previous": {
+          "stock_price": 45245997.0
+        },
+        "yoy": 83.1
+      },
+      "과시즌F": {
+        "current": {
+          "stock_price": 103256280.0
+        },
+        "previous": {
+          "stock_price": 75027764.0
+        },
+        "yoy": 137.6
+      },
+      "과시즌F_1년차(24F)": {
+        "current": {
+          "stock_price": 48604724.0
+        },
+        "previous": {
+          "stock_price": 50817043.0
+        },
+        "yoy": 95.6
+      },
+      "과시즌F_2년차(23F)": {
+        "current": {
+          "stock_price": 37242996.0
+        },
+        "previous": {
+          "stock_price": 22851936.0
+        },
+        "yoy": 163.0
+      },
+      "과시즌F_3년차(22F)": {
+        "current": {
+          "stock_price": 17408031.0
+        },
+        "previous": {
+          "stock_price": 1358785.0
+        },
+        "yoy": 1281.1
+      },
+      "과시즌F_4년차(21F)": {
+        "current": {
+          "stock_price": 529.0
+        },
+        "previous": {
+          "stock_price": 0.0
+        },
+        "yoy": 0.0
+      },
+      "과시즌S": {
+        "current": {
+          "stock_price": 53326440.0
+        },
+        "previous": {
+          "stock_price": 43080349.0
+        },
+        "yoy": 123.8
+      },
+      "과시즌S_1년차(24S)": {
+        "current": {
+          "stock_price": 27578609.0
+        },
+        "previous": {
+          "stock_price": 36909753.0
+        },
+        "yoy": 74.7
+      },
+      "과시즌S_2년차(23S)": {
+        "current": {
+          "stock_price": 22377717.0
+        },
+        "previous": {
+          "stock_price": 4984350.0
+        },
+        "yoy": 449.0
+      },
+      "과시즌S_3년차(22S)": {
+        "current": {
+          "stock_price": 3368948.0
+        },
+        "previous": {
+          "stock_price": 1186246.0
+        },
+        "yoy": 284.0
+      },
+      "과시즌S_4년차(21S)": {
+        "current": {
+          "stock_price": 1166.0
+        },
+        "previous": {
+          "stock_price": 0.0
+        },
+        "yoy": 0.0
+      },
+      "신발": {
+        "current": {
+          "stock_price": 54968620.0
+        },
+        "previous": {
+          "stock_price": 62918854.0
+        },
+        "yoy": 87.4
+      },
+      "모자": {
+        "current": {
+          "stock_price": 43400380.0
+        },
+        "previous": {
+          "stock_price": 44263751.0
+        },
+        "yoy": 98.0
+      },
+      "가방": {
+        "current": {
+          "stock_price": 17072544.0
+        },
+        "previous": {
+          "stock_price": 21955097.0
+        },
+        "yoy": 77.8
+      },
+      "기타ACC": {
+        "current": {
+          "stock_price": 1954038.0
+        },
+        "previous": {
+          "stock_price": 2497069.0
+        },
+        "yoy": 78.3
+      },
+      "TOTAL": {
+        "current": {
+          "stock_price": 363264634.0
+        },
+        "previous": {
+          "stock_price": 386014942.0
+        },
+        "yoy": 94.1
+      },
+      "과시즌F_3년차_이상": {
+        "current": {
+          "stock_price": 17408560.0
+        },
+        "previous": {
+          "stock_price": 1358785.0
+        },
+        "yoy": 1281.185765224079
+      },
+      "과시즌S_3년차_이상": {
+        "current": {
+          "stock_price": 3370114.0
+        },
+        "previous": {
+          "stock_price": 1186246.0
+        },
+        "yoy": 284.0990823151353
+      }
     }
   },
   "stagnant_inventory": {
@@ -22895,5 +23077,187 @@
         "yoy": 0
       }
     ]
+  },
+  "season_sales_detail": {
+    "26S": {
+      "current": {
+        "gross_sales": 473.391
+      },
+      "previous": {
+        "gross_sales": 0.0
+      },
+      "yoy": 0.0
+    },
+    "25F": {
+      "current": {
+        "gross_sales": 12077.362
+      },
+      "previous": {
+        "gross_sales": 17932.155
+      },
+      "yoy": 67.4
+    },
+    "25S": {
+      "current": {
+        "gross_sales": 285.059
+      },
+      "previous": {
+        "gross_sales": 2.514
+      },
+      "yoy": 11338.9
+    },
+    "과시즌F": {
+      "current": {
+        "gross_sales": 7128.528
+      },
+      "previous": {
+        "gross_sales": 5403.652
+      },
+      "yoy": 131.9
+    },
+    "과시즌F_1년차(24F)": {
+      "current": {
+        "gross_sales": 4467.098
+      },
+      "previous": {
+        "gross_sales": 4373.53
+      },
+      "yoy": 102.1
+    },
+    "과시즌F_2년차(23F)": {
+      "current": {
+        "gross_sales": 1941.678
+      },
+      "previous": {
+        "gross_sales": 1030.122
+      },
+      "yoy": 188.5
+    },
+    "과시즌F_3년차(22F)": {
+      "current": {
+        "gross_sales": 719.752
+      },
+      "previous": {
+        "gross_sales": 0.0
+      },
+      "yoy": 0.0
+    },
+    "과시즌F_4년차(21F)": {
+      "current": {
+        "gross_sales": 0.0
+      },
+      "previous": {
+        "gross_sales": 0.0
+      },
+      "yoy": 0.0
+    },
+    "과시즌S": {
+      "current": {
+        "gross_sales": 380.306
+      },
+      "previous": {
+        "gross_sales": 628.119
+      },
+      "yoy": 60.5
+    },
+    "과시즌S_1년차(24S)": {
+      "current": {
+        "gross_sales": 251.775
+      },
+      "previous": {
+        "gross_sales": 602.399
+      },
+      "yoy": 41.8
+    },
+    "과시즌S_2년차(23S)": {
+      "current": {
+        "gross_sales": 117.408
+      },
+      "previous": {
+        "gross_sales": 15.22
+      },
+      "yoy": 771.4
+    },
+    "과시즌S_3년차(22S)": {
+      "current": {
+        "gross_sales": 11.123
+      },
+      "previous": {
+        "gross_sales": 10.5
+      },
+      "yoy": 105.9
+    },
+    "과시즌S_4년차(21S)": {
+      "current": {
+        "gross_sales": 0.0
+      },
+      "previous": {
+        "gross_sales": 0.0
+      },
+      "yoy": 0.0
+    },
+    "신발": {
+      "current": {
+        "gross_sales": 5691.156
+      },
+      "previous": {
+        "gross_sales": 6916.626
+      },
+      "yoy": 82.3
+    },
+    "모자": {
+      "current": {
+        "gross_sales": 4014.147
+      },
+      "previous": {
+        "gross_sales": 4212.324
+      },
+      "yoy": 95.3
+    },
+    "가방": {
+      "current": {
+        "gross_sales": 1245.754
+      },
+      "previous": {
+        "gross_sales": 1800.614
+      },
+      "yoy": 69.2
+    },
+    "기타ACC": {
+      "current": {
+        "gross_sales": 287.152
+      },
+      "previous": {
+        "gross_sales": 247.562
+      },
+      "yoy": 116.0
+    },
+    "TOTAL": {
+      "current": {
+        "gross_sales": 31582.855
+      },
+      "previous": {
+        "gross_sales": 37143.566
+      },
+      "yoy": 85.0
+    },
+    "과시즌F_3년차_이상": {
+      "current": {
+        "gross_sales": 719.752
+      },
+      "previous": {
+        "gross_sales": 0.0
+      },
+      "yoy": 0
+    },
+    "과시즌S_3년차_이상": {
+      "current": {
+        "gross_sales": 11.123
+      },
+      "previous": {
+        "gross_sales": 10.5
+      },
+      "yoy": 105.93333333333332
+    }
   }
 }

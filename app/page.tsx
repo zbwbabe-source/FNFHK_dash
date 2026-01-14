@@ -11,6 +11,8 @@ export default function Home() {
   const [twData, setTwData] = useState<any>(null);
   const [hkPlData, setHkPlData] = useState<any>(null);
   const [twPlData, setTwPlData] = useState<any>(null);
+  const [hkSalesPerPyeongData, setHkSalesPerPyeongData] = useState<any>(null);
+  const [twSalesPerPyeongData, setTwSalesPerPyeongData] = useState<any>(null);
   const [bsData, setBsData] = useState<any>(null);
   const [cfData, setCfData] = useState<any>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('2512'); // 기본값: 25년 12월
@@ -53,15 +55,20 @@ export default function Home() {
         const bsPath = `/dashboard/bs-data-${selectedPeriod}.json`;
         // CF 데이터 경로
         const cfPath = `/dashboard/cf-data-${selectedPeriod}.json`;
+        // 평당매출 데이터 경로
+        const hkSalesPerPyeongPath = `/dashboard/hongkong-sales-per-pyeong-${selectedPeriod}.json`;
+        const twSalesPerPyeongPath = `/dashboard/taiwan-sales-per-pyeong-${selectedPeriod}.json`;
 
         // 모든 데이터 병렬 로드
-        const [hkDashboard, twDashboard, hkPl, twPl, bs, cf] = await Promise.all([
+        const [hkDashboard, twDashboard, hkPl, twPl, bs, cf, hkSalesPyeong, twSalesPyeong] = await Promise.all([
           loadWithFallback(hkDashboardPath, '/dashboard/hongkong-dashboard-data.json'),
           loadWithFallback(twDashboardPath, '/dashboard/taiwan-dashboard-data.json'),
           loadWithFallback(hkPlPath, '/dashboard/hongkong-pl-data.json'),
           loadWithFallback(twPlPath, '/dashboard/taiwan-pl-data.json'),
           fetch(bsPath).then(res => res.ok ? res.json() : null).catch(() => null),
-          fetch(cfPath).then(res => res.ok ? res.json() : null).catch(() => null)
+          fetch(cfPath).then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch(hkSalesPerPyeongPath).then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch(twSalesPerPyeongPath).then(res => res.ok ? res.json() : null).catch(() => null)
         ]);
 
         // ending_inventory는 components 폴더에서 import
@@ -106,6 +113,8 @@ export default function Home() {
         setTwData(twDashboard);
         setHkPlData(hkPl);
         setTwPlData(twPl);
+        setHkSalesPerPyeongData(hkSalesPyeong);
+        setTwSalesPerPyeongData(twSalesPyeong);
         setBsData(bs);
         setCfData(cf);
       } catch (e) {
@@ -684,58 +693,14 @@ export default function Home() {
   // 전체 YOY는 Dashboard 데이터의 sales_summary.total_yoy 사용 (전년 동월 기준)
   const twTotalYoy = twData?.sales_summary?.total_yoy ?? (twTotalPrevious > 0 ? (twTotalCurrent / twTotalPrevious) * 100 : 0);
 
-  // 평당매출 계산 (면적: 홍콩+마카오, 매출: 홍콩+마카오 오프라인)
-  // PL 데이터 사용 (이미 K HKD 단위)
-  const hkMcOfflineCurrentKHKD = (hkPlData?.current_month?.hk?.net_sales || 0) + (hkPlData?.current_month?.mc?.net_sales || 0); // K HKD 단위
-  const hkSalesPerPyeongCurrent = hkOfflineTotalArea > 0 ? hkMcOfflineCurrentKHKD / hkOfflineTotalArea : 0; // K HKD/평 단위
-  // hkOfflineCumulative는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
-  // 누적 평균 면적 (홍콩+마카오, 당월 면적 사용 - PL 데이터의 average_area는 홍콩만일 수 있음)
-  const hkCumulativeAvgArea = hkOfflineTotalArea; // 홍콩+마카오 당월 면적 사용
-  // 누적 평당매출 계산: 누적 매출을 누적 평균 면적로 나눔
-  const hkSalesPerPyeongCumulative = hkCumulativeAvgArea > 0 ? hkOfflineCumulative / hkCumulativeAvgArea : 0; // 누적 평당매출 (K HKD/평 단위)
-  // 평당매출/1일 계산: 평당매출(K HKD/평)을 HKD로 변환(1000 곱하기) 후 일수로 나누기
-  const hkDailySalesPerPyeongCurrent = currentMonthDays > 0 && hkSalesPerPyeongCurrent > 0 ? (hkSalesPerPyeongCurrent * 1000) / currentMonthDays : 0; // 당월은 해당 월 일수 기준
-  const hkDailySalesPerPyeongCumulative = cumulativeDays > 0 && hkSalesPerPyeongCumulative > 0 ? (hkSalesPerPyeongCumulative * 1000) / cumulativeDays : 0; // 누적은 누적 일수로 나누기
+  // 홍콩+마카오 평당매출 계산 (JSON 파일 사용)
+  const hkDailySalesPerPyeongCurrent = hkSalesPerPyeongData?.monthly?.current?.sales_per_pyeong_daily || 0;
+  const hkDailySalesPerPyeongPrevious = hkSalesPerPyeongData?.monthly?.previous?.sales_per_pyeong_daily || 0;
+  const hkDailySalesPerPyeongYoy = hkSalesPerPyeongData?.monthly?.yoy || 0;
   
-  // 전년도 평당매출/1일 계산 (홍콩+마카오)
-  const hkMcOfflinePreviousKHKD = (hkPlData?.prev_month?.hk?.net_sales || 0) + (hkPlData?.prev_month?.mc?.net_sales || 0); // K HKD 단위
-  const hkSalesPerPyeongPrevious = hkOfflineTotalAreaPrevious > 0 ? hkMcOfflinePreviousKHKD / hkOfflineTotalAreaPrevious : 0; // K HKD/평 단위
-  const hkDailySalesPerPyeongPrevious = currentMonthDays > 0 && hkSalesPerPyeongPrevious > 0 ? (hkSalesPerPyeongPrevious * 1000) / currentMonthDays : 0;
-  const hkDailySalesPerPyeongYoy = hkDailySalesPerPyeongPrevious > 0 ? (hkDailySalesPerPyeongCurrent / hkDailySalesPerPyeongPrevious) * 100 : 0;
-  
-  // 전년도 누적 평당매출/1일 계산 (홍콩+마카오)
-  const hkMcOfflineCumulativePrevious = (hkPlData?.cumulative?.prev_cumulative?.hk?.net_sales || 0) + (hkPlData?.cumulative?.prev_cumulative?.mc?.net_sales || 0); // K HKD 단위
-  const hkCumulativeAvgAreaPrevious = hkPlData?.cumulative?.prev_cumulative?.offline?.average_area || hkOfflineTotalAreaPrevious;
-  const hkSalesPerPyeongCumulativePrevious = hkCumulativeAvgAreaPrevious > 0 ? hkMcOfflineCumulativePrevious / hkCumulativeAvgAreaPrevious : 0;
-  const hkDailySalesPerPyeongCumulativePrevious = cumulativeDays > 0 && hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulativePrevious * 1000) / cumulativeDays : 0;
-  // 평당매출 YOY 계산 (평당매출/1일이 아닌 평당매출 자체의 YOY)
-  const hkSalesPerPyeongCumulativeYoy = hkSalesPerPyeongCumulativePrevious > 0 ? (hkSalesPerPyeongCumulative / hkSalesPerPyeongCumulativePrevious) * 100 : 0;
-  
-  // 디버깅: 평당매출 계산 확인 (면적: 홍콩+마카오, 매출: 홍콩+마카오 오프라인)
-  console.log('=== 홍콩+마카오 평당매출 계산 (면적: 홍콩+마카오, 매출: PL 데이터, M10A는 M10에 포함) ===');
-  console.log('[당월]');
-  console.log('홍콩+마카오 오프라인 매출 (PL 데이터):', hkMcOfflineCurrentKHKD.toFixed(2), 'K HKD');
-  console.log('홍콩+마카오 오프라인 면적:', hkOfflineTotalArea, '평 (M10A는 M10에 포함, 면적 0인 매장 제외)');
-  console.log('평당매출:', hkSalesPerPyeongCurrent.toFixed(2), 'K HKD/평');
-  console.log('당월 일수:', currentMonthDays, '일');
-  console.log('1일 평당매출:', hkDailySalesPerPyeongCurrent.toFixed(1), 'HKD/평/일');
-  console.log('계산식: ' + hkMcOfflineCurrentKHKD.toFixed(2) + ' / ' + hkOfflineTotalArea + ' = ' + hkSalesPerPyeongCurrent.toFixed(2) + ' K HKD/평');
-  console.log('일평균 계산식: (' + hkSalesPerPyeongCurrent.toFixed(2) + ' * 1000) / ' + currentMonthDays + ' = ' + hkDailySalesPerPyeongCurrent.toFixed(1) + ' HKD/평/일');
-    console.log('[누적]');
-    console.log('누적 오프라인 매출 (홍콩+마카오):', hkMcOfflineCumulative.toFixed(2), 'K HKD (PL 데이터, 이미 K HKD 단위)');
-    console.log('당월 오프라인 면적:', hkOfflineTotalArea, '평');
-    console.log('누적 평균 면적:', hkCumulativeAvgArea.toFixed(2), '평 (월별 면적 합계를 모두 더한 후 월수로 나눈 값, 홍콩+마카오)');
-    console.log('평당매출:', hkSalesPerPyeongCumulative.toFixed(2), 'K HKD/평');
-    console.log('누적 일수:', cumulativeDays, '일');
-    console.log('1일 평당매출:', hkDailySalesPerPyeongCumulative.toFixed(1), 'HKD/평/일');
-    console.log('계산식: ' + hkOfflineCumulative.toFixed(2) + ' / ' + hkCumulativeAvgArea.toFixed(2) + ' = ' + hkSalesPerPyeongCumulative.toFixed(2) + ' K HKD/평');
-    console.log('일평균 계산식: (' + hkSalesPerPyeongCumulative.toFixed(2) + ' * 1000) / ' + cumulativeDays + ' = ' + hkDailySalesPerPyeongCumulative.toFixed(1) + ' HKD/평/일');
-  console.log('=====================================');
-  
-  if (hkDailySalesPerPyeongCurrent > 100000) {
-    console.error('⚠️⚠️⚠️ 1일 평당매출이 비정상적으로 큽니다! ⚠️⚠️⚠️');
-    console.error('면적이 제대로 계산되지 않았을 가능성이 있습니다.');
-  }
+  const hkDailySalesPerPyeongCumulative = hkSalesPerPyeongData?.cumulative?.current?.sales_per_pyeong_daily || 0;
+  const hkDailySalesPerPyeongCumulativePrevious = hkSalesPerPyeongData?.cumulative?.previous?.sales_per_pyeong_daily || 0;
+  const hkSalesPerPyeongCumulativeYoy = hkSalesPerPyeongData?.cumulative?.yoy || 0;
 
   // 대만 평당매출 계산 (당월, 누적)
   // twOfflineCurrent는 PL 데이터에서 가져오므로 K HKD 단위 (1000으로 나누지 않음)
@@ -978,7 +943,7 @@ export default function Home() {
                         <span className={`ml-1 font-semibold ${
                           ((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? '+' : ''}
+                          {((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)) >= 0 ? '+' : '△'}
                           {formatPlNumber(Math.abs((hkPlCurrent?.operating_profit || 0) - (hkPlPrevMonth?.operating_profit || 0)))}
                         </span>
                       </div>
