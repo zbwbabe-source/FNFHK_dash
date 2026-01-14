@@ -9341,8 +9341,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const otherChange = otherTotal - otherTotalPrev;
                   
                   const otherDetail = expenseDetail.other_detail || {};
-                  const logistics = (otherDetail as any).logistics || 0;
-                  const depreciation = (otherDetail as any).depreciation || 0;
+                  const logistics = (otherDetail as any)['물류비'] || 0;
+                  const depreciation = (otherDetail as any)['감가상각비'] || 0;
+                  const maintenance = (otherDetail as any)['유지보수비'] || 0;
+                  const utilities = (otherDetail as any)['수도광열비'] || 0;
+                  const supplies = (otherDetail as any)['소모품비'] || 0;
+                  const communication = (otherDetail as any)['통신비'] || 0;
                   
                   return (
                     <>
@@ -9357,92 +9361,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(logistics))}K</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">임차료</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(rent))}K</span>
-                        </div>
-                        <div className="flex justify-between items-center">
                           <span className="text-xs text-gray-600">감가상각비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(depreciation))}K</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">여비교통비</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(travel))}K</span>
+                          <span className="text-xs text-gray-600">유지보수비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(maintenance))}K</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">보험료</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(insurance))}K</span>
+                          <span className="text-xs text-gray-600">수도광열비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(utilities))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">소모품비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(supplies))}K</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">통신비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(communication))}K</span>
                         </div>
                       </div>
                     </>
                   );
                 })()}
-
-                {/* 기타 상세 토글 */}
-                <div className="mt-3 pt-3 border-t">
-                  <button
-                    onClick={() => setShowOperatingExpenseItemAnalysis(prev => ({ ...prev, otherDetail: !prev.otherDetail }))}
-                    className="w-full flex items-center justify-between text-xs text-pink-600 hover:text-pink-800 font-semibold"
-                  >
-                    <span>기타 상세</span>
-                    {showOperatingExpenseItemAnalysis.otherDetail ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
-                  {showOperatingExpenseItemAnalysis.otherDetail && (() => {
-                    const currentMonthData = plData?.current_month?.total;
-                    const prevMonthData = plData?.prev_month?.total;
-                    const expenseDetail = currentMonthData?.expense_detail || {};
-                    const expenseDetailPrev = prevMonthData?.expense_detail || {};
-
-                    const otherDetail = expenseDetail.other_detail || {};
-                    const otherDetailPrev = expenseDetailPrev.other_detail || {};
-                    const otherDetailLabels: {[key: string]: string} = {
-                      'depreciation': '감가상각비',
-                      'duty_free': '면세점 직접비',
-                      'govt_license': '정부세금 및 라이센스',
-                      'logistics': '운반비',
-                      'maintenance': '유지보수비',
-                      'other_fee': '기타 수수료',
-                      'rent_free': '임대료 면제/할인',
-                      'retirement': '퇴직연금',
-                      'supplies': '소모품비',
-                      'transport': '운반비(기타)',
-                      'uniform': '피복비(유니폼)',
-                      'utilities': '수도광열비',
-                      'var_rent': '매출연동 임대료',
-                      'communication': '통신비',
-                      'bonus': '최종지급금'
-                    };
-
-                    return (
-                      <div className="mt-3 pt-3 border-t bg-pink-50 rounded p-2">
-                        <div className="space-y-1.5 text-xs">
-                          {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
-                            const prevValue = (otherDetailPrev as any)[key] || 0;
-                            if (value === 0 && prevValue === 0) return null;
-                            const itemChange = value - prevValue;
-                            const itemChangeRate = prevValue !== 0 ? (itemChange / prevValue) * 100 : 0;
-                            return (
-                              <div key={key} className="flex justify-between items-center">
-                                <span className="text-gray-700">{otherDetailLabels[key] || key}</span>
-                                <span className="text-gray-800 font-semibold">
-                                  {formatNumber(value)}K
-                                  {prevValue !== 0 && (
-                                    <span className={itemChange >= 0 ? 'text-red-600 ml-1' : 'text-green-600 ml-1'}>
-                                      ({itemChange >= 0 ? '+' : ''}{formatNumber(itemChange)}K)
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
 
                 {/* 당월 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">
@@ -9559,8 +9500,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const otherChange = otherTotal - otherTotalPrev;
                   
                   const otherDetail = expenseDetail.other_detail || {};
-                  const logistics = (otherDetail as any).logistics || 0;
-                  const depreciation = (otherDetail as any).depreciation || 0;
+                  const logistics = (otherDetail as any)['물류비'] || 0;
+                  const depreciation = (otherDetail as any)['감가상각비'] || 0;
+                  const maintenance = (otherDetail as any)['유지보수비'] || 0;
+                  const utilities = (otherDetail as any)['수도광열비'] || 0;
+                  const supplies = (otherDetail as any)['소모품비'] || 0;
+                  const communication = (otherDetail as any)['통신비'] || 0;
                   
                   return (
                     <>
@@ -9573,92 +9518,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(logistics))}K</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">임차료</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(rent))}K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">감가상각비</span>
                           <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(depreciation))}K</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">여비교통비</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(travel))}K</span>
+                    <span className="text-xs text-gray-600">유지보수비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(maintenance))}K</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">보험료</span>
-                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(insurance))}K</span>
+                    <span className="text-xs text-gray-600">수도광열비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(utilities))}K</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">소모품비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(supplies))}K</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600">통신비</span>
+                          <span className="text-xs font-semibold text-gray-800">{formatNumber(Math.round(communication))}K</span>
                   </div>
                 </div>
                     </>
                   );
                 })()}
-
-                {/* 기타 상세 토글 */}
-                <div className="mt-3 pt-3 border-t">
-                  <button
-                    onClick={() => setShowOperatingExpenseItemAnalysis(prev => ({ ...prev, otherDetailCumulative: !prev.otherDetailCumulative }))}
-                    className="w-full flex items-center justify-between text-xs text-pink-600 hover:text-pink-800 font-semibold"
-                  >
-                    <span>기타 상세</span>
-                    {showOperatingExpenseItemAnalysis.otherDetailCumulative ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
-                  {showOperatingExpenseItemAnalysis.otherDetailCumulative && (() => {
-                    const cumulativeData = plData?.cumulative?.total;
-                    const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
-                    const expenseDetail = cumulativeData?.expense_detail || {};
-                    const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
-
-                    const otherDetail = expenseDetail.other_detail || {};
-                    const otherDetailPrev = expenseDetailPrev.other_detail || {};
-                    const otherDetailLabels: {[key: string]: string} = {
-                      'depreciation': '감가상각비',
-                      'duty_free': '면세점 직접비',
-                      'govt_license': '정부세금 및 라이센스',
-                      'logistics': '운반비',
-                      'maintenance': '유지보수비',
-                      'other_fee': '기타 수수료',
-                      'rent_free': '임대료 면제/할인',
-                      'retirement': '퇴직연금',
-                      'supplies': '소모품비',
-                      'transport': '운반비(기타)',
-                      'uniform': '피복비(유니폼)',
-                      'utilities': '수도광열비',
-                      'var_rent': '매출연동 임대료',
-                      'communication': '통신비',
-                      'bonus': '최종지급금'
-                    };
-
-                    return (
-                      <div className="mt-3 pt-3 border-t bg-pink-50 rounded p-2">
-                        <div className="space-y-1.5 text-xs">
-                          {Object.entries(otherDetail).map(([key, value]: [string, any]) => {
-                            const prevValue = (otherDetailPrev as any)[key] || 0;
-                            if (value === 0 && prevValue === 0) return null;
-                            const itemChange = value - prevValue;
-                            const itemChangeRate = prevValue !== 0 ? (itemChange / prevValue) * 100 : 0;
-                            return (
-                              <div key={key} className="flex justify-between items-center">
-                                <span className="text-gray-700">{otherDetailLabels[key] || key}</span>
-                                <span className="text-gray-800 font-semibold">
-                                  {formatNumber(value)}K
-                                  {prevValue !== 0 && (
-                                    <span className={itemChange >= 0 ? 'text-red-600 ml-1' : 'text-green-600 ml-1'}>
-                                      ({itemChange >= 0 ? '+' : ''}{formatNumber(itemChange)}K)
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
 
                 {/* 누적 증감 분석 */}
                 <div className="mt-3 pt-3 border-t">
