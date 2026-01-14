@@ -2383,12 +2383,36 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             온라인{plData?.discovery?.store_count?.online || 0}개, 오프라인{plData?.discovery?.store_count?.offline || 0}개 (10/1 영업개시)
                           </div>
                           <div className="space-y-1 text-xs">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-start">
                               <span className="text-purple-700">실판매출</span>
-                              <span className="font-semibold text-purple-900">
-                                {formatNumber(plData?.discovery?.net_sales)} 
-                                <span className="text-purple-600"> (할인율 {formatPercent(plData?.discovery?.discount_rate, 1)}%)</span>
-                              </span>
+                              <div className="text-right">
+                                <div className="font-semibold text-purple-900">
+                                  {formatNumber(plData?.discovery?.net_sales)}
+                                </div>
+                                {plData?.discovery?.prev_net_sales !== undefined && plData.discovery.prev_net_sales > 0 && (
+                                  <div className={`text-[10px] font-semibold ${
+                                    plData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
+                                  }`}>
+                                    전월비 {formatPercent(plData.discovery.net_sales_mom)}%
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-start">
+                              <span className="text-purple-700">할인율</span>
+                              <div className="text-right">
+                                <div className="font-semibold text-amber-700">
+                                  {formatPercent(plData?.discovery?.discount_rate, 1)}%
+                                </div>
+                                {plData?.discovery?.prev_discount_rate !== undefined && (
+                                  <div className={`text-[10px] font-semibold ${
+                                    (plData.discovery.discount_rate - plData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
+                                  }`}>
+                                    ({(plData.discovery.discount_rate - plData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
+                                    {(plData.discovery.discount_rate - plData.discovery.prev_discount_rate).toFixed(1)}%p)
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-purple-700">직접비</span>

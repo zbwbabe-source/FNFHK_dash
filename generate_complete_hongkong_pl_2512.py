@@ -676,6 +676,41 @@ pl_data = {
 output_file = 'public/dashboard/hongkong-pl-data-2512.json'
 os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
+# Discovery PL 데이터 로드 (있으면)
+discovery_pl_file = 'public/dashboard/discovery-pl-data-2512.json'
+if os.path.exists(discovery_pl_file):
+    try:
+        with open(discovery_pl_file, 'r', encoding='utf-8') as f:
+            discovery_data = json.load(f)
+        
+        # Discovery 당월 데이터 추출
+        discovery_current = discovery_data.get('current_month', {}).get('data', {})
+        discovery_prev = discovery_data.get('prev_month', {}).get('data', {})
+        discovery_mom = discovery_data.get('current_month', {}).get('mom', {})
+        
+        # pl_data에 Discovery 추가
+        pl_data['discovery'] = {
+            'net_sales': discovery_current.get('net_sales', 0),
+            'prev_net_sales': discovery_prev.get('net_sales', 0),
+            'net_sales_mom': discovery_mom.get('net_sales', 0),
+            'discount_rate': discovery_current.get('discount_rate', 0),
+            'prev_discount_rate': discovery_prev.get('discount_rate', 0),
+            'direct_cost': discovery_current.get('direct_cost', 0),
+            'direct_profit': discovery_current.get('direct_profit', 0),
+            'operating_profit': discovery_current.get('operating_profit', 0),
+            'marketing': discovery_current.get('expense_detail', {}).get('marketing', 0),
+            'travel': discovery_current.get('expense_detail', {}).get('travel', 0),
+            'store_count': discovery_data.get('metadata', {}).get('store_count', {})
+        }
+        print(f"\n[INFO] Discovery 데이터 통합 완료")
+        print(f"  - 실판매출: {pl_data['discovery']['net_sales']:,.0f}K HKD")
+        print(f"  - 전월비: {pl_data['discovery']['net_sales_mom']:.1f}%")
+        print(f"  - 할인율: {pl_data['discovery']['discount_rate']:.1f}% (전월: {pl_data['discovery']['prev_discount_rate']:.1f}%)")
+    except Exception as e:
+        print(f"\n[WARNING] Discovery 데이터 로드 실패: {e}")
+else:
+    print(f"\n[INFO] Discovery 데이터 파일 없음, 스킵")
+
 with open(output_file, 'w', encoding='utf-8') as f:
     json.dump(pl_data, f, ensure_ascii=False, indent=2)
 

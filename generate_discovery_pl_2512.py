@@ -196,7 +196,8 @@ def get_ytd_data(start_period, end_period):
 
 # 데이터 추출
 current_month = get_period_data(202512)
-prev_month = get_period_data(202412)
+prev_month = get_period_data(202511)  # 전월 (2511)
+prev_year_month = get_period_data(202412)  # 전년동월 (2412)
 cumulative = get_ytd_data(202501, 202512)
 prev_cumulative = get_ytd_data(202401, 202412)
 
@@ -207,12 +208,17 @@ def calc_yoy(current, previous):
 def calc_change(current, previous):
     return current - previous
 
+# 전월비(MOM) 계산
+net_sales_mom = calc_yoy(current_month['net_sales'], prev_month['net_sales'])
+discount_rate_diff = current_month['discount_rate'] - prev_month['discount_rate']
+
 # JSON 구조 생성
 discovery_data = {
     "metadata": {
         "brand": "Discovery",
         "last_period": "2512",
-        "previous_period": "2412",
+        "previous_period": "2511",
+        "previous_year_period": "2412",
         "generated_at": datetime.now().isoformat(),
         "store_count": current_store_count
     },
@@ -220,9 +226,20 @@ discovery_data = {
         "data": current_month,
         "store_count": current_store_count,
         "yoy": {
+            "tag_sales": calc_yoy(current_month['tag_sales'], prev_year_month['tag_sales']),
+            "discount": calc_yoy(current_month['discount'], prev_year_month['discount']),
+            "net_sales": calc_yoy(current_month['net_sales'], prev_year_month['net_sales']),
+            "cogs": calc_yoy(current_month['cogs'], prev_year_month['cogs']),
+            "gross_profit": calc_yoy(current_month['gross_profit'], prev_year_month['gross_profit']),
+            "direct_cost": calc_yoy(current_month['direct_cost'], prev_year_month['direct_cost']),
+            "direct_profit": calc_yoy(current_month['direct_profit'], prev_year_month['direct_profit']),
+            "sg_a": calc_yoy(current_month['sg_a'], prev_year_month['sg_a']),
+            "operating_profit": calc_yoy(current_month['operating_profit'], prev_year_month['operating_profit']),
+        },
+        "mom": {
             "tag_sales": calc_yoy(current_month['tag_sales'], prev_month['tag_sales']),
             "discount": calc_yoy(current_month['discount'], prev_month['discount']),
-            "net_sales": calc_yoy(current_month['net_sales'], prev_month['net_sales']),
+            "net_sales": net_sales_mom,
             "cogs": calc_yoy(current_month['cogs'], prev_month['cogs']),
             "gross_profit": calc_yoy(current_month['gross_profit'], prev_month['gross_profit']),
             "direct_cost": calc_yoy(current_month['direct_cost'], prev_month['direct_cost']),
@@ -231,19 +248,22 @@ discovery_data = {
             "operating_profit": calc_yoy(current_month['operating_profit'], prev_month['operating_profit']),
         },
         "change": {
-            "tag_sales": calc_change(current_month['tag_sales'], prev_month['tag_sales']),
-            "discount": calc_change(current_month['discount'], prev_month['discount']),
-            "net_sales": calc_change(current_month['net_sales'], prev_month['net_sales']),
-            "cogs": calc_change(current_month['cogs'], prev_month['cogs']),
-            "gross_profit": calc_change(current_month['gross_profit'], prev_month['gross_profit']),
-            "direct_cost": calc_change(current_month['direct_cost'], prev_month['direct_cost']),
-            "direct_profit": calc_change(current_month['direct_profit'], prev_month['direct_profit']),
-            "sg_a": calc_change(current_month['sg_a'], prev_month['sg_a']),
-            "operating_profit": calc_change(current_month['operating_profit'], prev_month['operating_profit']),
+            "tag_sales": calc_change(current_month['tag_sales'], prev_year_month['tag_sales']),
+            "discount": calc_change(current_month['discount'], prev_year_month['discount']),
+            "net_sales": calc_change(current_month['net_sales'], prev_year_month['net_sales']),
+            "cogs": calc_change(current_month['cogs'], prev_year_month['cogs']),
+            "gross_profit": calc_change(current_month['gross_profit'], prev_year_month['gross_profit']),
+            "direct_cost": calc_change(current_month['direct_cost'], prev_year_month['direct_cost']),
+            "direct_profit": calc_change(current_month['direct_profit'], prev_year_month['direct_profit']),
+            "sg_a": calc_change(current_month['sg_a'], prev_year_month['sg_a']),
+            "operating_profit": calc_change(current_month['operating_profit'], prev_year_month['operating_profit']),
         }
     },
     "prev_month": {
         "data": prev_month
+    },
+    "prev_year_month": {
+        "data": prev_year_month
     },
     "cumulative": {
         "data": cumulative,
@@ -271,13 +291,18 @@ with open(output_file, 'w', encoding='utf-8') as f:
 print(f"\n[OK] Discovery PL 데이터 생성 완료: {output_file}")
 print(f"\n당월 데이터 (2512):")
 print(f"  - Tag매출액: {current_month['tag_sales']:,.0f}K HKD")
-print(f"  - 실판매출: {current_month['net_sales']:,.0f}K HKD (YOY {calc_yoy(current_month['net_sales'], prev_month['net_sales']):.1f}%)")
-print(f"  - 할인율: {current_month['discount_rate']:.1f}%")
+print(f"  - 실판매출: {current_month['net_sales']:,.0f}K HKD")
+print(f"    └ 전월비(MOM): {net_sales_mom:.1f}%")
+print(f"    └ 전년동월비(YOY): {calc_yoy(current_month['net_sales'], prev_year_month['net_sales']):.1f}%")
+print(f"  - 할인율: {current_month['discount_rate']:.1f}% (전월대비: {discount_rate_diff:+.1f}%p)")
 print(f"  - 매출원가: {current_month['cogs']:,.0f}K HKD")
 print(f"  - TAG대비 원가율: {current_month['cogs_rate']:.1f}%")
 print(f"  - 매출총이익: {current_month['gross_profit']:,.0f}K HKD ({current_month['gross_profit_rate']:.1f}%)")
 print(f"  - 직접이익: {current_month['direct_profit']:,.0f}K HKD ({current_month['direct_profit_rate']:.1f}%)")
 print(f"  - 영업이익: {current_month['operating_profit']:,.0f}K HKD ({current_month['operating_profit_rate']:.1f}%)")
+print(f"\n전월 데이터 (2511):")
+print(f"  - 실판매출: {prev_month['net_sales']:,.0f}K HKD")
+print(f"  - 할인율: {prev_month['discount_rate']:.1f}%")
 print(f"\n누적 데이터 (2501~2512):")
 print(f"  - Tag매출액: {cumulative['tag_sales']:,.0f}K HKD")
 print(f"  - 실판매출: {cumulative['net_sales']:,.0f}K HKD (YOY {calc_yoy(cumulative['net_sales'], prev_cumulative['net_sales']):.1f}%)")

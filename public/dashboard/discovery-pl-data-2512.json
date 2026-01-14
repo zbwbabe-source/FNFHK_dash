@@ -2,8 +2,9 @@
   "metadata": {
     "brand": "Discovery",
     "last_period": "2512",
-    "previous_period": "2412",
-    "generated_at": "2026-01-14T15:35:45.077636",
+    "previous_period": "2511",
+    "previous_year_period": "2412",
+    "generated_at": "2026-01-14T20:14:20.504431",
     "store_count": {
       "online": 1,
       "offline": 1,
@@ -60,6 +61,17 @@
       "sg_a": 538.3782681353063,
       "operating_profit": -860.9401474606791
     },
+    "mom": {
+      "tag_sales": 114.00607438367949,
+      "discount": 118.30226033692426,
+      "net_sales": 112.88560330219792,
+      "cogs": 114.21183944763487,
+      "gross_profit": 111.89374051865164,
+      "direct_cost": 118.24595266572568,
+      "direct_profit": 0,
+      "sg_a": 118.24595266989823,
+      "operating_profit": 0
+    },
     "change": {
       "tag_sales": 3263.2690335,
       "discount": 777.5197610000002,
@@ -73,6 +85,41 @@
     }
   },
   "prev_month": {
+    "data": {
+      "tag_sales": 3724.9172581,
+      "net_sales": 2954.3936599,
+      "discount": 770.5235981999999,
+      "discount_rate": 20.685656749138836,
+      "cogs": 1264.1190965600001,
+      "cogs_rate": 33.93683695419318,
+      "gross_profit": 1690.2745633700004,
+      "gross_profit_rate": 57.21223228685146,
+      "sg_a": 2044.25454608,
+      "operating_profit": -353.97998278200004,
+      "operating_profit_rate": -11.981476523815093,
+      "expense_detail": {
+        "salary": 258.31416995,
+        "travel": 5.850833745999999,
+        "uniform": 8.454818859,
+        "rent": 605.0266001699999,
+        "maintenance": 80.74689825,
+        "utilities": 8.048883373999999,
+        "supplies": 8.665192804,
+        "communication": 2.037752605,
+        "marketing": 460.650426914,
+        "fee": 77.734874493,
+        "logistics": 191.029589134,
+        "other_fee": 61.16479815699999,
+        "insurance": 18.032544244,
+        "depreciation": 258.49716342,
+        "duty_free": 0.0
+      },
+      "direct_cost": 2044.25454612,
+      "direct_profit": -353.97998274999964,
+      "direct_profit_rate": -11.981476522731947
+    }
+  },
+  "prev_year_month": {
     "data": {
       "tag_sales": 983.3629065,
       "net_sales": 849.3358344000001,
