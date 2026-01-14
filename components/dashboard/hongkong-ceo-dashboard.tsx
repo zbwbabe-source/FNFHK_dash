@@ -134,6 +134,37 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             console.log('Discovery cumulative data not found, skipping...');
           }
           
+          // 새로운 영업비 데이터 로드 (CSV 기반 재계산)
+          try {
+            const opexResponse = await fetch(`/dashboard/hongkong-opex-${period}.json`);
+            if (opexResponse.ok) {
+              const opexData = await opexResponse.json();
+              console.log('영업비 재계산 데이터 로드 성공:', opexData);
+              
+              // 기존 plData의 영업비 부분을 새 데이터로 교체
+              if (plDataResult.current_month && plDataResult.current_month.total) {
+                plDataResult.current_month.total.expense_detail = opexData.current_month.expense_detail;
+                plDataResult.current_month.total.sg_a = opexData.current_month.sg_a;
+              }
+              if (plDataResult.prev_month && plDataResult.prev_month.total) {
+                plDataResult.prev_month.total.expense_detail = opexData.prev_month.expense_detail;
+                plDataResult.prev_month.total.sg_a = opexData.prev_month.sg_a;
+              }
+              if (plDataResult.cumulative && plDataResult.cumulative.total) {
+                plDataResult.cumulative.total.expense_detail = opexData.cumulative.expense_detail;
+                plDataResult.cumulative.total.sg_a = opexData.cumulative.sg_a;
+              }
+              if (plDataResult.cumulative && plDataResult.cumulative.prev_cumulative && plDataResult.cumulative.prev_cumulative.total) {
+                plDataResult.cumulative.prev_cumulative.total.expense_detail = opexData.prev_cumulative.expense_detail;
+                plDataResult.cumulative.prev_cumulative.total.sg_a = opexData.prev_cumulative.sg_a;
+              }
+            } else {
+              console.log('영업비 재계산 데이터 없음, 기존 데이터 사용');
+            }
+          } catch (e) {
+            console.log('영업비 데이터 로드 실패, 기존 데이터 사용:', e);
+          }
+          
           setPlData(plDataResult);
         }
         

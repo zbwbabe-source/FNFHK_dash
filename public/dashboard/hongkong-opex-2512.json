@@ -1,0 +1,101 @@
+{
+  "current_month": {
+    "period": 202512,
+    "expense_detail": {
+      "salary": 5805.08,
+      "marketing": 424.49,
+      "fee": 1364.99,
+      "rent": 8419.13,
+      "insurance": 28.93,
+      "travel": 1.19,
+      "other": 2425.15,
+      "other_detail": {
+        "3_피복비(유니폼)": 1.13,
+        "5_유지보수비": 33.2,
+        "6_수도광열비": 83.79,
+        "7_소모품비": 113.64,
+        "8_통신비": 11.06,
+        "11_운반비": 949.34,
+        "14_감가상각비": 590.18,
+        "_government_rate_&_license_fee": 218.33,
+        "_kol_/_other": 424.49
+      }
+    },
+    "sg_a": 18468.95
+  },
+  "prev_month": {
+    "period": 202412,
+    "expense_detail": {
+      "salary": 5128.89,
+      "marketing": 100.68,
+      "fee": 1183.04,
+      "rent": 9642.53,
+      "insurance": 27.58,
+      "travel": 3.43,
+      "other": 2352.23,
+      "other_detail": {
+        "5_유지보수비": 73.59,
+        "6_수도광열비": 72.49,
+        "7_소모품비": 55.17,
+        "8_통신비": 12.8,
+        "11_운반비": 1113.97,
+        "14_감가상각비": 699.0,
+        "_government_rate_&_license_fee": 224.53,
+        "_kol_/_other": 100.68
+      }
+    },
+    "sg_a": 18438.37
+  },
+  "cumulative": {
+    "period_start": 202501,
+    "period_end": 202512,
+    "expense_detail": {
+      "salary": 43966.29,
+      "marketing": 1651.74,
+      "fee": 13147.61,
+      "rent": 105580.33,
+      "insurance": 370.48,
+      "travel": 41.06,
+      "other": 24859.32,
+      "other_detail": {
+        "3_피복비(유니폼)": 172.19,
+        "5_유지보수비": 214.5,
+        "6_수도광열비": 952.81,
+        "7_소모품비": 874.92,
+        "8_통신비": 145.18,
+        "11_운반비": 11429.68,
+        "14_감가상각비": 6628.54,
+        "_government_rate_&_license_fee": 2789.75,
+        "_kol_/_other": 1651.63,
+        "_mall_coupon": 0.11
+      }
+    },
+    "sg_a": 189616.82
+  },
+  "prev_cumulative": {
+    "period_start": 202401,
+    "period_end": 202412,
+    "expense_detail": {
+      "salary": 41885.84,
+      "marketing": 959.16,
+      "fee": 12717.29,
+      "rent": 111445.12,
+      "insurance": 325.72,
+      "travel": 20.07,
+      "other": 28378.5,
+      "other_detail": {
+        "3_피복비(유니폼)": 202.2,
+        "5_유지보수비": 495.41,
+        "6_수도광열비": 950.94,
+        "7_소모품비": 700.9,
+        "8_통신비": 141.3,
+        "11_운반비": 12773.29,
+        "14_감가상각비": 9492.1,
+        "_government_rate_&_license_fee": 2663.2,
+        "_kol_/_other": 958.56,
+        "_mall_coupon": 0.6
+      }
+    },
+    "sg_a": 195731.7
+  }
+}
