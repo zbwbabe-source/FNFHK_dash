@@ -249,7 +249,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         let turnoverAchievementRentRate = 0;
         let turnoverAchievementLaborRate = laborRate; // 인건비율은 동일
         const directProfit = s.current?.direct_profit ?? 0;
-        let turnoverAchievementDirectProfit = cumulativeDirectProfit;
+        let turnoverAchievementDirectProfit = directProfit;
         let turnoverAchievementDirectProfitRate = 0;
         
         if (turnoverTarget && turnoverTarget.turnover_rate > 0) {
