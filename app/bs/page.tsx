@@ -272,13 +272,12 @@ export default function BSPage() {
         <div className="bg-gradient-to-r from-blue-800 to-blue-900 text-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-center mb-3">
             <span className="text-red-400 text-xl mr-2">★</span>
-            <h2 className="text-lg font-bold">재무상태표 핵심 요약 (24.12 → 25.12 E)</h2>
+            <h2 className="text-lg font-bold">재무상태표 핵심 요약 (24.12 → 25.12)</h2>
             </div>
           <div className="text-sm leading-relaxed">
             <p>
               <strong>재고 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.inventory.year_end - bsData?.balance_sheet.assets.current_assets.inventory.prev_year) / bsData.balance_sheet.assets.current_assets.inventory.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.inventory.year_end - bsData?.balance_sheet.assets.current_assets.inventory.prev_year) / 1000))}백만 HKD)와 현금 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.cash.year_end - bsData?.balance_sheet.assets.current_assets.cash.prev_year) / bsData.balance_sheet.assets.current_assets.cash.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.cash.year_end - bsData?.balance_sheet.assets.current_assets.cash.prev_year) / 1000))}백만 HKD)로 유동자산 {Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.total.year_end - bsData?.balance_sheet.assets.current_assets.total.prev_year) / bsData.balance_sheet.assets.current_assets.total.prev_year * 100))}% 감소(△{Math.abs(Math.round((bsData?.balance_sheet.assets.current_assets.total.year_end - bsData?.balance_sheet.assets.current_assets.total.prev_year) / 1000))}백만 HKD).</strong><br />
-              사용권자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / bsData.balance_sheet.assets.non_current_assets.right_of_use.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / 1000)}백만 HKD)로 비유동자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / bsData.balance_sheet.assets.non_current_assets.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / 1000)}백만 HKD), 부채 {Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / bsData.balance_sheet.liabilities.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / 1000)}백만 HKD)로<br />
-              <strong className="text-yellow-300 bg-yellow-900 px-2 py-1 rounded">부채비율 {((bsData?.balance_sheet.liabilities.total.year_end || 0) / (bsData?.balance_sheet.equity.total.year_end || 1) * 100).toFixed(0).toLocaleString()}% 기록 (TP채무 제외 시 부채비율 {(((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / ((bsData?.balance_sheet.equity.total.year_end || 1) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) * 100).toFixed(1)}%, 자기자본비율 {(((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / (bsData?.balance_sheet.assets.total.year_end || 1) * 100).toFixed(1)}%로 정상 재무구조)</strong>
+              사용권자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / bsData.balance_sheet.assets.non_current_assets.right_of_use.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.right_of_use.year_end - bsData?.balance_sheet.assets.non_current_assets.right_of_use.prev_year) / 1000)}백만 HKD)로 비유동자산 {Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / bsData.balance_sheet.assets.non_current_assets.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.assets.non_current_assets.total.year_end - bsData?.balance_sheet.assets.non_current_assets.total.prev_year) / 1000)}백만 HKD), 부채 {Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / bsData.balance_sheet.liabilities.total.prev_year * 100)}% 증가(+{Math.round((bsData?.balance_sheet.liabilities.total.year_end - bsData?.balance_sheet.liabilities.total.prev_year) / 1000)}백만 HKD)로<br />              <strong className="text-yellow-300 bg-yellow-900 px-2 py-1 rounded">부채비율 {((bsData?.balance_sheet.liabilities.total.year_end || 0) / (bsData?.balance_sheet.equity.total.year_end || 1) * 100).toFixed(0).toLocaleString()}% 기록 (TP채무 제외 시 부채비율 {(((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / ((bsData?.balance_sheet.equity.total.year_end || 1) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) * 100).toFixed(1)}%, 자기자본비율 {(((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0)) / (bsData?.balance_sheet.assets.total.year_end || 1) * 100).toFixed(1)}%로 정상 재무구조)</strong>
             </p>
           </div>
         </div>
@@ -298,8 +297,8 @@ export default function BSPage() {
               <div className="bg-white p-3 rounded border border-yellow-200">
                 <div className="font-semibold text-yellow-800 mb-2">💡 전체 부채비율</div>
                 <div className="text-xs space-y-1">
-                  <div>• 총부채: {formatNumber(bsData?.balance_sheet.liabilities.total.year_end || 0)} (25.12 E)</div>
-                  <div>• 총자본: {formatNumber(bsData?.balance_sheet.equity.total.year_end || 0)} (25.12 E)</div>
+                  <div>• 총부채: {formatNumber(bsData?.balance_sheet.liabilities.total.year_end || 0)} (25.12)</div>
+                  <div>• 총자본: {formatNumber(bsData?.balance_sheet.equity.total.year_end || 0)} (25.12)</div>
                   <div className="border-t border-yellow-200 mt-2 pt-2">
                     <strong>부채비율 = (총부채 ÷ 총자본) × 100</strong><br />
                     = ({formatNumber(bsData?.balance_sheet.liabilities.total.year_end || 0)} ÷ {formatNumber(bsData?.balance_sheet.equity.total.year_end || 0)}) × 100<br />
@@ -312,8 +311,8 @@ export default function BSPage() {
               <div className="bg-white p-3 rounded border border-green-200">
                 <div className="font-semibold text-green-800 mb-2">✅ TP채무 제외 시</div>
                 <div className="text-xs space-y-1">
-                  <div>• 총부채 (TP제외): {formatNumber((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12 E)</div>
-                  <div>• 총자본 (TP포함): {formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12 E)</div>
+                  <div>• 총부채 (TP제외): {formatNumber((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12)</div>
+                  <div>• 총자본 (TP포함): {formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} (25.12)</div>
                   <div className="border-t border-green-200 mt-2 pt-2">
                     <strong>부채비율 = ((총부채 - TP채무) ÷ (총자본 + TP채무)) × 100</strong><br />
                     = ({formatNumber((bsData?.balance_sheet.liabilities.total.year_end || 0) - (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))} ÷ {formatNumber((bsData?.balance_sheet.equity.total.year_end || 0) + (bsData?.balance_sheet.liabilities.current_liabilities.accounts_payable_tp?.year_end || 0))}) × 100<br />
@@ -359,7 +358,7 @@ export default function BSPage() {
                     2025.11
                   </th>
                   <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
-                    2025.12 E
+                    2025.12
                   </th>
                   <th className="bg-blue-800 text-white px-4 py-3 text-center border border-gray-300 font-semibold">
                     증감액
@@ -514,7 +513,7 @@ export default function BSPage() {
                       <th className="px-4 py-3 border border-gray-300 text-left font-semibold">계정과목</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">24년기말</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">2025-11</th>
-                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">25년 기말(E)</th>
+                      <th className="px-4 py-3 border border-gray-300 text-center font-semibold">25년 기말</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">연간비교</th>
                       <th className="px-4 py-3 border border-gray-300 text-center font-semibold">비고</th>
                     </tr>
