@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "period": "2512",
+    "generated_at": "2026-01-14T19:34:29.683453",
+    "source": {
+      "acc_weeks": "ACC_Inventory_Weeks_2512.csv",
+      "sales_rate": "TW_2512 SALES RATE.csv"
+    },
+    "unit": "1K HKD (for sales/inbound)",
+    "exchange_rate": 4.02
+  },
+  "acc_inventory_weeks": {
+    "ACC 전체": {
+      "weeks_2412": 43.8,
+      "weeks_2512": 34.2,
+      "weeks_diff": -9.6
+    },
+    "가방": {
+      "weeks_2412": 64.8,
+      "weeks_2512": 34.4,
+      "weeks_diff": -30.4
+    },
+    "기타ACC": {
+      "weeks_2412": 51.4,
+      "weeks_2512": 34.9,
+      "weeks_diff": -16.5
+    },
+    "모자": {
+      "weeks_2412": 38.0,
+      "weeks_2512": 34.3,
+      "weeks_diff": -3.7
+    },
+    "신발": {
+      "weeks_2412": 43.6,
+      "weeks_2512": 34.0,
+      "weeks_diff": -9.6
+    }
+  },
+  "sales_rate": {
+    "total": {
+      "inbound_2412": 53656.53980099503,
+      "inbound_2512": 60139.48258706468,
+      "inbound_yoy": 112.1,
+      "sales_2412": 25550.06716417911,
+      "sales_2512": 27657.7512437811,
+      "sales_yoy": 108.2,
+      "rate_2412": 47.6,
+      "rate_2512": 46.0,
+      "rate_diff_pp": -1.6
+    },
+    "top5_categories": {
+      "BN": {
+        "inbound_yoy": 235.8,
+        "sales_yoy": 280.8,
+        "rate_2412": 58.3,
+        "rate_2512": 69.4,
+        "rate_diff_pp": 11.1
+      },
+      "TS": {
+        "inbound_yoy": 131.3,
+        "sales_yoy": 116.0,
+        "rate_2412": 71.7,
+        "rate_2512": 63.3,
+        "rate_diff_pp": -8.4
+      },
+      "DJ": {
+        "inbound_yoy": 188.4,
+        "sales_yoy": 113.2,
+        "rate_2412": 62.1,
+        "rate_2512": 37.3,
+        "rate_diff_pp": -24.8
+      },
+      "MT": {
+        "inbound_yoy": 73.4,
+        "sales_yoy": 79.6,
+        "rate_2412": 33.7,
+        "rate_2512": 36.5,
+        "rate_diff_pp": 2.8
+      },
+      "PT": {
+        "inbound_yoy": 82.4,
+        "sales_yoy": 83.7,
+        "rate_2412": 42.4,
+        "rate_2512": 43.1,
+        "rate_diff_pp": 0.7
+      }
+    }
+  }
+}

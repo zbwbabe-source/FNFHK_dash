@@ -71,6 +71,19 @@ export default function Home() {
           fetch(twSalesPerPyeongPath).then(res => res.ok ? res.json() : null).catch(() => null)
         ]);
 
+        // TAG Summary 데이터 로드 (전처리된 재고 YOY)
+        try {
+          const tagSummaryPath = `/dashboard/taiwan-tag-summary-${selectedPeriod}.json`;
+          const tagSummaryResponse = await fetch(tagSummaryPath);
+          if (tagSummaryResponse.ok) {
+            const tagSummaryData = await tagSummaryResponse.json();
+            // twDashboard에 TAG Summary 추가
+            (twDashboard as any).tag_summary = tagSummaryData;
+          }
+        } catch (e) {
+          console.log('TAG Summary data not found, skipping...');
+        }
+
         // ending_inventory는 components 폴더에서 import
         let hkDefaultData = null;
         let twDefaultData = null;
@@ -111,6 +124,19 @@ export default function Home() {
 
         setHkData(hkDashboard);
         setTwData(twDashboard);
+        
+        // Discovery PL 데이터 로드
+        try {
+          const discoveryResponse = await fetch(`/dashboard/discovery-pl-data-${selectedPeriod}.json`);
+          if (discoveryResponse.ok) {
+            const discoveryData = await discoveryResponse.json();
+            (hkPl as any).discovery = discoveryData.current_month.data;
+            (hkPl as any).discovery.cumulative_operating_profit = discoveryData.cumulative.data.operating_profit;
+          }
+        } catch (e) {
+          console.log('Discovery data not found, skipping...');
+        }
+        
         setHkPlData(hkPl);
         setTwPlData(twPl);
         setHkSalesPerPyeongData(hkSalesPyeong);
@@ -1129,8 +1155,6 @@ export default function Home() {
               <div>
                 <Link
                   href={`/hongkong?period=${selectedPeriod}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -1503,8 +1527,6 @@ export default function Home() {
               <div>
                 <Link
                   href={`/taiwan?period=${selectedPeriod}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-center py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >

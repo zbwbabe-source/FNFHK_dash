@@ -1,0 +1,175 @@
+{
+  "metadata": {
+    "period": "2512",
+    "generated_at": "2026-01-14T19:18:01.004901",
+    "source": "TW_Inventory_TAG_Summary (3).csv",
+    "unit": "1K HKD",
+    "exchange_rate": 4.02
+  },
+  "ending_inventory_tag": {
+    "current": 162126.94527363186,
+    "previous": 179457.87810945275,
+    "yoy": 90.3
+  },
+  "past_season_inventory_tag": {
+    "current": 25777.00995024876,
+    "previous": 35240.8631840796,
+    "yoy": 73.1
+  },
+  "tag_detail": {
+    "25F": {
+      "stock_current": 32481.731343283587,
+      "stock_previous": 28106.472636815924,
+      "stock_yoy": 115.6,
+      "sales_current": 9052.049751243781,
+      "sales_previous": 9242.890547263682,
+      "sales_yoy": 97.9,
+      "sales_ytd_current": 27657.7512437811,
+      "sales_ytd_previous": 25550.06716417911,
+      "sales_ytd_yoy": 108.2
+    },
+    "25S": {
+      "stock_current": 19870.60696517413,
+      "stock_previous": 24500.870646766172,
+      "stock_yoy": 81.1,
+      "sales_current": 183.63432835820896,
+      "sales_previous": 264.02238805970154,
+      "sales_yoy": 69.6,
+      "sales_ytd_current": 27083.709203980103,
+      "sales_ytd_previous": 28244.50248756219,
+      "sales_ytd_yoy": 95.9
+    },
+    "과시즌F": {
+      "stock_current": 25777.00995024876,
+      "stock_previous": 35240.8631840796,
+      "stock_yoy": 73.1,
+      "sales_current": 4129.358208955224,
+      "sales_previous": 4805.296019900498,
+      "sales_yoy": 85.9,
+      "sales_ytd_current": 32474.4328358209,
+      "sales_ytd_previous": 28349.55721393035,
+      "sales_ytd_yoy": 114.6
+    },
+    "과시즌F_1년차(24F)": {
+      "stock_current": 12294.626865671644,
+      "stock_previous": 26412.29850746269,
+      "stock_yoy": 46.5,
+      "sales_current": 2126.60447761194,
+      "sales_previous": 3977.552238805971,
+      "sales_yoy": 53.5,
+      "sales_ytd_current": 16176.527363184081,
+      "sales_ytd_previous": 19646.671641791047,
+      "sales_ytd_yoy": 82.3
+    },
+    "과시즌F_2년차(23F)": {
+      "stock_current": 13483.970149253733,
+      "stock_previous": 8826.905472636818,
+      "stock_yoy": 152.8,
+      "sales_current": 2002.7537313432838,
+      "sales_previous": 827.7437810945274,
+      "sales_yoy": 242.0,
+      "sales_ytd_current": 12364.233830845773,
+      "sales_ytd_previous": 8432.79104477612,
+      "sales_ytd_yoy": 146.6
+    },
+    "과시즌F_3년차(22F)": {
+      "stock_current": -1.5870646766169156,
+      "stock_previous": 1.6592039800995027,
+      "stock_yoy": -95.7,
+      "sales_current": 0.0,
+      "sales_previous": 0.0,
+      "sales_yoy": 0.0,
+      "sales_ytd_current": 3933.671641791045,
+      "sales_ytd_previous": 270.09452736318406,
+      "sales_ytd_yoy": 1456.4
+    },
+    "과시즌S": {
+      "stock_current": 12511.228855721394,
+      "stock_previous": 13585.853233830847,
+      "stock_yoy": 92.1,
+      "sales_current": 717.7139303482588,
+      "sales_previous": 462.7338308457712,
+      "sales_yoy": 155.1,
+      "sales_ytd_current": 18133.733830845773,
+      "sales_ytd_previous": 17292.940298507463,
+      "sales_ytd_yoy": 104.9
+    },
+    "과시즌S_1년차(24S)": {
+      "stock_current": 12508.654228855723,
+      "stock_previous": 13585.853233830847,
+      "stock_yoy": 92.1,
+      "sales_current": 700.9029850746269,
+      "sales_previous": 462.7338308457712,
+      "sales_yoy": 151.5,
+      "sales_ytd_current": 12074.196517412936,
+      "sales_ytd_previous": 14999.651741293535,
+      "sales_ytd_yoy": 80.5
+    },
+    "과시즌S_2년차(23S)": {
+      "stock_current": 2.5746268656716422,
+      "stock_previous": 0.0,
+      "stock_yoy": 0.0,
+      "sales_current": 16.81094527363184,
+      "sales_previous": 0.0,
+      "sales_yoy": 0.0,
+      "sales_ytd_current": 6059.5373134328365,
+      "sales_ytd_previous": 2293.2885572139303,
+      "sales_ytd_yoy": 264.2
+    },
+    "신발": {
+      "stock_current": 34729.30597014925,
+      "stock_previous": 38793.009950248765,
+      "stock_yoy": 89.5,
+      "sales_current": 4528.084577114429,
+      "sales_previous": 3943.7686567164183,
+      "sales_yoy": 114.8,
+      "sales_ytd_current": 46536.888059701494,
+      "sales_ytd_previous": 48174.151741293535,
+      "sales_ytd_yoy": 96.6
+    },
+    "모자": {
+      "stock_current": 26439.542288557215,
+      "stock_previous": 25077.604477611945,
+      "stock_yoy": 105.4,
+      "sales_current": 3413.2786069651743,
+      "sales_previous": 2921.5398009950254,
+      "sales_yoy": 116.8,
+      "sales_ytd_current": 40787.72562189055,
+      "sales_ytd_previous": 32196.39626865672,
+      "sales_ytd_yoy": 126.7
+    },
+    "가방": {
+      "stock_current": 8052.73880597015,
+      "stock_previous": 11165.544776119403,
+      "stock_yoy": 72.1,
+      "sales_current": 1036.0199004975125,
+      "sales_previous": 763.5721393034827,
+      "sales_yoy": 135.7,
+      "sales_ytd_current": 10442.594527363184,
+      "sales_ytd_previous": 10208.194029850747,
+      "sales_ytd_yoy": 102.3
+    },
+    "기타ACC": {
+      "stock_current": 2264.781094527363,
+      "stock_previous": 2987.6592039801,
+      "stock_yoy": 75.8,
+      "sales_current": 287.05721393034827,
+      "sales_previous": 257.43283582089555,
+      "sales_yoy": 111.5,
+      "sales_ytd_current": 2916.4054726368163,
+      "sales_ytd_previous": 2490.42039800995,
+      "sales_ytd_yoy": 117.1
+    },
+    "TOTAL": {
+      "stock_current": 162126.94527363186,
+      "stock_previous": 179457.87810945275,
+      "stock_yoy": 90.3,
+      "sales_current": 23347.196517412936,
+      "sales_previous": 22661.256218905473,
+      "sales_yoy": 103.0,
+      "sales_ytd_current": 206033.2407960199,
+      "sales_ytd_previous": 192506.22960199008,
+      "sales_ytd_yoy": 107.0
+    }
+  }
+}

@@ -22,7 +22,7 @@ def parse_period(period_str):
 # Store Code 분류
 OUTLET_CODES = {'M07', 'M13', 'M15', 'M21'}
 ONLINE_CODES = {'HE1', 'HE2', 'XE1'}
-EXCLUDED_STORES = {'M06', 'M19'}  # K11 임시매장, 신라면세점 제외
+EXCLUDED_STORES = {'M06', 'M19', 'W01'}  # K11 임시매장, 신라면세점(M19, W01) 제외
 
 def is_offline_store(store_code):
     """오프라인 매장인지 확인"""

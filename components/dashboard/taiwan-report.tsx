@@ -3394,7 +3394,7 @@ const TaiwanReport = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
             <div className="w-2 h-2 bg-cyan-500 rounded-full mr-2"></div>
-            온라인 채널별 현황 (실판V-, 25년 10월 기준, 1K HKD)
+            온라인 채널별 현황 (실판V-, 25년 12월 기준, 1K HKD)
           </h3>
         </div>
         
@@ -3440,11 +3440,11 @@ const TaiwanReport = () => {
                 <div className="space-y-1.5">
                   <div className="bg-cyan-600 px-2 py-2 rounded">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-cyan-200">당월 (25년 10월)</span>
+                      <span className="text-xs text-cyan-200">당월 (25년 12월)</span>
                       <span className="text-sm font-bold text-white">26.8%</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-cyan-200">전년 (24년 10월)</span>
+                      <span className="text-xs text-cyan-200">전년 (24년 12월)</span>
                       <span className="text-xs font-semibold text-cyan-200">24.4%</span>
                     </div>
                     <div className="flex justify-between items-center mt-1 pt-1 border-t border-cyan-500">

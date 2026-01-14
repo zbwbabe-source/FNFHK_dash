@@ -1,0 +1,38 @@
+{
+  "current_year": 2025,
+  "previous_year": 2024,
+  "weighted_average_area": {
+    "current": 0.0,
+    "previous": 0.0
+  },
+  "monthly_areas": {
+    "current": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "previous": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

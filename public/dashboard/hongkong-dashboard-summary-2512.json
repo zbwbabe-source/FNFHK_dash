@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "period": "2512",
+    "year": 2025,
+    "month": 12,
+    "generated_at": "2026-01-14T10:08:10.090530"
+  },
+  "summary": {
+    "total_net_sales": 42833.5841723312,
+    "total_net_sales_prev": 46474.04141650557,
+    "yoy": 92.16668674981763,
+    "change": -3640.457244174373,
+    "tag_sales": 55060.7769183558,
+    "tag_sales_prev": 58796.5355513722,
+    "discount_rate": 22.21,
+    "discount_rate_prev": 20.96,
+    "discount_change": 1.25
+  },
+  "brands": {
+    "MLB": {
+      "net_sales": 42833.5841723312,
+      "net_sales_prev": 46474.04141650557,
+      "yoy": 92.16668674981763,
+      "tag_sales": 55060.7769183558,
+      "discount_rate": 22.21,
+      "net_ytd": 403977.0635335444,
+      "net_ytd_prev": 427445.9491122475,
+      "ytd_yoy": 94.50950801441795
+    },
+    "Discovery": {
+      "net_sales": 3335.085106967544,
+      "net_sales_prev": 849.335834324881,
+      "yoy": 392.6697746855968,
+      "tag_sales": 4246.631940298508,
+      "discount_rate": 21.47,
+      "net_ytd": 14223.285078665838,
+      "net_ytd_prev": 1001.0962961659436,
+      "ytd_yoy": 1420.7709221519444
+    }
+  },
+  "channels": {
+    "리테일": {
+      "net_sales": 29426.02403594409,
+      "net_sales_prev": 34523.37920768334,
+      "yoy": 85.23506305372098,
+      "discount_rate": 13.43
+    },
+    "아울렛": {
+      "net_sales": 7008.3886843330965,
+      "net_sales_prev": 7509.188143624884,
+      "yoy": 93.33084416433282,
+      "discount_rate": 42.79
+    },
+    "오피스": {
+      "net_sales": 0.0,
+      "net_sales_prev": 0.0,
+      "yoy": 0,
+      "discount_rate": 0.0
+    },
+    "온라인": {
+      "net_sales": 6399.171452054015,
+      "net_sales_prev": 4441.474065197343,
+      "yoy": 144.07764985496289,
+      "discount_rate": 27.46
+    }
+  },
+  "ytd": {
+    "net_sales": 403977.0635335444,
+    "net_sales_prev": 427445.9491122475,
+    "yoy": 94.50950801441795
+  }
+}

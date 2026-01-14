@@ -69,6 +69,7 @@ interface FlattenedStoreRow {
   turnover_achievement_labor_rate: number; // 턴오버 달성시 인건비율 (%)
   turnover_achievement_direct_profit: number; // 턴오버 달성시 직접이익
   turnover_achievement_direct_profit_rate: number; // 턴오버 달성시 직접이익률 (%)
+  is_closed?: boolean; // 폐점 매장 여부
 }
 
 const CATEGORY_LABEL: Record<StoreCategoryKey, string> = {
@@ -133,26 +134,36 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   const [showSalesPerPyeongAnalysis, setShowSalesPerPyeongAnalysis] = useState(true); // 1번 섹션 접기/펼치기
   const [expandedCategoriesSalesPerPyeong, setExpandedCategoriesSalesPerPyeong] = useState<Set<string>>(new Set()); // 1번 섹션 펼쳐진 카테고리 목록
   const [showTurnoverRentExplanation, setShowTurnoverRentExplanation] = useState(false); // 턴오버 임차료 설명 접기/펼치기
+  const [showMonthlyOrCumulative, setShowMonthlyOrCumulative] = useState<'monthly' | 'cumulative'>('monthly'); // 당월/누적 토글
   
   // 동적 데이터 로드
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [cumulativeData, setCumulativeData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/dashboard/hongkong-dashboard-data-${period}.json`);
+        // 당월 데이터 로드
+        const response = await fetch(`/dashboard/hongkong-store-status-${period}.json`);
         if (!response.ok) {
           throw new Error(`Failed to load data for period ${period}`);
         }
         const data = await response.json();
         setDashboardData(data);
+        
+        // 누적 데이터 로드
+        const cumulativeResponse = await fetch(`/dashboard/hongkong-store-status-${period}-cumulative.json`);
+        if (cumulativeResponse.ok) {
+          const cumulativeDataJson = await cumulativeResponse.json();
+          setCumulativeData(cumulativeDataJson);
+        }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         // 폴백: 기본 데이터 로드 시도
         try {
-          const fallbackResponse = await fetch('/dashboard/hongkong-dashboard-data.json');
+          const fallbackResponse = await fetch('/dashboard/hongkong-store-status.json');
           const fallbackData = await fallbackResponse.json();
           setDashboardData(fallbackData);
         } catch (fallbackError) {
@@ -202,34 +213,25 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
   const allStores: FlattenedStoreRow[] = useMemo(() => {
     const result: FlattenedStoreRow[] = [];
     const storeAreas = (storeAreasData as any)?.store_areas || {};
+    
+    // 당월/누적 선택에 따라 데이터 소스 결정
+    const sourceData = showMonthlyOrCumulative === 'cumulative' && cumulativeData ? cumulativeData : dashboardData;
+    if (!sourceData) return [];
 
     // 모든 매장을 먼저 수집 (카테고리 무관)
     const allStoreRecords: StoreRecord[] = [];
     const categories = ['profit_improving', 'profit_deteriorating', 'loss_improving', 'loss_deteriorating'] as StoreCategoryKey[];
     categories.forEach((cat) => {
-      const catData = (storeStatusData as any)?.categories?.[cat];
+      const catData = sourceData?.categories?.[cat];
       if (!catData?.stores) return;
       allStoreRecords.push(...(catData.stores as StoreRecord[]));
     });
 
-    // 누적 기준으로 카테고리 재분류 함수
-    const categorizeByCumulative = (store: StoreRecord): StoreCategoryKey => {
-      const cumulativeDirectProfit = store.current?.cumulative?.direct_profit ?? store.current?.direct_profit ?? 0;
-      const cumulativeYoy = store.cumulative_yoy ?? store.yoy ?? 0;
-      
-      if (cumulativeDirectProfit > 0) {
-        return cumulativeYoy >= 100 ? 'profit_improving' : 'profit_deteriorating';
-      } else {
-        return cumulativeYoy >= 100 ? 'loss_improving' : 'loss_deteriorating';
-      }
-    };
-
     // 모든 매장 처리
     allStoreRecords.forEach((s) => {
         const area = storeAreas[s.shop_cd] || 0; // 평 단위
-        // 누적 기준으로 평당매출 계산
-        const netSales = s.current?.cumulative?.net_sales ?? s.current?.net_sales ?? 0;
-        const salesPerPyeong = area > 0 ? netSales / area : 0; // 평당매출 (1K HKD/평) - 누적 기준
+        const netSales = s.current?.net_sales ?? 0;
+        const salesPerPyeong = area > 0 ? netSales / area : 0; // 평당매출 (1K HKD/평)
         
         const rent = s.current?.rent ?? 0;
         const laborCost = s.current?.labor_cost ?? 0;
@@ -246,7 +248,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         // 턴오버 달성시 시나리오 계산 변수
         let turnoverAchievementRentRate = 0;
         let turnoverAchievementLaborRate = laborRate; // 인건비율은 동일
-        const cumulativeDirectProfit = s.current?.cumulative?.direct_profit ?? s.current?.direct_profit ?? 0;
+        const directProfit = s.current?.direct_profit ?? 0;
         let turnoverAchievementDirectProfit = cumulativeDirectProfit;
         let turnoverAchievementDirectProfitRate = 0;
         
@@ -302,11 +304,10 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
         result.push({
           store_code: s.shop_cd,
           store_name: s.shop_nm.trim(),
-          category: reclassifiedCategory, // 누적 기준으로 재분류된 카테고리
+          category: s.category,
           net_sales: netSales,
-          // 누적 기준으로 직접이익 사용 (평당매출 상세 일관성)
-          direct_profit: s.current?.cumulative?.direct_profit ?? s.current?.direct_profit ?? 0,
-          yoy: cumulativeYoy, // 누적 YOY 사용
+          direct_profit: directProfit,
+          yoy: s.yoy,
           rent_labor_ratio: s.current?.rent_labor_ratio ?? 0,
           rent_rate: rentRate,
           labor_rate: laborRate,
@@ -320,6 +321,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           turnover_achievement_labor_rate: turnoverAchievementLaborRate,
           turnover_achievement_direct_profit: turnoverAchievementDirectProfit,
           turnover_achievement_direct_profit_rate: turnoverAchievementDirectProfitRate,
+          is_closed: (s as any).is_closed || false, // 폐점 매장 여부
         });
     });
 
@@ -368,7 +370,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
     });
 
     return result;
-  }, []);
+  }, [showMonthlyOrCumulative, dashboardData, cumulativeData]);
 
   // 기본값 설정
   useEffect(() => {
@@ -413,6 +415,29 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
             <p className="text-sm text-slate-200">
               매장별 평당매출, 턴오버 달성률, 손익구조를 분석하여 효율성을 한눈에 파악하는 화면입니다.
             </p>
+          </div>
+          {/* 당월/누적 토글 버튼 */}
+          <div className="flex items-center gap-2 bg-slate-700/50 rounded-lg p-1">
+            <button
+              onClick={() => setShowMonthlyOrCumulative('monthly')}
+              className={`px-4 py-2 text-sm font-semibold rounded transition-colors ${
+                showMonthlyOrCumulative === 'monthly'
+                  ? 'bg-white text-slate-800'
+                  : 'bg-transparent text-white hover:bg-slate-600'
+              }`}
+            >
+              당월
+            </button>
+            <button
+              onClick={() => setShowMonthlyOrCumulative('cumulative')}
+              className={`px-4 py-2 text-sm font-semibold rounded transition-colors ${
+                showMonthlyOrCumulative === 'cumulative'
+                  ? 'bg-white text-slate-800'
+                  : 'bg-transparent text-white hover:bg-slate-600'
+              }`}
+            >
+              누적
+            </button>
           </div>
         </div>
       </div>
@@ -1060,6 +1085,11 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
                                     <td className="p-2 font-medium border-r border-gray-300 sticky left-0 bg-white z-10">
                                       <div className="flex items-center gap-2">
                                         <span className="text-gray-600">{store.store_name}</span>
+                                        {store.is_closed && (
+                                          <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                            영업종료
+                                          </span>
+                                        )}
                                         <span className={`px-1.5 py-0.5 rounded text-[9px] ${
                                           store.category === 'profit_improving' ? 'bg-green-100 text-green-800' :
                                           store.category === 'profit_deteriorating' ? 'bg-yellow-100 text-yellow-800' :
