@@ -49,71 +49,82 @@ current_store_count = count_stores(202512)
 print(f"\n홍콩 Discovery 매장 수 (2512): 온라인 {current_store_count['online']}개, 오프라인 {current_store_count['offline']}개")
 
 # 계정명별로 데이터 추출하는 함수
-def extract_account_data(df, period, account_name):
+def extract_account_data(df, period, account_name, exclude_m99=False, only_m99=False):
     """특정 기간의 계정 데이터 추출"""
     filtered = df[(df['PERIOD'] == period) & (df['ACCOUNT_NM'] == account_name)]
+    
+    # M99 필터링
+    if exclude_m99:
+        filtered = filtered[~filtered['SHOP_CD'].str.contains('99', na=False)]
+    elif only_m99:
+        filtered = filtered[filtered['SHOP_CD'].str.contains('99', na=False)]
+    
     return filtered['VALUE'].sum()
 
 # 당월(2512)와 전년동월(2412) 데이터 추출
 def get_period_data(period):
-    """특정 기간의 모든 손익 데이터 추출"""
+    """특정 기간의 모든 손익 데이터 추출 - M99와 실제 매장 분리"""
     data = {}
     
-    # 매출 관련
-    data['tag_sales'] = extract_account_data(df_discovery, period, 'Tag매출액')
-    data['net_sales'] = extract_account_data(df_discovery, period, '실매출액')
+    # 매출 관련 (HK만)
+    df_period = df_discovery[df_discovery['PERIOD'] == period]
+    df_hk = df_period[df_period['CNTRY_CD'] == 'HK']
+    
+    data['tag_sales'] = df_hk[df_hk['ACCOUNT_NM'] == 'Tag매출액']['VALUE'].sum()
+    data['net_sales'] = df_hk[df_hk['ACCOUNT_NM'] == '실매출액']['VALUE'].sum()
     data['discount'] = data['tag_sales'] - data['net_sales']
     data['discount_rate'] = (data['discount'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
     
     # 원가 및 이익
-    data['cogs'] = extract_account_data(df_discovery, period, '매출원가합계')
+    data['cogs'] = df_hk[df_hk['ACCOUNT_NM'] == '매출원가합계']['VALUE'].sum()
     data['cogs_rate'] = (data['cogs'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
-    data['gross_profit'] = extract_account_data(df_discovery, period, '매출총이익')
+    data['gross_profit'] = df_hk[df_hk['ACCOUNT_NM'] == '매출총이익']['VALUE'].sum()
     data['gross_profit_rate'] = (data['gross_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
     
-    # 영업 관련
-    data['sg_a'] = extract_account_data(df_discovery, period, '판매관리비')
-    data['operating_profit'] = extract_account_data(df_discovery, period, '영업이익')
+    # 영업이익
+    data['operating_profit'] = df_hk[df_hk['ACCOUNT_NM'] == '영업이익']['VALUE'].sum()
     data['operating_profit_rate'] = (data['operating_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
     
-    # 비용 상세 항목
+    # M99와 실제 매장 분리
+    df_hk_m99 = df_hk[df_hk['SHOP_CD'].str.contains('99', na=False)]
+    df_hk_real = df_hk[~df_hk['SHOP_CD'].str.contains('99', na=False)]
+    
+    # 실제 매장 직접비 (M99 제외)
+    direct_cost_accounts = [
+        '1. 급 여', '2. TRAVEL & MEAL', '3. 피복비(유니폼)', '4. 임차료',
+        '5. 유지보수비', '6. 수도광열비', '7. 소모품비', '8. 통신비',
+        '9. 광고선전비', '10. 지급수수료', '11. 운반비', '12. 기타 수수료(매장관리비 외)',
+        '13. 보험료', '14. 감가상각비', '15. 면세점 직접비'
+    ]
+    
+    data['direct_cost'] = 0
+    for acc in direct_cost_accounts:
+        val = df_hk_real[df_hk_real['ACCOUNT_NM'] == acc]['VALUE'].sum()
+        data['direct_cost'] += val
+    
+    # M99 영업비
+    data['sg_a'] = df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '판매관리비']['VALUE'].sum()
+    
+    # 비용 상세 (M99만, 영업비용 항목)
     data['expense_detail'] = {
-        'salary': extract_account_data(df_discovery, period, '1. 급 여'),
-        'travel': extract_account_data(df_discovery, period, '2. TRAVEL & MEAL'),
-        'uniform': extract_account_data(df_discovery, period, '3. 피복비(유니폼)'),
-        'rent': extract_account_data(df_discovery, period, '4. 임차료'),
-        'maintenance': extract_account_data(df_discovery, period, '5. 유지보수비'),
-        'utilities': extract_account_data(df_discovery, period, '6. 수도광열비'),
-        'supplies': extract_account_data(df_discovery, period, '7. 소모품비'),
-        'communication': extract_account_data(df_discovery, period, '8. 통신비'),
-        'marketing': extract_account_data(df_discovery, period, '9. 광고선전비'),
-        'fee': extract_account_data(df_discovery, period, '10. 지급수수료'),
-        'logistics': extract_account_data(df_discovery, period, '11. 운반비'),
-        'other_fee': extract_account_data(df_discovery, period, '12. 기타 수수료(매장관리비 외)'),
-        'insurance': extract_account_data(df_discovery, period, '13. 보험료'),
-        'depreciation': extract_account_data(df_discovery, period, '14. 감가상각비'),
-        'duty_free': extract_account_data(df_discovery, period, '15. 면세점 직접비'),
+        'salary': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '1. 급 여']['VALUE'].sum(),
+        'travel': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '2. TRAVEL & MEAL']['VALUE'].sum(),
+        'uniform': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '3. 피복비(유니폼)']['VALUE'].sum(),
+        'rent': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '4. 임차료']['VALUE'].sum(),
+        'maintenance': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '5. 유지보수비']['VALUE'].sum(),
+        'utilities': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '6. 수도광열비']['VALUE'].sum(),
+        'supplies': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '7. 소모품비']['VALUE'].sum(),
+        'communication': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '8. 통신비']['VALUE'].sum(),
+        'marketing': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '9. 광고선전비']['VALUE'].sum(),
+        'fee': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '10. 지급수수료']['VALUE'].sum(),
+        'logistics': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '11. 운반비']['VALUE'].sum(),
+        'other_fee': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '12. 기타 수수료(매장관리비 외)']['VALUE'].sum(),
+        'insurance': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '13. 보험료']['VALUE'].sum(),
+        'depreciation': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '14. 감가상각비']['VALUE'].sum(),
+        'duty_free': df_hk_m99[df_hk_m99['ACCOUNT_NM'] == '15. 면세점 직접비']['VALUE'].sum(),
     }
     
-    # 직접비 계산
-    data['direct_cost'] = sum([
-        data['expense_detail']['salary'],
-        data['expense_detail']['rent'],
-        data['expense_detail']['logistics'],
-        data['expense_detail']['other_fee'],
-        data['expense_detail']['insurance'],
-        data['expense_detail']['depreciation'],
-        data['expense_detail']['duty_free'],
-        data['expense_detail']['travel'],
-        data['expense_detail']['uniform'],
-        data['expense_detail']['maintenance'],
-        data['expense_detail']['utilities'],
-        data['expense_detail']['supplies'],
-        data['expense_detail']['communication'],
-        data['expense_detail']['marketing'],
-        data['expense_detail']['fee']
-    ])
-    
+    # 직접이익 = 매출총이익 - 직접비 (M99 제외)
     data['direct_profit'] = data['gross_profit'] - data['direct_cost']
     data['direct_profit_rate'] = (data['direct_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
     
@@ -121,74 +132,77 @@ def get_period_data(period):
 
 # 누적 데이터 추출 (2501~2512, 2401~2412)
 def get_ytd_data(start_period, end_period):
-    """누적 기간의 모든 손익 데이터 추출"""
+    """누적 기간의 모든 손익 데이터 추출 - M99와 실제 매장 분리"""
     df_ytd = df_discovery[(df_discovery['PERIOD'] >= start_period) & (df_discovery['PERIOD'] <= end_period)]
+    df_ytd_hk = df_ytd[df_ytd['CNTRY_CD'] == 'HK']
     
     data = {}
-    accounts = [
-        'Tag매출액', '실매출액', '매출원가합계', '매출총이익', '판매관리비', '영업이익',
+    
+    # 매출 관련
+    data['tag_sales'] = df_ytd_hk[df_ytd_hk['ACCOUNT_NM'] == 'Tag매출액']['VALUE'].sum()
+    data['net_sales'] = df_ytd_hk[df_ytd_hk['ACCOUNT_NM'] == '실매출액']['VALUE'].sum()
+    data['discount'] = data['tag_sales'] - data['net_sales']
+    data['discount_rate'] = (data['discount'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
+    
+    data['cogs'] = df_ytd_hk[df_ytd_hk['ACCOUNT_NM'] == '매출원가합계']['VALUE'].sum()
+    data['cogs_rate'] = (data['cogs'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
+    data['gross_profit'] = df_ytd_hk[df_ytd_hk['ACCOUNT_NM'] == '매출총이익']['VALUE'].sum()
+    data['gross_profit_rate'] = (data['gross_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
+    
+    data['operating_profit'] = df_ytd_hk[df_ytd_hk['ACCOUNT_NM'] == '영업이익']['VALUE'].sum()
+    data['operating_profit_rate'] = (data['operating_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
+    
+    # M99와 실제 매장 분리
+    df_ytd_hk_m99 = df_ytd_hk[df_ytd_hk['SHOP_CD'].str.contains('99', na=False)]
+    df_ytd_hk_real = df_ytd_hk[~df_ytd_hk['SHOP_CD'].str.contains('99', na=False)]
+    
+    # 실제 매장 직접비
+    direct_cost_accounts = [
         '1. 급 여', '2. TRAVEL & MEAL', '3. 피복비(유니폼)', '4. 임차료',
         '5. 유지보수비', '6. 수도광열비', '7. 소모품비', '8. 통신비',
         '9. 광고선전비', '10. 지급수수료', '11. 운반비', '12. 기타 수수료(매장관리비 외)',
         '13. 보험료', '14. 감가상각비', '15. 면세점 직접비'
     ]
     
-    for account in accounts:
-        filtered = df_ytd[df_ytd['ACCOUNT_NM'] == account]
-        data[account] = filtered['VALUE'].sum()
+    data['direct_cost'] = 0
+    for acc in direct_cost_accounts:
+        val = df_ytd_hk_real[df_ytd_hk_real['ACCOUNT_NM'] == acc]['VALUE'].sum()
+        data['direct_cost'] += val
     
-    # 계산
-    data['tag_sales'] = data.get('Tag매출액', 0)
-    data['net_sales'] = data.get('실매출액', 0)
-    data['discount'] = data['tag_sales'] - data['net_sales']
-    data['discount_rate'] = (data['discount'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
+    # M99 영업비
+    data['sg_a'] = df_ytd_hk_m99[df_ytd_hk_m99['ACCOUNT_NM'] == '판매관리비']['VALUE'].sum()
     
-    data['cogs'] = data.get('매출원가합계', 0)
-    data['cogs_rate'] = (data['cogs'] / data['tag_sales'] * 100) if data['tag_sales'] > 0 else 0
-    data['gross_profit'] = data.get('매출총이익', 0)
-    data['gross_profit_rate'] = (data['gross_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
+    # 비용 상세 (M99만)
+    data['expense_detail'] = {}
+    for acc in direct_cost_accounts:
+        key = acc.split('. ')[1] if '. ' in acc else acc
+        key_map = {
+            '급 여': 'salary',
+            'TRAVEL & MEAL': 'travel',
+            '피복비(유니폼)': 'uniform',
+            '임차료': 'rent',
+            '유지보수비': 'maintenance',
+            '수도광열비': 'utilities',
+            '소모품비': 'supplies',
+            '통신비': 'communication',
+            '광고선전비': 'marketing',
+            '지급수수료': 'fee',
+            '운반비': 'logistics',
+            '기타 수수료(매장관리비 외)': 'other_fee',
+            '보험료': 'insurance',
+            '감가상각비': 'depreciation',
+            '면세점 직접비': 'duty_free'
+        }
+        eng_key = key_map.get(key, key)
+        data['expense_detail'][eng_key] = df_ytd_hk_m99[df_ytd_hk_m99['ACCOUNT_NM'] == acc]['VALUE'].sum()
     
-    data['sg_a'] = data.get('판매관리비', 0)
-    data['operating_profit'] = data.get('영업이익', 0)
-    data['operating_profit_rate'] = (data['operating_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
+    # 필요한 계정 추가 (만약 없으면 0으로)
+    for key in ['salary', 'travel', 'uniform', 'rent', 'maintenance', 'utilities', 'supplies', 
+                'communication', 'marketing', 'fee', 'logistics', 'other_fee', 'insurance', 'depreciation', 'duty_free']:
+        if key not in data['expense_detail']:
+            data['expense_detail'][key] = 0
     
-    # 비용 상세
-    data['expense_detail'] = {
-        'salary': data.get('1. 급 여', 0),
-        'travel': data.get('2. TRAVEL & MEAL', 0),
-        'uniform': data.get('3. 피복비(유니폼)', 0),
-        'rent': data.get('4. 임차료', 0),
-        'maintenance': data.get('5. 유지보수비', 0),
-        'utilities': data.get('6. 수도광열비', 0),
-        'supplies': data.get('7. 소모품비', 0),
-        'communication': data.get('8. 통신비', 0),
-        'marketing': data.get('9. 광고선전비', 0),
-        'fee': data.get('10. 지급수수료', 0),
-        'logistics': data.get('11. 운반비', 0),
-        'other_fee': data.get('12. 기타 수수료(매장관리비 외)', 0),
-        'insurance': data.get('13. 보험료', 0),
-        'depreciation': data.get('14. 감가상각비', 0),
-        'duty_free': data.get('15. 면세점 직접비', 0),
-    }
-    
-    data['direct_cost'] = sum([
-        data['expense_detail']['salary'],
-        data['expense_detail']['rent'],
-        data['expense_detail']['logistics'],
-        data['expense_detail']['other_fee'],
-        data['expense_detail']['insurance'],
-        data['expense_detail']['depreciation'],
-        data['expense_detail']['duty_free'],
-        data['expense_detail']['travel'],
-        data['expense_detail']['uniform'],
-        data['expense_detail']['maintenance'],
-        data['expense_detail']['utilities'],
-        data['expense_detail']['supplies'],
-        data['expense_detail']['communication'],
-        data['expense_detail']['marketing'],
-        data['expense_detail']['fee']
-    ])
-    
+    # 직접이익 = 매출총이익 - 직접비 (M99 제외)
     data['direct_profit'] = data['gross_profit'] - data['direct_cost']
     data['direct_profit_rate'] = (data['direct_profit'] / data['net_sales'] * 100) if data['net_sales'] > 0 else 0
     

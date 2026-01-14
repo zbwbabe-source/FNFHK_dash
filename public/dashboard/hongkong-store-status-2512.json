@@ -5,11 +5,11 @@
     "generated_at": "2026-01-14T14:20:49.969352"
   },
   "summary": {
-    "total_stores": 19,
-    "hk_stores": 15,
+    "total_stores": 20,
+    "hk_stores": 16,
     "mc_stores": 4,
-    "total_direct_profit": 2435.3975127999997,
-    "sales_per_store": 1260.4913415789474,
+    "total_direct_profit": 2319.7375128,
+    "sales_per_store": 924.6308714999999,
     "overall_yoy": 84.66607881347646
   },
   "categories": {
@@ -223,10 +223,10 @@
     },
     "loss_improving": {
       "name": "적자 & 성장",
-      "count": 1,
-      "total_direct_profit": -10.038419499999975,
-      "avg_yoy": 113.82879128152581,
-      "avg_rent_labor_ratio": 33.654434982967786,
+      "count": 2,
+      "total_direct_profit": -125.69841949999997,
+      "avg_yoy": 112.40939564076291,
+      "avg_rent_labor_ratio": 52.75721749148389,
       "stores": [
         {
           "shop_cd": "M15",
@@ -246,6 +246,37 @@
           "yoy": 113.82879128152581,
           "category": "loss_improving",
           "previous_category": "loss_improving"
+        },
+        {
+          "shop_cd": "M19",
+          "shop_nm": "NTP 3",
+          "country": "HK",
+          "current": {
+            "net_sales": 284.13,
+            "direct_profit": -115.66,
+            "rent_labor_ratio": 71.86,
+            "rent": 131.08,
+            "labor_cost": 73.09
+          },
+          "previous": {
+            "net_sales": 255.98,
+            "direct_profit": -63.8
+          },
+          "yoy": 110.99,
+          "category": "loss_improving",
+          "previous_category": "loss_deteriorating",
+          "cumulative": {
+            "net_sales": 1784.69,
+            "direct_profit": -1704.87,
+            "rent_labor_ratio": 114.13,
+            "rent": 1532.47,
+            "labor_cost": 504.39
+          },
+          "prev_cumulative": {
+            "net_sales": 1691.76,
+            "direct_profit": -1655.03
+          },
+          "cumulative_yoy": 105.49
         }
       ]
     },

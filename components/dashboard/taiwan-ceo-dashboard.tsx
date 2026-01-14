@@ -9948,34 +9948,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )}
                   </button>
                   {showOperatingExpenseItemAnalysis.salary && (() => {
-                    const cumulativeData = plData?.cumulative?.total;
-                    const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
-                    const expenseDetail = cumulativeData?.expense_detail || {};
-                    const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
-                    const current = (expenseDetail as any).salary || 0;
-                    const prev = (expenseDetailPrev as any).salary || 0;
-                    const change = current - prev;
-                    const changeRate = prev !== 0 ? (current / prev) * 100 : 0;
-                    const currentSales = cumulativeData?.net_sales || 0;
-                    const prevSales = prevCumulativeData?.net_sales || 0;
-                    const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
-                    const prevRatio = prevSales !== 0 ? (prev / prevSales) * 100 : 0;
-                    const ratioChange = currentRatio - prevRatio;
-
-                    return (
-                      <div className="mt-3 pt-3 border-t bg-blue-50 rounded p-2">
-                        <div className="space-y-1.5 text-xs">
-                          <div className="flex items-start">
-                            <span className="text-blue-600 mr-1">•</span>
-                            <span className="text-gray-700">TW Office 급여 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                          </div>
-                          <div className="flex items-start">
-                            <span className="text-blue-600 mr-1">•</span>
-                            <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
+                    return null;
                   })()}
                 </div>
               </>
@@ -10255,38 +10228,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     )}
                   </button>
                   {showOperatingExpenseItemAnalysis.fee && (() => {
-                    const cumulativeData = plData?.cumulative?.total;
-                    const prevCumulativeData = plData?.cumulative?.prev_cumulative?.total;
-                    const expenseDetail = cumulativeData?.expense_detail || {};
-                    const expenseDetailPrev = prevCumulativeData?.expense_detail || {};
-                    const current = ((expenseDetail as any).fee || 0) + ((expenseDetail as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함 (other_detail 안에 있음)
-                    const prev = ((expenseDetailPrev as any).fee || 0) + ((expenseDetailPrev as any)?.other_detail?.other_fee || 0); // 기타 수수료 포함
-                    const change = current - prev;
-                    const changeRate = prev !== 0 ? (change / prev) * 100 : 0;
-                    const currentSales = cumulativeData?.net_sales || 0;
-                    const prevSales = prevCumulativeData?.net_sales || 0;
-                    const currentRatio = currentSales !== 0 ? (current / currentSales) * 100 : 0;
-                    const prevRatio = prevSales !== 0 ? (prev / prevSales) * 100 : 0;
-                    const ratioChange = currentRatio - prevRatio;
-
-                    return (
-                      <div className="mt-3 pt-3 border-t bg-orange-50 rounded p-2">
-                        <div className="space-y-1.5 text-xs">
-                          <div className="flex items-start">
-                            <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">지급수수료 {change >= 0 ? '증가' : '감소'} {change >= 0 ? '+' : ''}{formatNumber(change)}K (YOY {formatPercent(changeRate)}%)</span>
-                          </div>
-                          <div className="flex items-start">
-                            <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">매출 대비 비율: {formatPercent(currentRatio)}% (전년 대비 {ratioChange >= 0 ? '+' : ''}{formatPercent(ratioChange)}%p)</span>
-                          </div>
-                          <div className="flex items-start">
-                            <span className="text-orange-600 mr-1">•</span>
-                            <span className="text-gray-700">지급수수료 변화는 다양한 수수료 항목의 종합 결과</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
+                    return null;
                   })()}
                 </div>
               </>

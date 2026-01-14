@@ -1,0 +1,508 @@
+{
+  "metadata": {
+    "period": "2512",
+    "generated_at": "2026-01-14T18:35:24.975048"
+  },
+  "stores": [
+    {
+      "shop_cd": "T01",
+      "shop_nm": "台北101",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 70,
+      "is_active": true,
+      "current": {
+        "net_sales": 739.5714477611941,
+        "direct_profit": 142.73354975124374,
+        "direct_profit_rate": 19.299494346803403,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 5751.251733487998,
+        "direct_profit": 27.970841986254072,
+        "direct_profit_rate": 0.48634355236769333,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T02",
+      "shop_nm": "新光三越信義A11",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 60,
+      "is_active": true,
+      "current": {
+        "net_sales": 788.1764626865672,
+        "direct_profit": 181.31806716417913,
+        "direct_profit_rate": 23.00475537497541,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 7039.941196637054,
+        "direct_profit": 1481.8551612861925,
+        "direct_profit_rate": 21.04925481471447,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T03",
+      "shop_nm": "微風南京",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 50,
+      "is_active": true,
+      "current": {
+        "net_sales": 854.4976641791046,
+        "direct_profit": 172.35619651741297,
+        "direct_profit_rate": 20.17047017711762,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 7135.9230617374105,
+        "direct_profit": 1003.5455294572043,
+        "direct_profit_rate": 14.063289651176078,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T04",
+      "shop_nm": "新光三越台北站前",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 45,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 2385.408685969889,
+        "direct_profit": 269.52315801770374,
+        "direct_profit_rate": 11.298825211920349,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T05",
+      "shop_nm": "微風信義",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 55,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T06",
+      "shop_nm": "誠品信義",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 40,
+      "is_active": true,
+      "current": {
+        "net_sales": 829.2330845771145,
+        "direct_profit": 159.11623134328352,
+        "direct_profit_rate": 19.188360221351793,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 6002.089560352581,
+        "direct_profit": 1377.5744446860526,
+        "direct_profit_rate": 22.95158095916732,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T07",
+      "shop_nm": "台中大遠百",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 45,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 4455.241190646429,
+        "direct_profit": 878.2212405361681,
+        "direct_profit_rate": 19.712091959913476,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T08",
+      "shop_nm": "高雄大遠百",
+      "region": "TW",
+      "channel": "정규점",
+      "area": 40,
+      "is_active": true,
+      "current": {
+        "net_sales": 1335.780905472637,
+        "direct_profit": 283.2775348258708,
+        "direct_profit_rate": 21.206886074302673,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 11322.214416386681,
+        "direct_profit": 2117.079037134881,
+        "direct_profit_rate": 18.698453847251162,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T09",
+      "shop_nm": "Gloria Outlet 華泰名品城",
+      "region": "TW",
+      "channel": "아웃렛",
+      "area": 35,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 1609.1538627340174,
+        "direct_profit": 184.22001596132532,
+        "direct_profit_rate": 11.448253658499013,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T10",
+      "shop_nm": "Online",
+      "region": "TW",
+      "channel": "온라인",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 869.2639676616917,
+        "direct_profit": 187.45748756218916,
+        "direct_profit_rate": 21.565082016047125,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 7489.168396074731,
+        "direct_profit": 1471.1216178112322,
+        "direct_profit_rate": 19.64332406495607,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T11",
+      "shop_nm": "T11",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 611.6236965174129,
+        "direct_profit": 168.81816169154217,
+        "direct_profit_rate": 27.601638499749647,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 5711.799757656359,
+        "direct_profit": 1214.01178219458,
+        "direct_profit_rate": 21.2544527767673,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T12",
+      "shop_nm": "T12",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 881.9071517412935,
+        "direct_profit": 219.14590796019894,
+        "direct_profit_rate": 24.84909069254097,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 7194.5667810005525,
+        "direct_profit": 1378.025285687053,
+        "direct_profit_rate": 19.153693719629498,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T13",
+      "shop_nm": "T13",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 558.951365671642,
+        "direct_profit": 84.53670149253745,
+        "direct_profit_rate": 15.12416046983931,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 5183.07521300893,
+        "direct_profit": 704.0595692155566,
+        "direct_profit_rate": 13.583819263290778,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T14",
+      "shop_nm": "T14",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 667.2577960199005,
+        "direct_profit": 132.14599253731342,
+        "direct_profit_rate": 19.80433849189111,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 5128.124791080074,
+        "direct_profit": 790.0584181608338,
+        "direct_profit_rate": 15.406380506478149,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T15",
+      "shop_nm": "T15",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 878.485095422381,
+        "direct_profit": -335.4503484290583,
+        "direct_profit_rate": -38.18509274397782,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T16",
+      "shop_nm": "T16",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 531.9218194740586,
+        "direct_profit": 93.14902096659586,
+        "direct_profit_rate": 17.511787927537473,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 4184.677335433216,
+        "direct_profit": 221.77993199323646,
+        "direct_profit_rate": 5.299809620095282,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T17",
+      "shop_nm": "T17",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 552.5234565268894,
+        "direct_profit": 89.9391903577351,
+        "direct_profit_rate": 16.27789540793153,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 4314.750980566204,
+        "direct_profit": 617.4463109276662,
+        "direct_profit_rate": 14.310126209106086,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "T18",
+      "shop_nm": "T18",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 686.2218976545843,
+        "direct_profit": 125.73713397299218,
+        "direct_profit_rate": 18.32310137620864,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 2741.9232176238106,
+        "direct_profit": 287.3582085021337,
+        "direct_profit_rate": 10.480169782112366,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TE1",
+      "shop_nm": "TE1",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 1830.914238332149,
+        "direct_profit": 175.7480069888651,
+        "direct_profit_rate": 9.598920763703317,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 15257.98240699671,
+        "direct_profit": 2388.388843938952,
+        "direct_profit_rate": 15.653372642792737,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TE2",
+      "shop_nm": "TE2",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 2004.308457711443,
+        "direct_profit": 840.033184079602,
+        "direct_profit_rate": 41.911372515923404,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 16831.09826118492,
+        "direct_profit": 6677.21385740064,
+        "direct_profit_rate": 39.67188447113587,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TE3",
+      "shop_nm": "TE3",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 1200.4880360104241,
+        "direct_profit": 383.280772328832,
+        "direct_profit_rate": 31.927079723558684,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 9066.528522714221,
+        "direct_profit": 2340.3803086024614,
+        "direct_profit_rate": 25.813411414734382,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TE4",
+      "shop_nm": "TE4",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 0.0,
+        "direct_profit": 0.0,
+        "direct_profit_rate": 0,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TU1",
+      "shop_nm": "TU1",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 607.8615099502489,
+        "direct_profit": 22.42743034825881,
+        "direct_profit_rate": 3.6895625041457896,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 6918.265139361502,
+        "direct_profit": 148.44019239614545,
+        "direct_profit_rate": 2.1456273994414334,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TU2",
+      "shop_nm": "TU2",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 421.9751616915423,
+        "direct_profit": 13.004017412935298,
+        "direct_profit_rate": 3.081702098485371,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 5084.019436011733,
+        "direct_profit": 140.13291029654079,
+        "direct_profit_rate": 2.756340963292442,
+        "operating_profit": 0
+      }
+    },
+    {
+      "shop_cd": "TU3",
+      "shop_nm": "TU3",
+      "region": "TW",
+      "channel": "기타",
+      "area": 0,
+      "is_active": true,
+      "current": {
+        "net_sales": 1264.1838426913055,
+        "direct_profit": 51.82006159677786,
+        "direct_profit_rate": 4.099092224312784,
+        "operating_profit": 0
+      },
+      "cumulative": {
+        "net_sales": 11957.719011456951,
+        "direct_profit": 189.0349816268449,
+        "direct_profit_rate": 1.5808615459664703,
+        "operating_profit": 0
+      }
+    }
+  ]
+}

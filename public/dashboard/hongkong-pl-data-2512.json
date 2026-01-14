@@ -2,7 +2,7 @@
   "metadata": {
     "last_period": "2512",
     "previous_period": "2412",
-    "generated_at": "2026-01-14T20:49:25.037962"
+    "generated_at": "2026-01-14T21:26:44.201993"
   },
   "channel_direct_profit": {
     "hk_offline": {
@@ -583,20 +583,29 @@
     }
   },
   "discovery": {
-    "net_sales": 3335.0851069,
-    "prev_net_sales": 2954.3936599,
-    "net_sales_mom": 112.88560330219792,
-    "discount_rate": 21.465171599024902,
-    "prev_discount_rate": 20.685656749138836,
-    "direct_cost": 2417.2482629720007,
-    "direct_profit": -525.9368289820006,
-    "operating_profit": -525.9368290159999,
-    "marketing": 605.653699718,
-    "travel": 5.373134328,
+    "net_sales": 604.66831,
+    "prev_net_sales": 583.4153,
+    "net_sales_mom": 103.64286126880799,
+    "discount_rate": 12.937235788746179,
+    "prev_discount_rate": 12.121029997665257,
+    "direct_cost": 721.84687,
+    "direct_profit": -335.4736135499999,
+    "sg_a": 321.78,
+    "operating_profit": -657.253613546,
+    "marketing": 321.78,
+    "travel": 0.0,
     "store_count": {
       "online": 1,
       "offline": 1,
       "total": 2
-    }
+    },
+    "cumulative_net_sales": 1596.3417000000002,
+    "cumulative_discount_rate": 11.838178158110537,
+    "cumulative_direct_cost": 2608.1357399999997,
+    "cumulative_direct_profit": -1583.2473687929999,
+    "cumulative_sg_a": 778.29265,
+    "cumulative_operating_profit": -2361.540019086,
+    "cumulative_marketing": 752.55265,
+    "cumulative_travel": 25.74
   }
 }

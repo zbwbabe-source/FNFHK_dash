@@ -2052,5 +2052,24 @@
       },
       "yoy": 586.9296994065955
     }
+  },
+  "stores": {
+    "M19": {
+      "shop_cd": "M19",
+      "shop_nm": "NTP 3",
+      "country": "HK",
+      "cumulative": {
+        "net_sales": 1784.69,
+        "direct_profit": -1704.87,
+        "rent_labor_ratio": 114.13,
+        "rent": 1532.47,
+        "labor_cost": 504.39
+      },
+      "prev_cumulative": {
+        "net_sales": 1691.76,
+        "direct_profit": -1655.03
+      },
+      "cumulative_yoy": 105.49
+    }
   }
 }

@@ -677,6 +677,9 @@ if os.path.exists(discovery_pl_file):
         discovery_mom = discovery_data.get('current_month', {}).get('mom', {})
         discovery_store_count = discovery_data.get('metadata', {}).get('store_count', {})
         
+        # Discovery 누적 데이터 추출
+        discovery_cumulative = discovery_data.get('cumulative', {}).get('data', {})
+        
         # pl_data에 Discovery 추가
         pl_data['discovery'] = {
             'net_sales': discovery_current.get('net_sales', 0),
@@ -686,18 +689,40 @@ if os.path.exists(discovery_pl_file):
             'prev_discount_rate': discovery_prev.get('discount_rate', 0),
             'direct_cost': discovery_current.get('direct_cost', 0),
             'direct_profit': discovery_current.get('direct_profit', 0),
+            'sg_a': discovery_current.get('sg_a', 0),
             'operating_profit': discovery_current.get('operating_profit', 0),
             'marketing': discovery_current.get('expense_detail', {}).get('marketing', 0),
             'travel': discovery_current.get('expense_detail', {}).get('travel', 0),
-            'store_count': discovery_store_count
+            'store_count': discovery_store_count,
+            # 누적 데이터 추가
+            'cumulative_net_sales': discovery_cumulative.get('net_sales', 0),
+            'cumulative_discount_rate': discovery_cumulative.get('discount_rate', 0),
+            'cumulative_direct_cost': discovery_cumulative.get('direct_cost', 0),
+            'cumulative_direct_profit': discovery_cumulative.get('direct_profit', 0),
+            'cumulative_sg_a': discovery_cumulative.get('sg_a', 0),
+            'cumulative_operating_profit': discovery_cumulative.get('operating_profit', 0),
+            'cumulative_marketing': discovery_cumulative.get('expense_detail', {}).get('marketing', 0),
+            'cumulative_travel': discovery_cumulative.get('expense_detail', {}).get('travel', 0),
         }
         print(f"\n[INFO] Discovery 데이터 통합 완료")
+        print(f"  [당월]")
         print(f"  - 실판매출: {pl_data['discovery']['net_sales']:,.0f}K HKD")
         print(f"  - 전월 실판매출: {pl_data['discovery']['prev_net_sales']:,.0f}K HKD")
         print(f"  - 전월비(MOM): {pl_data['discovery']['net_sales_mom']:.1f}%")
         print(f"  - 할인율: {pl_data['discovery']['discount_rate']:.1f}%")
         print(f"  - 전월 할인율: {pl_data['discovery']['prev_discount_rate']:.1f}%")
         print(f"  - 할인율 증감: {pl_data['discovery']['discount_rate'] - pl_data['discovery']['prev_discount_rate']:+.1f}%p")
+        print(f"  - 직접비(실제 매장): {pl_data['discovery']['direct_cost']:,.0f}K HKD")
+        print(f"  - 직접손실: {pl_data['discovery']['direct_profit']:,.0f}K HKD")
+        print(f"  - 영업비(M99): {pl_data['discovery']['sg_a']:,.0f}K HKD")
+        print(f"  - 영업손실: {pl_data['discovery']['operating_profit']:,.0f}K HKD")
+        print(f"  [누적]")
+        print(f"  - 누적 실판매출: {pl_data['discovery']['cumulative_net_sales']:,.0f}K HKD")
+        print(f"  - 누적 할인율: {pl_data['discovery']['cumulative_discount_rate']:.1f}%")
+        print(f"  - 누적 직접비: {pl_data['discovery']['cumulative_direct_cost']:,.0f}K HKD")
+        print(f"  - 누적 직접손실: {pl_data['discovery']['cumulative_direct_profit']:,.0f}K HKD")
+        print(f"  - 누적 영업비(M99): {pl_data['discovery']['cumulative_sg_a']:,.0f}K HKD")
+        print(f"  - 누적 영업손실: {pl_data['discovery']['cumulative_operating_profit']:,.0f}K HKD")
         print(f"  - 매장수: 오프라인 {discovery_store_count.get('offline', 0)}개, 온라인 {discovery_store_count.get('online', 0)}개")
     except Exception as e:
         print(f"\n[WARNING] Discovery 데이터 로드 실패: {e}")

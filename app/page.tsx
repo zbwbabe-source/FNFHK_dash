@@ -125,16 +125,17 @@ export default function Home() {
         setHkData(hkDashboard);
         setTwData(twDashboard);
         
-        // Discovery PL 데이터 로드
+        // Discovery 누적 영업이익만 별도 로드
         try {
           const discoveryResponse = await fetch(`/dashboard/discovery-pl-data-${selectedPeriod}.json`);
           if (discoveryResponse.ok) {
             const discoveryData = await discoveryResponse.json();
-            (hkPl as any).discovery = discoveryData.current_month.data;
-            (hkPl as any).discovery.cumulative_operating_profit = discoveryData.cumulative.data.operating_profit;
+            if ((hkPl as any).discovery) {
+              (hkPl as any).discovery.cumulative_operating_profit = discoveryData.cumulative.data.operating_profit;
+            }
           }
         } catch (e) {
-          console.log('Discovery data not found, skipping...');
+          console.log('Discovery cumulative data not found, skipping...');
         }
         
         setHkPlData(hkPl);
@@ -562,10 +563,55 @@ export default function Home() {
     ? (twCumulativeNetSales / twPrevCumulativeNetSales) * 100 
     : 0;
 
-  // 대만 재고 데이터
-  const twStockCurrent = twData?.ending_inventory?.total?.current || 0;
-  const twStockPrevious = twData?.ending_inventory?.total?.previous || 0;
-  const twStockYoy = twStockPrevious > 0 ? (twStockCurrent / twStockPrevious) * 100 : 0;
+  // 대만 재고 데이터 (대시보드와 동일한 로직: Season + ACC 합산)
+  const getTWStock = () => {
+    const endingInventory = twData?.ending_inventory;
+    if (!endingInventory) {
+      return { current: 0, previous: 0, yoy: 0 };
+    }
+
+    // 1. tag_summary 우선 사용
+    const tagSummary = twData?.tag_summary?.ending_inventory_tag;
+    if (tagSummary) {
+      return {
+        current: tagSummary.current || 0,
+        previous: tagSummary.previous || 0,
+        yoy: tagSummary.yoy || 0
+      };
+    }
+
+    // 2. by_season + acc_by_category 합산
+    const bySeasonData = endingInventory.by_season || {};
+    const accData = endingInventory.acc_by_category || {};
+
+    let totalCurrent = 0;
+    let totalPrevious = 0;
+
+    // Season 합산
+    Object.values(bySeasonData).forEach((season: any) => {
+      totalCurrent += season?.current?.stock_price || 0;
+      totalPrevious += season?.previous?.stock_price || 0;
+    });
+
+    // ACC 합산
+    Object.values(accData).forEach((category: any) => {
+      totalCurrent += category?.current?.stock_price || 0;
+      totalPrevious += category?.previous?.stock_price || 0;
+    });
+
+    const totalYoy = totalPrevious > 0 ? (totalCurrent / totalPrevious * 100) : 0;
+
+    return {
+      current: totalCurrent,
+      previous: totalPrevious,
+      yoy: totalYoy
+    };
+  };
+
+  const twStock = getTWStock();
+  const twStockCurrent = twStock.current;
+  const twStockPrevious = twStock.previous;
+  const twStockYoy = twStock.yoy;
 
   // 평당매출 계산용: 홍콩만 오프라인 매출 (마카오 제외)
   const hkOnlyOfflineCurrent = useMemo(() => {
@@ -1074,7 +1120,7 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                    )
+                    )}
                     
                     {showHkmcDiscovery && (
                       <>
