@@ -10,10 +10,13 @@ df = pd.read_csv(csv_file, encoding='utf-8-sig')
 df['VALUE'] = pd.to_numeric(df['VALUE'], errors='coerce').fillna(0)
 df['PERIOD'] = pd.to_numeric(df['PERIOD'], errors='coerce').astype('Int64')
 
-# HK 국가, M99 제외
-df_hk = df[(df['CNTRY_CD'] == 'HK') & (df['SHOP_CD'] != 'M99')].copy()
+# HK 국가, M99만 사용
+df_hk = df[(df['CNTRY_CD'] == 'HK') & (df['SHOP_CD'] == 'M99')].copy()
 
-print('=== 영업비 재계산 시작 ===\n')
+print(f'필터링: HK 국가, M99 매장만')
+print(f'필터링 후 행 수: {len(df_hk)}')
+
+print('\n=== 영업비 재계산 시작 ===\n')
 
 # 계정 매핑
 ACCOUNT_MAPPING = {
