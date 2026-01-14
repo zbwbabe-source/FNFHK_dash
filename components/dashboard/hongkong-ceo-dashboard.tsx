@@ -2994,8 +2994,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   <div className="mt-3 pt-3 border-t border-blue-200">
                                     <div className="text-xs font-semibold text-blue-700 mb-2">당월 급여 증가 {formatNumber(salaryChange)}K</div>
                                     <div className="text-xs text-gray-600 space-y-1">
-                                      <div>인원수 11명 → 15명 (136%)</div>
-                                      <div>MD+1, VM+1, Logi+1, Ecom+1</div>
+                                      <div>인원수 12명 → 15명 (136%)</div>
+                                      <div>MD+1, MKT+1, Ecom+1</div>
                                     </div>
                                   </div>
                                 );
@@ -9191,10 +9191,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <span className="text-orange-600 mr-1">•</span>
                             <span className="text-gray-700">전체 영업비 대비: {formatPercent(currentOpexRatio)}% (전년 대비 {opexRatioChange >= 0 ? '+' : ''}{formatPercent(opexRatioChange)}%p)</span>
                           </div>
-                          {Math.abs(changeRate) > 50 && (
+                          {change > 100 && (
                             <div className="flex items-start">
                               <span className="text-orange-600 mr-1">•</span>
-                              <span className="text-gray-700">지급수수료가 전년 대비 {Math.abs(changeRate) > 100 ? '크게' : '상당히'} {change >= 0 ? '증가' : '감소'}하여 주의 필요</span>
+                              <span className="text-gray-700">재고조정 121K (시티게이트)</span>
                             </div>
                           )}
                         </div>
