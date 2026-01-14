@@ -101,7 +101,7 @@ interface BSData {
 }
 
 export default function BSPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState('2511');
+  const [selectedPeriod, setSelectedPeriod] = useState('2512');
   const [bsData, setBsData] = useState<BSData | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['wc-main']));
   const [showVerification, setShowVerification] = useState(false);
@@ -254,6 +254,7 @@ export default function BSPage() {
               className="px-4 py-2 rounded-lg bg-white text-gray-800 font-semibold"
             >
               <option value="2511">2511</option>
+              <option value="2512">2512</option>
             </select>
             <Link
               href="/"

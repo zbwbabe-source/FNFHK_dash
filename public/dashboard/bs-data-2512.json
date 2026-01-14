@@ -1,0 +1,336 @@
+{
+  "period": "2512",
+  "balance_sheet": {
+    "assets": {
+      "total": {
+        "prev_year": 355225.0,
+        "current_month": 390985.0,
+        "year_end": 389860.0,
+        "yoy_krw": 0,
+        "note": ""
+      },
+      "current_assets": {
+        "total": {
+          "prev_year": 257921.0,
+          "current_month": 242721.0,
+          "year_end": 238316.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "cash": {
+          "prev_year": 32082.0,
+          "current_month": 21870.0,
+          "year_end": 25141.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "receivables": {
+          "prev_year": 20956.0,
+          "current_month": 27160.0,
+          "year_end": 33866.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "inventory": {
+          "prev_year": 185973.0,
+          "current_month": 175798.0,
+          "year_end": 160549.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "other_current": {
+          "prev_year": 18910.0,
+          "current_month": 17894.0,
+          "year_end": 18760.0,
+          "yoy_krw": 0,
+          "note": ""
+        }
+      },
+      "non_current_assets": {
+        "total": {
+          "prev_year": 97304.0,
+          "current_month": 148264.0,
+          "year_end": 151545.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "right_of_use": {
+          "prev_year": 60360.0,
+          "current_month": 99702.0,
+          "year_end": 103972.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "tangible": {
+          "prev_year": 13094.0,
+          "current_month": 20208.0,
+          "year_end": 19047.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "intangible": {
+          "prev_year": 0.0,
+          "current_month": 1150.0,
+          "year_end": 1129.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "deposits": {
+          "prev_year": 14228.0,
+          "current_month": 15930.0,
+          "year_end": 15930.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "other_non_current": {
+          "prev_year": 9622.0,
+          "current_month": 11274.0,
+          "year_end": 11466.0,
+          "yoy_krw": 0,
+          "note": ""
+        }
+      }
+    },
+    "liabilities": {
+      "total": {
+        "prev_year": 342903.0,
+        "current_month": 382194.0,
+        "year_end": 373868.0,
+        "yoy_krw": 0,
+        "note": ""
+      },
+      "current_liabilities": {
+        "total": {
+          "prev_year": 313828.0,
+          "current_month": 330414.0,
+          "year_end": 322088.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "accounts_payable": {
+          "prev_year": 134175.0,
+          "current_month": 141595.0,
+          "year_end": 133269.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "accounts_payable_tp": {
+          "prev_year": 114579.0,
+          "current_month": 114579.0,
+          "year_end": 114579.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "accrued_expenses": {
+          "prev_year": 15121.0,
+          "current_month": 15402.0,
+          "year_end": 15402.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "borrowings": {
+          "prev_year": 0.0,
+          "current_month": 0.0,
+          "year_end": 0.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "lease_liabilities_current": {
+          "prev_year": 39021.0,
+          "current_month": 52516.0,
+          "year_end": 52516.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "other_current": {
+          "prev_year": 10933.0,
+          "current_month": 6323.0,
+          "year_end": 6323.0,
+          "yoy_krw": 0,
+          "note": ""
+        }
+      },
+      "non_current_liabilities": {
+        "total": {
+          "prev_year": 29075.0,
+          "current_month": 51780.0,
+          "year_end": 51780.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "lease_liabilities_non_current": {
+          "prev_year": 20406.0,
+          "current_month": 49303.0,
+          "year_end": 49303.0,
+          "yoy_krw": 0,
+          "note": ""
+        },
+        "restoration_provision": {
+          "prev_year": 8668.0,
+          "current_month": 2476.0,
+          "year_end": 2476.0,
+          "yoy_krw": 0,
+          "note": ""
+        }
+      }
+    },
+    "equity": {
+      "total": {
+        "prev_year": 12322.0,
+        "current_month": 8791.0,
+        "year_end": 15993.0,
+        "yoy_krw": 0,
+        "note": ""
+      },
+      "capital": {
+        "prev_year": 20000.0,
+        "current_month": 20000.0,
+        "year_end": 20000.0,
+        "yoy_krw": 0,
+        "note": ""
+      },
+      "other_capital": {
+        "prev_year": -3142.0,
+        "current_month": -1384.0,
+        "year_end": -1384.0,
+        "yoy_krw": 0,
+        "note": ""
+      },
+      "retained_earnings": {
+        "prev_year": -4536.0,
+        "current_month": -9825.0,
+        "year_end": -2624.0,
+        "yoy_krw": 0,
+        "note": ""
+      }
+    },
+    "working_capital": {
+      "summary": {
+        "prev_year": 72754.0,
+        "current_month": 61363.0,
+        "year_end": 61146.0,
+        "yoy_krw": 0
+      },
+      "receivables": {
+        "total": {
+          "prev_year": 206929.0,
+          "current_month": 202958.0,
+          "year_end": 194415.0,
+          "yoy_krw": 0
+        },
+        "accounts_receivable": {
+          "prev_year": 20956.0,
+          "current_month": 27160.0,
+          "year_end": 33866.0,
+          "yoy_krw": 0
+        },
+        "inventory": {
+          "prev_year": 185973.0,
+          "current_month": 175798.0,
+          "year_end": 160549.0,
+          "yoy_krw": 0
+        }
+      },
+      "payables": {
+        "total": {
+          "prev_year": -134175.0,
+          "current_month": -141595.0,
+          "year_end": -133269.0,
+          "yoy_krw": 0
+        }
+      },
+      "cash": {
+        "total": {
+          "prev_year": 32082.0,
+          "current_month": 21870.0,
+          "year_end": 25141.0,
+          "yoy_krw": 0
+        },
+        "cash": {
+          "prev_year": 32082.0,
+          "current_month": 21870.0,
+          "year_end": 25141.0,
+          "yoy_krw": 0
+        }
+      },
+      "profit_creation": {
+        "total": {
+          "prev_year": -110043.0,
+          "current_month": -104754.0,
+          "year_end": -111955.0,
+          "yoy_krw": 0
+        },
+        "retained_earnings": {
+          "prev_year": 4536.0,
+          "current_month": 9825.0,
+          "year_end": 2624.0,
+          "yoy_krw": 0
+        },
+        "accounts_payable_tp": {
+          "prev_year": -114579.0,
+          "current_month": -114579.0,
+          "year_end": -114579.0,
+          "yoy_krw": 0
+        }
+      },
+      "other_wc_items": {
+        "total": {
+          "prev_year": 4274.0,
+          "current_month": 23638.0,
+          "year_end": 23515.0,
+          "yoy_krw": 0
+        },
+        "fixed_assets": {
+          "prev_year": 27322.0,
+          "current_month": 37288.0,
+          "year_end": 36106.0,
+          "yoy_krw": 0
+        },
+        "prepaid": {
+          "prev_year": 18910.0,
+          "current_month": 17894.0,
+          "year_end": 18760.0,
+          "yoy_krw": 0
+        },
+        "accrued": {
+          "prev_year": -15121.0,
+          "current_month": -15402.0,
+          "year_end": -15402.0,
+          "yoy_krw": 0
+        },
+        "other": {
+          "prev_year": -26837.0,
+          "current_month": -16142.0,
+          "year_end": -15949.0,
+          "yoy_krw": 0
+        }
+      },
+      "lease_related": {
+        "total": {
+          "prev_year": 933.0,
+          "current_month": -2117.0,
+          "year_end": 2153.0,
+          "yoy_krw": 0
+        },
+        "right_of_use": {
+          "prev_year": 60360.0,
+          "current_month": 99702.0,
+          "year_end": 103972.0,
+          "yoy_krw": 0
+        },
+        "lease_liabilities": {
+          "prev_year": -59427.0,
+          "current_month": -101819.0,
+          "year_end": -101819.0,
+          "yoy_krw": 0
+        }
+      },
+      "balance_check": {
+        "prev_year": 0.0,
+        "current_month": 1.0,
+        "year_end": 0.0,
+        "yoy_krw": 0
+      }
+    }
+  }
+}
