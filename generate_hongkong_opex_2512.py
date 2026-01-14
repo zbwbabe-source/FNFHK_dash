@@ -10,20 +10,20 @@ df = pd.read_csv(csv_file, encoding='utf-8-sig')
 df['VALUE'] = pd.to_numeric(df['VALUE'], errors='coerce').fillna(0)
 df['PERIOD'] = pd.to_numeric(df['PERIOD'], errors='coerce').astype('Int64')
 
-# HK 국가, M99만 사용
-df_hk = df[(df['CNTRY_CD'] == 'HK') & (df['SHOP_CD'] == 'M99')].copy()
+# HK 국가, 브랜드 M, M99 매장만 사용
+df_hk = df[(df['CNTRY_CD'] == 'HK') & (df['BRD_CD'] == 'M') & (df['SHOP_CD'] == 'M99')].copy()
 
-print(f'필터링: HK 국가, M99 매장만')
+print(f'필터링: HK 국가, 브랜드 M, M99 매장만')
 print(f'필터링 후 행 수: {len(df_hk)}')
 
 print('\n=== 영업비 재계산 시작 ===\n')
 
-# 계정 매핑
+# 계정 매핑 - 이미지 리스트의 계정들만 사용
 ACCOUNT_MAPPING = {
-    'salary': ['1. 급 여', ' - Payroll', ' - EMPLOYEE BENEFIT PROGRAMS', ' - Final Payment'],
+    'salary': ['1. 급 여'],
     'marketing': ['9. 광고선전비'],
     'fee': ['10. 지급수수료', '12. 기타 수수료(매장관리비 외)'],
-    'rent': ['4. 임차료', ' - Base Rent', ' - Rent free / Rent concession', ' - Turnover Rates'],
+    'rent': ['4. 임차료'],
     'insurance': ['13. 보험료'],
     'travel': ['2. TRAVEL & MEAL'],
 }
@@ -36,11 +36,7 @@ OTHER_ACCOUNTS = [
     '7. 소모품비',
     '8. 통신비',
     '11. 운반비',
-    '14. 감가상각비',
-    '15. 면세점 직접비',
-    ' - Government Rate & License Fee',
-    ' - KOL / other',
-    ' - Mall Coupon'
+    '14. 감가상각비'
 ]
 
 def calculate_expense(df_filtered, account_list):

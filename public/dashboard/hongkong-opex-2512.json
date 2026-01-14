@@ -2,95 +2,87 @@
   "current_month": {
     "period": 202512,
     "expense_detail": {
-      "salary": 1933.16,
-      "marketing": 741.87,
+      "salary": 966.58,
+      "marketing": 420.09,
       "fee": 973.84,
-      "rent": 159.99,
+      "rent": 82.66,
       "insurance": 20.16,
       "travel": 36.48,
-      "other": 905.35,
+      "other": 158.15,
       "other_detail": {
         "5_유지보수비": 6.23,
         "6_수도광열비": 1.12,
         "7_소모품비": 6.46,
         "8_통신비": 4.28,
         "11_운반비": 90.79,
-        "14_감가상각비": 49.27,
-        "_government_rate_&_license_fee": 5.33,
-        "_kol_/_other": 741.87
+        "14_감가상각비": 49.27
       }
     },
-    "sg_a": 4770.85
+    "sg_a": 2657.95
   },
   "prev_month": {
     "period": 202412,
     "expense_detail": {
-      "salary": 1523.62,
+      "salary": 761.81,
       "marketing": 366.42,
       "fee": 849.76,
-      "rent": 236.35,
+      "rent": 120.92,
       "insurance": 15.16,
       "travel": 53.12,
-      "other": 538.46,
+      "other": 166.56,
       "other_detail": {
         "5_유지보수비": 8.39,
         "6_수도광열비": 1.0,
         "7_소모품비": 9.87,
         "8_통신비": 3.51,
         "11_운반비": 104.91,
-        "14_감가상각비": 38.88,
-        "_government_rate_&_license_fee": 5.48,
-        "_kol_/_other": 366.42
+        "14_감가상각비": 38.88
       }
     },
-    "sg_a": 3582.9
+    "sg_a": 2333.75
   },
   "cumulative": {
     "period_start": 202501,
     "period_end": 202512,
     "expense_detail": {
-      "salary": 13915.9,
-      "marketing": 4718.26,
+      "salary": 6957.95,
+      "marketing": 3965.71,
       "fee": 2960.56,
-      "rent": 2267.16,
+      "rent": 1181.77,
       "insurance": 216.17,
-      "travel": 355.64,
-      "other": 6723.41,
+      "travel": 329.9,
+      "other": 1908.76,
       "other_detail": {
         "5_유지보수비": 66.31,
         "6_수도광열비": 11.1,
         "7_소모품비": 51.47,
         "8_통신비": 44.57,
         "11_운반비": 1201.57,
-        "14_감가상각비": 533.74,
-        "_government_rate_&_license_fee": 96.38,
-        "_kol_/_other": 4718.26
+        "14_감가상각비": 533.74
       }
     },
-    "sg_a": 31157.11
+    "sg_a": 17520.83
   },
   "prev_cumulative": {
     "period_start": 202401,
     "period_end": 202412,
     "expense_detail": {
-      "salary": 12185.33,
+      "salary": 6092.66,
       "marketing": 4636.97,
       "fee": 1911.65,
-      "rent": 2820.32,
+      "rent": 1436.32,
       "insurance": 232.7,
       "travel": 207.08,
-      "other": 6660.33,
+      "other": 1971.04,
       "other_detail": {
         "5_유지보수비": 101.15,
         "6_수도광열비": 11.52,
         "7_소모품비": 37.17,
         "8_통신비": 42.44,
         "11_운반비": 1329.94,
-        "14_감가상각비": 448.81,
-        "_government_rate_&_license_fee": 52.32,
-        "_kol_/_other": 4636.97
+        "14_감가상각비": 448.81
       }
     },
-    "sg_a": 28654.38
+    "sg_a": 16488.42
   }
 }
