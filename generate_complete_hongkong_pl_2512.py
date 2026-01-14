@@ -675,6 +675,7 @@ if os.path.exists(discovery_pl_file):
         discovery_current = discovery_data.get('current_month', {}).get('data', {})
         discovery_prev = discovery_data.get('prev_month', {}).get('data', {})
         discovery_mom = discovery_data.get('current_month', {}).get('mom', {})
+        discovery_store_count = discovery_data.get('metadata', {}).get('store_count', {})
         
         # pl_data에 Discovery 추가
         pl_data['discovery'] = {
@@ -688,12 +689,16 @@ if os.path.exists(discovery_pl_file):
             'operating_profit': discovery_current.get('operating_profit', 0),
             'marketing': discovery_current.get('expense_detail', {}).get('marketing', 0),
             'travel': discovery_current.get('expense_detail', {}).get('travel', 0),
-            'store_count': discovery_data.get('metadata', {}).get('store_count', {})
+            'store_count': discovery_store_count
         }
         print(f"\n[INFO] Discovery 데이터 통합 완료")
         print(f"  - 실판매출: {pl_data['discovery']['net_sales']:,.0f}K HKD")
-        print(f"  - 전월비: {pl_data['discovery']['net_sales_mom']:.1f}%")
-        print(f"  - 할인율: {pl_data['discovery']['discount_rate']:.1f}% (전월: {pl_data['discovery']['prev_discount_rate']:.1f}%)")
+        print(f"  - 전월 실판매출: {pl_data['discovery']['prev_net_sales']:,.0f}K HKD")
+        print(f"  - 전월비(MOM): {pl_data['discovery']['net_sales_mom']:.1f}%")
+        print(f"  - 할인율: {pl_data['discovery']['discount_rate']:.1f}%")
+        print(f"  - 전월 할인율: {pl_data['discovery']['prev_discount_rate']:.1f}%")
+        print(f"  - 할인율 증감: {pl_data['discovery']['discount_rate'] - pl_data['discovery']['prev_discount_rate']:+.1f}%p")
+        print(f"  - 매장수: 오프라인 {discovery_store_count.get('offline', 0)}개, 온라인 {discovery_store_count.get('online', 0)}개")
     except Exception as e:
         print(f"\n[WARNING] Discovery 데이터 로드 실패: {e}")
 else:
