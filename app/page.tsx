@@ -1074,7 +1074,7 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                    )}
+                    )
                     
                     {showHkmcDiscovery && (
                       <>
@@ -1113,6 +1113,29 @@ export default function Home() {
                                   hkPlData.discovery.net_sales_mom >= 100 ? 'text-green-600' : 'text-red-600'
                                 }`}>
                                   전월비 {formatPercent(hkPlData.discovery.net_sales_mom)}%
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 할인율 */}
+                        <div className="mb-3">
+                          <div className="text-xs text-gray-600 mb-1">📊 할인율</div>
+                          <div className="flex items-baseline gap-2">
+                            <div className="text-lg font-bold text-amber-700">
+                              {hkPlData?.discovery?.discount_rate?.toFixed(1) || '0.0'}%
+                            </div>
+                            {hkPlData?.discovery?.prev_discount_rate !== undefined && (
+                              <>
+                                <div className="text-xs text-gray-500">
+                                  (전월: {hkPlData.discovery.prev_discount_rate.toFixed(1)}%)
+                                </div>
+                                <div className={`text-xs font-semibold ${
+                                  (hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  {(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate) >= 0 ? '+' : ''}
+                                  {(hkPlData.discovery.discount_rate - hkPlData.discovery.prev_discount_rate).toFixed(1)}%p
                                 </div>
                               </>
                             )}
