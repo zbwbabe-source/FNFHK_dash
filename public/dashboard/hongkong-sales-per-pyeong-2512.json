@@ -1,0 +1,162 @@
+{
+  "monthly": {
+    "current": {
+      "stores": 20,
+      "total_sales_hkd": 24233511.0,
+      "total_area": 761.4000000000001,
+      "sales_per_pyeong_daily": 1026.695772642924,
+      "days": 31
+    },
+    "previous": {
+      "stores": 22,
+      "total_sales_hkd": 29335923.0,
+      "total_area": 803.6000000000001,
+      "sales_per_pyeong_daily": 1177.600916841953,
+      "days": 31
+    },
+    "yoy": 87.18537476994153
+  },
+  "cumulative": {
+    "current": {
+      "stores": 22,
+      "total_sales_hkd": 237722216.0,
+      "weighted_avg_area": 803.3000000000002,
+      "monthly_areas": [
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        831.6000000000001,
+        831.6000000000001,
+        831.6000000000001,
+        800.4000000000001,
+        761.4000000000001,
+        761.4000000000001
+      ],
+      "sales_per_pyeong_daily": 810.7727405275156,
+      "days": 365
+    },
+    "previous": {
+      "stores": 22,
+      "total_sales_hkd": 277101010.0,
+      "weighted_avg_area": 803.6,
+      "monthly_areas": [
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001,
+        803.6000000000001
+      ],
+      "sales_per_pyeong_daily": 944.7248000436392,
+      "days": 365
+    },
+    "yoy": 85.82104973745412
+  },
+  "channels": {
+    "HK_Retail": {
+      "monthly": {
+        "current": {
+          "sales_per_pyeong_daily": 1049.1205846160815,
+          "area": 427.3
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 1142.2564435078618,
+          "area": 497.5
+        },
+        "yoy": 91.84632667899332
+      },
+      "cumulative": {
+        "current": {
+          "sales_per_pyeong_daily": 748.3578880522543,
+          "weighted_avg_area": 483.2
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 833.8532498106973,
+          "weighted_avg_area": 497.5
+        },
+        "yoy": 89.74695346239254
+      }
+    },
+    "HK_Outlet": {
+      "monthly": {
+        "current": {
+          "sales_per_pyeong_daily": 1081.3159690360228,
+          "area": 137.1
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 1078.707089244959,
+          "area": 137.1
+        },
+        "yoy": 100.24185247478906
+      },
+      "cumulative": {
+        "current": {
+          "sales_per_pyeong_daily": 789.3976799256618,
+          "weighted_avg_area": 137.1
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 892.7683622593248,
+          "weighted_avg_area": 137.1
+        },
+        "yoy": 88.4213322622608
+      }
+    },
+    "MC_Retail": {
+      "monthly": {
+        "current": {
+          "sales_per_pyeong_daily": 998.7827438787407,
+          "area": 166.0
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 1416.0633473585788,
+          "area": 138.0
+        },
+        "yoy": 70.53234911713498
+      },
+      "cumulative": {
+        "current": {
+          "sales_per_pyeong_daily": 1046.267700072098,
+          "weighted_avg_area": 152.0
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 1445.7265634306136,
+          "weighted_avg_area": 138.0
+        },
+        "yoy": 72.36968086063065
+      }
+    },
+    "MC_Outlet": {
+      "monthly": {
+        "current": {
+          "sales_per_pyeong_daily": 625.5026014568159,
+          "area": 31.0
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 1120.6462018730488,
+          "area": 31.0
+        },
+        "yoy": 55.81624248682149
+      },
+      "cumulative": {
+        "current": {
+          "sales_per_pyeong_daily": 723.487052585064,
+          "weighted_avg_area": 31.0
+        },
+        "previous": {
+          "sales_per_pyeong_daily": 723.5499779054353,
+          "weighted_avg_area": 31.0
+        },
+        "yoy": 99.9913032517044
+      }
+    }
+  }
+}
