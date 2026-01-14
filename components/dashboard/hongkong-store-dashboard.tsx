@@ -297,10 +297,6 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           turnoverAchievementDirectProfitRate = turnoverAchievementSales > 0 ? (turnoverAchievementDirectProfit / turnoverAchievementSales) * 100 : 0;
         }
         
-        // 누적 기준으로 카테고리 재분류
-        const reclassifiedCategory = categorizeByCumulative(s);
-        const cumulativeYoy = s.cumulative_yoy ?? s.yoy ?? 0;
-        
         result.push({
           store_code: s.shop_cd,
           store_name: s.shop_nm.trim(),
