@@ -308,6 +308,7 @@ function CashFlowPageContent() {
               className="px-4 py-2 rounded-lg bg-white text-gray-800 font-semibold"
             >
               <option value="2511">2511</option>
+              <option value="2512">2512</option>
             </select>
             <Link
               href="/"
@@ -325,7 +326,7 @@ function CashFlowPageContent() {
           <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-l-4 border-blue-500">
             <div className="text-center">
               <div className="text-sm font-semibold mb-3 opacity-90 text-blue-900">
-                📌 현금흐름 한줄 요약 (24년 → 25년 E)
+                📌 현금흐름 한줄 요약 (24년 → 25년)
               </div>
               <div className="text-base font-bold leading-relaxed text-gray-800 space-y-2">
                 <div>
@@ -381,12 +382,12 @@ function CashFlowPageContent() {
                         25년 1~11월 (실적)
                       </th>
                       <th className="px-2 py-3 border border-gray-300 bg-gray-500 text-white font-bold text-center" style={{ width: '9%' }}>
-                        25년 12월 (E)
+                        25년 12월
                       </th>
                     </>
                   )}
                   <th className="px-2 py-3 border border-gray-300 bg-gradient-to-br from-blue-600 to-blue-800 text-white font-bold text-center" style={{ width: '9%' }}>
-                    2025년 (E)
+                    2025년
                   </th>
                   <th className="px-2 py-3 border border-gray-300 bg-gray-100 font-bold text-center" style={{ width: '7%' }}>
                     YOY
