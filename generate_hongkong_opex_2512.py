@@ -62,12 +62,22 @@ def calculate_expenses_for_period(df_data, period_start, period_end):
     
     # 기타 상세
     expenses['other_detail'] = {}
+    other_detail_labels = {
+        '11. 운반비': '물류비',
+        '14. 감가상각비': '감가상각비',
+        '5. 유지보수비': '유지보수비',
+        '6. 수도광열비': '수도광열비',
+        '7. 소모품비': '소모품비',
+        '8. 통신비': '통신비',
+        '3. 피복비(유니폼)': '피복비'
+    }
+    
     for account in OTHER_ACCOUNTS:
         value = df_period[df_period['ACCOUNT_NM'] == account]['VALUE'].sum()
         if value != 0:
-            # 계정명을 키로 사용 (간단하게)
-            key_name = account.strip().replace('.', '').replace(' ', '_').replace('-', '').lower()
-            expenses['other_detail'][key_name] = round(value, 2)
+            # 한글 라벨 사용
+            label = other_detail_labels.get(account, account.strip().replace('.', '').replace(' ', '_').replace('-', '').lower())
+            expenses['other_detail'][label] = round(value, 2)
     
     # 전체 영업비
     expenses['total'] = sum([expenses[k] for k in ['salary', 'marketing', 'fee', 'rent', 'insurance', 'travel', 'other']])
