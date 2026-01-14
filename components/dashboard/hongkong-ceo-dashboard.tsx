@@ -2123,7 +2123,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   onClick={() => setShowProfitDetail(!showProfitDetail)}
                   className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
                 >
-                  <span>채널별 직접이익{profitViewType === '누적' ? '(YOY)' : ''}[이익률]</span>
+                  <span>채널별 직접이익(YOY)[이익률]</span>
                   {showProfitDetail ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
@@ -2168,7 +2168,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <span className="text-gray-600">HK 오프라인</span>
                         <span className={`font-semibold ${(plData?.channel_direct_profit?.hk_offline?.direct_profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatNumber(plData?.channel_direct_profit?.hk_offline?.direct_profit || 0)} 
-                          <span className="text-green-600"> ({plData?.channel_direct_profit?.hk_offline?.yoy === null || plData?.channel_direct_profit?.hk_offline?.yoy === undefined ? '흑자전환' : `${formatPercent(plData?.channel_direct_profit?.hk_offline?.yoy || 0)}%`})</span> 
+                          <span className="text-red-600"> (적자)</span> 
                           <span className="text-blue-600"> [{formatPercent(plData?.channel_direct_profit?.hk_offline?.direct_profit_rate || 0, 1)}%]</span>
                         </span>
                       </div>
