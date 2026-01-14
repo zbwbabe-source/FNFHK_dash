@@ -1330,12 +1330,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       setEditingCard('executive-summary');
                       // 현재 표시된 텍스트를 편집용으로 준비
                       if (!ceoInsights['executive-summary-text']) {
-                        const defaultText = ceoInsightsData 
+                        const defaultText = ceoInsightsData
                           ? ceoInsightsData.executive_summary.items.join('\n')
-                          : `• ${currentMonth}월 매출 성장: 실판매출 ${formatNumber(pl?.net_sales)}K (YOY ${formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +${formatNumber(plChange?.net_sales)}K
-• 당월 영업이익 흑자 전환: ${formatNumber(pl?.operating_profit)}K (영업이익률 ${formatPercent(pl?.operating_profit_rate || 0, 1)}%)
-• 매장효율성 증대: 평당매출 ${Math.round(dailySalesPerPyeong)} HKD/평/1일 (YOY ${formatPercent(dailySalesPerPyeongYoy)}%)
-• 재고효율화: 총재고 ${formatNumber(endingInventory?.total?.current)}K (YOY ${formatPercent(endingInventory?.total?.yoy)}%)`;
+                          : `• 재고효율화 유지: 당시즌 판매율 50.1% (전년비 +14.9%p) - 입고 62%, 판매 111%
+• 25F 재고(TAG) 전년비 48%: 26S 조기투입으로 대응 중`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -1377,37 +1375,13 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                  {generateExecutiveSummary ? (
-                    <>
-                      <div className="flex items-start">
+                  {ceoInsightsData?.executive_summary?.items ? (
+                    ceoInsightsData.executive_summary.items.map((item: string, idx: number) => (
+                      <div key={idx} className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">{currentMonth}월 매출 성장</span>: 실판매출 {formatNumber(pl?.net_sales)}K (YOY {formatPercent(plYoy?.net_sales)}%), 전년 동월 대비 +{formatNumber(plChange?.net_sales)}K
-                        </div>
+                        <div className="flex-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold">$1</span>') }} />
                       </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">당월 영업이익 흑자 전환</span>: {formatNumber(pl?.operating_profit)}K (영업이익률 {formatPercent(pl?.operating_profit_rate || 0, 1)}%)
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">매장효율성 증대</span>: 평당매출 {Math.round(dailySalesPerPyeong)} HKD/평/1일 (YOY {formatPercent(dailySalesPerPyeongYoy)}%)
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">재고효율화</span>: 총재고 {formatNumber(endingInventory?.total?.current)}K (YOY {formatPercent(endingInventory?.total?.yoy)}%)
-                        </div>
-                      </div>
-
-                    </>
+                    ))
                   ) : (
                     <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
                   )}
