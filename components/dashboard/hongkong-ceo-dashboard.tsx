@@ -125,7 +125,19 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
         
         if (storeStatusResponse.ok) {
           const storeStatusDataResult = await storeStatusResponse.json();
-          setStoreStatusData(storeStatusDataResult);
+          
+          // 누적 매장 상태 데이터도 로드 시도
+          const storeStatusCumulativeResponse = await fetch(`/dashboard/hongkong-store-status-${period}-cumulative.json`);
+          if (storeStatusCumulativeResponse.ok) {
+            const storeStatusCumulativeResult = await storeStatusCumulativeResponse.json();
+            // 당월과 누적 데이터를 함께 저장
+            setStoreStatusData({
+              monthly: storeStatusDataResult,
+              cumulative: storeStatusCumulativeResult
+            });
+          } else {
+            setStoreStatusData({ monthly: storeStatusDataResult, cumulative: null });
+          }
         }
         
         // CEO 인사이트 데이터 로드 (period별)
@@ -505,6 +517,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
     insights: false
   });
   const [showYoyTrend, setShowYoyTrend] = useState(false);
+  const [showStoreMonthlyOrCumulative, setShowStoreMonthlyOrCumulative] = useState<'monthly' | 'cumulative'>('monthly');
   const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(`hk_store_ai_analysis_${period}`);
@@ -585,10 +598,21 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
   const countryChannel = dashboardData?.country_channel_summary || {};
   const offlineEfficiency = dashboardData?.offline_store_efficiency || {};
   const storeEfficiencySummary = offlineEfficiency?.total;
-  const totalStoreCurrent = storeEfficiencySummary?.current?.store_count ?? storeStatusData?.summary?.total_stores ?? 0;
-  const totalStorePrevious = storeEfficiencySummary?.previous?.store_count ?? offlineEfficiency?.total?.previous?.store_count ?? storeStatusData?.summary?.total_stores ?? 0;
-  const totalSalesPerStore = storeEfficiencySummary?.current?.sales_per_store ?? storeStatusData?.summary?.sales_per_store ?? 0;
-  const prevSalesPerStore = storeEfficiencySummary?.previous?.sales_per_store ?? offlineEfficiency?.total?.previous?.sales_per_store ?? storeStatusData?.summary?.sales_per_store ?? 0;
+  
+  // 당월/누적 데이터 선택
+  const getStoreStatusData = () => {
+    if (showStoreMonthlyOrCumulative === 'cumulative' && storeStatusData?.cumulative) {
+      return storeStatusData.cumulative;
+    }
+    return storeStatusData?.monthly || storeStatusData;
+  };
+  
+  const currentStoreStatusData = getStoreStatusData();
+  
+  const totalStoreCurrent = storeEfficiencySummary?.current?.store_count ?? currentStoreStatusData?.summary?.total_stores ?? 0;
+  const totalStorePrevious = storeEfficiencySummary?.previous?.store_count ?? offlineEfficiency?.total?.previous?.store_count ?? currentStoreStatusData?.summary?.total_stores ?? 0;
+  const totalSalesPerStore = storeEfficiencySummary?.current?.sales_per_store ?? currentStoreStatusData?.summary?.sales_per_store ?? 0;
+  const prevSalesPerStore = storeEfficiencySummary?.previous?.sales_per_store ?? offlineEfficiency?.total?.previous?.sales_per_store ?? currentStoreStatusData?.summary?.sales_per_store ?? 0;
   const totalSalesPerStoreYoy = offlineEfficiency?.total?.yoy ?? (prevSalesPerStore ? (totalSalesPerStore / prevSalesPerStore) * 100 : 0);
 
   // 평당매출 계산 (당월) - 홍콩+마카오, 온라인 제외
@@ -6710,14 +6734,39 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
       <div className="mb-4">
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              오프라인 매장별 현황 (실판V-, {(() => {
-                const p = period || '2510';
-                const year = parseInt(p.substring(0, 2)) + 2000;
-                const month = parseInt(p.substring(2, 4));
-                return `${year % 100}년 ${month}월`;
-              })()} 기준)
-            </h3>
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                오프라인 매장별 현황 (실판V-, {(() => {
+                  const p = period || '2510';
+                  const year = parseInt(p.substring(0, 2)) + 2000;
+                  const month = parseInt(p.substring(2, 4));
+                  return `${year % 100}년 ${month}월`;
+                })()} 기준)
+              </h3>
+              {/* 당월/누적 토글 버튼 */}
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setShowStoreMonthlyOrCumulative('monthly')}
+                  className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${
+                    showStoreMonthlyOrCumulative === 'monthly'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-transparent text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  당월
+                </button>
+                <button
+                  onClick={() => setShowStoreMonthlyOrCumulative('cumulative')}
+                  className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${
+                    showStoreMonthlyOrCumulative === 'cumulative'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-transparent text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  누적
+                </button>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors"
@@ -6760,15 +6809,20 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
           </div>
           
           {(() => {
+            // 당월/누적 선택에 따라 데이터 소스 결정
+            const currentStoreData = showStoreMonthlyOrCumulative === 'cumulative' && storeStatusData?.cumulative
+              ? storeStatusData.cumulative
+              : storeStatusData?.monthly || storeStatusData;
+            
             // 동적으로 카드 개수 계산 (전체 요약 1 + 홍콩 카드들 + 마카오 1)
             const hkCardCount = [
-              storeStatusData?.categories?.profit_improving?.count,
-              storeStatusData?.categories?.profit_deteriorating?.count,
-              storeStatusData?.categories?.loss_improving?.count,
-              storeStatusData?.categories?.loss_deteriorating?.count
+              currentStoreData?.categories?.profit_improving?.count,
+              currentStoreData?.categories?.profit_deteriorating?.count,
+              currentStoreData?.categories?.loss_improving?.count,
+              currentStoreData?.categories?.loss_deteriorating?.count
             ].filter(count => count && count > 0).length;
             
-            const mcCardCount = storeStatusData?.mc_summary?.count > 0 ? 1 : 0;
+            const mcCardCount = currentStoreData?.mc_summary?.count > 0 ? 1 : 0;
             const totalCards = 1 + hkCardCount + mcCardCount; // 전체 요약 1 + 홍콩 + 마카오
             
             return (
@@ -6805,8 +6859,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 <div className="pt-2 border-t border-slate-600">
                   <div className="flex items-center justify-between">
                     <div className="text-slate-300 text-[10px]">전체 직접이익</div>
-                    <div className={`font-bold text-sm ${(storeStatusData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatNumber(Math.round(storeStatusData?.summary?.total_direct_profit || 0))}K HKD
+                    <div className={`font-bold text-sm ${(currentStoreData?.summary?.total_direct_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatNumber(Math.round(currentStoreData?.summary?.total_direct_profit || 0))}K HKD
                   </div>
                 </div>
                       </div>
@@ -6814,49 +6868,43 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 {/* 홍콩 오프라인 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="text-white font-semibold text-xs mb-2">
-                    홍콩 오프라인 ({storeStatusData?.summary?.hk_stores || 0}개, 리뉴얼 1개 포함)
+                    홍콩 오프라인 ({currentStoreData?.summary?.hk_stores || 0}개)
                       </div>
                   <div className="grid grid-cols-4 gap-2">
                     <div className="bg-green-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold text-center">흑자 & 성장</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{currentStoreData?.categories?.profit_improving?.count || 0}개</span>
                       </div>
                     <div className="bg-blue-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-orange-300 text-sm">▲</span>
                       <span className="text-white text-xs font-semibold text-center">흑자 & 악화</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.profit_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{currentStoreData?.categories?.profit_deteriorating?.count || 0}개</span>
                       </div>
                     <div className="bg-amber-700 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold text-center">적자 & 성장</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_improving?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{currentStoreData?.categories?.loss_improving?.count || 0}개</span>
                     </div>
                     <div className="bg-red-600 rounded px-2 py-1.5 flex flex-col items-center justify-center">
                       <span className="text-red-200 text-sm">↓</span>
                       <span className="text-white text-xs font-semibold text-center">적자 & 악화</span>
-                      <span className="text-white text-xs font-bold">{storeStatusData?.categories?.loss_deteriorating?.count || 0}개</span>
+                      <span className="text-white text-xs font-bold">{currentStoreData?.categories?.loss_deteriorating?.count || 0}개</span>
                 </div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="bg-slate-500 rounded px-2 py-1.5 flex items-center gap-1.5">
-                      <span className="text-white text-xs font-semibold">리뉴얼 중</span>
-                      <span className="text-white text-xs font-bold ml-auto">1개 (LCX)</span>
-                    </div>
                   </div>
                 </div>
                 
                 {/* 마카오 매장 */}
                 <div className="pt-2 border-t border-slate-600">
                   <div className="text-white font-semibold text-xs mb-2">
-                    마카오 매장 ({storeStatusData?.summary?.mc_stores || 0}개)
+                    마카오 매장 ({currentStoreData?.summary?.mc_stores || 0}개)
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-green-600 rounded px-2 py-1.5 flex items-center gap-1.5">
                       <span className="text-white text-sm">✓</span>
                       <span className="text-white text-xs font-semibold">흑자</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          const mcStores = currentStoreData?.mc_summary?.stores || [];
                           return mcStores.filter((s: any) => s.current.direct_profit > 0).length;
                         })()}개</span>
                       </div>
@@ -6864,7 +6912,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       <span className="text-blue-300 text-sm">↗</span>
                       <span className="text-white text-xs font-semibold">적자 (Senado)</span>
                       <span className="text-white text-xs font-bold ml-auto">{(() => {
-                          const mcStores = storeStatusData?.mc_summary?.stores || [];
+                          const mcStores = currentStoreData?.mc_summary?.stores || [];
                           return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
                         })()}개</span>
                       </div>
@@ -6898,8 +6946,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <span className="text-white font-semibold text-xs">전략 인사이트</span>
                             </div>
                   <div className="text-[10px] text-slate-200 space-y-1.5">
-                    <div>적자 {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개 매장 집중 관리 필요 (HK {((storeStatusData?.categories?.loss_improving?.count || 0) + (storeStatusData?.categories?.loss_deteriorating?.count || 0))}개, MC {(() => {
-                      const mcStores = storeStatusData?.mc_summary?.stores || [];
+                    <div>적자 {((currentStoreData?.categories?.loss_improving?.count || 0) + (currentStoreData?.categories?.loss_deteriorating?.count || 0))}개 매장 집중 관리 필요 (HK {((currentStoreData?.categories?.loss_improving?.count || 0) + (currentStoreData?.categories?.loss_deteriorating?.count || 0))}개, MC {(() => {
+                      const mcStores = currentStoreData?.mc_summary?.stores || [];
                       return mcStores.filter((s: any) => s.current.direct_profit <= 0).length;
                     })()}개), Yoho-NTP3-Time Sq 우선 개선 대상</div>
                     <div className="flex items-start gap-1.5">
@@ -6913,7 +6961,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {/* 흑자 & 성장 */}
             {(() => {
-              const cat = storeStatusData?.categories?.profit_improving;
+              const cat = currentStoreData?.categories?.profit_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-green-50 rounded-lg p-3 border-2 border-green-400 min-w-0">
@@ -6966,6 +7014,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   </span>
                                 )}
                               <span className="font-semibold text-green-900">{store.shop_nm}</span>
+                              {store.is_closed && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                  영업종료
+                                </span>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -7041,7 +7094,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {/* 흑자 & 매출악화 */}
             {(() => {
-              const cat = storeStatusData?.categories?.profit_deteriorating;
+              const cat = currentStoreData?.categories?.profit_deteriorating;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-400 min-w-0">
@@ -7094,6 +7147,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   </span>
                                 )}
                               <span className="font-semibold text-blue-900">{store.shop_nm}</span>
+                              {store.is_closed && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                  영업종료
+                                </span>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -7169,7 +7227,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {/* 적자 & 성장 */}
             {(() => {
-              const cat = storeStatusData?.categories?.loss_improving;
+              const cat = currentStoreData?.categories?.loss_improving;
               if (!cat || cat.count === 0) return null;
               return (
                 <div className="bg-yellow-50 rounded-lg p-3 border-2 border-yellow-400 min-w-0">
@@ -7222,6 +7280,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   </span>
                                 )}
                               <span className="font-semibold text-yellow-900">{store.shop_nm}</span>
+                              {store.is_closed && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                  영업종료
+                                </span>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -7296,13 +7359,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {/* 적자 & 매출악화 */}
             {(() => {
-              const cat = storeStatusData?.categories?.loss_deteriorating;
+              const cat = currentStoreData?.categories?.loss_deteriorating;
               if (!cat || cat.count === 0) return null;
-              // LCX 제외 (리뉴얼 중)
-              const storesWithoutLCX = cat.stores.filter((s: any) => s.shop_cd !== 'M05');
-              const avgYoyWithoutLCX = storesWithoutLCX.length > 0 
-                ? storesWithoutLCX.reduce((sum: number, s: any) => sum + s.yoy, 0) / storesWithoutLCX.length 
-                : 0;
               return (
                 <div className="bg-red-50 rounded-lg p-3 border-2 border-red-400 min-w-0">
                   <h4 className="text-sm font-bold text-red-800 mb-2">적자 & 매출악화</h4>
@@ -7314,7 +7372,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                     <div>
                       <div className="text-red-700">직접손실 합계</div>
                       <div className="font-bold text-red-600">{Math.round(cat.total_direct_profit)}K</div>
-                      <div className="text-red-600">| 평균 YOY: {Math.round(avgYoyWithoutLCX)}% (LCX 제외)</div>
+                      <div className="text-red-600">| 평균 YOY: {Math.round(cat.avg_yoy)}%</div>
                     </div>
                   </div>
                   <div className="border-t border-red-300 pt-2 mb-2">
@@ -7341,7 +7399,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         const prevBadge = getCategoryBadge(store.previous_category);
                           const currentBadge = getCategoryBadge(store.category);
                         return (
-                          <div key={idx} className={`flex justify-between items-center rounded px-2 py-1 ${store.shop_cd === 'M05' ? 'bg-gray-100 opacity-60' : 'bg-white'}`}>
+                          <div key={idx} className="flex justify-between items-center rounded px-2 py-1 bg-white">
                             <div className="flex items-center gap-1.5">
                               {store.previous_category && (
                                 <span className={`${prevBadge.color} ${prevBadge.text} text-[9px] px-1.5 py-0.5 rounded font-bold`}>
@@ -7353,9 +7411,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                     {currentBadge.symbol}
                                   </span>
                                 )}
-                              <span className={`font-semibold ${store.shop_cd === 'M05' ? 'text-gray-500' : 'text-red-900'}`}>
-                                {store.shop_nm}{store.shop_cd === 'M05' ? ' (리뉴얼)' : ''}
+                              <span className="font-semibold text-red-900">
+                                {store.shop_nm}
                               </span>
+                              {store.is_closed && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                  영업종료
+                                </span>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -7429,7 +7492,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             
             {/* 마카오 매장 종합 */}
             {(() => {
-              const mc = storeStatusData?.mc_summary;
+              const mc = currentStoreData?.mc_summary;
               if (!mc || mc.count === 0) return null;
               return (
                 <div className="bg-purple-50 rounded-lg p-3 border-2 border-purple-400 min-w-0">
@@ -7484,6 +7547,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   </span>
                                 )}
                               <span className="font-semibold text-purple-900">{store.shop_nm}</span>
+                              {store.is_closed && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-200 text-gray-700 font-semibold">
+                                  영업종료
+                                </span>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${store.current.direct_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
