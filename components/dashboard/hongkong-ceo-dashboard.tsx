@@ -2727,6 +2727,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                 
                                 // 기타 항목인 경우 토글 기능 추가
                                 if (item.key === 'other') {
+                                  // 기타 = other + rent + travel + insurance
+                                  const otherValue = (expenseDetail as any).other || 0;
+                                  const rentValue = (expenseDetail as any).rent || 0;
+                                  const travelValue = (expenseDetail as any).travel || 0;
+                                  const insuranceValue = (expenseDetail as any).insurance || 0;
+                                  const otherTotal = otherValue + rentValue + travelValue + insuranceValue;
+                                  
+                                  const otherValuePrev = (expenseDetailPrev as any).other || 0;
+                                  const rentValuePrev = (expenseDetailPrev as any).rent || 0;
+                                  const travelValuePrev = (expenseDetailPrev as any).travel || 0;
+                                  const insuranceValuePrev = (expenseDetailPrev as any).insurance || 0;
+                                  const otherTotalPrev = otherValuePrev + rentValuePrev + travelValuePrev + insuranceValuePrev;
+                                  
+                                  const otherYoy = otherTotalPrev > 0 ? (otherTotal / otherTotalPrev * 100) : 0;
+                                  const otherColorClass = otherYoy >= 100 ? 'text-red-600' : 'text-green-600';
+                                  
                                   const otherDetail = expenseDetail.other_detail || {};
                                   const otherDetailPrev = expenseDetailPrev.other_detail || {};
                                   // otherDetail에 0보다 큰 값이 있는지 확인
@@ -2765,10 +2781,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                       >
                                         <span className="text-gray-600">{item.label}</span>
                                         <span className="font-semibold flex items-center gap-1">
-                                          {formatNumber(current)} 
-                                          {showYoy && (
-                                            <span className={colorClass}>
-                                              ({yoy === Infinity ? '신규' : formatPercent(yoy)}%)
+                                          {formatNumber(otherTotal)} 
+                                          {otherTotalPrev > 0 && (
+                                            <span className={otherColorClass}>
+                                              ({formatPercent(otherYoy)}%)
                                             </span>
                                           )}
                                           {hasOtherDetail ? (
@@ -3067,6 +3083,22 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               
                               // 기타 항목인 경우 토글 기능 추가
                               if (item.key === 'other') {
+                                // 기타 = other + rent + travel + insurance
+                                const otherValue = (expenseDetail as any).other || 0;
+                                const rentValue = (expenseDetail as any).rent || 0;
+                                const travelValue = (expenseDetail as any).travel || 0;
+                                const insuranceValue = (expenseDetail as any).insurance || 0;
+                                const otherTotal = otherValue + rentValue + travelValue + insuranceValue;
+                                
+                                const otherValuePrev = (expenseDetailPrev as any).other || 0;
+                                const rentValuePrev = (expenseDetailPrev as any).rent || 0;
+                                const travelValuePrev = (expenseDetailPrev as any).travel || 0;
+                                const insuranceValuePrev = (expenseDetailPrev as any).insurance || 0;
+                                const otherTotalPrev = otherValuePrev + rentValuePrev + travelValuePrev + insuranceValuePrev;
+                                
+                                const otherYoy = otherTotalPrev > 0 ? (otherTotal / otherTotalPrev * 100) : 0;
+                                const otherColorClass = otherYoy >= 100 ? 'text-red-600' : 'text-green-600';
+                                
                                 const otherDetail = expenseDetail.other_detail || {};
                                 const otherDetailPrev = expenseDetailPrev.other_detail || {};
                                 
@@ -3078,10 +3110,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                     >
                                       <span className="text-gray-600">{item.label}</span>
                                       <span className="font-semibold flex items-center gap-1">
-                                        {formatNumber(current)} 
-                                        {showYoy && (
-                                          <span className={colorClass}>
-                                            ({yoy === Infinity ? '신규' : formatPercent(yoy)}%)
+                                        {formatNumber(otherTotal)} 
+                                        {otherTotalPrev > 0 && (
+                                          <span className={otherColorClass}>
+                                            ({formatPercent(otherYoy)}%)
                                           </span>
                                         )}
                                         {showOtherDetailCumulative ? (
