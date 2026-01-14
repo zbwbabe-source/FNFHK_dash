@@ -267,7 +267,7 @@ const HongKongStoreDashboard: React.FC<HongKongStoreDashboardProps> = ({ period 
           
           // 턴오버 달성시 직접이익 계산 (누적 기준)
           // 1. 현재 매출총이익 = 누적 직접이익 + 현재 임차료 + 인건비
-          const currentGrossProfit = cumulativeDirectProfit + rent + laborCost;
+          const currentGrossProfit = directProfit + rent + laborCost;
           // 2. 현재 매출원가 = 현재 매출 - 현재 매출총이익 (최소 0)
           const currentCogs = Math.max(0, netSales - currentGrossProfit);
           // 3. 현재 매출원가율 = 현재 매출원가 / 현재 매출 (0-1 사이로 제한)
