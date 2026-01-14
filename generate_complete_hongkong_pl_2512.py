@@ -439,31 +439,27 @@ offline_channels = [ch for ch in [channel_names['retail'], channel_names['outlet
 hk_offline_sales = get_channel_data(df_mlb, 202512, offline_channels, 'HK')
 hk_offline_sales_prev = get_channel_data(df_mlb, 202412, offline_channels, 'HK')
 
-# 직접이익 = 매출총이익 - 직접비(직접 계산) - 영업비(전체 M99를 HK+MC 실판매출 비율로 안분)
+# 직접이익 = 매출총이익 - 직접비 (영업비 제외)
 hk_offline_gross = hk_offline_sales * (current_month_hk['gross_profit_rate'] / 100)
 hk_offline_direct_cost = get_channel_direct_cost(df_mlb, 202512, offline_channels, 'HK')
-hk_offline_sg_a = total_sg_a_current * (hk_offline_sales / total_net_sales_current) if total_net_sales_current > 0 else 0
-hk_offline_direct_profit = hk_offline_gross - hk_offline_direct_cost - hk_offline_sg_a
-print(f"  HK 오프라인 매출: {hk_offline_sales:,.0f}K, 총이익: {hk_offline_gross:,.0f}K, 직접비: {hk_offline_direct_cost:,.0f}K, 영업비: {hk_offline_sg_a:,.0f}K, 직접이익: {hk_offline_direct_profit:,.0f}K")
+hk_offline_direct_profit = hk_offline_gross - hk_offline_direct_cost
+print(f"  HK 오프라인 매출: {hk_offline_sales:,.0f}K, 총이익: {hk_offline_gross:,.0f}K, 직접비: {hk_offline_direct_cost:,.0f}K, 직접이익: {hk_offline_direct_profit:,.0f}K")
 
 hk_offline_gross_prev = hk_offline_sales_prev * (prev_month_hk['gross_profit_rate'] / 100)
 hk_offline_direct_cost_prev = get_channel_direct_cost(df_mlb, 202412, offline_channels, 'HK')
-hk_offline_sg_a_prev = total_sg_a_prev * (hk_offline_sales_prev / total_net_sales_prev) if total_net_sales_prev > 0 else 0
-hk_offline_direct_profit_prev = hk_offline_gross_prev - hk_offline_direct_cost_prev - hk_offline_sg_a_prev
+hk_offline_direct_profit_prev = hk_offline_gross_prev - hk_offline_direct_cost_prev
 
 # MC 오프라인 (정규점 + 아웃렛)
 mc_offline_sales = get_channel_data(df_mlb, 202512, offline_channels, 'MC')
 mc_offline_sales_prev = get_channel_data(df_mlb, 202412, offline_channels, 'MC')
 mc_offline_gross = mc_offline_sales * (current_month_mc['gross_profit_rate'] / 100)
 mc_offline_direct_cost = get_channel_direct_cost(df_mlb, 202512, offline_channels, 'MC')
-mc_offline_sg_a = total_sg_a_current * (mc_offline_sales / total_net_sales_current) if total_net_sales_current > 0 else 0
-mc_offline_direct_profit = mc_offline_gross - mc_offline_direct_cost - mc_offline_sg_a
-print(f"  MC 오프라인 매출: {mc_offline_sales:,.0f}K, 총이익: {mc_offline_gross:,.0f}K, 직접비: {mc_offline_direct_cost:,.0f}K, 영업비: {mc_offline_sg_a:,.0f}K, 직접이익: {mc_offline_direct_profit:,.0f}K")
+mc_offline_direct_profit = mc_offline_gross - mc_offline_direct_cost
+print(f"  MC 오프라인 매출: {mc_offline_sales:,.0f}K, 총이익: {mc_offline_gross:,.0f}K, 직접비: {mc_offline_direct_cost:,.0f}K, 직접이익: {mc_offline_direct_profit:,.0f}K")
 
 mc_offline_gross_prev = mc_offline_sales_prev * (prev_month_mc['gross_profit_rate'] / 100)
 mc_offline_direct_cost_prev = get_channel_direct_cost(df_mlb, 202412, offline_channels, 'MC')
-mc_offline_sg_a_prev = total_sg_a_prev * (mc_offline_sales_prev / total_net_sales_prev) if total_net_sales_prev > 0 else 0
-mc_offline_direct_profit_prev = mc_offline_gross_prev - mc_offline_direct_cost_prev - mc_offline_sg_a_prev
+mc_offline_direct_profit_prev = mc_offline_gross_prev - mc_offline_direct_cost_prev
 
 # HK 온라인
 online_channels = [channel_names['online']] if channel_names['online'] else []
@@ -471,14 +467,12 @@ hk_online_sales = get_channel_data(df_mlb, 202512, online_channels, 'HK')
 hk_online_sales_prev = get_channel_data(df_mlb, 202412, online_channels, 'HK')
 hk_online_gross = hk_online_sales * (current_month_hk['gross_profit_rate'] / 100)
 hk_online_direct_cost = get_channel_direct_cost(df_mlb, 202512, online_channels, 'HK')
-hk_online_sg_a = total_sg_a_current * (hk_online_sales / total_net_sales_current) if total_net_sales_current > 0 else 0
-hk_online_direct_profit = hk_online_gross - hk_online_direct_cost - hk_online_sg_a
-print(f"  HK 온라인 매출: {hk_online_sales:,.0f}K, 총이익: {hk_online_gross:,.0f}K, 직접비: {hk_online_direct_cost:,.0f}K, 영업비: {hk_online_sg_a:,.0f}K, 직접이익: {hk_online_direct_profit:,.0f}K")
+hk_online_direct_profit = hk_online_gross - hk_online_direct_cost
+print(f"  HK 온라인 매출: {hk_online_sales:,.0f}K, 총이익: {hk_online_gross:,.0f}K, 직접비: {hk_online_direct_cost:,.0f}K, 직접이익: {hk_online_direct_profit:,.0f}K")
 
 hk_online_gross_prev = hk_online_sales_prev * (prev_month_hk['gross_profit_rate'] / 100)
 hk_online_direct_cost_prev = get_channel_direct_cost(df_mlb, 202412, online_channels, 'HK')
-hk_online_sg_a_prev = total_sg_a_prev * (hk_online_sales_prev / total_net_sales_prev) if total_net_sales_prev > 0 else 0
-hk_online_direct_profit_prev = hk_online_gross_prev - hk_online_direct_cost_prev - hk_online_sg_a_prev
+hk_online_direct_profit_prev = hk_online_gross_prev - hk_online_direct_cost_prev
 
 channel_direct_profit = {
     "hk_offline": {
@@ -545,20 +539,17 @@ cumul_total_net_sales = cumulative_hk['net_sales'] + cumulative_mc['net_sales']
 cumul_hk_offline_sales = get_channel_data_ytd(df_mlb, 202501, 202512, offline_channels, 'HK')
 cumul_hk_offline_gross = cumul_hk_offline_sales * (cumulative_hk['gross_profit_rate'] / 100)
 cumul_hk_offline_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202501, 202512, offline_channels, 'HK')
-cumul_hk_offline_sg_a = cumul_total_sg_a * (cumul_hk_offline_sales / cumul_total_net_sales) if cumul_total_net_sales > 0 else 0
-cumul_hk_offline_direct_profit = cumul_hk_offline_gross - cumul_hk_offline_direct_cost - cumul_hk_offline_sg_a
+cumul_hk_offline_direct_profit = cumul_hk_offline_gross - cumul_hk_offline_direct_cost
 
 cumul_mc_offline_sales = get_channel_data_ytd(df_mlb, 202501, 202512, offline_channels, 'MC')
 cumul_mc_offline_gross = cumul_mc_offline_sales * (cumulative_mc['gross_profit_rate'] / 100)
 cumul_mc_offline_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202501, 202512, offline_channels, 'MC')
-cumul_mc_offline_sg_a = cumul_total_sg_a * (cumul_mc_offline_sales / cumul_total_net_sales) if cumul_total_net_sales > 0 else 0
-cumul_mc_offline_direct_profit = cumul_mc_offline_gross - cumul_mc_offline_direct_cost - cumul_mc_offline_sg_a
+cumul_mc_offline_direct_profit = cumul_mc_offline_gross - cumul_mc_offline_direct_cost
 
 cumul_hk_online_sales = get_channel_data_ytd(df_mlb, 202501, 202512, online_channels, 'HK')
 cumul_hk_online_gross = cumul_hk_online_sales * (cumulative_hk['gross_profit_rate'] / 100)
 cumul_hk_online_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202501, 202512, online_channels, 'HK')
-cumul_hk_online_sg_a = cumul_total_sg_a * (cumul_hk_online_sales / cumul_total_net_sales) if cumul_total_net_sales > 0 else 0
-cumul_hk_online_direct_profit = cumul_hk_online_gross - cumul_hk_online_direct_cost - cumul_hk_online_sg_a
+cumul_hk_online_direct_profit = cumul_hk_online_gross - cumul_hk_online_direct_cost
 
 print(f"  누적 HK 오프라인: {cumul_hk_offline_direct_profit:,.0f}K")
 print(f"  누적 MC 오프라인: {cumul_mc_offline_direct_profit:,.0f}K")
@@ -571,20 +562,17 @@ prev_cumul_total_net_sales = prev_cumulative_hk['net_sales'] + prev_cumulative_m
 prev_cumul_hk_offline_sales = get_channel_data_ytd(df_mlb, 202401, 202412, offline_channels, 'HK')
 prev_cumul_hk_offline_gross = prev_cumul_hk_offline_sales * (prev_cumulative_hk['gross_profit_rate'] / 100)
 prev_cumul_hk_offline_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202401, 202412, offline_channels, 'HK')
-prev_cumul_hk_offline_sg_a = prev_cumul_total_sg_a * (prev_cumul_hk_offline_sales / prev_cumul_total_net_sales) if prev_cumul_total_net_sales > 0 else 0
-prev_cumul_hk_offline_direct_profit = prev_cumul_hk_offline_gross - prev_cumul_hk_offline_direct_cost - prev_cumul_hk_offline_sg_a
+prev_cumul_hk_offline_direct_profit = prev_cumul_hk_offline_gross - prev_cumul_hk_offline_direct_cost
 
 prev_cumul_mc_offline_sales = get_channel_data_ytd(df_mlb, 202401, 202412, offline_channels, 'MC')
 prev_cumul_mc_offline_gross = prev_cumul_mc_offline_sales * (prev_cumulative_mc['gross_profit_rate'] / 100)
 prev_cumul_mc_offline_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202401, 202412, offline_channels, 'MC')
-prev_cumul_mc_offline_sg_a = prev_cumul_total_sg_a * (prev_cumul_mc_offline_sales / prev_cumul_total_net_sales) if prev_cumul_total_net_sales > 0 else 0
-prev_cumul_mc_offline_direct_profit = prev_cumul_mc_offline_gross - prev_cumul_mc_offline_direct_cost - prev_cumul_mc_offline_sg_a
+prev_cumul_mc_offline_direct_profit = prev_cumul_mc_offline_gross - prev_cumul_mc_offline_direct_cost
 
 prev_cumul_hk_online_sales = get_channel_data_ytd(df_mlb, 202401, 202412, online_channels, 'HK')
 prev_cumul_hk_online_gross = prev_cumul_hk_online_sales * (prev_cumulative_hk['gross_profit_rate'] / 100)
 prev_cumul_hk_online_direct_cost = get_channel_direct_cost_ytd(df_mlb, 202401, 202412, online_channels, 'HK')
-prev_cumul_hk_online_sg_a = prev_cumul_total_sg_a * (prev_cumul_hk_online_sales / prev_cumul_total_net_sales) if prev_cumul_total_net_sales > 0 else 0
-prev_cumul_hk_online_direct_profit = prev_cumul_hk_online_gross - prev_cumul_hk_online_direct_cost - prev_cumul_hk_online_sg_a
+prev_cumul_hk_online_direct_profit = prev_cumul_hk_online_gross - prev_cumul_hk_online_direct_cost
 
 cumulative_channel_direct_profit = {
     "hk_offline": {

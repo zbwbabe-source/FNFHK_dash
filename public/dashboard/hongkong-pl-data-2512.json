@@ -2,23 +2,23 @@
   "metadata": {
     "last_period": "2512",
     "previous_period": "2412",
-    "generated_at": "2026-01-14T20:30:26.362813"
+    "generated_at": "2026-01-14T20:36:15.545668"
   },
   "channel_direct_profit": {
     "hk_offline": {
-      "direct_profit": -492.2483327924572,
-      "direct_profit_rate": -2.6618646123532645,
-      "yoy": -39.38197543680748
+      "direct_profit": 1428.0028426153622,
+      "direct_profit_rate": 7.722017485634329,
+      "yoy": 47.58100992327121
     },
     "mc_offline": {
-      "direct_profit": 217.30336402499233,
-      "direct_profit_rate": 3.7852136435917503,
-      "yoy": 23.888454570850694
+      "direct_profit": 813.4262580000004,
+      "direct_profit_rate": 14.169095741579344,
+      "yoy": 55.66035556731699
     },
     "hk_online": {
-      "direct_profit": 291.98387966746395,
-      "direct_profit_rate": 21.41490953017436,
-      "yoy": 335.8586094102393
+      "direct_profit": 433.5640332846367,
+      "direct_profit_rate": 31.798791628161954,
+      "yoy": 368.4751299240927
     },
     "total": {
       "direct_profit": 2674.9931338999986,
@@ -413,19 +413,19 @@
     },
     "channel_direct_profit": {
       "hk_offline": {
-        "direct_profit": -15430.913800131504,
-        "direct_profit_rate": -8.728431028275565,
-        "yoy": 0
+        "direct_profit": -3057.4603650163335,
+        "direct_profit_rate": -1.7294395045809843,
+        "yoy": -61.33696457900305
       },
       "mc_offline": {
-        "direct_profit": 4646.102782802597,
-        "direct_profit_rate": 7.014764440913454,
-        "yoy": 36.80789102714543
+        "direct_profit": 9281.758658199993,
+        "direct_profit_rate": 14.013755964608036,
+        "yoy": 53.706452976872065
       },
       "hk_online": {
-        "direct_profit": 1761.7045981039028,
-        "direct_profit_rate": 24.09541729301473,
-        "yoy": 145.46684357251254
+        "direct_profit": 2273.426615591332,
+        "direct_profit_rate": 31.09440881670931,
+        "yoy": 153.47983528460477
       },
       "total": {
         "direct_profit": 8497.72490877501,
