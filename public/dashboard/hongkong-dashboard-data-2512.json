@@ -145,13 +145,6 @@
           "previous_sales": 0.0
         },
         {
-          "shop_cd": "M05",
-          "shop_nm": "M05 MLB LCX",
-          "reason": "10/13-11/7 리뉴얼중",
-          "current_sales": 1075490.0,
-          "previous_sales": 1357841.0
-        },
-        {
           "shop_cd": "M06",
           "shop_nm": "M06 MLB KIDS K11",
           "reason": "종료",
