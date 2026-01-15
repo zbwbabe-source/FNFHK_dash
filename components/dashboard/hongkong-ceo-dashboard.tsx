@@ -3581,7 +3581,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   <span className="text-xs font-semibold text-gray-700">누적판매</span>
                   <span className="text-sm font-bold text-green-600">
                     {formatNumber(Math.round(seasonSales?.current_season_f?.accumulated?.ac_sales_gross || 0))}K 
-                    ({formatPercent((seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0) < 100 ? (seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0) + 100 : (seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0))}%) ✓
+                    ({formatPercent(seasonSales?.current_season_f?.accumulated?.ac_sales_gross_yoy || 0)}%) ✓
                   </span>
                 </div>
               </div>
