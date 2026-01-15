@@ -3002,6 +3002,30 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               }
                               return null;
                             })()}
+                            
+                            {/* 당월 지급수수료 증가 사유 */}
+                            {(() => {
+                              const feeCurrent = (expenseDetail as any).fee || 0;
+                              const feePrev = (expenseDetailPrev as any).fee || 0;
+                              const feeChange = feeCurrent - feePrev;
+                              
+                              if (feeChange > 100) {
+                                return (
+                                  <div className="mt-3 pt-3 border-t border-purple-200">
+                                    <div className="text-xs font-semibold text-purple-700 mb-2">당월 지급수수료 974K 내역</div>
+                                    <div className="text-xs text-gray-600 space-y-1">
+                                      <div>• 감사수수료 480K</div>
+                                      <div>• 재고조사수수료 235K</div>
+                                      <div>• 재고조정(시티게이트) 120K</div>
+                                      <div>• VM창고 서비스료 66K</div>
+                                      <div>• 세무신고수수료 33K</div>
+                                      <div>• 관리비 26K, 기타 14K</div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         );
                       })()}
