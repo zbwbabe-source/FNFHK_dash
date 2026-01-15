@@ -1407,6 +1407,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
                         const defaultText = `• 과시즌F 재고: ${formatNumber(pastSeasonFW?.total?.current)}K (전년YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%)
+  • 과시즌F 정체재고 비중 18.4%
+  • 3년차 정체재고 비중 39.5%
+  (정체재고: 품번단위 월 판매율 0.1% 미만)
 • MLB 25년 누적 영업손실: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업손실률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
 • Discovery 25년 누적 영업손실: -2,362K (25년 10/1 영업개시)
   • 오프라인 1개, 온라인 1개 매장
@@ -4631,12 +4634,14 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
               
               {/* 과시즌F 상세 버튼 */}
               <div className="border-t pt-3 mt-3">
-                <button
-                  onClick={() => setShowStagnantInventoryModal(true)}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-semibold transition-colors"
+                <a
+                  href="https://pastseason-hk.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-semibold transition-colors block text-center"
                 >
-                  과시즌F 상세
-                </button>
+                  과시즌F 소진/정체재고 현황
+                </a>
               </div>
             </div>
           </div>
