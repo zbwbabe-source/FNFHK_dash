@@ -8749,6 +8749,36 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 })()}
               </>
             )}
+          </div>
+
+          {/* 기타 직접비 */}
+          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-semibold text-gray-700">기타 직접비</div>
+              <div className="text-xs font-bold px-2 py-1 rounded bg-purple-100 text-purple-700">
+                {directCostViewType}
+              </div>
+            </div>
+            
+            {directCostViewType === '당월' ? (
+              <>
+                {(() => {
+                  const current = (directCostCurrent?.current || {}) as any;
+                  const totalRent = Math.round(current.rent || 0);
+                  const totalSalary = Math.round(current.labor_cost || 0);
+                  const totalDirectCost = Math.round(directCostCurrent?.totalDirectCost || 0);
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCost = totalDirectCost - totalRent - totalSalary;
+                  
+                  const prev = (directCostCurrent?.prev || {}) as any;
+                  const totalRentPrev = Math.round(prev.rent || 0);
+                  const totalSalaryPrev = Math.round(prev.labor_cost || 0);
+                  const totalDirectCostPrev = Math.round(directCostCurrent?.totalDirectCostPrev || 0);
+                  // 기타직접비 = 총 직접비 - 급여 - 임차료 (logistics는 기타직접비에 포함)
+                  const otherDirectCostPrev = totalDirectCostPrev - totalRentPrev - totalSalaryPrev;
+                  
+                  const change = otherDirectCost - otherDirectCostPrev;
+                  const yoy = otherDirectCostPrev !== 0 ? Math.round((otherDirectCost / otherDirectCostPrev) * 100) : 0;
                   
                   // 기타 직접비 상세 항목
                   const otherDetailItems = [
