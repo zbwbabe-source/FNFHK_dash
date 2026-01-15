@@ -8811,13 +8811,90 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         ))}
                       </div>
 
-                      {/* 누적 증감 분석 */}
+                      {/* 당월 증감 분석 */}
                       <div className="mt-3 pt-3 border-t">
                         <button
                           onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
                           className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
                         >
-                          <span>누적 증감 분석</span>
+                          <span>당월 증감 분석</span>
+                          {showDirectCostItemAnalysis.other ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </button>
+                        {showDirectCostItemAnalysis.other && (
+                          <div className="mt-3 pt-3 border-t rounded p-2">
+                            <div className="space-y-1.5 text-xs">
+                              {otherDetailItems.map((item, idx) => (
+                                <div key={idx} className="flex justify-between items-center">
+                                  <span className="text-gray-600">{item.label}</span>
+                                  <span className="text-gray-800">{formatNumber(item.value)}K</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </>
+            ) : (
+              <>
+                {(() => {
+                  // 하드코딩된 누적 데이터 (2512 기준)
+                  const totalDirectCost = 140220; // 2512 누적 전체 직접비
+                  const totalSalary = 27115; // 2512 누적 급여
+                  const totalRent = 70402; // 2512 누적 임차료
+                  const otherDirectCost = totalDirectCost - totalSalary - totalRent; // 42,703
+                  
+                  const totalDirectCostPrev = 147610; // 2412 누적 전체 직접비
+                  const totalSalaryPrev = 26709; // 2412 누적 급여
+                  const totalRentPrev = 74224; // 2412 누적 임차료
+                  const otherDirectCostPrev = totalDirectCostPrev - totalSalaryPrev - totalRentPrev; // 46,677
+                  
+                  const change = otherDirectCost - otherDirectCostPrev;
+                  const yoy = Math.round((otherDirectCost / otherDirectCostPrev) * 100);
+                  
+                  // 기타 직접비 상세 항목 (하드코딩)
+                  const otherDetailItems = [
+                    { label: '매장관리비', value: 12109 },
+                    { label: '감가상각비', value: 8469 },
+                    { label: '지급수수료', value: 4118 },
+                    { label: '수도광열비', value: 1206 },
+                    { label: '광고비', value: 1410 },
+                    { label: '보험료', value: 592 },
+                    { label: '수선유지비', value: 257 },
+                    { label: '물류비', value: 214 },
+                    { label: '통신비', value: 208 },
+                    { label: '여비교통비', value: 51 }
+                  ];
+                  
+                  return (
+                    <>
+                      <div className="text-2xl font-bold mb-2 text-gray-800">{formatNumber(otherDirectCost)}K</div>
+                      <div className={`text-xs mb-3 ${change >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        YOY {yoy}% ({change >= 0 ? '▲' : '▼'} {Math.abs(change)}K)
+                      </div>
+                      
+                      <div className="border-t pt-3 space-y-1.5 border-gray-200">
+                        {otherDetailItems.slice(0, 5).map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600">{item.label}</span>
+                            <span className="text-xs font-semibold text-gray-800">{formatNumber(item.value)}K</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 누적 상세 내역 */}
+                      <div className="mt-3 pt-3 border-t">
+                        <button
+                          onClick={() => setShowDirectCostItemAnalysis(prev => ({ ...prev, other: !prev.other }))}
+                          className="w-full flex items-center justify-between text-xs text-purple-600 hover:text-purple-800 font-semibold"
+                        >
+                          <span>누적 상세 내역</span>
                           {showDirectCostItemAnalysis.other ? (
                             <ChevronDown className="w-4 h-4" />
                           ) : (
