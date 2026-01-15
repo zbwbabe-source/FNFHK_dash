@@ -1332,8 +1332,11 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       if (!ceoInsights['executive-summary-text']) {
                         const defaultText = ceoInsightsData 
                           ? ceoInsightsData.executive_summary.items.join('\n')
-                          : `• 재고효율화 유지: 당시즌 판매율 50.1% (전년비 +14.9%p) - 입고 62%, 판매 111%
-• 25F 재고(TAG) 전년비 48%: 26S 조기투입으로 대응 중`;
+                          : `• 기말재고(TAG) 전년비 94%
+• 당시즌 재고효율화
+  • 당시즌 (25F) 판매율 50.1% (전년비 +14.9%p)
+  • **입고 62%**, 판매 89%
+  • 26S 조기투입으로 입고부족 대응 중 (24F대비 25F+26S 판매 90%)`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -2929,11 +2932,12 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               const salaryCurrent = (expenseDetail as any).salary || 0;
                               const salaryPrev = (expenseDetailPrev as any).salary || 0;
                               const salaryChange = salaryCurrent - salaryPrev;
+                              const salaryYoy = salaryPrev > 0 ? (salaryCurrent / salaryPrev * 100) : 0;
                               
                               if (salaryChange > 0) {
                                 return (
                                   <div className="mt-3 pt-3 border-t border-blue-200">
-                                    <div className="text-xs font-semibold text-blue-700 mb-2">당월 급여 증가 {formatNumber(salaryChange)}K</div>
+                                    <div className="text-xs font-semibold text-blue-700 mb-2">당월 급여 YOY {Math.round(salaryYoy)}%(+{formatNumber(salaryChange)})</div>
                                     <div className="text-xs text-gray-600 space-y-1">
                                       <div>인원수 12명 → 15명 (125%), 인당급여 102%</div>
                                       <div>MD+1, MKT+1, Ecom+1</div>
@@ -2953,7 +2957,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               if (feeChange > 100) {
                                 return (
                                   <div className="mt-3 pt-3 border-t border-purple-200">
-                                    <div className="text-xs font-semibold text-purple-700 mb-2">당월 지급수수료 974K 내역</div>
+                                    <div className="text-xs font-semibold text-purple-700 mb-2">당월 지급수수료 974 내역</div>
                                     <div className="text-xs text-gray-600 space-y-1">
                                       <div>• 감사수수료 480K</div>
                                       <div>• 재고조사수수료 235K</div>
@@ -4477,10 +4481,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <div className="flex justify-between text-xs pl-2">
                                 <span className="text-gray-600">3년차 이상</span>
                                 <span className="font-semibold">
-                                  {formatNumber(Math.round(salesData['과시즌F_3년차_이상'].current.gross_sales))} 
-                                  <span className={salesData['과시즌F_3년차_이상'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
-                                    {' '}({formatPercent(salesData['과시즌F_3년차_이상'].yoy)}%)
-                                  </span>
+                                  {(() => {
+                                    const current = Math.round(salesData['과시즌F_3년차_이상'].current.gross_sales);
+                                    const previous = salesData['과시즌F_3년차_이상'].previous?.gross_sales || 0;
+                                    const yoy = salesData['과시즌F_3년차_이상'].yoy || 0;
+                                    
+                                    if (previous === 0 && current > 0) {
+                                      return (
+                                        <>
+                                          {formatNumber(current)}
+                                          <span className="text-orange-600"> (신규)</span>
+                                        </>
+                                      );
+                                    }
+                                    
+                                    return (
+                                      <>
+                                        {formatNumber(current)} 
+                                        <span className={yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                          {' '}({formatPercent(yoy)}%)
+                                        </span>
+                                      </>
+                                    );
+                                  })()}
                                 </span>
                               </div>
                             )}
@@ -4531,10 +4554,29 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                               <div className="flex justify-between text-xs pl-2">
                                 <span className="text-gray-600">3년차 이상</span>
                                 <span className="font-semibold">
-                                  {formatNumber(Math.round(salesData['과시즌S_3년차_이상'].current.gross_sales))} 
-                                  <span className={salesData['과시즌S_3년차_이상'].yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
-                                    {' '}({formatPercent(salesData['과시즌S_3년차_이상'].yoy)}%)
-                                  </span>
+                                  {(() => {
+                                    const current = Math.round(salesData['과시즌S_3년차_이상'].current.gross_sales);
+                                    const previous = salesData['과시즌S_3년차_이상'].previous?.gross_sales || 0;
+                                    const yoy = salesData['과시즌S_3년차_이상'].yoy || 0;
+                                    
+                                    if (previous === 0 && current > 0) {
+                                      return (
+                                        <>
+                                          {formatNumber(current)}
+                                          <span className="text-orange-600"> (신규)</span>
+                                        </>
+                                      );
+                                    }
+                                    
+                                    return (
+                                      <>
+                                        {formatNumber(current)} 
+                                        <span className={yoy >= 100 ? 'text-red-600' : 'text-green-600'}>
+                                          {' '}({formatPercent(yoy)}%)
+                                        </span>
+                                      </>
+                                    );
+                                  })()}
                                 </span>
                               </div>
                             )}
