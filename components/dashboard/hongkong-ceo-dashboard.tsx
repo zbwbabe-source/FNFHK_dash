@@ -3207,6 +3207,28 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           </div>
                         );
                       })()}
+                      
+                      {/* 누적 지급수수료 증가 사유 */}
+                      {(() => {
+                        const expenseDetail = plData?.cumulative?.total?.expense_detail || {};
+                        const expenseDetailPrev = plData?.cumulative?.prev_cumulative?.total?.expense_detail || {};
+                        const feeCurrent = (expenseDetail as any).fee || 0;
+                        const feePrev = (expenseDetailPrev as any).fee || 0;
+                        const feeChange = feeCurrent - feePrev;
+                        
+                        if (feeChange > 1000) {
+                          return (
+                            <div className="mt-3 pt-3 border-t border-purple-200">
+                              <div className="text-xs font-semibold text-purple-700 mb-2">누적 지급수수료 증가 +{formatNumber(Math.round(feeChange))}K</div>
+                              <div className="text-xs text-gray-600 space-y-1">
+                                <div>• 3월 재고소각 895K</div>
+                                <div>• 물류담당자 외주비 88K (1-4월)</div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   )}
                 </>
