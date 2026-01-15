@@ -1833,57 +1833,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   )}
                 </div>
               )}
-              
-              {/* 전년 동일매장 기준 YOY */}
-              <div className="mt-3 pt-3 border-t">
-                <div className="bg-blue-50 rounded-lg p-2">
-                  <div className="text-xs font-semibold text-blue-800 mb-1">📌 전년 동일 오프라인 매장 기준</div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-blue-700">실판매출 YOY (종료매장 제외)</span>
-                    <span className="text-sm font-bold text-blue-900">{formatPercent(salesSummary?.same_store_yoy)}%</span>
-                  </div>
-                  <div className="text-[10px] text-blue-600 mt-1 italic">
-                    * 종료매장 제외 ({salesSummary?.same_store_count || 0}개 오프라인 매장 기준)
-                  </div>
-                  
-                  {/* 토글 버튼 */}
-                  <button
-                    onClick={() => setShowSameStoreDetails(!showSameStoreDetails)}
-                    className="mt-2 text-xs text-blue-700 hover:text-blue-800 font-semibold flex items-center w-full justify-between"
-                  >
-                    <span>매장 리스트</span>
-                    {showSameStoreDetails ? (
-                      <ChevronDown className="w-3 h-3" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3" />
-                    )}
-                  </button>
-                  
-                  {/* 매장 리스트 */}
-                  {showSameStoreDetails && (
-                    <div className="mt-2 space-y-1 border-t border-blue-200 pt-2">
-                      {/* 포함된 매장 (순번 표시) */}
-                      {dashboardData?.sales_summary?.same_store_details?.included?.map((store: any, idx: number) => (
-                        <div key={idx} className="text-[10px] text-blue-800 flex items-center gap-1.5">
-                          <span className="text-blue-400 font-mono">{idx + 1}.</span>
-                          <span>{store.shop_nm}</span>
-                        </div>
-                      ))}
-                      
-                      {/* 제외된 매장 (회색 스타일) - 전년에도 제외된 매장은 제외 */}
-                      {dashboardData?.sales_summary?.same_store_details?.excluded
-                        ?.filter((store: any) => store.current_sales > 0 || store.previous_sales > 0)
-                        ?.map((store: any, idx: number) => (
-                          <div key={idx} className="text-[10px] text-gray-400 flex items-center gap-1.5">
-                            <span className="text-gray-300 font-mono">-</span>
-                            <span>{store.shop_nm}</span>
-                            <span className="text-[9px] italic ml-auto">({store.reason})</span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
             {/* 할인율 카드 */}
