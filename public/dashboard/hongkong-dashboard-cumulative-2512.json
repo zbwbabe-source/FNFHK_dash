@@ -1883,12 +1883,12 @@
     },
     "25F": {
       "current": {
-        "gross_sales": 40561.108
+        "gross_sales": 40885.0
       },
       "previous": {
-        "gross_sales": 45605.832
+        "gross_sales": 46007.0
       },
-      "yoy": 88.9
+      "yoy": 89.0
     },
     "25S": {
       "current": {

@@ -7,7 +7,7 @@
   },
   "summary": {
     "total_stores": 22,
-    "hk_stores": 18,
+    "hk_stores": 19,
     "mc_stores": 4,
     "closed_stores": 3,
     "total_direct_profit": 9185.896400226997,
@@ -224,11 +224,31 @@
     },
     "loss_deteriorating": {
       "name": "적자 & 악화",
-      "count": 9,
-      "total_direct_profit": -9340.762016373003,
-      "avg_yoy": 72.09476036898997,
-      "avg_rent_labor_ratio": 79.91849948760769,
+      "count": 10,
+      "total_direct_profit": -11045.632016373003,
+      "avg_yoy": 75.48762203832969,
+      "avg_rent_labor_ratio": 82.42149948760769,
       "stores": [
+        {
+          "shop_cd": "M19",
+          "shop_nm": "NTP 3",
+          "country": "HK",
+          "is_closed": false,
+          "current": {
+            "net_sales": 1784.69,
+            "direct_profit": -1704.87,
+            "rent_labor_ratio": 114.13,
+            "rent": 1532.47,
+            "labor_cost": 504.39
+          },
+          "previous": {
+            "net_sales": 1691.76,
+            "direct_profit": -1655.03
+          },
+          "yoy": 105.49,
+          "category": "loss_deteriorating",
+          "previous_category": "loss_deteriorating"
+        },
         {
           "shop_cd": "M02",
           "shop_nm": "TSQ",

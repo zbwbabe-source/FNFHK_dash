@@ -1487,7 +1487,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       if (!ceoInsights['strategy-text']) {
                         const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
 • 1-2월 합계 매출 YOY 123% 목표 (춘절 당년 2월, 전년 1월)
-• 당월 흑자 전환 기조 지속
 • 채널 효율화: 2026년 7월 NTP3(25년 직접손실 -1,705K), 세나도(아)(25년 직접손실 -1,018K) 영업종료 예정`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
@@ -1541,13 +1540,6 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                         <span className="text-gray-600 mr-2">•</span>
                         <div className="flex-1 leading-relaxed">
                           <span className="font-semibold">1-2월 합계 매출 YOY 123% 목표</span> (춘절 당년 2월, 전년 1월)
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">당월 흑자 전환 기조 지속</span>
                         </div>
                       </div>
 
