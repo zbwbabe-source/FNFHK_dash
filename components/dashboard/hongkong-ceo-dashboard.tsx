@@ -3571,7 +3571,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                             <span className="text-gray-600">{item.subcategory_code}</span>
                             <span className="font-semibold">
                               <span className={(item.net_acp_p_yoy || 0) < 80 ? 'text-red-600' : 'text-orange-600'}>{formatPercent(item.net_acp_p_yoy || 0)}%</span> /
-                              <span className={((item.ac_sales_gross_yoy || 0) < 100 ? (item.ac_sales_gross_yoy || 0) + 100 : (item.ac_sales_gross_yoy || 0)) >= 100 ? 'text-green-600' : 'text-red-600'}> {formatPercent((item.ac_sales_gross_yoy || 0) < 100 ? (item.ac_sales_gross_yoy || 0) + 100 : (item.ac_sales_gross_yoy || 0))}%</span> /
+                              <span className={(item.ac_sales_gross_yoy || 0) >= 100 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.ac_sales_gross_yoy || 0)}%</span> /
                               <span className={(item.sales_rate || 0) > 30 ? 'text-green-600' : 'text-red-600'}> {formatPercent(item.sales_rate || 0, 1)}%</span>
                             </span>
                           </div>
