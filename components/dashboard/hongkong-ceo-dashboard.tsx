@@ -8544,9 +8544,9 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
             ) : (
               <>
                 {(() => {
-                  // 하드코딩된 누적 데이터 (2512 기준)
-                  const current = 214; // 2512 누적 물류비
-                  const prev = 259; // 2412 누적
+                  // 하드코딩된 누적 데이터 (2512 HK Direct expense.csv 기준)
+                  const current = 14068; // 2512 누적 물류비
+                  const prev = 16268; // 2412 누적 물류비
                   const change = current - prev;
                   const yoy = Math.round((current / prev) * 100);
                   const currentSales = plData?.cumulative?.total?.net_sales || 1;
@@ -8688,16 +8688,17 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                   const change = otherDirectCost - otherDirectCostPrev;
                   const yoy = Math.round((otherDirectCost / otherDirectCostPrev) * 100);
                   
-                  // 기타 직접비 상세 항목 (하드코딩)
+                  // 기타 직접비 상세 항목 (CSV 기준 - 2512 HK Direct expense.csv)
                   const otherDetailItems = [
+                    { label: '물류비', value: 14068 },
                     { label: '매장관리비', value: 12109 },
                     { label: '감가상각비', value: 8469 },
                     { label: '지급수수료', value: 4118 },
-                    { label: '수도광열비', value: 1206 },
                     { label: '광고비', value: 1410 },
+                    { label: '수도광열비', value: 1206 },
                     { label: '보험료', value: 592 },
                     { label: '수선유지비', value: 257 },
-                    { label: '물류비', value: 214 },
+                    { label: '유니폼', value: 214 },
                     { label: '통신비', value: 208 },
                     { label: '여비교통비', value: 51 }
                   ];
