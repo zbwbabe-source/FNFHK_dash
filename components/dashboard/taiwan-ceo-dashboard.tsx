@@ -935,11 +935,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       setEditingCard('executive-summary');
                       if (!ceoInsights['executive-summary-text']) {
                         // 기본 텍스트 설정
-                        const defaultText = `• **당월 실판매출:** 17,236K HKD, YOY 106% (전월비 +943K)
-• **당월 영업이익:** 2,440K HKD, YOY 121% (전월비 +416K)
-• **누적 영업이익:** 14,223K HKD, YOY 106%
-• **온라인 성장:** 5,035K (YOY 125%, 비중 29.2%), 직접이익 1,400K
-• **총재고 효율화:** 165,642K HKD, YOY 90%`;
+                        const defaultText = `• 당월 매출개선: 17,237K YOY 106%
+• 누적 매출개선: 153,643K YOY 109%
+• 당월 영업이익 흑자: 2,461K (이익률 14.3%, 전년비 +1.8%p)
+• 누적 영업이익 흑자: 14,314K (이익률 9.3% 전년비 △0.2%p)
+• 총재고: 162,127K, YOY 90%`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -1132,7 +1132,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
                   // 5. 총재고 효율화
                   const itemId5 = 'tw-key-performance-5';
-                  const defaultText5 = `총재고 효율화: 165,642K HKD, YOY 90%`;
+                  const defaultText5 = `총재고 효율화: 162,127K HKD, YOY 90%`;
                   insights.push(
                     editingItemId === itemId5 ? (
                       <div key="inventory" className="flex items-start">
@@ -1306,9 +1306,10 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                     } else {
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
-                        const defaultText = `• **Discovery 누적 영업손실:** -2,331K (오프라인 3개+온라인 2개)
-• **할인율 상승:** 22.9% (전년 21.1%, +1.8%p)
-• **SKM Tainan(T13) 당월 적자:** -14K HKD`;
+                        const defaultText = `• DJ 입고 188%, 판매 113%로 판매율 제고 필요
+• Discovery 25년 누적 영업손실 -2,344K
+  • 온라인2개, 오프라인 3개점
+  • 26년 5월 10월 총 2개점 오픈 예정`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1354,14 +1355,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                   {ceoInsightsData.warnings.items.map((item: string, index: number) => (
                     <div key={index} className="flex items-start">
                       <span className="text-orange-600 font-bold mr-2">•</span>
-                      <span className="whitespace-pre-wrap">
-                        {item.split(/(\*\*[^*]+\*\*)/).map((part: string, i: number) => {
-                          if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={i}>{part.slice(2, -2)}</strong>;
-                          }
-                          return <span key={i}>{part}</span>;
-                        })}
-                      </span>
+                      <div className="flex-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold">$1</span>') }} />
                     </div>
                   ))}
                 </div>
@@ -2306,74 +2300,149 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 </button>
               </div>
               {showItemProfitDetail && (
-                <div className="mt-3 pt-3 border-t">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th className="text-left py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">항목</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">금액</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">YOY</th>
-                          <th className="text-right py-1.5 px-2 font-semibold text-gray-700 border-b-2 border-gray-300">전년비</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700">택매출</td>
-                          <td className="text-right py-1 px-2 font-semibold">{formatNumber(pl?.tag_sales)}</td>
-                          <td className="text-right py-1 px-2 text-red-600 font-semibold">{formatPercent(salesSummary?.total_yoy || 0)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600 font-semibold">△{formatNumber(Math.abs(plChange?.tag_sales || 0))}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 할인 ({formatPercent((pl as any)?.discount_rate, 1)}%)</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber((pl as any)?.discount)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.discount)}%</td>
-                          <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.discount || 0))}</td>
-                        </tr>
-                        <tr className="bg-gray-100 font-semibold">
-                          <td className="py-1.5 px-2 text-blue-800 border-t border-blue-200">= 실판매출</td>
-                          <td className="text-right py-1.5 px-2 text-blue-800 border-t border-blue-200">{formatNumber(pl?.net_sales)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">{formatPercent(profitStructureYoy.net_sales)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-blue-200">△{formatNumber(Math.abs(plChange?.net_sales || 0))}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 매출원가 ({formatPercent((pl as any)?.cogs_rate)}%)</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.cogs)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(profitStructureYoy.cogs)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600">△{formatNumber(Math.abs(plChange?.cogs || 0))}</td>
-                        </tr>
-                        <tr className="bg-green-50 font-semibold">
-                          <td className="py-1.5 px-2 text-green-800 border-t border-green-200">= 매출총이익 ({formatPercent((pl as any)?.gross_profit_rate)}%)</td>
-                          <td className="text-right py-1.5 px-2 text-green-800 border-t border-green-200">{formatNumber(pl?.gross_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">{formatPercent(profitStructureYoy.gross_profit)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-green-200">△{formatNumber(Math.abs(plChange?.gross_profit || 0))}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 직접비</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.direct_cost)}</td>
-                          <td className="text-right py-1 px-2 text-green-600">{formatPercent(profitStructureYoy.direct_cost)}%</td>
-                          <td className="text-right py-1 px-2 text-green-600">△{formatNumber(Math.abs(plChange?.direct_cost || 0))}</td>
-                        </tr>
-                        <tr className="bg-gray-100 font-semibold">
-                          <td className="py-1.5 px-2 text-orange-800 border-t border-yellow-200">= 직접이익 ({formatPercent((pl as any)?.direct_profit_rate)}%)</td>
-                          <td className="text-right py-1.5 px-2 text-orange-800 border-t border-yellow-200">{formatNumber(pl?.direct_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">{formatPercent(profitStructureYoy.direct_profit)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t border-yellow-200">△{formatNumber(Math.abs(plChange?.direct_profit || 0))}</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50">
-                          <td className="py-1 px-2 text-gray-700 pl-4">- 영업비</td>
-                          <td className="text-right py-1 px-2 text-gray-600">{formatNumber(pl?.sg_a)}</td>
-                          <td className="text-right py-1 px-2 text-red-600">{formatPercent(profitStructureYoy.sg_a)}%</td>
-                          <td className="text-right py-1 px-2 text-red-600">+{formatNumber(plChange?.sg_a || 0)}</td>
-                        </tr>
-                        <tr className="bg-gray-100 font-bold">
-                          <td className="py-1.5 px-2 text-red-800 border-t-2 border-red-300">= 영업이익 ({formatPercent((pl as any)?.operating_profit_rate)}%)</td>
-                          <td className="text-right py-1.5 px-2 text-red-800 border-t-2 border-red-300">{formatNumber(pl?.operating_profit)}</td>
-                          <td className="text-right py-1.5 px-2 text-red-600 border-t-2 border-red-300">{formatPercent(profitStructureYoy.operating_profit)}%</td>
-                          <td className="text-right py-1.5 px-2 text-red-700 border-t-2 border-red-300">△{formatNumber(Math.abs(plChange?.operating_profit || 0))}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div className="mt-2 pt-2 border-t">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg">
+                    <div className="text-xs text-gray-600 mb-3 font-semibold">
+                      💰 Tag매출대비 백분율 기준 PL
+                    </div>
+                      {(() => {
+                        const plSource = showProfitMonthlyOrYTD === 'ytd' ? plData?.cumulative?.total : pl;
+                        const tagSales = plSource?.tag_sales || 1;
+                        
+                        // 누적 데이터는 rate만 있으므로 실제 금액 계산
+                        let discount, cogs, sg_a;
+                        if (showProfitMonthlyOrYTD === 'ytd') {
+                          discount = tagSales * ((plSource as any)?.discount_rate || 0) / 100;
+                          cogs = (plSource?.net_sales || 0) * ((plSource as any)?.cogs_rate || 0) / 100;
+                          sg_a = plSource?.sg_a || 0;
+                        } else {
+                          discount = plSource?.discount || 0;
+                          cogs = plSource?.cogs || 0;
+                          sg_a = plSource?.sg_a || 0;
+                        }
+                        
+                        const discountPct = (discount / tagSales * 100);
+                        const netSalesPct = ((plSource?.net_sales || 0) / tagSales * 100);
+                        const cogsPct = (cogs / tagSales * 100);
+                        const grossProfitPct = ((plSource?.gross_profit || 0) / tagSales * 100);
+                        const directCostPct = ((plSource?.direct_cost || 0) / tagSales * 100);
+                        const directProfitPct = ((plSource?.direct_profit || 0) / tagSales * 100);
+                        const sgaPct = (sg_a / tagSales * 100);
+                        const opProfitPct = ((plSource?.operating_profit || 0) / tagSales * 100);
+                      
+                      const maxHeight = 200; // 최대 높이 (px)
+                        
+                        return (
+                        <div className="flex items-start justify-center gap-2 py-4">
+                            {/* 택매출 */}
+                          <div className="flex flex-col items-center w-16">
+                            <div className="text-xs font-bold text-blue-900 mb-1">{formatNumber(plSource?.tag_sales)}K</div>
+                            <div className="w-12 bg-blue-600 rounded-t-md flex items-start justify-center pt-2" style={{height: `${maxHeight}px`}}>
+                              <span className="text-white text-sm font-bold">100%</span>
+                                </div>
+                            <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5">택매출</div>
+                            <div className="text-xs text-blue-900 font-bold h-6 flex items-center">100.0%</div>
+                            <div className="text-[10px] text-gray-600 h-10">&nbsp;</div>
+                            </div>
+
+                            {/* 실판매출 */}
+                          <div className="flex flex-col items-center w-16">
+                            <div className="text-xs font-bold text-blue-700 mb-1">{formatNumber(plSource?.net_sales)}K</div>
+                            <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
+                              <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
+                                <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
+                                </div>
+                              <div className="bg-blue-500 flex-1 flex items-start justify-center pt-2">
+                                <span className="text-white text-sm font-bold">{formatPercent(netSalesPct, 1)}%</span>
+                              </div>
+                                  </div>
+                            <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5 whitespace-nowrap">실판매출</div>
+                            <div className="text-xs text-blue-700 font-bold h-6 flex items-center">{formatPercent(netSalesPct, 1)}%</div>
+                            <div className="text-[10px] text-gray-600 h-10 flex flex-col items-center justify-start">
+                              <div>할인</div>
+                              <div>({formatPercent(discountPct, 1)}%)</div>
+                              </div>
+                            </div>
+
+                          {/* 총이익 */}
+                          <div className="flex flex-col items-center w-16">
+                            <div className="text-xs font-bold text-green-700 mb-1">{formatNumber(plSource?.gross_profit)}K</div>
+                            <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
+                              <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
+                                <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
+                                </div>
+                              <div className="bg-gray-500 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * cogsPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">원가<br/>{formatPercent(cogsPct, 1)}%</span>
+                              </div>
+                              <div className="bg-green-600 flex-1 flex items-start justify-center pt-2">
+                                <span className="text-white text-sm font-bold">{formatPercent(grossProfitPct, 1)}%</span>
+                                  </div>
+                                  </div>
+                            <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5">총이익</div>
+                            <div className="text-xs text-green-700 font-bold h-6 flex items-center">{formatPercent(grossProfitPct, 1)}%</div>
+                            <div className="text-[10px] text-gray-600 h-10 flex flex-col items-center justify-start">
+                              <div>원가</div>
+                              <div>({formatPercent(cogsPct, 1)}%)</div>
+                              </div>
+                            </div>
+
+                            {/* 직접이익 */}
+                          <div className="flex flex-col items-center w-16">
+                            <div className="text-xs font-bold text-green-600 mb-1">{formatNumber(plSource?.direct_profit)}K</div>
+                            <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
+                              <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
+                                <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
+                                </div>
+                              <div className="bg-gray-500 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * cogsPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">원가<br/>{formatPercent(cogsPct, 1)}%</span>
+                              </div>
+                              <div className="bg-gray-600 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * directCostPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">직접비<br/>{formatPercent(directCostPct, 1)}%</span>
+                                  </div>
+                              <div className="bg-green-500 flex-1">
+                                  </div>
+                                  </div>
+                            <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5 whitespace-nowrap">직접이익</div>
+                            <div className="text-xs text-green-600 font-bold h-6 flex items-center">{formatPercent(directProfitPct, 1)}%</div>
+                            <div className="text-[10px] text-gray-600 h-10 flex flex-col items-center justify-start">
+                              <div>직접비</div>
+                              <div>({formatPercent(directCostPct, 1)}%)</div>
+                              </div>
+                            </div>
+
+                            {/* 영업이익 */}
+                          <div className="flex flex-col items-center w-16">
+                            <div className={`text-xs font-bold mb-1 ${(plSource?.operating_profit || 0) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
+                              {formatNumber(plSource?.operating_profit)}K
+                                </div>
+                            <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
+                              <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
+                                <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
+                              </div>
+                              <div className="bg-gray-500 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * cogsPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">원가<br/>{formatPercent(cogsPct, 1)}%</span>
+                                  </div>
+                              <div className="bg-gray-600 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * directCostPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">직접비<br/>{formatPercent(directCostPct, 1)}%</span>
+                                  </div>
+                              <div className="bg-gray-700 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * sgaPct / 100}px`}}>
+                                <span className="text-white text-[9px] font-semibold">영업비<br/>{formatPercent(sgaPct, 1)}%</span>
+                                  </div>
+                              <div className={`flex-1 ${(plSource?.operating_profit || 0) >= 0 ? 'bg-green-400' : 'bg-red-600'}`}>
+                                  </div>
+                                  </div>
+                            <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5 whitespace-nowrap">영업이익</div>
+                            <div className={`text-xs font-bold h-6 flex items-center ${(plSource?.operating_profit || 0) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
+                              {formatPercent(opProfitPct, 1)}%
+                                </div>
+                            <div className="text-[10px] text-gray-600 h-10 flex flex-col items-center justify-start">
+                              <div>영업비</div>
+                              <div>({formatPercent(sgaPct, 1)}%)</div>
+                              </div>
+                              </div>
+                            </div>
+                        );
+                      })()}
                   </div>
                 </div>
               )}
