@@ -213,7 +213,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
         }
         
         // CEO 인사이트 데이터 로드 (period별)
-        const ceoInsightsResponse = await fetch(`/dashboard/hongkong-ceo-insights-${period}.json`);
+        const ceoInsightsResponse = await fetch(`/dashboard/hongkong-ceo-insights-${period}.json?_=${Date.now()}`);
         if (ceoInsightsResponse.ok) {
           const ceoInsightsResult = await ceoInsightsResponse.json();
           setCeoInsightsData(ceoInsightsResult);
@@ -1335,8 +1335,8 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                           : `• 기말재고(TAG) 전년비 94%
 • 당시즌 재고효율화
   • 당시즌 (25F) 판매율 50.1% (전년비 +14.9%p)
-  • **입고 62%**, 판매 89%
-  • 26S 조기투입으로 입고부족 대응 중 (24F대비 25F+26S 판매 90%)`;
+  • 당시즌 (25F) 재고 YOY 48% (누적입고 62%, 누적판매 89%)
+  • 26S 조기투입으로 입고부족 대응 중 (전년 24F 누적판매 대비 25F+26S 누적판매 90%)`;
                         setCeoInsights({ ...ceoInsights, 'executive-summary-text': defaultText });
                       }
                     }
@@ -1407,8 +1407,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       setEditingCard('risk');
                       if (!ceoInsights['risk-text']) {
                         const defaultText = `• 과시즌F 재고: ${formatNumber(pastSeasonFW?.total?.current)}K (전년YOY ${formatPercent(pastSeasonFW?.total?.yoy)}%)
-• 누적 영업손실: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
-• Discovery 영업손실: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중`;
+• MLB 25년 누적 영업손실: ${formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업손실률 ${formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
+• Discovery 25년 누적 영업손실: -2,362K (25년 10/1 영업개시)
+  • 오프라인 1개, 온라인 1개 매장
+  • 26년 확장 없이 운영하며 효율성 개선에 집중`;
                         setCeoInsights({ ...ceoInsights, 'risk-text': defaultText });
                       }
                     }
@@ -1450,26 +1452,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                      <div className="flex items-start">
+                  {ceoInsightsData?.warnings?.items ? (
+                    ceoInsightsData.warnings.items.map((item: string, idx: number) => (
+                      <div key={idx} className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">과시즌F 재고</span>: {formatNumber(pastSeasonFW?.total?.current)}K (전년YOY {formatPercent(pastSeasonFW?.total?.yoy)}%)
-                        </div>
+                        <div className="flex-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold">$1</span>') }} />
                       </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">누적 영업손실</span>: {formatNumber(plData?.cumulative?.total?.operating_profit)}K (영업이익률 {formatPercent(plData?.cumulative?.total?.operating_profit_rate || 0, 1)}%)
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">Discovery 영업손실</span>: 오프라인 1개, 온라인 1개 매장으로 당분간 확장 없이 운영하며 효율성 개선에 집중
-                        </div>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
+                  )}
                 </div>
               )}
             </div>
@@ -1490,7 +1482,10 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                       if (!ceoInsights['strategy-text']) {
                         const defaultText = `• 재고 정상화: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
 • 1-2월 합계 매출 YOY 123% 목표 (춘절 당년 2월, 전년 1월)
-• 채널 효율화: 2026년 7월 NTP3(25년 직접손실 -1,705K), 세나도(아)(25년 직접손실 -1,018K) 영업종료 예정`;
+• 채널 효율화
+  • 누적적자 2개 매장 2026년 7월 영업종료 예정
+  • NTP3 (25년 직접손실 -1,705K)
+  • 세나도(아) (25년 직접손실 -1,018K)`;
                         setCeoInsights({ ...ceoInsights, 'strategy-text': defaultText });
                       }
                     }
@@ -1532,26 +1527,16 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                 </div>
               ) : (
                 <div className="space-y-2 text-sm text-gray-700">
-                      <div className="flex items-start">
+                  {ceoInsightsData?.opportunities?.items ? (
+                    ceoInsightsData.opportunities.items.map((item: string, idx: number) => (
+                      <div key={idx} className="flex items-start">
                         <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">재고 정상화</span>: 26년 매출YOY 113%, 재고일수 25년말 320일→ 26년말240일
-                        </div>
+                        <div className="flex-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold">$1</span>') }} />
                       </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">1-2월 합계 매출 YOY 123% 목표</span> (춘절 당년 2월, 전년 1월)
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="text-gray-600 mr-2">•</span>
-                        <div className="flex-1 leading-relaxed">
-                          <span className="font-semibold">채널 효율화</span>: 2026년 7월 NTP3(25년 직접손실 -1,705K), 세나도(아)(25년 직접손실 -1,018K) 영업종료 예정
-                        </div>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-500 text-center py-4">데이터 로딩 중...</div>
+                  )}
                 </div>
               )}
             </div>
