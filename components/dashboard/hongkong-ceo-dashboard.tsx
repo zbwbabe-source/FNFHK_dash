@@ -2994,7 +2994,7 @@ const HongKongCEODashboard: React.FC<HongKongCEODashboardProps> = ({ period = '2
                                   <div className="mt-3 pt-3 border-t border-blue-200">
                                     <div className="text-xs font-semibold text-blue-700 mb-2">당월 급여 증가 {formatNumber(salaryChange)}K</div>
                                     <div className="text-xs text-gray-600 space-y-1">
-                                      <div>인원수 12명 → 15명 (136%)</div>
+                                      <div>인원수 12명 → 15명 (125%), 인당급여 102%</div>
                                       <div>MD+1, MKT+1, Ecom+1</div>
                                     </div>
                                   </div>
