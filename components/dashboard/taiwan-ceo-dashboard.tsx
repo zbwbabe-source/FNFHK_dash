@@ -2309,26 +2309,29 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                         const plSource = showProfitMonthlyOrYTD === 'ytd' ? plData?.cumulative?.total : pl;
                         const tagSales = plSource?.tag_sales || 1;
                         
+                        // 대만은 원가율이 택대비 36.2% 고정
+                        const TAIWAN_COGS_RATE = 36.2;
+                        
                         // 누적 데이터는 rate만 있으므로 실제 금액 계산
                         let discount, cogs, sg_a;
                         if (showProfitMonthlyOrYTD === 'ytd') {
                           discount = tagSales * ((plSource as any)?.discount_rate || 0) / 100;
-                          cogs = (plSource?.net_sales || 0) * ((plSource as any)?.cogs_rate || 0) / 100;
+                          cogs = tagSales * TAIWAN_COGS_RATE / 100;  // 택대비 36.2% 고정
                           sg_a = plSource?.sg_a || 0;
                         } else {
                           discount = plSource?.discount || 0;
-                          cogs = plSource?.cogs || 0;
+                          cogs = tagSales * TAIWAN_COGS_RATE / 100;  // 택대비 36.2% 고정
                           sg_a = plSource?.sg_a || 0;
                         }
                         
                         const discountPct = (discount / tagSales * 100);
                         const netSalesPct = ((plSource?.net_sales || 0) / tagSales * 100);
-                        const cogsPct = (cogs / tagSales * 100);
-                        const grossProfitPct = ((plSource?.gross_profit || 0) / tagSales * 100);
+                        const cogsPct = (cogs / tagSales * 100);  // 36.2%로 고정됨
+                        const grossProfitPct = (((plSource?.net_sales || 0) - cogs) / tagSales * 100);
                         const directCostPct = ((plSource?.direct_cost || 0) / tagSales * 100);
-                        const directProfitPct = ((plSource?.direct_profit || 0) / tagSales * 100);
+                        const directProfitPct = (((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0)) / tagSales * 100);
                         const sgaPct = (sg_a / tagSales * 100);
-                        const opProfitPct = ((plSource?.operating_profit || 0) / tagSales * 100);
+                        const opProfitPct = (((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0) - sg_a) / tagSales * 100);
                       
                       const maxHeight = 200; // 최대 높이 (px)
                         
@@ -2366,7 +2369,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
                           {/* 총이익 */}
                           <div className="flex flex-col items-center w-16">
-                            <div className="text-xs font-bold text-green-700 mb-1">{formatNumber(plSource?.gross_profit)}K</div>
+                            <div className="text-xs font-bold text-green-700 mb-1">{formatNumber((plSource?.net_sales || 0) - cogs)}K</div>
                             <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
                               <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
                                 <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
@@ -2388,7 +2391,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
                             {/* 직접이익 */}
                           <div className="flex flex-col items-center w-16">
-                            <div className="text-xs font-bold text-green-600 mb-1">{formatNumber(plSource?.direct_profit)}K</div>
+                            <div className="text-xs font-bold text-green-600 mb-1">{formatNumber((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0))}K</div>
                             <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
                               <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
                                 <span className="text-gray-900 text-[9px] font-semibold">할인<br/>{formatPercent(discountPct, 1)}%</span>
@@ -2412,8 +2415,8 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
 
                             {/* 영업이익 */}
                           <div className="flex flex-col items-center w-16">
-                            <div className={`text-xs font-bold mb-1 ${(plSource?.operating_profit || 0) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
-                              {formatNumber(plSource?.operating_profit)}K
+                            <div className={`text-xs font-bold mb-1 ${((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0) - sg_a) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
+                              {formatNumber((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0) - sg_a)}K
                                 </div>
                             <div className="w-12 rounded-t-md flex flex-col overflow-hidden" style={{height: `${maxHeight}px`}}>
                               <div className="bg-gray-400 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * discountPct / 100}px`}}>
@@ -2428,11 +2431,11 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                               <div className="bg-gray-700 flex items-center justify-center flex-shrink-0" style={{height: `${maxHeight * sgaPct / 100}px`}}>
                                 <span className="text-white text-[9px] font-semibold">영업비<br/>{formatPercent(sgaPct, 1)}%</span>
                                   </div>
-                              <div className={`flex-1 ${(plSource?.operating_profit || 0) >= 0 ? 'bg-green-400' : 'bg-red-600'}`}>
+                              <div className={`flex-1 ${((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0) - sg_a) >= 0 ? 'bg-green-400' : 'bg-red-600'}`}>
                                   </div>
                                   </div>
                             <div className="text-[10px] font-semibold text-gray-700 mt-2 h-5 whitespace-nowrap">영업이익</div>
-                            <div className={`text-xs font-bold h-6 flex items-center ${(plSource?.operating_profit || 0) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
+                            <div className={`text-xs font-bold h-6 flex items-center ${((plSource?.net_sales || 0) - cogs - (plSource?.direct_cost || 0) - sg_a) >= 0 ? 'text-green-900' : 'text-red-900'}`}>
                               {formatPercent(opProfitPct, 1)}%
                                 </div>
                             <div className="text-[10px] text-gray-600 h-10 flex flex-col items-center justify-start">
@@ -6835,8 +6838,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
                     data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any, idx: number) => {
-                      const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
-                      // 마지막 월(10월)은 카드의 YOY 사용 - monthly_item_data의 마지막 월과 전년 동월 비교
+                      // monthly_item_yoy만 사용
                       let 당시즌F = (dashboardData?.monthly_item_yoy as any)?.['당시즌F']?.[idx] || 0;
                       let 당시즌S = (dashboardData?.monthly_item_yoy as any)?.['당시즌S']?.[idx] || 0;
                       let 과시즌F = (dashboardData?.monthly_item_yoy as any)?.['과시즌F']?.[idx] || 0;
@@ -6845,43 +6847,6 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       let 신발 = (dashboardData?.monthly_item_yoy as any)?.['신발']?.[idx] || 0;
                       let 가방 = (dashboardData?.monthly_item_yoy as any)?.['가방']?.[idx] || 0;
                       let 기타ACC = (dashboardData?.monthly_item_yoy as any)?.['기타ACC']?.[idx] || 0;
-                      
-                      if (isLastMonth) {
-                        // 마지막 월(10월)은 카드의 YOY 사용
-                        // 당시즌F는 seasonSales 사용
-                        const currentSeasonF = seasonSales?.current_season_f?.october?.total_net_sales || 0;
-                        const prevSeasonF = seasonSales?.previous_season_f?.october?.total_net_sales || 0;
-                        당시즌F = prevSeasonF > 0 ? Math.round((currentSeasonF / prevSeasonF) * 100) : 0;
-                        
-                        // 모자, 신발, 가방, 기타ACC는 accStock?.october_sales 사용
-                        const heaSales = accStock?.october_sales ? (accStock.october_sales as any)?.HEA : undefined;
-                        const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
-                        const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
-                        const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
-                        모자 = Math.round(heaSales?.yoy || 0);
-                        신발 = Math.round(shoSales?.yoy || 0);
-                        가방 = Math.round(bagSales?.yoy || 0);
-                        기타ACC = Math.round(atcSales?.yoy || 0);
-                        
-                        // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                        const lastMonthData = item;
-                        const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
-                          const period = d.period;
-                          const year = parseInt(period.slice(0, 2));
-                          const month = parseInt(period.slice(2, 4));
-                          return year === 24 && month === 10; // 2410
-                        });
-                        
-                        if (prevYearMonth) {
-                          const calcYoy = (current: number, previous: number) => {
-                            return previous > 0 ? Math.round((current / previous) * 100) : 0;
-                          };
-                          
-                          당시즌S = calcYoy(lastMonthData?.당시즌S?.net_sales || 0, prevYearMonth?.당시즌S?.net_sales || 0);
-                          과시즌F = calcYoy(lastMonthData?.과시즌F?.net_sales || 0, prevYearMonth?.과시즌F?.net_sales || 0);
-                          과시즌S = calcYoy(lastMonthData?.과시즌S?.net_sales || 0, prevYearMonth?.과시즌S?.net_sales || 0);
-                        }
-                      }
                       
                       return {
                       month: `${item.period.slice(2, 4)}월`,
@@ -6919,49 +6884,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart 
                     data={(Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).map((item: any, idx: number) => {
-                      const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                       let yoy = dashboardData?.monthly_item_yoy ? ((dashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] || 0) : 0;
-                      
-                      if (isLastMonth) {
-                        // 마지막 월(10월)은 카드의 YOY 사용
-                        if (selectedItem === '당시즌F') {
-                          // 당시즌F는 seasonSales 사용
-                          const currentSeasonF = seasonSales?.current_season_f?.october?.total_net_sales || 0;
-                          const prevSeasonF = seasonSales?.previous_season_f?.october?.total_net_sales || 0;
-                          yoy = prevSeasonF > 0 ? Math.round((currentSeasonF / prevSeasonF) * 100) : 0;
-                        } else if (selectedItem === '모자') {
-                          // 모자는 accStock?.october_sales 사용
-                          const heaSales = accStock?.october_sales ? (accStock.october_sales as any)?.HEA : undefined;
-                          yoy = Math.round(heaSales?.yoy || 0);
-                        } else if (selectedItem === '신발') {
-                          // 신발은 accStock?.october_sales 사용
-                          const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
-                          yoy = Math.round(shoSales?.yoy || 0);
-                        } else if (selectedItem === '가방') {
-                          // 가방은 accStock?.october_sales 사용
-                          const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
-                          yoy = Math.round(bagSales?.yoy || 0);
-                        } else if (selectedItem === '기타ACC') {
-                          // 기타ACC는 accStock?.october_sales 사용
-                          const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
-                          yoy = Math.round(atcSales?.yoy || 0);
-                        } else {
-                          // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                          const lastMonthData = item;
-                          const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
-                            const period = d.period;
-                            const year = parseInt(period.slice(0, 2));
-                            const month = parseInt(period.slice(2, 4));
-                            return year === 24 && month === 10; // 2410
-                          });
-                          
-                          if (prevYearMonth) {
-                            const currentNet = (lastMonthData as any)[selectedItem]?.net_sales || 0;
-                            const prevNet = (prevYearMonth as any)[selectedItem]?.net_sales || 0;
-                            yoy = prevNet > 0 ? Math.round((currentNet / prevNet) * 100) : 0;
-                          }
-                        }
-                      }
                       
                       return {
                       month: `${item.period.slice(2, 4)}월`,
@@ -7018,48 +6941,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <tr key={item}>
                             <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">{item}</td>
                             {((Array.isArray(monthlyItemTrend) ? monthlyItemTrend : [])).map((monthData: any, idx: number) => {
-                              const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                               let yoy = (dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[item]?.[idx] : 0) || 0;
-                              
-                              if (isLastMonth) {
-                                // 마지막 월(10월)은 카드의 YOY 사용
-                                if (item === '당시즌F') {
-                                  // 당시즌F는 seasonSales 사용
-                                  const currentSeasonF = seasonSales?.current_season_f?.october?.total_net_sales || 0;
-                                  const prevSeasonF = seasonSales?.previous_season_f?.october?.total_net_sales || 0;
-                                  yoy = prevSeasonF > 0 ? Math.round((currentSeasonF / prevSeasonF) * 100) : 0;
-                                } else if (item === '모자') {
-                                  // 모자는 accStock?.october_sales 사용
-                                  const heaSales = accStock?.october_sales ? (accStock.october_sales as any)?.HEA : undefined;
-                                  yoy = Math.round(heaSales?.yoy || 0);
-                                } else if (item === '신발') {
-                                  // 신발은 accStock?.october_sales 사용
-                                  const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
-                                  yoy = Math.round(shoSales?.yoy || 0);
-                                } else if (item === '가방') {
-                                  // 가방은 accStock?.october_sales 사용
-                                  const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
-                                  yoy = Math.round(bagSales?.yoy || 0);
-                                } else if (item === '기타ACC') {
-                                  // 기타ACC는 accStock?.october_sales 사용
-                                  const atcSales = accStock?.october_sales ? (accStock.october_sales as any)?.ATC : undefined;
-                                  yoy = Math.round(atcSales?.yoy || 0);
-                                } else {
-                                  // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                                  const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
-                                    const period = d.period;
-                                    const year = parseInt(period.slice(0, 2));
-                                    const month = parseInt(period.slice(2, 4));
-                                    return year === 24 && month === 10; // 2410
-                                  });
-                                  
-                                  if (prevYearMonth) {
-                                    const currentNet = (monthData as any)[item]?.net_sales || 0;
-                                    const prevNet = (prevYearMonth as any)[item]?.net_sales || 0;
-                                    yoy = prevNet > 0 ? Math.round((currentNet / prevNet) * 100) : 0;
-                                  }
-                                }
-                              }
                               
                               return (
                               <td 
@@ -7077,44 +6959,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                       <tr>
                         <td className="border border-gray-300 px-1 py-1 font-semibold bg-orange-50">YOY</td>
                         {((Array.isArray(monthlyItemTrend) ? monthlyItemTrend : [])).map((monthData: any, idx: number) => {
-                          const isLastMonth = idx === (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).length - 1;
                           let yoy = (dashboardData?.monthly_item_yoy ? (dashboardData.monthly_item_yoy as any)[selectedItem]?.[idx] : 0) || 0;
-                          
-                          if (isLastMonth) {
-                            // 마지막 월(10월)은 카드의 YOY 사용
-                            if (selectedItem === '당시즌F') {
-                              // 당시즌F는 seasonSales 사용
-                              const currentSeasonF = seasonSales?.current_season_f?.october?.total_net_sales || 0;
-                              const prevSeasonF = seasonSales?.previous_season_f?.october?.total_net_sales || 0;
-                              yoy = prevSeasonF > 0 ? Math.round((currentSeasonF / prevSeasonF) * 100) : 0;
-                            } else if (selectedItem === '모자') {
-                              // 모자는 accStock?.october_sales 사용
-                              const heaSales = accStock?.october_sales ? (accStock.october_sales as any)?.HEA : undefined;
-                              yoy = Math.round(heaSales?.yoy || 0);
-                            } else if (selectedItem === '신발') {
-                              // 신발은 accStock?.october_sales 사용
-                              const shoSales = accStock?.october_sales ? (accStock.october_sales as any)?.SHO : undefined;
-                              yoy = Math.round(shoSales?.yoy || 0);
-                            } else if (selectedItem === '가방외') {
-                              // 가방외는 accStock?.october_sales 사용
-                              const bagSales = accStock?.october_sales ? (accStock.october_sales as any)?.BAG : undefined;
-                              yoy = Math.round(bagSales?.yoy || 0);
-                            } else {
-                              // 당시즌S, 과시즌F, 과시즌S는 monthly_item_data 사용
-                              const prevYearMonth = (Array.isArray(monthlyItemTrend) ? monthlyItemTrend : []).find((d: any) => {
-                                const period = d.period;
-                                const year = parseInt(period.slice(0, 2));
-                                const month = parseInt(period.slice(2, 4));
-                                return year === 24 && month === 10; // 2410
-                              });
-                              
-                              if (prevYearMonth) {
-                                const currentNet = (monthData as any)[selectedItem]?.net_sales || 0;
-                                const prevNet = (prevYearMonth as any)[selectedItem]?.net_sales || 0;
-                                yoy = prevNet > 0 ? Math.round((currentNet / prevNet) * 100) : 0;
-                              }
-                            }
-                          }
                           
                           return (
                           <td 
@@ -7847,35 +7692,7 @@ const TaiwanCEODashboard: React.FC<TaiwanCEODashboardProps> = ({ period = '2511'
                           <tr key={itemKey} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-1 py-1 font-semibold bg-gray-50">{displayNameMap[itemKey] || itemKey}</td>
                             {months.map((month: string, idx: number) => {
-                              const isLastMonth = idx === months.length - 1;
                               let yoyValue = (inventoryYOY as any)[itemKey]?.[idx];
-                              // 마지막 월(10월)은 카드의 YOY 사용 (ending_inventory 기준)
-                              if (isLastMonth) {
-                                if (itemKey === 'F당시즌') {
-                                  yoyValue = Math.round(endingInventory?.by_season?.['당시즌_의류']?.yoy || 0);
-                                } else if (itemKey === 'S당시즌') {
-                                  yoyValue = Math.round(endingInventory?.by_season?.['당시즌_SS']?.yoy || 0);
-                                } else if (itemKey === '과시즌FW') {
-                                  yoyValue = Math.round(endingInventory?.by_season?.['과시즌_FW']?.yoy || 0);
-                                } else if (itemKey === '과시즌SS') {
-                                  yoyValue = Math.round(endingInventory?.by_season?.['과시즌_SS']?.yoy || 0);
-                                } else if (itemKey === '모자') {
-                                  yoyValue = Math.round(endingInventory?.acc_by_category?.['모자']?.yoy || 0);
-                                } else if (itemKey === '신발') {
-                                  yoyValue = Math.round(endingInventory?.acc_by_category?.['신발']?.yoy || 0);
-                                } else if (itemKey === '가방외') {
-                                  // 가방외는 ATC + BAG + WTC 합계
-                                  const atcCurrent = endingInventory?.acc_by_category?.ATC?.current?.stock_price || 0;
-                                  const bagCurrent = endingInventory?.acc_by_category?.['가방']?.current?.stock_price || 0;
-                                  const wtcCurrent = endingInventory?.acc_by_category?.WTC?.current?.stock_price || 0;
-                                  const atcPrev = endingInventory?.acc_by_category?.ATC?.previous?.stock_price || 0;
-                                  const bagPrev = endingInventory?.acc_by_category?.['가방']?.previous?.stock_price || 0;
-                                  const wtcPrev = endingInventory?.acc_by_category?.WTC?.previous?.stock_price || 0;
-                                  const totalCurrent = atcCurrent + bagCurrent + wtcCurrent;
-                                  const totalPrev = atcPrev + bagPrev + wtcPrev;
-                                  yoyValue = totalPrev > 0 ? Math.round((totalCurrent / totalPrev) * 100) : 0;
-                                }
-                              }
                               const displayValue = yoyValue !== null && yoyValue !== undefined ? `${yoyValue}%` : '-';
                               const isPositive = yoyValue !== null && yoyValue !== undefined && yoyValue < 100;
                               const isNegative = yoyValue !== null && yoyValue !== undefined && yoyValue > 100;
